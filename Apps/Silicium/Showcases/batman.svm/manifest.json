@@ -1,0 +1,13 @@
+{
+    "readOnly": true,
+    "uuid": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Batman Rising",
+    "meta": {
+        "description": "Released in December 2022 by the Batman Group, Batman Rising is an Amiga demo designed for Original Chipset (OCS) systems with 1 MB of RAM. The production won first place at the Posadas Party Autumn Edition and demonstrates what can be achieved on the standard Amiga chipset without additional hardware. It combines custom graphics, animation effects, and a soundtrack to present a cinematic interpretation of the Batman theme within the limitations of classic Amiga hardware."
+    },
+    "platform": "AMIGA",
+    "screenshot": "screenshot2.png",
+    "version": "0.1b1",
+    "created": 1767225600,
+    "modified": 1767225600
+}

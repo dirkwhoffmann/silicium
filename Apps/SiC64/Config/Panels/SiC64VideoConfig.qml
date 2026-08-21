@@ -1,0 +1,203 @@
+// -----------------------------------------------------------------------------
+// This file is part of Silicium UI
+//
+// Copyright (C) Dirk W. Hoffmann. www.dirkwhoffmann.de
+// Licensed under the GNU General Public License v3
+//
+// See https://www.gnu.org for license information
+// -----------------------------------------------------------------------------
+
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import Silicium.Assets
+import Silicium.Controllers
+import Silicium.Preferences
+import Silicium.Theme
+
+SettingsPage {
+
+    id: root
+
+    required property C64Controller controller
+    readonly property var config: controller.configController
+
+    readonly property int labelWidth: 100
+    readonly property int comboWidth: 220
+    readonly property int sectionWidth: 320
+    readonly property int knobWidth: 75
+
+    toolbar: ConfigToolbar {
+
+        heading: "Video Settings"
+
+        menuContent: [
+            MenuItem {
+                text: "Restore factory defaults..."
+                onTriggered: config.restoreVideoDefaults()
+            }
+        ]
+
+        HSpacer { }
+
+        ConfigLock {
+
+            onClicked: controller.powerOnOrOff()
+        }
+    }
+
+    component VideoKnob: SiKnob {
+
+        id: knob
+
+        // The knob's caption is its bottom label.
+        property alias text: knob.b
+
+        Layout.topMargin: 13
+        Layout.preferredWidth: root.knobWidth
+        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+    }
+
+    ConfigSection {
+
+        header: "MONITOR"
+        size: 2 * root.sectionWidth
+        // layout.spacing: 40
+
+        GridLayout {
+
+            // First column holds the combo box; the remaining columns hold the
+            // knobs, so knobs line up vertically across the three rows. Empty
+            // trailing cells are filled with a spacer to keep the grid flow.
+            columns: 4
+            columnSpacing: Style.largeSpacing
+            rowSpacing: Style.largeSpacing
+
+            //
+            // Row 1: Palette
+            //
+
+            SiComboBoxControl {
+
+                Layout.alignment: Qt.AlignVCenter
+
+                l: "Palette:"
+                lwidth: root.labelWidth
+                controlWidth: root.comboWidth
+
+                model: [
+                    "Standard Colors",
+                    "Black and White",
+                    "Paper White",
+                    "Green",
+                    "Amber",
+                    "Sepia"
+                ]
+
+                currentIndex: config.MON_PALETTE
+                onCurrentIndexChanged: config.MON_PALETTE = currentIndex;
+            }
+
+            VideoKnob {
+
+                text: "BRIGHTNESS"
+                from: 0
+                to: 100
+                value: config.MON_BRIGHTNESS
+                onMoved: (value) => config.MON_BRIGHTNESS = value
+            }
+
+            VideoKnob {
+
+                text: "CONTRAST"
+                from: 0
+                to: 100
+                value: config.MON_CONTRAST
+                onMoved: (value) => config.MON_CONTRAST = value
+            }
+
+            VideoKnob {
+
+                text: "COLOR"
+                from: 0
+                to: 100
+                value: config.MON_SATURATION
+                onMoved: (value) => config.MON_SATURATION = value
+            }
+
+            //
+            // Row 2: Zoom
+            //
+
+            SiComboBoxControl {
+
+                Layout.alignment: Qt.AlignVCenter
+
+                l: "Zoom:"
+                lwidth: root.labelWidth
+                controlWidth: root.comboWidth
+
+                model: [
+                    "Custom"
+                ]
+            }
+
+            VideoKnob {
+
+                text: "H ZOOM"
+                from: 0
+                to: 200
+                value: config.MON_HZOOM
+                onMoved: (value) => config.MON_HZOOM = value
+            }
+
+            VideoKnob {
+
+                text: "V ZOOM"
+                from: 0
+                to: 200
+                value: config.MON_VZOOM
+                onMoved: (value) => config.MON_VZOOM = value
+            }
+
+            Item { }
+
+            //
+            // Row 3: Center
+            //
+
+            SiComboBoxControl {
+
+                Layout.alignment: Qt.AlignVCenter
+
+                l: "Center:"
+                lwidth: root.labelWidth
+                controlWidth: root.comboWidth
+
+                model: [
+                    "Custom"
+                ]
+            }
+
+            VideoKnob {
+
+                text: "H CENTER"
+                from: 0
+                to: 1000
+                value: config.MON_HCENTER
+                onMoved: (value) => config.MON_HCENTER = value
+            }
+
+            VideoKnob {
+
+                text: "V CENTER"
+                from: 0
+                to: 1000
+                value: config.MON_VCENTER
+                onMoved: (value) => config.MON_VCENTER = value
+            }
+
+            Item { }
+        }
+    }
+}

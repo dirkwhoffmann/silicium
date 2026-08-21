@@ -1,0 +1,8 @@
+mem load openroms
+
+# Set texture format
+host set TEX_FORMAT ARGB
+
+# Enable second SID
+sid2 set ENABLE true
+sid2 set ADDRESS 0xd420

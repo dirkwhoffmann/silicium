@@ -1,0 +1,14 @@
+{
+    "created": 1767398400,
+    "modified": 1784308307,
+    "name": "Rink a Dink - Redux",
+    "meta": {
+        "author": "Lemon",
+        "description": "Released in 2013 by the Amiga demo group Lemon, Rink A Dink: Redux is an OCS/ECS demo created for the Oldskool Demo competition at Revision 2013, where it won first place. The production is a remake of the original Rink A Dink demo and combines classic Amiga demo effects such as plasma, vector graphics, and scrolling displays with a soundtrack by Magnar and Nuke. Due to its compatibility with standard Amiga hardware and its variety of effects, it has been used extensively as a reference production during the development and testing of vAmiga."
+    },
+    "platform": "AMIGA",
+    "readOnly": true,
+    "screenshot": "screenshot.png",
+    "uuid": "54a67257-50d8-4ca0-b516-2b9f777f68e0",
+    "version": "0.1b1"
+}

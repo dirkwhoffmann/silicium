@@ -1,0 +1,140 @@
+#pragma once
+
+#include <source_location>
+
+namespace retro::vault {
+
+//
+// Debug settings
+//
+
+// Default channels
+constexpr long NULLDEV         = 0;
+constexpr long STDERR          = 1;
+
+// File systems
+constexpr long FS_DEBUG        = 0;
+
+// Media
+constexpr long IMG_DEBUG       = 0;
+
+}
+
+//
+// Forced error conditions
+//
+
+namespace retro::vault::force {
+
+constexpr long HDR_TOO_LARGE        = 0;
+constexpr long HDR_UNSUPPORTED_C    = 0;
+constexpr long HDR_UNSUPPORTED_H    = 0;
+constexpr long HDR_UNSUPPORTED_S    = 0;
+constexpr long HDR_UNSUPPORTED_B    = 0;
+constexpr long HDR_UNKNOWN_GEOMETRY = 0;
+constexpr long HDR_MODIFIED         = 0;
+constexpr long FS_WRONG_BSIZE       = 0;
+constexpr long FS_WRONG_CAPACITY    = 0;
+constexpr long FS_WRONG_DOS_TYPE    = 0;
+constexpr long DMS_CANT_CREATE      = 0;
+
+}
+
+
+//
+// Logging channels
+//
+
+namespace retro::vault {
+
+// Default channels
+extern long CH_NULLDEV;
+extern long CH_STDERR;
+
+// File systems
+extern long CH_FS_DEBUG;
+
+// Images
+extern long CH_IMG_DEBUG;
+
+}
+
+
+//
+// Main logging macro
+//
+
+#if NDEBUG
+
+#define logMsg(key, level, format, ...) \
+    do { \
+        if constexpr (key) \
+            log(CH_ ## key, level, std::source_location::current(), \
+                format __VA_OPT__(,) __VA_ARGS__); \
+    } while (0)
+
+#else
+
+#define logMsg(key, level, format, ...)                           \
+do { \
+    log(CH_ ## key, level, std::source_location::current(), \
+        format __VA_OPT__(,) __VA_ARGS__); \
+} while (0)
+
+#endif
+
+/*
+#define logMsg(key, level, format, ...)                           \
+do { \
+log(::retro::vault::channel::key, level, std::source_location::current(), \
+format __VA_OPT__(,) __VA_ARGS__); \
+} while (0)
+
+#endif
+*/
+
+//
+// Wrappers for all syslog levels
+//
+
+#define logemergency(format, ...) \
+    logMsg(STDERR, utl::LogLevel::LOG_EMERG, format __VA_OPT__(,) __VA_ARGS__)
+
+#define logalert(format, ...) \
+    logMsg(STDERR, utl::LogLevel::LOG_ALERT, format __VA_OPT__(,) __VA_ARGS__)
+
+#define logcritical(format, ...) \
+    logMsg(STDERR, utl::LogLevel::LOG_CRIT, format __VA_OPT__(,) __VA_ARGS__)
+
+#define logerror(format, ...) \
+    logMsg(STDERR, utl::LogLevel::LOG_ERR, format __VA_OPT__(,) __VA_ARGS__)
+
+#define logwarn(format, ...) \
+    logMsg(STDERR, utl::LogLevel::LOG_WARNING, format __VA_OPT__(,) __VA_ARGS__)
+
+#define lognotice(channel, format, ...) \
+    logMsg(channel, utl::LogLevel::LOG_NOTICE, format __VA_OPT__(,) __VA_ARGS__)
+
+#define loginfo(channel, format, ...) \
+    logMsg(channel, utl::LogLevel::LOG_INFO, format __VA_OPT__(,) __VA_ARGS__)
+
+#define logdebug(channel, format, ...) \
+    logMsg(channel, utl::LogLevel::LOG_DEBUG, format __VA_OPT__(,) __VA_ARGS__)
+
+#define lognull(channel, format, ...)
+
+
+//
+// Convenience wrappers
+//
+
+#define fatal(format, ...) \
+    do { \
+        logemergency(format __VA_OPT__(,) __VA_ARGS__); \
+        assert(false); \
+        std::terminate(); \
+    } while(0)
+
+#define xfiles(format, ...) \
+    logMsg(XFILES, utl::LogLevel::LOG_INFO, format __VA_OPT__(,) __VA_ARGS__)
+

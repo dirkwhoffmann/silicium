@@ -1,0 +1,14 @@
+{
+    "readOnly": true,
+    "uuid": "e86cbc7d-4234-4859-8b53-d28d7a52fdfa",
+    "name": "Celtic Heart",
+    "meta": {
+        "author": "Night Owl Design",
+        "description": "Developed in early 2019, Celtic Heart is an Amiga action-platformer built largely on the Trap Runner engine. Set in a medieval fantasy world, the game follows the Celtic knight Eric on a quest to save his kingdom from an evil force. Players guide Eric through a series of levels, combining platforming, exploration, and combat while facing enemies and environmental challenges. The game was developed for classic Amiga systems and continues the tradition of action-oriented platform games on the platform."
+    },
+    "platform": "AMIGA",
+    "screenshot": "screenshot.png",
+    "version": "0.1b1",
+    "created": 1767398400,
+    "modified": 1767398400
+}

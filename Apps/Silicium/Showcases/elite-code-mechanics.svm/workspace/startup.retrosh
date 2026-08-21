@@ -1,0 +1,6 @@
+# Give the C64 time to boot
+wait 2
+
+# Run the showcase
+mem flash elite-code-mechanics.prg
+keyboard type run

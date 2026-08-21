@@ -1,0 +1,15 @@
+{
+    "readOnly": true,
+    "uuid": "701cb584-39f0-4d28-a4e3-ba33162967a1",
+    "name": "Adventureland",
+    "meta": {
+        "author": "Adventure International",
+        "description": "Released for the Commodore 64 in the early 1980s, Adventureland (also known as Adventure #1) is the first game in Scott Adams' series of text adventures. The game uses a text parser that lets players explore a fantasy world, solve puzzles, and collect treasures through typed commands. As one of the earliest adventure games for the Commodore 64, it helped establish interactive fiction on home computers."
+    },
+    "platform": "C64",
+    "screenshot": "screenshot.png",
+    "version": "0.1b1",
+    "created": 1767398400,
+    "modified": 1767398400,
+    "startup": "startup.retrosh"
+}

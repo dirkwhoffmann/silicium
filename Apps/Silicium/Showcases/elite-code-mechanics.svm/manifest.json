@@ -1,0 +1,15 @@
+{
+    "readOnly": true,
+    "uuid": "c454f048-b37f-4ae6-8d23-ec27185117c6",
+    "name": "Elite Code Mechanics",
+    "meta": {
+        "author": "Abyss-Connection",
+        "description": "Released in 2020 by Abyss Connection, Elite Code Mechanics is a one-file demo for the Commodore 64 created for the Extended Color Mode (ECM) graphics competition. Every effect in the production is based on the C64's ECM display mode, a graphics mode with significant color restrictions that is relatively uncommon in demos. Accompanied by a soundtrack by Richard, the demo showcases a range of visual techniques built entirely within these constraints."
+    },
+    "platform": "C64",
+    "screenshot": "screenshot.png",
+    "version": "0.1b1",
+    "created": 1767398400,
+    "modified": 1767398400,
+    "startup": "startup.retrosh"
+}

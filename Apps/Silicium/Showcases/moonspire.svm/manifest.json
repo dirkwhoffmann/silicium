@@ -1,0 +1,15 @@
+{
+    "readOnly": true,
+    "uuid": "c2143a1d-7adb-46b7-8c91-ba4fdea7c674",
+    "name": "Moonspire: The Draxx War",
+    "meta": {
+        "author": "Dušan Milivojević",
+        "description": "Released in late 2017 by Dušan Milivojević, this preview showcases an early stage of a planned sequel to the 2014 Commodore 64 game Moonspire. Developed in collaboration with musician Ari Yliaho, it moves the action to a Draxx spaceship while retaining the exploration-based shoot-'em-up gameplay of the original and introducing updated graphics. Players explore a maze-like environment, hack at least 80% of the ship's computer terminals, and make their way to an evacuation pad. The project was never completed, although a larger unfinished version became available in 2021."
+    },
+    "platform": "C64",
+    "screenshot": "screenshot.png",
+    "version": "0.1b1",
+    "created": 1767398400,
+    "modified": 1767398400,
+    "startup": "startup.retrosh"
+}

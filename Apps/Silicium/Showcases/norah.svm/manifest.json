@@ -1,0 +1,15 @@
+{
+    "readOnly": true,
+    "created": 1767398400,
+    "modified": 1784988385,
+    "name": "To Norah",
+    "meta": {
+        "author": "Elysium, Wrath Designs",
+        "description": "Released in late 2020 by the demo groups Elysium and Wrath Designs, To Norah is a one-file demo for the Commodore 64 designed for systems equipped with two SID sound chips. Its soundtrack makes extensive use of the additional audio capabilities provided by the dual-SID configuration, including a convincing simulation of a Hammond organ."
+    },
+    "platform": "C64",
+    "screenshot": "screenshot.png",
+    "startup": "startup.retrosh",
+    "uuid": "120e8400-e29b-41d4-a716-446655440032",
+    "version": "0.1b1"
+}

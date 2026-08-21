@@ -1,0 +1,14 @@
+{
+    "readOnly": true,
+    "uuid": "96ab9214-cb0d-4f6a-97bc-4d55eeea1b27",
+    "name": "Trap Runner",
+    "meta": {
+        "author": "Night Owl Design",
+        "description": "Trap Runner is a platform game for the Amiga in which players navigate maze-like environments, avoid obstacles, and battle enemies while collecting items. The game includes various objectives, such as increasing the score, gaining extra lives, and completing special missions. It runs on OCS and ECS Amiga systems with at least 1 MB of RAM."
+    },
+    "platform": "AMIGA",
+    "screenshot": "screenshot.png",
+    "version": "0.1b1",
+    "created": 1767398400,
+    "modified": 1767398400
+}

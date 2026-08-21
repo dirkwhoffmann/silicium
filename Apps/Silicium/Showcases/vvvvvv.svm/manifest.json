@@ -1,0 +1,15 @@
+{
+    "readOnly": true,
+    "uuid": "276ba254-4059-4dd8-bb73-cb3dc4089f44",
+    "name": "VVVVVV Demo",
+    "meta": {
+        "author": "Paul Koller",
+        "description": "Released as a playable demo in 2010, VVVVVV is a Commodore 64 adaptation of Terry Cavanagh's minimalist platform game. Created by Paul Koller, it recreates the original's gravity-flipping gameplay within the constraints of the C64 hardware. This early version includes the core game mechanics and several of the original levels, accompanied by a chiptune soundtrack adapted for the Commodore 64."
+    },
+    "platform": "C64",
+    "screenshot": "screenshot.png",
+    "version": "0.1b1",
+    "created": 1767398400,
+    "modified": 1767398400,
+    "startup": "startup.retrosh"
+}

@@ -1,0 +1,408 @@
+// -----------------------------------------------------------------------------
+// This file is part of VirtualC64
+//
+// Copyright (C) Dirk W. Hoffmann. www.dirkwhoffmann.de
+// This FILE is dual-licensed. You are free to choose between:
+//
+//     - The GNU General Public License v3 (or any later version)
+//     - The Mozilla Public License v2
+//
+// SPDX-License-Identifier: GPL-3.0-or-later OR MPL-2.0
+// -----------------------------------------------------------------------------
+
+#include "vcconfig.h"
+#include "Datasette.h"
+#include "Emulator.h"
+
+namespace vc64 {
+
+utl::Time
+Pulse::delay() const
+{
+    return utl::Time((i64)cycles * 1000000000 / PAL::CLOCK_FREQUENCY);
+}
+
+utl::Time
+Datasette::tapeDuration(isize pos)
+{
+    utl::Time result;
+    
+    for (isize i = 0; i < pos && i < numPulses; i++) {
+        result += pulses[i].delay();
+    }
+    
+    return result;
+}
+
+void
+Datasette::insertTape(const fs::path &path)
+{
+    auto tap = TAPFile(path);
+    insertTape(tap);
+}
+
+void
+Datasette::insertTape(TAPFile &file)
+{
+    // Allocate pulse buffer
+    isize numPulses = file.numPulses();
+    alloc(numPulses);
+    
+    loginfo(TAP_DEBUG, "Inserting tape (%ld pulses)...\n", numPulses);
+    
+    // Read pulses
+    file.seek(0);
+    for (isize i = 0; i < numPulses; i++) {
+        
+        pulses[i].cycles = (i32)file.read();
+        assert(pulses[i].cycles != -1);
+    }
+    
+    // Rewind the tape
+    rewind();
+    
+    // Update the execution event slot
+    updateDatEvent();
+    
+    // Inform the GUI
+    msgQueue.put(Msg::VC1530_TAPE, 1);    
+}
+
+void
+Datasette::ejectTape()
+{
+    // Only proceed if a tape is present
+    if (!hasTape()) return;
+    
+    loginfo(TAP_DEBUG, "Ejecting tape...\n");
+    
+    pressStop();
+    rewind();
+    dealloc();
+    
+    msgQueue.put(Msg::VC1530_TAPE, 0);
+}
+
+void
+Datasette::rewind(isize seconds)
+{
+    i64 old = (i64)counter.asSeconds();
+
+    // Start at the beginning
+    counter = utl::Time(0);
+    head = 0;
+    
+    // Fast forward to the requested position
+    while (counter.asMilliseconds() < 1000 * seconds && head + 1 < numPulses) {
+        advanceHead();
+    }
+    
+    // Inform the GUI
+    if (old != (i64)counter.asSeconds()) {
+        msgQueue.put(Msg::VC1530_COUNTER, (i64)counter.asSeconds());
+    }
+}
+
+void
+Datasette::advanceHead()
+{
+    assert(head < numPulses);
+    
+    i64 old = (i64)counter.asSeconds();
+
+    counter += pulses[head].delay();
+    head++;
+    
+    // Inform the GUI
+    if (old != (i64)counter.asSeconds()) {
+        msgQueue.put(Msg::VC1530_COUNTER, (i64)counter.asSeconds());
+    }
+}
+
+void
+Datasette::pressPlay()
+{
+    loginfo(TAP_DEBUG, "pressPlay\n");
+
+    // Only proceed if the device is connected
+    if (!config.connected) return;
+
+    // Only proceed if a tape is present
+    if (!hasTape()) return;
+
+    // Pause the emulator and press press
+    play();
+}
+
+void
+Datasette::play()
+{
+    if (!playKey) {
+
+        playKey = true;
+
+        // Schedule the first pulse
+        schedulePulse(head);
+        advanceHead();
+
+        // Update the execution event slot
+        updateDatEvent();
+
+        // Inform the GUI
+        msgQueue.put(Msg::VC1530_PLAY, 1);
+    }
+}
+
+void
+Datasette::pressStop()
+{
+    loginfo(TAP_DEBUG, "pressStop\n");
+
+    // Only proceed if the device is connected
+    if (!config.connected) return;
+
+    // Pause the emulator and press press
+    stop();
+}
+
+void
+Datasette::stop()
+{
+    if (playKey) {
+        
+        playKey = false;
+        motor = false;
+
+        // Update the execution event slot
+        scheduleNextDatEvent();
+
+        msgQueue.put(Msg::VC1530_PLAY, 0);
+    }
+}
+
+void
+Datasette::setMotor(bool value)
+{
+    if (motor != value) {
+
+        // Only proceed if the device is connected
+        if (!config.connected) return;
+
+        motor = value;
+
+        // Update the execution event slot
+        scheduleNextDatEvent();
+
+        /* When the motor is switched on or off, a MSG_VC1530_MOTOR message is
+         * sent to the GUI. However, if we sent the message immediately, we
+         * would risk to flood the message queue, because some C64 switch the
+         * motor state insanely often. To cope with this situation, we set a
+         * counter and let the vsync handler send the message once the counter
+         * has timed out.
+         */
+        c64.scheduleRel<SLOT_MOT>(C64::msec(200), motor ? MOT_START : MOT_STOP);
+    }
+}
+
+void
+Datasette::processCommand(const Command &cmd)
+{
+    switch (cmd.type) {
+
+        case Cmd::DATASETTE_PLAY:    pressPlay(); break;
+        case Cmd::DATASETTE_STOP:    pressStop(); break;
+        case Cmd::DATASETTE_REWIND:  rewind(); break;
+
+        default:
+            fatalError;
+    }
+}
+
+void
+Datasette::processMotEvent(EventID event)
+{
+    switch (event) {
+
+        case MOT_START: msgQueue.put(Msg::VC1530_MOTOR, true);
+        case MOT_STOP:  msgQueue.put(Msg::VC1530_MOTOR, false);
+
+        default:
+            break;
+    }
+
+    c64.cancel<SLOT_MOT>();
+}
+
+void
+Datasette::processDatEvent(EventID event, i64 cycles)
+{
+    assert(event == DAT_EXECUTE);
+
+    for (isize i = 0; i < cycles; i++) {
+
+        if (--nextRisingEdge == 0) {
+
+            cia1.triggerRisingEdgeOnFlagPin();
+        }
+
+        if (--nextFallingEdge == 0) {
+
+            cia1.triggerFallingEdgeOnFlagPin();
+
+            if (head < numPulses) {
+
+                schedulePulse(head);
+                advanceHead();
+
+            } else {
+
+                pressStop();
+            }
+        }
+    }
+
+    scheduleNextDatEvent();
+}
+
+void
+Datasette::updateDatEvent()
+{
+    if (playKey && motor && hasTape() && config.connected) {
+
+        scheduleNextDatEvent();
+
+    } else {
+
+        c64.cancel<SLOT_DAT>();
+    }
+}
+
+void
+Datasette::scheduleNextDatEvent()
+{
+    static constexpr Cycle period = 16;
+
+    if (playKey && motor && hasTape() && config.connected) {
+
+        // Call the execution handler periodically
+        c64.scheduleRel<SLOT_DAT>(period, DAT_EXECUTE, period);
+
+    } else {
+
+        c64.cancel<SLOT_DAT>();
+    }
+}
+
+void
+Datasette::schedulePulse(isize nr)
+{
+    assert(nr < numPulses);
+    
+    // The VC1530 uses square waves with a 50% duty cycle
+    nextRisingEdge = pulses[nr].cycles / 2;
+    nextFallingEdge = pulses[nr].cycles;
+}
+
+std::unique_ptr<TAPFile>
+Datasette::makeTAP() const
+{
+    if (!hasTape()) return nullptr;
+
+    // Pulses in type-1 format
+    std::vector<u8> pulseVec;
+
+    for (isize i = 0; i < numPulses; i++) {
+
+        Pulse &p = pulses[i];
+
+        if (p.cycles / 8 > 255 || p.cycles % 8 != 0) {
+
+            pulseVec.push_back(0);
+            pulseVec.push_back(BYTE0(p.cycles));
+            pulseVec.push_back(BYTE1(p.cycles));
+            pulseVec.push_back(BYTE2(p.cycles));
+
+        } else {
+
+            pulseVec.push_back(u8(p.cycles / 8));
+        }
+    }
+
+    Buffer<u8> buffer(0x14 + (isize)pulseVec.size(), 0);
+
+    u8 *ptr = buffer.ptr;
+
+    // TAP signature
+    std::strcpy(reinterpret_cast<char *>(ptr), "C64-TAPE-RAW");
+
+    // TAP version
+    ptr[0x0C] = 0x01;
+
+    // Data length
+    ptr[0x10] = BYTE0(pulseVec.size());
+    ptr[0x11] = BYTE1(pulseVec.size());
+    ptr[0x12] = BYTE2(pulseVec.size());
+    ptr[0x13] = BYTE3(pulseVec.size());
+
+    // Pulse data
+    std::memcpy(ptr + 0x14, pulseVec.data(), pulseVec.size());
+
+    return std::make_unique<TAPFile>(buffer.ptr, buffer.size);
+}
+
+void
+Datasette::exportTAP(const fs::path &path) const
+{
+    auto tap = makeTAP();
+    tap->writeToFile(path);
+}
+
+/*
+MediaFile *
+Datasette::exportTAP() const
+{
+    if (!hasTape()) return nullptr;
+
+    // Pulses in type-1 format
+    std::vector<u8> pulseVec;
+
+    for (isize i = 0; i < numPulses; i++) {
+
+        Pulse &p = pulses[i];
+
+        if (p.cycles / 8 > 255 || p.cycles % 8 != 0) {
+
+            pulseVec.push_back(0);
+            pulseVec.push_back(BYTE0(p.cycles));
+            pulseVec.push_back(BYTE1(p.cycles));
+            pulseVec.push_back(BYTE2(p.cycles));
+
+        } else {
+
+            pulseVec.push_back(u8(p.cycles / 8));
+        }
+    }
+
+    Buffer<u8> buffer(0x14 + (isize)pulseVec.size(), 0);
+
+    // Cartridge signature
+    u8 *ptr = buffer.ptr;
+    strcpy((char *)ptr, "C64-TAPE-RAW");
+
+    // TAP version
+    ptr[0x0C] = 0x01;
+
+    // Data length
+    ptr[0x10] = BYTE0(pulseVec.size());
+    ptr[0x11] = BYTE1(pulseVec.size());
+    ptr[0x12] = BYTE2(pulseVec.size());
+    ptr[0x13] = BYTE3(pulseVec.size());
+
+    // Pulse data
+    memcpy(ptr + 0x14, pulseVec.data(), pulseVec.size());
+
+    return new TAPFile(buffer.ptr, buffer.size);
+}
+*/
+
+}

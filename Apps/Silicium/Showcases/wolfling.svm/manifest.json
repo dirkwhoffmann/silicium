@@ -1,0 +1,15 @@
+{
+    "readOnly": true,
+    "uuid": "3619101d-25da-4dfb-bc05-06301679689b",
+    "name": "Wolfling",
+    "meta": {
+        "author": "Lazycow",
+        "description": "Released for the Commodore 64 in 2019, Wolfling is a homebrew action-platformer developed by Matthias Bock (better known as Lazycow). The game features a shape-shifting mechanic in which the protagonist, Ling, can transform between human and wolf forms by entering shafts of moonlight. Each form has its own controls, movement characteristics, and abilities, which are used to explore gothic environments, engage enemies, and solve environmental puzzles."
+    },
+    "platform": "C64",
+    "screenshot": "screenshot.png",
+    "version": "0.1b1",
+    "created": 1767398400,
+    "modified": 1767398400,
+    "startup": "startup.retrosh"
+}

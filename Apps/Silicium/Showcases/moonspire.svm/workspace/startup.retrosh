@@ -1,0 +1,5 @@
+# Give the C64 time to boot
+wait 2
+
+# Run the showcase
+expansion attach moonspire.crt

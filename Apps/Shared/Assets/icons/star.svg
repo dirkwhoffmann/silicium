@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xl="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="672 -1136 193 208" width="193" height="208">
+  <defs/>
+  <g id="Badges" stroke="none" fill-opacity="1" stroke-opacity="1" stroke-dasharray="none" fill="none">
+    <title>Badges</title>
+    <g id="Badges_Ebene_1">
+      <title>Ebene 1</title>
+      <g id="Graphic_27">
+        <title>path3</title>
+        <path d="M 723 -1136 C 733 -1054 724 -1034 672 -1009 C 729 -1014 748 -995 759 -928 C 774 -992 788 -1015 865 -971 C 798 -1032 813.5 -1046.75 831.5 -1122.75 C 788.5 -1054.75 763 -1063 723 -1136 Z M 730 -1114 C 762 -1055.6 789.6 -1051.1 824 -1105.5 C 804.5 -1047.5 783.4 -1040.8 837 -992 C 775.4 -1027.2 770 -1003.2 758 -952 C 749.2 -1005.6 736.9 -1018.2 691.3 -1014.2 C 732.9 -1034.2 738 -1048.4 730 -1114 Z" fill="white"/>
+      </g>
+    </g>
+  </g>
+</svg>

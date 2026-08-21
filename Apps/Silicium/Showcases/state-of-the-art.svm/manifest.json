@@ -1,0 +1,14 @@
+{
+    "readOnly": true,
+    "uuid": "1f98916d-0890-43d2-b53d-fc2602ffbd9b",
+    "name": "State of the Art",
+    "meta": {
+        "author": "Spaceballs",
+        "description": "Released in December 1992 by the Norwegian demogroup Spaceballs, State of the Art is an Amiga 500 demo that won first place at The Party II. The production placed a strong emphasis on visual design and animation rather than focusing primarily on technical demonstrations of hardware effects. It combines a synchronized electronic soundtrack with rotoscoped animations of dancing silhouettes. The entire demo fits on a single floppy disk and runs on a standard Amiga 500 with 1 MB of RAM."
+    },
+    "platform": "AMIGA",
+    "screenshot": "screenshot.png",
+    "version": "0.1b1",
+    "created": 1767398400,
+    "modified": 1767398400
+}

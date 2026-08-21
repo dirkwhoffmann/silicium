@@ -1,0 +1,14 @@
+{
+    "readOnly": true,
+    "uuid": "440e8400-e29b-41d4-a716-446652440011",
+    "name": "DiagRom",
+    "meta": {
+        "author": "John Hertell",
+        "description": "The Amiga Diagnostic ROM is a hardware testing tool for Commodore Amiga computers. It replaces the Kickstart ROM on the motherboard and boots the system into a diagnostic environment instead of the normal operating system. The ROM contains test routines for checking various hardware components, including memory, custom chips, and peripheral interfaces."
+    },
+    "platform": "AMIGA",
+    "screenshot": "screenshot.png",
+    "version": "0.1b1",
+    "created": 1767312000,
+    "modified": 1767312000
+}
