@@ -1,1 +1,3 @@
-![Image](https://github.com/user-attachments/assets/a62fbbac-de13-436e-8ff3-2f99d3963d10)
+<p align="center">
+  <a href = "https://dirkwhoffmann.github.io/Silicium"><img src="https://dirkwhoffmann.github.io/Silicium/images/redirect.png"></a>
+</p>
