@@ -7,6 +7,8 @@
 // See https://mozilla.org/MPL/2.0 for license information
 // -----------------------------------------------------------------------------
 
+#if 0
+
 #pragma once
 
 #include "utl/abilities/Loggable.h"
@@ -125,3 +127,5 @@ extern long IMG_DEBUG;
 //
 
 #define xfiles(format, ...) logMsg(XFILES, LogLevel::LOG_INFO, format __VA_OPT__(, ) __VA_ARGS__)
+
+#endif

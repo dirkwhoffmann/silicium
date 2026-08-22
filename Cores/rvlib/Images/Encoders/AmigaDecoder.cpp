@@ -21,7 +21,7 @@ static constexpr isize bsize  = 512;
 utl::ByteView
 AmigaDecoder::decodeTrack(utl::BitView track, TrackNr t, std::span<u8> out)
 {
-    loginfo(IMG_DEBUG, "Decoding Amiga track %ld\n", t);
+    logme(LOG_IMG, "Decoding Amiga track %ld\n", t);
 
     // Find all sectors
     auto sectors    = seekSectors(track);
@@ -52,7 +52,7 @@ AmigaDecoder::decodeTrack(utl::BitView track, TrackNr t, std::span<u8> out)
 utl::ByteView
 AmigaDecoder::decodeSector(utl::BitView track, TrackNr t, SectorNr s, std::span<u8> out)
 {
-    loginfo(IMG_DEBUG, "Decoding Amiga sector %ld:%ld\n", t, s);
+    logme(LOG_IMG, "Decoding Amiga sector %ld:%ld\n", t, s);
 
     // Ensure the output buffer is large enough
     assert(isize(out.size()) >= bsize);

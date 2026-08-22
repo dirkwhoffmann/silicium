@@ -17,7 +17,7 @@
 
 namespace retro::vault {
 
-extern utl::LogChannel HDF_DBG;
+// extern utl::LogChannel HDF_DBG;
 
 /* Common base of everything the library treats as an image.
  *

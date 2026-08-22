@@ -22,7 +22,7 @@ Transport::Transport(RemoteServer &server) : server(server), delegate(server) {
 
 Transport::~Transport() {
 
-    loginfo(SRV_DEBUG, "Shutting down\n");
+    logme(LOG_SRV, "Shutting down\n");
 }
 
 void
@@ -43,7 +43,7 @@ Transport::start(u16 port, const string &endpoint)
 {
     if (!isOff()) return;
 
-    loginfo(SRV_DEBUG, "Starting server...\n");
+    logme(LOG_SRV, "Starting server...\n");
     switchState(SrvState::STARTING);
 
     // Make sure we continue with a terminated server thread
@@ -76,7 +76,7 @@ Transport::stop()
 
     if (!isOff()) {
 
-        loginfo(SRV_DEBUG, "Stopping server...\n");
+        logme(LOG_SRV, "Stopping server...\n");
         switchState(SrvState::STOPPING);
 
         // Interrupt the server thread
@@ -102,7 +102,7 @@ Transport::switchState(SrvState newState)
 
     if (oldState != newState) {
 
-        loginfo(SRV_DEBUG, "Switching state: %s -> %s\n",
+        logme(LOG_SRV, "Switching state: %s -> %s\n",
               SrvStateEnum::key(state), SrvStateEnum::key(newState));
 
         // Switch state

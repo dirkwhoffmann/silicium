@@ -30,7 +30,7 @@ using retro::vault::Platform;
 // listener in windowDidOpen()) and marshals them onto the GUI thread, where
 // it is safe to touch QObjects.
 static void
-process(const void *listener, const Message &msg)
+process(const void *listener, const Message msg)
 {
     auto *con = static_cast<C64Controller *>(const_cast<void *>(listener));
 

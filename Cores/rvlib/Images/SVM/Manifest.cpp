@@ -10,9 +10,9 @@
 #include "rvconfig.h"
 #include "Manifest.h"
 #include "utl/io.h"
+#include "json.h"
 #include <ctime>
 #include <fstream>
-#include <json.h>
 
 namespace retro::vault {
 

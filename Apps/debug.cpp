@@ -7,6 +7,8 @@
 // See https://mozilla.org/MPL/2.0 for license information
 // -----------------------------------------------------------------------------
 
+#if 0
+
 #include "config.h"
 
 #define STR(x)  #x
@@ -36,3 +38,5 @@ namespace utl::channel {
     DEBUG_CHANNEL(DMS_DEBUG, "DMS files");
 
 } // namespace utl::channel
+
+#endif

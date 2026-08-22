@@ -19,6 +19,8 @@
 // Action Replay (hardware version 3)
 //
 
+using namespace utl;
+
 namespace vc64 {
 
 class ActionReplay3 final : public Cartridge {

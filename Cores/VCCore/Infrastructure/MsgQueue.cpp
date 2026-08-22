@@ -53,18 +53,18 @@ MsgQueue::put(const Message &msg, const string &str)
 
         SYNCHRONIZED
 
-        loginfo(MSG_DEBUG, "%s [%llx]\n", MsgEnum::key(msg.type), msg.value);
+        logme(LOG_MSG, "%s [%llx]\n", MsgEnum::key(msg.type), msg.value);
 
         // Delete the oldest element if the queue is full
         if (queue.isFull()) {
-
+            
             if (!listener) {
-
+                
                 auto &lost = queue.read();
-                logwarn("Message lost: %s [%llx]\n", MsgEnum::key(lost.type), lost.value);
+                logme(LV_WARNING, "Message lost: %s [%llx]\n", MsgEnum::key(lost.type), lost.value);
             }
         }
-
+        
         // Add message to the ringbuffer
         auto w = queue.w;
         queue.write(msg);

@@ -108,7 +108,7 @@ C64Encoder::encodeTrack(utl::ByteView src, TrackNr t)
     if (count != trackDefaults(t).sectors)
         throw DeviceError(DeviceError::DSK_WRONG_SECTOR_CNT);
 
-    loginfo(IMG_DEBUG, "Encoding C64 track %ld with %ld sectors\n", t, count);
+    logme(LOG_IMG, "Encoding C64 track %ld with %ld sectors\n", t, count);
 
     // Setup the backing buffer
     if (gcrbuffer.empty()) gcrbuffer.resize(16384);
@@ -137,15 +137,12 @@ C64Encoder::encodeTrack(utl::ByteView src, TrackNr t)
         totalBits += encodedBits;
     }
 
-    if constexpr (IMG_DEBUG) {
+    if CONSTEXPR (debug::LOG_IMG != debug::LogLevel::LOG_NONE) {
 
-        loginfo(IMG_DEBUG,
+        logme(LOG_IMG,
                 "\nTrack size: %ld Encoded: %ld Checksum: %x\n",
                 view.size(), totalBits, view.byteView().fnv32());
     }
-
-    // for (isize i = 0; i < 64; ++i) printf("%02X ", gcrbuffer[i]);
-    // printf("\n");
     
     return view;
 }
@@ -160,7 +157,7 @@ isize
 C64Encoder::encodeSector(utl::MutableBitView view,
                          isize offset, TrackNr t, SectorNr s, utl::ByteView src)
 {
-    loginfo(IMG_DEBUG, "%ld (%ld) ", s, offset);
+    logme(LOG_IMG, "%ld (%ld) ", s, offset);
 
     BlockNr b = trackDefaults(t).firstSectorNr + s;
 

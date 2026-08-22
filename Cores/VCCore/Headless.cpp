@@ -174,13 +174,13 @@ Headless::runScript(const fs::path &path)
 }
 
 void
-process(const void *listener, const Message &msg)
+process(const void *listener, Message msg)
 {
     ((Headless *)listener)->process(msg);
 }
 
 void
-Headless::process(const Message &msg)
+Headless::process(Message msg)
 {
     static bool messages = keys.find("messages") != keys.end();
     

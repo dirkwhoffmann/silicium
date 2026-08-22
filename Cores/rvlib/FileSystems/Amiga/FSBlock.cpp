@@ -280,10 +280,8 @@ bool
 FSBlock::matches(const FSPattern &pattern) const
 {
     if (pattern.isAbsolute()) {
-        printf("Abs matching %s and %s (%d)\n", absName().c_str(), pattern.glob.c_str(), pattern.match(absName()));
         return pattern.match(absName());
     } else {
-        printf("Rel matching %s and %s (%d)\n", relName().c_str(), pattern.glob.c_str(), pattern.match(relName()));
         return pattern.match(cppName());
     }
 }
@@ -1620,7 +1618,7 @@ FSBlock::writeBootBlock(BootBlockId id, isize page)
     assert(page == 0 || page == 1);
     assert(type == FSBlockType::BOOT);
     
-    loginfo(FS_DEBUG, "writeBootBlock(%s, %ld)\n", BootBlockIdEnum::key(id), page);
+    logme(LOG_FS, "writeBootBlock(%s, %ld)\n", BootBlockIdEnum::key(id), page);
     
     if (id != BootBlockId::NONE) {
 
@@ -1935,7 +1933,7 @@ FSBlock::extractData(Buffer<u8> &buf) const
     }
 
     if (bytesRemaining != 0) {
-        logwarn("%ld remaining bytes. Expected 0.\n", bytesRemaining);
+        logme(LV_WARNING, "%ld remaining bytes. Expected 0.\n", bytesRemaining);
     }
 
     return bytesTotal;
@@ -2038,7 +2036,7 @@ FSBlock::overwriteData(Buffer<u8> &buf)
                 
             } else {
                 
-                logwarn("Ignoring block %ld (no data block)\n", ref);
+                logme(LV_WARNING, "Ignoring block %ld (no data block)\n", ref);
             }
         }
         
@@ -2047,7 +2045,7 @@ FSBlock::overwriteData(Buffer<u8> &buf)
     }
     
     if (bytesRemaining != 0) {
-        logwarn("%ld remaining bytes. Expected 0.\n", bytesRemaining);
+        logme(LV_WARNING, "%ld remaining bytes. Expected 0.\n", bytesRemaining);
     }
     
     return bytesTotal;

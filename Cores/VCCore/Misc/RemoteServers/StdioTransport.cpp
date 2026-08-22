@@ -42,7 +42,7 @@ StdioTransport::~StdioTransport()
 void
 StdioTransport::disconnect()
 {
-    loginfo(SRV_DEBUG, "Disconnecting stdio transport...\n");
+    logme(LOG_SRV, "Disconnecting stdio transport...\n");
 
     switchState(SrvState::STOPPING);
     stdio.terminate();
@@ -57,7 +57,7 @@ StdioTransport::main(u16 port, const string &endpoint)
 
     } catch (std::exception &err) {
 
-        loginfo(SRV_DEBUG, "Stdio server thread interrupted\n");
+        logme(LOG_SRV, "Stdio server thread interrupted\n");
         delegate.didTerminate(err.what());
     }
 

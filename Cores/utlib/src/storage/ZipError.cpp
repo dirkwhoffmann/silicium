@@ -18,9 +18,17 @@ ZipError::setError(long fault, const std::string &msg)
 {
     switch (fault) {
 
+        /* Kept in step with the inline constructor in ZipError.h, which this
+         * duplicates. NOT_A_FILE and NOT_A_DIRECTORY were missing here, so the
+         * detail was dropped for anyone passing a string literal (which selects
+         * the const char* constructor and lands in this function) while a
+         * std::string argument kept it.
+         */
         case INVALID_ZIP_MODE: set_msg("Invalid ZIP mode: " + msg); break;
         case INVALID_ARCHIVE:  set_msg("Invalid or unsupported ZIP file: " + msg); break;
-        case KUBA_ZIP_ERROR:   set_msg("KubaZip error: " + msg); break;
+        case NOT_A_FILE:       set_msg("Not a file: " + msg); break;
+        case NOT_A_DIRECTORY:  set_msg("Not a directory: " + msg); break;
+        case KUBA_ZIP_ERROR:   set_msg("KubaZip error code: " + msg); break;
         default:               set_msg("ZipError " + std::to_string(fault) + " (" + errstr() + ")");
     }
 }

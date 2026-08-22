@@ -262,6 +262,6 @@ Message;
 // Signatures
 //
 
-typedef void Callback(const void *, const Message &);
+typedef void Callback(const void *, Message);
 
 }

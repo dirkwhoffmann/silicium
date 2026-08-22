@@ -269,7 +269,7 @@ void
 Host::setSearchPath(const fs::path &path)
 {
     SYNCHRONIZED
-
+    
     searchPath = path;
 }
 
