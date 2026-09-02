@@ -147,13 +147,15 @@ ColumnLayout {
                 // row) and a narrower, right-aligned top (the row above),
                 // which is exactly the ISO/Amiga Enter shape.
                 //
-                // The click target is the whole bounding rectangle, notch
-                // included -- the same simplification vAmiga's own Mac app
-                // makes (its Return button's hit-testable frame is the
-                // full bounding box too; only the key-cap artwork shows
-                // the notch). A precise hit region would need the same
-                // polygon fed to a containsMouse()-style override, which
-                // isn't worth it for a corner nobody will try to click.
+                // Return's own click target is still its whole bounding
+                // rectangle, notch included -- but that's harmless, because
+                // AmigaKeyModel adds Return *first* in every layout (see
+                // AmigaKeyModel::buildA500Ansi() and friends), so every key
+                // that visually overlaps the notch (here, "]") comes later
+                // and is stacked on top by the Repeater, both for painting
+                // and for mouse hit-testing. A click in the notch therefore
+                // always reaches the key actually drawn there, never
+                // Return's own MouseArea underneath.
                 //
 
                 Shape {

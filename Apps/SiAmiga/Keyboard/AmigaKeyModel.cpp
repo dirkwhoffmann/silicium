@@ -121,6 +121,15 @@ AmigaKeyModel::build()
 void
 AmigaKeyModel::buildA500Ansi()
 {
+    // Return is added first so every key that visually overlaps its
+    // notched corner (here, "]") ends up later in 'keys' and therefore
+    // stacked on top in the Repeater -- both for painting and for mouse
+    // hit-testing, so a click inside the notch (which shows "]", not
+    // Return) actually hits "]", not Return's own full bounding box. See
+    // AmigaKeyModel.h and SiAmKeyboardPanel.qml for how notchWidth/
+    // notchHeight turn into the visible L shape.
+    add(keys, 68, "Return", 497, 106, 81, 72, /* notchWidth */ 27, /* notchHeight */ 36);
+
     add(keys, 69, "Esc", 20, 20, 36, 36);
     add(keys, 80, "F1", 74, 20, 45, 36);
     add(keys, 81, "F2", 119, 20, 45, 36);
@@ -183,12 +192,6 @@ AmigaKeyModel::buildA500Ansi()
     add(keys, 40, "L", 389, 142, 36, 36);
     add(keys, 41, ";", 425, 142, 36, 36);
     add(keys, 42, "'", 461, 142, 36, 36);
-    // Return: bounding box spans this row and the one above it (Q-P/[]).
-    // Real hardware cuts the top-left corner away, leaving a wide bottom
-    // (aligned with this row) and a narrower, right-aligned top (aligned
-    // with the row above) -- see AmigaKeyModel.h and SiAmKeyboardPanel.qml
-    // for how notchWidth/notchHeight turn into that shape.
-    add(keys, 68, "Return", 497, 106, 81, 72, /* notchWidth */ 27, /* notchHeight */ 36);
     add(keys, 76, "Up", 632, 142, 36, 36);
     add(keys, 45, "4", 722, 142, 36, 36);
     add(keys, 46, "5", 757, 142, 36, 36);
@@ -232,6 +235,10 @@ AmigaKeyModel::buildA500Ansi()
 void
 AmigaKeyModel::buildA500Iso()
 {
+    // Return first -- see buildA500Ansi() for why (so overlapping neighbors
+    // stack on top for both painting and mouse hit-testing).
+    add(keys, 68, "Return", 524, 106, 54, 72, /* notchWidth */ 27, /* notchHeight */ 36);
+
     add(keys, 69, "Esc", 20, 20, 36, 36);
     add(keys, 80, "F1", 74, 20, 45, 36);
     add(keys, 81, "F2", 119, 20, 45, 36);
@@ -295,7 +302,6 @@ AmigaKeyModel::buildA500Iso()
     add(keys, 41, ";", 425, 142, 36, 36);
     add(keys, 42, "'", 461, 142, 36, 36);
     add(keys, 43, "#", 497, 142, 36, 36);
-    add(keys, 68, "Return", 524, 106, 54, 72, /* notchWidth */ 27, /* notchHeight */ 36);
     add(keys, 76, "Up", 632, 142, 36, 36);
     add(keys, 45, "4", 722, 142, 36, 36);
     add(keys, 46, "5", 757, 142, 36, 36);
@@ -341,6 +347,10 @@ AmigaKeyModel::buildA500Iso()
 void
 AmigaKeyModel::buildA1000Ansi()
 {
+    // Return first -- see buildA500Ansi() for why (so overlapping neighbors
+    // stack on top for both painting and mouse hit-testing).
+    add(keys, 68, "Return", 488, 92, 72, 72, /* notchWidth */ 27, /* notchHeight */ 36);
+
     add(keys, 69, "Esc", 20, 20, 36, 36);
     add(keys, 80, "F1", 74, 20, 45, 36);
     add(keys, 81, "F2", 119, 20, 45, 36);
@@ -401,7 +411,6 @@ AmigaKeyModel::buildA1000Ansi()
     add(keys, 40, "L", 380, 128, 36, 36);
     add(keys, 41, ";", 416, 128, 36, 36);
     add(keys, 42, "'", 452, 128, 36, 36);
-    add(keys, 68, "Return", 488, 92, 72, 72, /* notchWidth */ 27, /* notchHeight */ 36);
     add(keys, 76, "Up", 560, 128, 36, 36);
     add(keys, 29, "1", 632, 128, 36, 36);
     add(keys, 30, "2", 667, 128, 36, 36);
@@ -440,6 +449,10 @@ AmigaKeyModel::buildA1000Ansi()
 void
 AmigaKeyModel::buildA1000Iso()
 {
+    // Return first -- see buildA500Ansi() for why (so overlapping neighbors
+    // stack on top for both painting and mouse hit-testing).
+    add(keys, 68, "Return", 488, 92, 72, 72, /* notchWidth */ 27, /* notchHeight */ 36);
+
     add(keys, 69, "Esc", 20, 20, 36, 36);
     add(keys, 80, "F1", 74, 20, 45, 36);
     add(keys, 81, "F2", 119, 20, 45, 36);
@@ -500,7 +513,6 @@ AmigaKeyModel::buildA1000Iso()
     add(keys, 40, "L", 380, 128, 36, 36);
     add(keys, 41, ";", 416, 128, 36, 36);
     add(keys, 42, "'", 452, 128, 36, 36);
-    add(keys, 68, "Return", 488, 92, 72, 72, /* notchWidth */ 27, /* notchHeight */ 36);
     add(keys, 76, "Up", 560, 128, 36, 36);
     add(keys, 29, "1", 632, 128, 36, 36);
     add(keys, 30, "2", 667, 128, 36, 36);
