@@ -158,80 +158,63 @@ ColumnLayout {
                 // Return's own MouseArea underneath.
                 //
 
+                // Return is rendered as an ordinary Rectangle background
+                // (returnBg, pixel-identical to SiButton's own -- Palette.
+                // widget, lighter(1.4)/darker(1.05)) clipped to the notch
+                // polygon via a Shape used purely as an alpha mask
+                // (returnShape). ShapePath.fillColor/fillGradient silently
+                // fails to paint at all on some of the notch's smaller
+                // instances (e.g. the A1000 layouts) when given
+                // Palette.widget directly -- reproducible, not tied to any
+                // one renderer backend, and specific to colors close in
+                // lightness to the panel background -- so the actual key
+                // color never goes through ShapePath at all here; the mask
+                // is filled with plain opaque black instead (only its alpha
+                // coverage is ever used, so its own color doesn't matter,
+                // and black was never affected by the failure). Both
+                // returnBg and returnShape run through a ShaderEffectSource
+                // with hideSource: true -- the standard way to keep an item
+                // in the scene graph (so MultiEffect can sample it) without
+                // it also drawing itself directly on top.
+
+                Rectangle {
+
+                    id: returnBg
+                    visible: keyItem.isReturn
+                    anchors.fill: parent
+
+                    border.color: keyItem.pressed ? Palette.accent : Palette.widgetShadow
+                    border.width: 1
+
+                    gradient: Gradient {
+
+                        GradientStop {
+                            position: 0.0
+                            color: (keyItem.pressed ? Palette.accentElevated : Palette.widget).lighter(1.4)
+                        }
+                        GradientStop {
+                            position: 1.0
+                            color: (keyItem.pressed ? Palette.accentElevated : Palette.widget).darker(1.05)
+                        }
+                    }
+                }
+
                 Shape {
 
                     id: returnShape
                     visible: keyItem.isReturn
                     anchors.fill: parent
-                    // ShapePath strokes are centered on the path, unlike
-                    // Rectangle.border (drawn inward) -- every other key
-                    // uses a Rectangle background, so without this inset the
-                    // stroke's outer half would spill half a pixel past
-                    // keyItem's bounds on every edge, making Return look
-                    // very slightly larger than its neighbors.
-                    anchors.margins: strokeHalf
                     antialiasing: true
 
-                    readonly property real strokeHalf: 0.5
                     readonly property real nw: model.notchWidth * root.scale
                     readonly property real nh: model.notchHeight * root.scale
                     readonly property real kw: width
                     readonly property real kh: height
                     readonly property real r: Style.radius
 
-                    // SiButton gets its visual weight from a lighter-to-darker
-                    // gradient plus a drop shadow (see SiButton.qml's own
-                    // background Rectangle) -- a flat fill/stroke here just
-                    // blended into the panel background, so the shape needs
-                    // the same treatment to read as a raised key.
-                    layer.enabled: true
-                    layer.effect: MultiEffect {
-
-                        shadowEnabled: true
-                        shadowColor: "#40000000"
-                        shadowBlur: 0.1
-                        shadowVerticalOffset: 1
-                        shadowHorizontalOffset: 1
-                    }
-
                     ShapePath {
 
-                        id: returnPath
-
-                        // Palette.widget itself (this Shape's natural
-                        // "unpressed" tone, same as every SiButton) silently
-                        // fails to paint at all as ShapePath.fillColor/
-                        // fillGradient on some of the notch's smaller
-                        // instances (e.g. the A1000 layouts) -- reproducible,
-                        // but not tied to any one renderer backend
-                        // (GeometryRenderer/CurveRenderer made no
-                        // difference), and not fixable by routing the same
-                        // color through a Rectangle used as a MultiEffect
-                        // mask source either (that came out washed out
-                        // instead of merely invisible). What the failing
-                        // cases have in common is being close in lightness
-                        // to the panel background; both gradient stops below
-                        // stay well clear of that zone (verified against the
-                        // A1000 layouts, the ones that failed before), so the
-                        // lighter-to-darker "shine" SiButton gets survives
-                        // here too.
-                        fillGradient: LinearGradient {
-
-                            x1: 0; y1: 0
-                            x2: 0; y2: returnShape.kh
-
-                            GradientStop {
-                                position: 0.0
-                                color: keyItem.pressed ? Palette.accentElevated : Qt.darker(Palette.widget, 1.35)
-                            }
-                            GradientStop {
-                                position: 1.0
-                                color: keyItem.pressed ? Palette.accent : Qt.darker(Palette.widget, 1.9)
-                            }
-                        }
-                        strokeColor: keyItem.pressed ? Palette.accent : Palette.widgetShadow
-                        strokeWidth: 1
-                        joinStyle: ShapePath.RoundJoin
+                        fillColor: "black"
 
                         // Starts at the notch's inner corner (V5) -- the one
                         // corner left sharp, matching real ISO-Enter keycaps
@@ -280,6 +263,45 @@ ColumnLayout {
                         // Back to V5 (sharp), closing the path
                         PathLine { x: returnShape.nw; y: returnShape.nh }
                     }
+                }
+
+                ShaderEffectSource {
+
+                    id: returnBgSource
+                    sourceItem: returnBg
+                    hideSource: true
+                    live: true
+                    anchors.fill: returnBg
+                    visible: false
+                }
+
+                ShaderEffectSource {
+
+                    id: returnMaskSource
+                    sourceItem: returnShape
+                    hideSource: true
+                    live: true
+                    anchors.fill: returnShape
+                    visible: false
+                }
+
+                MultiEffect {
+
+                    visible: keyItem.isReturn
+                    anchors.fill: parent
+                    source: returnBgSource
+                    maskEnabled: true
+                    maskSource: returnMaskSource
+                    maskThresholdMin: 0.5
+                    maskSpreadAtMin: 0.0
+
+                    // Same drop shadow SiButton gets from its own background
+                    // Rectangle, so the notched key reads as raised too.
+                    shadowEnabled: true
+                    shadowColor: "#40000000"
+                    shadowBlur: 0.1
+                    shadowVerticalOffset: 1
+                    shadowHorizontalOffset: 1
                 }
 
                 SiText {
