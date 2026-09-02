@@ -215,6 +215,212 @@ SiAmController::powerOff()
 }
 
 void
+SiAmController::softReset()
+{
+    core().softReset();
+}
+
+void
+SiAmController::brk()
+{
+    // vAmiga has no direct equivalent of vc64's Cmd::CPU_BRK (an immediate
+    // software breakpoint); pausing is the closest available action.
+    pause();
+}
+
+void
+SiAmController::stepOver()
+{
+    core().stepOver();
+}
+
+void
+SiAmController::stepInto()
+{
+    core().stepInto();
+}
+
+void
+SiAmController::finishLine()
+{
+    core().finishLine();
+}
+
+void
+SiAmController::finishFrame()
+{
+    core().finishFrame();
+}
+
+void
+SiAmController::toggleWarp()
+{
+    // Cycles the warp mode AUTO -> NEVER -> ALWAYS -> AUTO, mirroring
+    // C64Controller::toggleWarp().
+    switch (Warp(m_configController->warpMode())) {
+
+        case Warp::AUTO:   m_configController->setWarpMode(int(Warp::NEVER));  break;
+        case Warp::NEVER:  m_configController->setWarpMode(int(Warp::ALWAYS)); break;
+        case Warp::ALWAYS: m_configController->setWarpMode(int(Warp::AUTO));   break;
+    }
+}
+
+bool
+SiAmController::mouseCaptured()
+{
+    return inputManager.getCaptureMouse();
+}
+
+void
+SiAmController::captureMouse()
+{
+    inputManager.setCaptureMouse(true);
+    emit mouseWasCaptured();
+}
+
+void
+SiAmController::releaseMouse()
+{
+    inputManager.setCaptureMouse(false);
+}
+
+bool
+SiAmController::driveHasDisk(int nr) const
+{
+    return core().df[nr]->getInfo().hasDisk;
+}
+
+bool
+SiAmController::driveWriteProtected(int nr) const
+{
+    return core().df[nr]->getInfo().hasProtectedDisk;
+}
+
+bool
+SiAmController::driveModified(int nr) const
+{
+    return core().df[nr]->getInfo().hasModifiedDisk;
+}
+
+void
+SiAmController::insertDisk(int nr, const QUrl &url, bool wp)
+{
+    try {
+
+        if (url.isLocalFile()) {
+            core().df[nr]->insert(url.toLocalFile().toStdWString(), wp);
+        }
+
+    } catch (const std::exception &e) {
+
+        showError("Failed to insert the disk.", e.what());
+    }
+}
+
+void
+SiAmController::newDisk(int nr)
+{
+    try {
+
+        core().df[nr]->insertBlankDisk(amiga::FSFormat::OFS, amiga::BootBlockId::AMIGADOS_13, "Empty");
+
+    } catch (const std::exception &e) {
+
+        showError("Failed to create a new disk.", e.what());
+    }
+}
+
+void
+SiAmController::ejectDisk(int nr)
+{
+    try {
+
+        core().df[nr]->ejectDisk();
+
+    } catch (const std::exception &e) {
+
+        showError("Failed to eject the disk.", e.what());
+    }
+}
+
+void
+SiAmController::exportDisk(int nr, const QUrl &url)
+{
+    try {
+
+        if (url.isLocalFile()) {
+            core().df[nr]->writeToFile(url.toLocalFile().toStdWString());
+        }
+
+    } catch (const std::exception &e) {
+
+        showError("Failed to export the disk.", e.what());
+    }
+}
+
+void
+SiAmController::toggleWriteProtection(int nr)
+{
+    try {
+
+        auto &drive = *core().df[nr];
+        drive.setFlag(DiskFlags::PROTECTED, !drive.getFlag(DiskFlags::PROTECTED));
+
+    } catch (const std::exception &e) {
+
+        showError("Failed to change the write-protection status.", e.what());
+    }
+}
+
+bool
+SiAmController::hdHasDisk(int nr) const
+{
+    return core().hd[nr]->getInfo().hasDisk;
+}
+
+void
+SiAmController::attachHd(int nr, const QUrl &url)
+{
+    try {
+
+        if (url.isLocalFile()) {
+            core().hd[nr]->attach(url.toLocalFile().toStdWString());
+        }
+
+    } catch (const std::exception &e) {
+
+        showError("Failed to attach the hard drive.", e.what());
+    }
+}
+
+void
+SiAmController::detachHd(int nr)
+{
+    m_configController->setHdConnected(nr, false);
+}
+
+void
+SiAmController::exportHd(int nr, const QUrl &url)
+{
+    try {
+
+        if (url.isLocalFile()) {
+            core().hd[nr]->writeToFile(url.toLocalFile().toStdWString());
+        }
+
+    } catch (const std::exception &e) {
+
+        showError("Failed to export the hard drive.", e.what());
+    }
+}
+
+void
+SiAmController::resetKeyboardMatrix()
+{
+    core().put(Cmd::KEY_RELEASE_ALL);
+}
+
+void
 SiAmController::didPowerOn()
 {
     setState(VMState::PAUSED);

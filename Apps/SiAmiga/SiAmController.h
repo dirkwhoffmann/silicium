@@ -15,6 +15,7 @@
 #include "SiAmRenderer.h"
 #include "SiAmActivityController.h"
 #include "Config/SiAmConfigController.h"
+#include <QUrl>
 
 class QCoreApplication;
 using vamiga::VAmiga;
@@ -97,6 +98,64 @@ public:
     Q_INVOKABLE void powerOff();
     Q_INVOKABLE void powerOnOrOff() { isPoweredOn() ? powerOff() : powerOn(); }
 
+    // Additional emulator control actions (see SiAmMenu.qml's Edit menu).
+    Q_INVOKABLE void softReset();
+    Q_INVOKABLE void brk();
+    Q_INVOKABLE void stepOver();
+    Q_INVOKABLE void stepInto();
+    Q_INVOKABLE void finishLine();
+    Q_INVOKABLE void finishFrame();
+    Q_INVOKABLE void toggleWarp();
+
+    //
+    // Controlling the mouse
+    //
+
+    Q_PROPERTY(bool mouseCaptured READ mouseCaptured NOTIFY captureChanged)
+
+    Q_INVOKABLE void captureMouse();
+    Q_INVOKABLE void releaseMouse();
+    Q_INVOKABLE void captureOrReleaseMouse() { mouseCaptured() ? releaseMouse() : captureMouse(); }
+
+    bool mouseCaptured();
+
+
+    //
+    // Floppy drives (df0..df3)
+    //
+
+    // 'nr' is 0-3 throughout this section, matching the core's df[] indexing
+    // (and SiAmConfigController's driveConnected(nr)/setDriveConnected(nr,..)).
+    Q_INVOKABLE bool driveHasDisk(int nr) const;
+    Q_INVOKABLE bool driveWriteProtected(int nr) const;
+    Q_INVOKABLE bool driveModified(int nr) const;
+    Q_INVOKABLE void insertDisk(int nr, const QUrl &url, bool wp = false);
+    Q_INVOKABLE void newDisk(int nr);
+    Q_INVOKABLE void ejectDisk(int nr);
+    Q_INVOKABLE void exportDisk(int nr, const QUrl &url);
+    Q_INVOKABLE void toggleWriteProtection(int nr);
+
+
+    //
+    // Hard drives (hd0..hd3)
+    //
+
+    Q_INVOKABLE bool hdHasDisk(int nr) const;
+    Q_INVOKABLE void attachHd(int nr, const QUrl &url);
+    // There's no direct "detach" call on the core's HardDriveAPI (unlike
+    // FloppyDriveAPI::ejectDisk()) -- disconnecting the controller via
+    // HDC_CONNECT is the closest equivalent, and it's what the menu's
+    // "Detach" item does.
+    Q_INVOKABLE void detachHd(int nr);
+    Q_INVOKABLE void exportHd(int nr, const QUrl &url);
+
+
+    //
+    // Keyboard
+    //
+
+    Q_INVOKABLE void resetKeyboardMatrix();
+
     // Starts the emulator core once the window's scene graph is ready, and
     // halts it when the window is destroyed (see attachWindow() below).
     void windowDidOpen();
@@ -156,4 +215,6 @@ signals:
     void stateChanged();
     void rendererChanged();
     void shutdown();
+    void captureChanged();
+    void mouseWasCaptured();
 };
