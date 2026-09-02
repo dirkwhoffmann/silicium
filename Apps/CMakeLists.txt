@@ -311,13 +311,13 @@ qt_add_resources(SiAmiga "assets_files"
         FILES ${ASSET_RESOURCES})
 
 file(GLOB_RECURSE SIAMIGA_QML_SOURCES CONFIGURE_DEPENDS
-        "${CMAKE_CURRENT_SOURCE_DIR}/SiAmiga/*.qml")
+        "${CMAKE_CURRENT_SOURCE_DIR}/SiAmiga/*.qml"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Shared/*.qml")
 list(TRANSFORM SIAMIGA_QML_SOURCES REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "")
 
-# Unlike SiC64, this stub doesn't pull in Shared/*.qml (the shared chrome
-# components) -- it only has its own two files, and pulling those in would
-# also require registering the Preferences/Assets/Logger singletons they
-# depend on (see SiC64/main.cpp) for no reason yet.
+# The config window pulls in the shared chrome components (SettingsPage,
+# ConfigToolbar, ...), so Shared/*.qml joins the module now -- see main.cpp
+# for the Assets/Preferences/Theme singletons those components need.
 #
 # SiAmiga's module needs its own URI, for the same reason SiC64's does (see
 # the comment above qt_add_qml_module(SiC64, ...)).

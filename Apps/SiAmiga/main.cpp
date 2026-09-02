@@ -11,7 +11,12 @@
 #include "SiAmController.h"
 #include "SiAmRenderer.h"
 #include "SiAmActivityController.h"
+#include "Config/SiAmConfigController.h"
+#include "Assets.h"
 #include "Logger.h"
+#include "Palette.h"
+#include "Preferences.h"
+#include "Shortcuts.h"
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
@@ -53,9 +58,16 @@ main(int argc, char *argv[])
     // Register types
     qmlRegisterType<SiAmRenderer>("Silicium.Controllers", 1, 0, "SiAmRenderer");
     qmlRegisterType<SiAmActivityController>("Silicium.Controllers", 1, 0, "SiAmActivityController");
+    qmlRegisterType<SiAmConfigController>("Silicium.Controllers", 1, 0, "SiAmConfigController");
+
+    // Register attachments
+    qmlRegisterUncreatableType<Palette>("Silicium.Theme", 1, 0, "Palette", "Palette is an attached property");
 
     // Register singletons
+    qmlRegisterSingletonInstance("Silicium.Assets", 1, 0, "Assets", Assets::instance());
     qmlRegisterSingletonInstance("Silicium.Controllers", 1, 0, "SiAmController", &SiAmController::instance());
+    qmlRegisterSingletonInstance("Silicium.Preferences", 1, 0, "Preferences", &Preferences::instance());
+    qmlRegisterSingletonInstance("Silicium.Theme", 1, 0, "Shortcuts", &Shortcuts::instance());
 
     // Launch the emulator core
     SiAmController::instance().initialize();

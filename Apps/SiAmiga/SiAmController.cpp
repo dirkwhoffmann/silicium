@@ -34,6 +34,7 @@ SiAmController::SiAmController()
     LogTask task("Creating SiAmController...");
 
     m_activityController = make_unique<SiAmActivityController>(this);
+    m_configController = make_unique<SiAmConfigController>(this);
 }
 
 SiAmController &
@@ -217,6 +218,7 @@ void
 SiAmController::didPowerOn()
 {
     setState(VMState::PAUSED);
+    m_configController->queryRoms();
 }
 
 void

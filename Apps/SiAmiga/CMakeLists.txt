@@ -4,4 +4,5 @@ target_include_directories(SiAmiga PUBLIC
 target_sources(SiAmiga PRIVATE
         SiAmController.cpp
         SiAmRenderer.cpp
-        SiAmActivityController.cpp)
+        SiAmActivityController.cpp
+        Config/SiAmConfigController.cpp)

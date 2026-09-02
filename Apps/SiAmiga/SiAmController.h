@@ -14,6 +14,7 @@
 #include "AudioController.h"
 #include "SiAmRenderer.h"
 #include "SiAmActivityController.h"
+#include "Config/SiAmConfigController.h"
 
 class QCoreApplication;
 using vamiga::VAmiga;
@@ -39,6 +40,7 @@ class SiAmController : public Controller {
 
     // Subcontrollers
     unique_ptr<SiAmActivityController> m_activityController;
+    unique_ptr<SiAmConfigController> m_configController;
 
 public:
 
@@ -106,6 +108,10 @@ public:
     Q_PROPERTY(SiAmActivityController *activityController READ getActivityController CONSTANT)
 
     SiAmActivityController *getActivityController() const { return m_activityController.get(); }
+
+    Q_PROPERTY(SiAmConfigController *configController READ getConfigController CONSTANT)
+
+    SiAmConfigController *getConfigController() const { return m_configController.get(); }
 
 
     //
