@@ -200,17 +200,35 @@ ColumnLayout {
 
                         // Palette.widget itself (this Shape's natural
                         // "unpressed" tone, same as every SiButton) silently
-                        // fails to paint at all as ShapePath.fillColor on
-                        // some of the notch's smaller instances (e.g. the
-                        // A1000 layouts) -- reproducible, but not tied to any
-                        // one renderer backend (GeometryRenderer/
-                        // CurveRenderer made no difference), and not fixable
-                        // by routing the same color through a Rectangle used
-                        // as a MultiEffect mask source either (that came out
-                        // washed out instead of merely invisible). A modest
-                        // darkening is the smallest margin found that
-                        // reliably avoids it everywhere.
-                        fillColor: keyItem.pressed ? Palette.accentElevated : Qt.darker(Palette.widget, 1.65)
+                        // fails to paint at all as ShapePath.fillColor/
+                        // fillGradient on some of the notch's smaller
+                        // instances (e.g. the A1000 layouts) -- reproducible,
+                        // but not tied to any one renderer backend
+                        // (GeometryRenderer/CurveRenderer made no
+                        // difference), and not fixable by routing the same
+                        // color through a Rectangle used as a MultiEffect
+                        // mask source either (that came out washed out
+                        // instead of merely invisible). What the failing
+                        // cases have in common is being close in lightness
+                        // to the panel background; both gradient stops below
+                        // stay well clear of that zone (verified against the
+                        // A1000 layouts, the ones that failed before), so the
+                        // lighter-to-darker "shine" SiButton gets survives
+                        // here too.
+                        fillGradient: LinearGradient {
+
+                            x1: 0; y1: 0
+                            x2: 0; y2: returnShape.kh
+
+                            GradientStop {
+                                position: 0.0
+                                color: keyItem.pressed ? Palette.accentElevated : Qt.darker(Palette.widget, 1.35)
+                            }
+                            GradientStop {
+                                position: 1.0
+                                color: keyItem.pressed ? Palette.accent : Qt.darker(Palette.widget, 1.9)
+                            }
+                        }
                         strokeColor: keyItem.pressed ? Palette.accent : Palette.widgetShadow
                         strokeWidth: 1
                         joinStyle: ShapePath.RoundJoin
