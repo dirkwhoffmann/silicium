@@ -16,11 +16,13 @@ import Silicium.Controllers
 import Silicium.Theme
 
 // Visual content of the virtual Amiga keyboard, port of SiC64KeyboardPanel.qml.
-// The C64 panel's icon bar (SHIFT/Commodore/CTRL preview toggles, lowercase
-// switch) has no counterpart here -- the Amiga keyboard has no equivalent
-// "preview a modifier's key caps" feature in AmigaKeyModel (that model has
-// no per-modifier label variants at all yet, see AmigaKeyModel.h), so this
-// is just the key grid, unlike SiC64KeyboardPanel's header row + grid.
+// The C64 panel's icon bar toggles independent modifier-preview switches
+// (SHIFT/Commodore/CTRL/lowercase); AmigaKeyModel has no per-modifier label
+// variants to preview, so SiAmKeyboardIconBar's toggles do something
+// different instead -- they pick which of the four physical Amiga keyboards
+// (A500/A1000 x ANSI/ISO) is on screen, which is why the Binding targets
+// below go to keyModel's a1000/iso properties rather than shiftPressed-style
+// preview flags.
 //
 // The interesting difference is Return: on a real Amiga keyboard it's an
 // upside-down L (ISO Enter shape), not a rectangle. AmigaKeyModel encodes
@@ -43,7 +45,60 @@ ColumnLayout {
     // overall scale factor for resizing the whole keyboard.
     readonly property real scale: 0.85
 
-    spacing: 0
+    spacing: Style.largeSpacing
+
+    //
+    // Layout selection
+    //
+    // Key cap labels and positions follow the icon bar's A500/A1000 and
+    // ANSI/ISO toggles, which together pick one of AmigaKeyModel's four
+    // built-in key tables -- see AmigaKeyModel::build().
+    //
+
+    Binding { target: kc.keyModel; property: "a1000"; value: iconBar.a1000 }
+    Binding { target: kc.keyModel; property: "iso"; value: iconBar.iso }
+
+    //
+    // Header row
+    //
+
+    RowLayout {
+
+        id: headerRow
+
+        Layout.fillWidth: true
+        Layout.fillHeight: false
+        spacing: Style.mediumSpacing
+
+        HSpacer {}
+
+        SiAmKeyboardIconBar { id: iconBar }
+
+        HSpacer {}
+
+        SiTemplateImage {
+
+            id: mouseIcon1
+            source: Assets.iconUrl(Assets.MousePress)
+            opacity: 0.5
+            Layout.preferredWidth: 24
+            Layout.preferredHeight: 24
+        }
+
+        SiTemplateImage {
+
+            id: mouseIcon2
+            source: Assets.iconUrl(Assets.MousePush)
+            opacity: 0.5
+            Layout.preferredWidth: 24
+            Layout.preferredHeight: 24
+            Layout.rightMargin: 10
+        }
+    }
+
+    //
+    // Key section
+    //
 
     Item {
 
@@ -134,19 +189,26 @@ ColumnLayout {
 
                     ShapePath {
 
-                        readonly property color baseColor: keyItem.pressed ? Palette.accentElevated : Palette.widget
+                        id: returnPath
 
-                        fillGradient: LinearGradient {
-                            x1: 0; y1: 0
-                            x2: 0; y2: keyItem.height
-                            GradientStop { position: 0.0; color: Qt.lighter(returnPath.baseColor, 1.4) }
-                            GradientStop { position: 1.0; color: Qt.darker(returnPath.baseColor, 1.05) }
-                        }
+                        // Palette.widget itself (this Shape's natural
+                        // "unpressed" tone, same as every SiButton) renders
+                        // fine everywhere else, but on some of this notch's
+                        // smaller instances (e.g. the A1000 layouts) it's
+                        // close enough to the panel background that this
+                        // Shape's fill silently fails to paint at all --
+                        // reproducible, but not tied to any one platform
+                        // renderer we tried (GeometryRenderer/CurveRenderer
+                        // made no difference), so it looks like an
+                        // antialiasing/coverage edge case specific to a
+                        // small, mostly-notched fill this close in tone to
+                        // its surroundings. Darkening it is a large enough
+                        // margin to reliably dodge that (verified against
+                        // both the failing and working cases above).
+                        fillColor: keyItem.pressed ? Palette.accentElevated : Qt.darker(Palette.widget, 1.8)
                         strokeColor: keyItem.pressed ? Palette.accent : Palette.widgetShadow
                         strokeWidth: 1
                         joinStyle: ShapePath.RoundJoin
-
-                        id: returnPath
 
                         // Starts at the notch's inner corner (V5) -- the one
                         // corner left sharp, matching real ISO-Enter keycaps
