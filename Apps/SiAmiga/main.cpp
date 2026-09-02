@@ -8,18 +8,34 @@
 // -----------------------------------------------------------------------------
 
 #include "config.h"
-#include "VAmiga.h"
+#include "SiAmigaController.h"
+#include "SiAmigaRenderer.h"
+#include "Logger.h"
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 #include <QIcon>
-#include <QDebug>
+
+void
+startLogger(int argc, char *argv[])
+{
+    Logger::install();
+
+    QStringList quoted;
+    const QStringList args = QCoreApplication::arguments();
+    for (const auto &arg : args) quoted << QString("\"%1\"").arg(arg);
+
+    qCDebug(siLog).noquote() << quoted.join(' ');
+    qCDebug(siLog).noquote() << "Running with Qt Version:" << qVersion();
+}
 
 int
 main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
+
+    startLogger(argc, argv);
 
     // Identify the application
     QCoreApplication::setOrganizationName("dirkwhoffmann");
@@ -33,12 +49,14 @@ main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar, true);
     app.setWindowIcon(QIcon(":/assets/images/app-icon.png"));
 
-    // Stub: instantiate the vAmiga core to prove VACore links and runs
-    // inside a standalone app. The Amiga backend itself (an equivalent of
-    // C64Controller) is built out in a later step.
-    vamiga::VAmiga vamiga;
-    qInfo().noquote() << "SiAmiga stub -- vAmiga core version"
-                       << QString::fromStdString(vamiga::VAmiga::version());
+    // Register types
+    qmlRegisterType<SiAmigaRenderer>("Silicium.Controllers", 1, 0, "SiAmigaRenderer");
+
+    // Register singletons
+    qmlRegisterSingletonInstance("Silicium.Controllers", 1, 0, "SiAmigaController", &SiAmigaController::instance());
+
+    // Launch the emulator core
+    SiAmigaController::instance().initialize();
 
     const QUrl url(QStringLiteral("qrc:/qt/qml/siamigaUI/SiAmiga/SiAmigaWindow.qml"));
     QObject::connect(
@@ -46,7 +64,18 @@ main(int argc, char *argv[])
         &QQmlApplicationEngine::objectCreated,
         &app,
         [url](QObject *obj, const QUrl &objUrl) {
-            if (!obj && url == objUrl) QCoreApplication::exit(-1);
+
+            if (!obj && url == objUrl) {
+                QCoreApplication::exit(-1);
+                return;
+            }
+
+            if (url != objUrl) return;
+
+            // Wire the main window's lifetime to the SiAmigaController
+            if (auto *window = qobject_cast<QQuickWindow *>(obj)) {
+                SiAmigaController::instance().attachWindow(window);
+            }
         });
     engine.load(url);
 

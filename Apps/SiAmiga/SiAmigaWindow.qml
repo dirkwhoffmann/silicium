@@ -1,19 +1,23 @@
 import QtQuick
 import QtQuick.Window
+import Silicium.Controllers
 
 Window {
 
-    visible: true
-    width: 480
-    height: 320
-    title: "SiAmiga"
-    color: "#1e1e1e"
+    id: root
 
-    Text {
-        anchors.centerIn: parent
-        text: "SiAmiga\n(coming soon)"
-        color: "white"
-        font.pixelSize: 24
-        horizontalAlignment: Text.AlignHCenter
+    property SiAmigaController amiga: SiAmigaController
+
+    visible: true
+    width: 800
+    height: 600
+    minimumWidth: 400
+    minimumHeight: 300
+    title: "SiAmiga"
+    color: "black"
+
+    SiAmigaCanvas {
+
+        controller: root.amiga
     }
 }

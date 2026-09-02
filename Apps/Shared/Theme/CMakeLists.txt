@@ -1,5 +1,6 @@
 target_include_directories(silicium PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(SiC64 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(SiAmiga PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # file(GLOB QML_FILES CONFIGURE_DEPENDS "*.qml")
 file(GLOB CPP_FILES CONFIGURE_DEPENDS  "*.cpp")
@@ -16,5 +17,8 @@ target_sources(silicium PRIVATE
         ${CPP_FILES}
 )
 target_sources(SiC64 PRIVATE
+        ${CPP_FILES}
+)
+target_sources(SiAmiga PRIVATE
         ${CPP_FILES}
 )

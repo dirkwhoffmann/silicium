@@ -299,8 +299,10 @@ target_link_libraries(SiAmiga PRIVATE
         VACore
         Qt6::Core
         Qt6::Gui
+        Qt6::Multimedia
         Qt6::Quick
-        Qt6::QuickControls2)
+        Qt6::QuickControls2
+        SDL3::SDL3)
 
 # SiAmiga embeds the same Shared/Assets tree as the other two apps.
 qt_add_resources(SiAmiga "assets_files"
@@ -308,13 +310,22 @@ qt_add_resources(SiAmiga "assets_files"
         BASE "${CMAKE_CURRENT_SOURCE_DIR}/Shared/Assets"
         FILES ${ASSET_RESOURCES})
 
+file(GLOB_RECURSE SIAMIGA_QML_SOURCES CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/SiAmiga/*.qml")
+list(TRANSFORM SIAMIGA_QML_SOURCES REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "")
+
+# Unlike SiC64, this stub doesn't pull in Shared/*.qml (the shared chrome
+# components) -- it only has its own two files, and pulling those in would
+# also require registering the Preferences/Assets/Logger singletons they
+# depend on (see SiC64/main.cpp) for no reason yet.
+#
 # SiAmiga's module needs its own URI, for the same reason SiC64's does (see
 # the comment above qt_add_qml_module(SiC64, ...)).
 qt_add_qml_module(SiAmiga
         URI siamigaUI
         VERSION 1.0
         OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/SiAmiga/siamigaUI"
-        QML_FILES "SiAmiga/SiAmigaWindow.qml")
+        QML_FILES ${SIAMIGA_QML_SOURCES})
 
 #
 # Subdirectories
@@ -322,6 +333,7 @@ qt_add_qml_module(SiAmiga
 
 add_subdirectory(Silicium)
 add_subdirectory(SiC64)
+add_subdirectory(SiAmiga)
 add_subdirectory(Shared)
 
 target_sources(silicium PRIVATE debug.cpp)
