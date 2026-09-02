@@ -10,80 +10,43 @@
 /* The Loggable interface provides a framework for printing log messages.
  *
  * Messages are generated via the log function and are always written to
- * stderr. Whether a call site actually calls log() at all is decided at
- * the call site itself (see the logging macros in debug.h), based on a
- * per-flag debug setting rather than a runtime channel lookup.
+ * stderr.
+ *
+ * The log levels follow the conventional log4j-style hierarchy:
+ *
+ *   OFF:   The highest possible rank. Intended to turn off logging.
+ *   FATAL: Severe errors that cause premature termination.
+ *   ERROR: Other runtime errors or unexpected conditions.
+ *   WARN:  Runtime situations that are undesirable or unexpected.
+ *   INFO:  Interesting runtime events.
+ *   DEBUG: Detailed information on the flow through the system.
+ *   TRACE: Most detailed information.
  */
 
 #pragma once
 
-#include "utl/abilities/Reflectable.h"
+#include "utl/common.h"
 #include <source_location>
 
 namespace utl {
 
-enum class LogLevel : long
-{
-    LOG_NONE    = -1,
-    LOG_EMERG   = 0,
-    LOG_ALERT   = 1,
-    LOG_CRIT    = 2,
-    LOG_ERR     = 3,
-    LOG_WARNING = 4,
-    LOG_NOTICE  = 5,
-    LOG_INFO    = 6,
-    LOG_DEBUG   = 7
-};
+inline constexpr long LOG_OFF   = 0;
+inline constexpr long LOG_FATAL = 1;
+inline constexpr long LOG_ERROR = 2;
+inline constexpr long LOG_WARN  = 3;
+inline constexpr long LOG_INFO  = 4;
+inline constexpr long LOG_DEBUG = 5;
+inline constexpr long LOG_TRACE = 6;
 
-struct LogLevelEnum : Reflectable<LogLevelEnum, LogLevel>
-{
-    static constexpr long minVal = -1;
-    static constexpr long maxVal = (long)LogLevel::LOG_DEBUG;
-
-    static const char *_key(long value) { return _key(LogLevel(value)); }
-    static const char *_key(LogLevel value)
-    {
-        switch (value) {
-
-            case LogLevel::LOG_NONE:    return "LV_NONE";
-            case LogLevel::LOG_EMERG:   return "LV_EMERGENCY";
-            case LogLevel::LOG_ALERT:   return "LV_ALERT";
-            case LogLevel::LOG_CRIT:    return "LV_CRITICAL";
-            case LogLevel::LOG_ERR:     return "LV_ERROR";
-            case LogLevel::LOG_WARNING: return "LV_WARNING";
-            case LogLevel::LOG_NOTICE:  return "LV_NOTICE";
-            case LogLevel::LOG_INFO:    return "LV_INFO";
-            case LogLevel::LOG_DEBUG:   return "LV_DEBUG";
-        }
-        return "???";
-    }
-    static const char *help(long value) { return help(LogLevel(value)); }
-    static const char *help(LogLevel value)
-    {
-        switch (value) {
-
-            case LogLevel::LOG_NONE:    return "Logging disabled";
-            case LogLevel::LOG_EMERG:   return "System is unusable";
-            case LogLevel::LOG_ALERT:   return "Immediate action required";
-            case LogLevel::LOG_CRIT:    return "Critical condition";
-            case LogLevel::LOG_ERR:     return "Error condition";
-            case LogLevel::LOG_WARNING: return "Warning condition";
-            case LogLevel::LOG_NOTICE:  return "Normal but significant condition";
-            case LogLevel::LOG_INFO:    return "Informational message";
-            case LogLevel::LOG_DEBUG:   return "Debug message";
-        }
-        return "???";
-    }
-};
 
 /* Descriptor of a single debug flag.
  *
  * Client code declares its flags in X-macro tables (see debug.h) and
  * expands those tables into a vector of descriptors. In projects that
  * combine several independent libraries, each with its own debug flags,
- * the descriptor gives RetroShell a uniform way to list and modify all of
+ * the descriptor provides a uniform way to list and modify all of
  * them without any library having to know about the others. Both accessors
- * funnel through 'long', so that LogLevel, bool, and plain value flags can
+ * funnel through 'long', so that logging, bool, and plain value flags can
  * share a single descriptor type.
  *
  * Descriptor tables exist in debug builds only. In release builds the flags
@@ -115,7 +78,7 @@ public:
 #if defined(__clang__)
     __attribute__((format(printf, 4, 5)))
 #endif
-    void log(LogLevel level,
+    void log(long level,
              const std::source_location &loc,
              const char *fmt, ...) const;
 
@@ -126,7 +89,26 @@ public:
 protected:
 
     // Optional prefix printed prior to the debug message
-    virtual string prefix(LogLevel, const std::source_location &) const;
+    virtual string prefix(long, const std::source_location &) const;
 };
+
+
+//
+// Logging macros
+//
+
+#ifdef logmsg
+#undef logmsg
+#endif
+
+#define logmsg(key, format, ...) \
+    do { \
+        if CONSTEXPR (key != LOG_OFF) \
+            log(key, std::source_location::current(), \
+                format __VA_OPT__(,) __VA_ARGS__); \
+    } while (0)
+
+#define xfiles(format, ...) \
+    logmsg(LOG_XFILES, format __VA_OPT__(,) __VA_ARGS__)
 
 }

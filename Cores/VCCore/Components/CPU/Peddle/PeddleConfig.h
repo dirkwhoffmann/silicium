@@ -7,7 +7,7 @@
 
 #pragma once
 
-// #include "vcconfig.h"
+#include "vcconfig.h"
 
 /* Idle memory accesses
  *

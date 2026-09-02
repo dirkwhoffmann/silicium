@@ -33,7 +33,7 @@ FSTraits::adf() const
 
 FileSystem::FileSystem(Volume &vol) : cache(*this, vol)
 {
-    logme(LOG_FS, "Creating file system...\n");
+    logmsg(LOG_FS, "Creating file system...\n");
 
     auto layout  = FSDescriptor(vol.capacity());
     layout.bsize = vol.bsize();
@@ -53,12 +53,12 @@ FileSystem::FileSystem(Volume &vol) : cache(*this, vol)
     bmBlocks        = layout.bmBlocks;
     bmExtBlocks     = layout.bmExtBlocks;
 
-    if CONSTEXPR (debug::FS_VERIFY) dumpState();
+    if CONSTEXPR (FS_VERIFY) dumpState();
 
     // Set the current directory to '/'
     current = rootBlock;
 
-    logme(LOG_FS, "Success\n");
+    logmsg(LOG_FS, "Success\n");
 }
 
 void
@@ -79,7 +79,7 @@ FileSystem::dumpState(std::ostream &os) const noexcept
 
     if (isFormatted()) {
 
-        auto fill = 100.0 * st.usedBlocks / st.traits.blocks;
+        auto fill = 100.0 * double(st.usedBlocks) / double(st.traits.blocks);
 
         os << std::setw(5) << std::left << ("DOS" + std::to_string(isize(traits.dos)));
         os << "  ";
@@ -116,7 +116,7 @@ FileSystem::dumpProps(std::ostream &os) const noexcept
 
     auto st   = stat();
     auto bst  = bootStat();
-    auto fill = 100.0 * st.usedBlocks / st.traits.blocks;
+    auto fill = 100.0 * double(st.usedBlocks) / double(st.traits.blocks);
 
     os << tab("Name");
     os << st.name << std::endl;

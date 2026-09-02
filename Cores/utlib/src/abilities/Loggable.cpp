@@ -14,19 +14,18 @@
 namespace utl {
 
 void
-Loggable::log(LogLevel level,
+Loggable::log(long level,
               const std::source_location &loc,
               const char *fmt, ...) const
 {
     fprintf(stderr, "%s", prefix(level, loc).c_str());
 
+    // Severities, per each client project's LOG_OFF..LOG_TRACE scheme
     switch (level) {
 
-        case LogLevel::LOG_EMERG:   fprintf(stderr, "EMERGENCY: "); break;
-        case LogLevel::LOG_CRIT:    fprintf(stderr, "CRITICAL: ");  break;
-        case LogLevel::LOG_ERR:     fprintf(stderr, "ERROR: ");     break;
-        case LogLevel::LOG_WARNING: fprintf(stderr, "WARNING: ");   break;
-        case LogLevel::LOG_NOTICE:  fprintf(stderr, "NOTICE: ");    break;
+        case 1: fprintf(stderr, "FATAL: "); break;
+        case 2: fprintf(stderr, "ERROR: "); break;
+        case 3: fprintf(stderr, "WARN: ");  break;
 
         default:
             break;
@@ -39,7 +38,7 @@ Loggable::log(LogLevel level,
 }
 
 string
-Loggable::prefix(LogLevel level, const std::source_location &loc) const
+Loggable::prefix(long level, const std::source_location &loc) const
 {
     const isize verbosity = 2;
 

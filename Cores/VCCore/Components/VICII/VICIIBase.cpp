@@ -169,23 +169,23 @@ VICII::_dump(Category category, std::ostream &os) const
 void
 VICII::clearStats()
 {
-    if CONSTEXPR (debug::VICII_STATS) {
+    if CONSTEXPR (VICII_STATS) {
 
         double canvasTotal = stats.canvasFastPath + stats.canvasSlowPath;
         double spriteTotal = stats.spriteFastPath + stats.spriteSlowPath;
         double exitTotal = stats.quickExitHit + stats.quickExitMiss;
 
-        logme(LV_INFO, "Canvas: Fast path: %ld Slow path: %ld Ratio: %f\n",
+        logmsg(LOG_INFO, "Canvas: Fast path: %ld Slow path: %ld Ratio: %f\n",
             stats.canvasFastPath,
             stats.canvasSlowPath,
             canvasTotal != 0 ? stats.canvasFastPath / canvasTotal : -1);
 
-        logme(LV_INFO, "Sprites: Fast path: %ld Slow path: %ld Ratio: %f\n",
+        logmsg(LOG_INFO, "Sprites: Fast path: %ld Slow path: %ld Ratio: %f\n",
             stats.spriteFastPath,
             stats.spriteSlowPath,
             spriteTotal != 0 ? stats.spriteFastPath / spriteTotal : -1);
 
-        logme(LV_INFO, "Exits: Hit: %ld Miss: %ld Ratio: %f\n",
+        logmsg(LOG_INFO, "Exits: Hit: %ld Miss: %ld Ratio: %f\n",
             stats.quickExitHit,
             stats.quickExitMiss,
             exitTotal != 0 ? stats.quickExitHit / exitTotal : -1);

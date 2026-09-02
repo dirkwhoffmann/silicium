@@ -274,16 +274,16 @@ CoreComponent::load(const u8 *buf)
         auto count = u64(reader.ptr - (buf + result));
 
         // Check integrity
-        if (size != count || hash != c->checksum(false) || force::SNAP_CORRUPTED) {
+        if (size != count || hash != c->checksum(false) || SNAP_CORRUPTED) {
 
-            logme(LOG_SNP, "Loaded %llu bytes (expected %llu)\n", count, size);
-            logme(LOG_SNP, "Hash: %llx (expected %llx)\n", hash, c->checksum(false));
-            if CONSTEXPR (debug::SNP_VERIFY) { fatalError; }
+            logmsg(LOG_SNP, "Loaded %llu bytes (expected %llu)\n", count, size);
+            logmsg(LOG_SNP, "Hash: %llx (expected %llx)\n", hash, c->checksum(false));
+            if CONSTEXPR (SNP_VERIFY) { fatalError; }
             
             throw MediaError(MediaError::SNAP_CORRUPTED);
         }
 
-        // logme(LOG_SNP, "Loaded %llu bytes (expected %llu)\n", count, size);
+        // logmsg(LOG_SNP, "Loaded %llu bytes (expected %llu)\n", count, size);
         result += isize(count);
     });
 
@@ -312,15 +312,15 @@ CoreComponent::save(u8 *buffer)
         isize count = (isize)(writer.ptr - (buffer + result));
 
         // Check integrity
-        if (count != c->size(false) || force::SNAP_CORRUPTED) {
+        if (count != c->size(false) || SNAP_CORRUPTED) {
 
-            logme(LOG_SNP, "Saved %ld bytes (expected %ld)\n", count, c->size(false));
-            if CONSTEXPR (debug::SNP_VERIFY) { fatalError; }
+            logmsg(LOG_SNP, "Saved %ld bytes (expected %ld)\n", count, c->size(false));
+            if CONSTEXPR (SNP_VERIFY) { fatalError; }
             
             throw MediaError(MediaError::SNAP_CORRUPTED);
         }
 
-        // logme(LOG_SNP, "Saved %ld bytes (expected %ld)\n", count, c->size(false));
+        // logmsg(LOG_SNP, "Saved %ld bytes (expected %ld)\n", count, c->size(false));
         result += count;
     });
 
@@ -371,7 +371,7 @@ CoreComponent::diff(CoreComponent &other)
 
     // Compare this component
     if (auto check1 = checksum(false), check2 = other.checksum(false); check1 != check2) {
-        logme(LV_INFO, "Checksum mismatch: %llx != %llx\n", check1, check2);
+        logmsg(LOG_INFO, "Checksum mismatch: %llx != %llx\n", check1, check2);
     }
 }
 

@@ -43,6 +43,8 @@ public:
     class RegressionTester &regressionTester;
     class RemoteManager &remoteManager;
     class RetroShell &retroShell;
+    class RetroShell &rshShell;
+    class RetroShell &rpcShell;
     class SIDBridge &sidBridge;
     class SID& sid0;
     class SID& sid1;
@@ -66,7 +68,7 @@ public:
     SubComponent(C64& ref, isize id);
 
     bool isRunAheadInstance() const;
-    string prefix(LogLevel, const std::source_location &) const override;
+    string prefix(long, const std::source_location &) const override;
 };
 
 }

@@ -20,7 +20,7 @@ namespace retro::vault::cbm {
 
 FileSystem::FileSystem(Volume &vol) : cache(*this, vol)
 {
-    logme(LOG_FS, "Creating file system...\n");
+    logmsg(LOG_FS, "Creating file system...\n");
 
     // Check consistency
     if (vol.capacity() != 683 && vol.capacity() != 768 && vol.capacity() != 802)
@@ -32,8 +32,8 @@ FileSystem::FileSystem(Volume &vol) : cache(*this, vol)
     // Derive persistant file system properties
     traits.init(cache.predictDOS(vol), vol.capacity());
 
-    if CONSTEXPR (debug::FS_VERIFY) dumpStatfs();
-    logme(LOG_FS, "Success\n");
+    if CONSTEXPR (FS_VERIFY) dumpStatfs();
+    logmsg(LOG_FS, "Success\n");
 }
 
 void

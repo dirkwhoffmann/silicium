@@ -491,7 +491,21 @@ C64Controller::windowDidOpen()
     // Power on the emulator
     core().setListener(this, ::process);
     core().c64.installOpenRoms();
-    core().c64.loadWorkspace(svm->root() / SVMFile::workspaceDir);
+
+    // A corrupted SVM archive can throw here (e.g. while unpacking it into
+    // its temp-space root on first access). This runs inside a Qt signal
+    // handler (see attachWindow()), and Qt does not tolerate an exception
+    // escaping one, so the failure must be caught here rather than left to
+    // propagate.
+    try {
+
+        core().c64.loadWorkspace(svm->root() / SVMFile::workspaceDir);
+
+    } catch (const std::exception &e) {
+
+        showError("Failed to load workspace.", e.what());
+    }
+
     core().powerOn();
 
     for (const auto &command : execCommands) {
@@ -1414,10 +1428,9 @@ C64Controller::loadSnapshot(const utl::UUID &uuid)
         return;
     }
 
-    auto path = svm->root() / SVMFile::snapshotDir / info->binary;
-
     try {
 
+        auto path = svm->root() / SVMFile::snapshotDir / info->binary;
         core().c64.loadSnapshot(path);
 
     } catch (const std::exception &e) {

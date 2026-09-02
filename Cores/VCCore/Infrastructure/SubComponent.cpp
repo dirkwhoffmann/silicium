@@ -41,6 +41,8 @@ powerSupply(ref.supply),
 regressionTester(ref.regressionTester),
 remoteManager(ref.remoteManager),
 retroShell(ref.retroShell),
+rshShell(ref.rshShell),
+rpcShell(ref.rpcShell),
 sidBridge(ref.sidBridge),
 sid0(ref.sidBridge.sid[0]),
 sid1(ref.sidBridge.sid[1]),
@@ -62,7 +64,7 @@ SubComponent::isRunAheadInstance() const
 }
 
 string
-SubComponent::prefix(LogLevel level, const std::source_location &loc) const
+SubComponent::prefix(long level, const std::source_location &loc) const
 {
     return c64.prefix(level, loc);
 }

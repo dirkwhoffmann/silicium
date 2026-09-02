@@ -66,6 +66,7 @@ add_subdirectory(Ports)
 add_subdirectory(Media)
 add_subdirectory(Misc)
 add_subdirectory(Peripherals)
+add_subdirectory(ThirdParty)
 
 # Threads
 set(THREADS_PREFER_PTHREAD_FLAG ON)

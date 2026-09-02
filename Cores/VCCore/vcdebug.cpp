@@ -12,11 +12,10 @@
 
 #include "vcconfig.h"
 #include "utl/abilities/Loggable.h"
-#include <type_traits>
 
 #ifndef NDEBUG
 
-namespace vc64::debug {
+namespace vc64 {
 
 /* The flag descriptor tables, generated from the X-macro lists in vcdebug.h.
  * Each entry wraps its flag in a pair of captureless lambdas, so that flags
@@ -26,12 +25,12 @@ namespace vc64::debug {
 #define LOG_FLAG_ENTRY(name, dflt, help) \
     { #name, help, false, \
       []() -> long { return (long)name; }, \
-      [](long value) { name = LogLevel(value); } },
+      [](long value) { name = value; } },
 
-#define DEBUG_FLAG_ENTRY(type, name, dflt, help) \
-    { #name, help, std::is_same_v<type, bool>, \
+#define DEBUG_FLAG_ENTRY(name, dflt, help) \
+    { #name, help, true, \
       []() -> long { return (long)name; }, \
-      [](long value) { name = (type)value; } },
+      [](long value) { name = (bool)value; } },
 
 const std::vector<FlagInfo> logFlags = { VC_LOG_FLAGS(LOG_FLAG_ENTRY) };
 const std::vector<FlagInfo> debugFlags = { VC_DEBUG_FLAGS(DEBUG_FLAG_ENTRY) };

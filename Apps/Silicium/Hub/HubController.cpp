@@ -211,7 +211,18 @@ HubController::selected() const
 void
 HubController::setSelected(const QString &value)
 {
-    select(UUID::fromString(value.toStdString()));
+    // This is a Q_PROPERTY WRITE accessor, invoked directly by QML property
+    // bindings -- an exception escaping here is exactly as fatal as one
+    // escaping a signal handler. UUID::fromString() throws on a string that
+    // contains something other than hex digits and dashes.
+    try {
+
+        select(UUID::fromString(value.toStdString()));
+
+    } catch (const std::exception &e) {
+
+        qCWarning(siLog).noquote() << "Failed to select" << value << ":" << e.what();
+    }
 }
 
 void
