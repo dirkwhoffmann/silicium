@@ -160,28 +160,44 @@ ColumnLayout {
 
                 // Return is rendered as an ordinary Rectangle background
                 // (returnBg, pixel-identical to SiButton's own -- Palette.
-                // widget, lighter(1.4)/darker(1.05)) clipped to the notch
-                // polygon via a Shape used purely as an alpha mask
-                // (returnShape). ShapePath.fillColor/fillGradient silently
-                // fails to paint at all on some of the notch's smaller
-                // instances (e.g. the A1000 layouts) when given
-                // Palette.widget directly -- reproducible, not tied to any
-                // one renderer backend, and specific to colors close in
-                // lightness to the panel background -- so the actual key
-                // color never goes through ShapePath at all here; the mask
-                // is filled with plain opaque black instead (only its alpha
-                // coverage is ever used, so its own color doesn't matter,
-                // and black was never affected by the failure). Both
-                // returnBg and returnShape run through a ShaderEffectSource
-                // with hideSource: true -- the standard way to keep an item
-                // in the scene graph (so MultiEffect can sample it) without
-                // it also drawing itself directly on top.
+                // widget, lighter(1.4)/darker(1.05), including the same
+                // radius: Style.radius) clipped to the notch polygon via a
+                // Shape used purely as an alpha mask (returnShape).
+                // ShapePath.fillColor/fillGradient silently fails to paint
+                // at all on some of the notch's smaller instances (e.g. the
+                // A1000 layouts) when given Palette.widget directly --
+                // reproducible, not tied to any one renderer backend, and
+                // specific to colors close in lightness to the panel
+                // background -- so the actual key color never goes through
+                // ShapePath at all here; the mask is filled with plain
+                // opaque black instead (only its alpha coverage is ever
+                // used, so its own color doesn't matter, and black was
+                // never affected by the failure). Both returnBg and
+                // returnShape run through a ShaderEffectSource with
+                // hideSource: true -- the standard way to keep an item in
+                // the scene graph (so MultiEffect can sample it) without it
+                // also drawing itself directly on top.
+                //
+                // The mask's own path is a plain-cornered hexagon (no
+                // PathArc rounding) -- rounding the *mask's* corners turned
+                // out not to survive the ShaderEffectSource/MultiEffect
+                // round-trip (the arcs got lost, leaving sharp corners
+                // regardless of radius). returnBg.radius rounds the three
+                // ordinary outer corners instead -- a plain Rectangle
+                // property, unaffected by any of this -- and the mask
+                // simply doesn't need to touch those pixels: a Rectangle's
+                // rounded corner is already empty there, so a square mask
+                // corner reveals nothing extra. Only the notch's own two
+                // corners (V0, V4) are actually cut by the mask, and those
+                // stay sharp, matching real ISO-Enter keycaps whose inner
+                // notch corner is a plain right angle even though the
+                // outer corners are rounded.
 
                 Rectangle {
 
                     id: returnBg
-                    visible: keyItem.isReturn
                     anchors.fill: parent
+                    radius: Style.radius
 
                     border.color: keyItem.pressed ? Palette.accent : Palette.widgetShadow
                     border.width: 1
@@ -202,7 +218,6 @@ ColumnLayout {
                 Shape {
 
                     id: returnShape
-                    visible: keyItem.isReturn
                     anchors.fill: parent
                     antialiasing: true
 
@@ -210,58 +225,24 @@ ColumnLayout {
                     readonly property real nh: model.notchHeight * root.scale
                     readonly property real kw: width
                     readonly property real kh: height
-                    readonly property real r: Style.radius
 
                     ShapePath {
 
                         fillColor: "black"
 
-                        // Starts at the notch's inner corner (V5) -- the one
-                        // corner left sharp, matching real ISO-Enter keycaps
-                        // whose inner corner is a plain right angle even
-                        // though the outer corners are rounded. Every other
-                        // corner is a straight edge run up to r short of the
-                        // corner, then a quarter-circle PathArc around it.
+                        // The notch cut -- from the inner corner (V5) up to
+                        // V0, across to V1 (top-right), down to V2
+                        // (bottom-right), across to V3 (bottom-left), and
+                        // back up to V4, closing at V5.
                         startX: returnShape.nw
                         startY: returnShape.nh
 
-                        // Round V0 (top of the notch)
-                        PathLine { x: returnShape.nw; y: returnShape.r }
-                        PathArc {
-                            x: returnShape.nw + returnShape.r; y: 0
-                            radiusX: returnShape.r; radiusY: returnShape.r
-                            direction: PathArc.Clockwise
-                        }
-                        // Round V1 (top-right)
-                        PathLine { x: returnShape.kw - returnShape.r; y: 0 }
-                        PathArc {
-                            x: returnShape.kw; y: returnShape.r
-                            radiusX: returnShape.r; radiusY: returnShape.r
-                            direction: PathArc.Clockwise
-                        }
-                        // Round V2 (bottom-right)
-                        PathLine { x: returnShape.kw; y: returnShape.kh - returnShape.r }
-                        PathArc {
-                            x: returnShape.kw - returnShape.r; y: returnShape.kh
-                            radiusX: returnShape.r; radiusY: returnShape.r
-                            direction: PathArc.Clockwise
-                        }
-                        // Round V3 (bottom-left)
-                        PathLine { x: returnShape.r; y: returnShape.kh }
-                        PathArc {
-                            x: 0; y: returnShape.kh - returnShape.r
-                            radiusX: returnShape.r; radiusY: returnShape.r
-                            direction: PathArc.Clockwise
-                        }
-                        // Round V4 (bottom of the notch)
-                        PathLine { x: 0; y: returnShape.nh + returnShape.r }
-                        PathArc {
-                            x: returnShape.r; y: returnShape.nh
-                            radiusX: returnShape.r; radiusY: returnShape.r
-                            direction: PathArc.Clockwise
-                        }
-                        // Back to V5 (sharp), closing the path
-                        PathLine { x: returnShape.nw; y: returnShape.nh }
+                        PathLine { x: returnShape.nw; y: 0 }              // V0
+                        PathLine { x: returnShape.kw; y: 0 }              // V1
+                        PathLine { x: returnShape.kw; y: returnShape.kh } // V2
+                        PathLine { x: 0; y: returnShape.kh }              // V3
+                        PathLine { x: 0; y: returnShape.nh }              // V4
+                        PathLine { x: returnShape.nw; y: returnShape.nh } // back to V5
                     }
                 }
 
@@ -293,7 +274,7 @@ ColumnLayout {
                     maskEnabled: true
                     maskSource: returnMaskSource
                     maskThresholdMin: 0.5
-                    maskSpreadAtMin: 0.0
+                    maskSpreadAtMin: 0.1
 
                     // Same drop shadow SiButton gets from its own background
                     // Rectangle, so the notched key reads as raised too.
