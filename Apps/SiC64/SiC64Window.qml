@@ -596,7 +596,7 @@ VMWindow {
         actions: root.actions
     }
 
-    About {
+    SiC64About {
 
         id: aboutWindow
         visible: false

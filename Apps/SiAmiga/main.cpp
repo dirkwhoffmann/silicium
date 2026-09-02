@@ -12,6 +12,7 @@
 #include "SiAmRenderer.h"
 #include "SiAmActivityController.h"
 #include "Config/SiAmConfigController.h"
+#include "AppController.h"
 #include "Assets.h"
 #include "Logger.h"
 #include "Palette.h"
@@ -65,6 +66,7 @@ main(int argc, char *argv[])
 
     // Register singletons
     qmlRegisterSingletonInstance("Silicium.Assets", 1, 0, "Assets", Assets::instance());
+    qmlRegisterSingletonInstance("Silicium.Controllers", 1, 0, "AppController", &AppController::instance());
     qmlRegisterSingletonInstance("Silicium.Controllers", 1, 0, "SiAmController", &SiAmController::instance());
     qmlRegisterSingletonInstance("Silicium.Preferences", 1, 0, "Preferences", &Preferences::instance());
     qmlRegisterSingletonInstance("Silicium.Theme", 1, 0, "Shortcuts", &Shortcuts::instance());

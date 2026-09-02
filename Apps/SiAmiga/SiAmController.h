@@ -31,6 +31,9 @@ class SiAmController : public Controller {
     // Current state
     VMState m_state = VMState::HIBERNATED;
 
+    // Always empty for now -- see getErrorMessage() below.
+    QString errorMessage;
+
     // Gateway to the host audio backend
     AudioController m_audio;
 
@@ -74,6 +77,12 @@ public:
     bool isPoweredOn() const { return m_state == VMState::PAUSED || m_state == VMState::RUNNING; }
     bool isRunning() { return m_state == VMState::RUNNING; }
     bool isPaused() { return m_state == VMState::PAUSED; }
+
+    // Always empty for now -- this stub has no command-line/SVM parsing
+    // yet (see C64Controller::parseArguments for what it will eventually
+    // mirror). Kept so SiAmAbout.qml's error path binds to something real.
+    Q_PROPERTY(QString errorMessage READ getErrorMessage CONSTANT)
+    const QString &getErrorMessage() const { return errorMessage; }
 
 
     //

@@ -99,7 +99,7 @@ main(int argc, char *argv[])
     // Load the main window, or an alert window if the SVM file couldn't be opened
     const QUrl url(ok
         ? QStringLiteral("qrc:/qt/qml/sic64UI/SiC64/SiC64Window.qml")
-        : QStringLiteral("qrc:/qt/qml/sic64UI/SiC64/Dialogs/About.qml"));
+        : QStringLiteral("qrc:/qt/qml/sic64UI/SiC64/Dialogs/SiC64About.qml"));
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreated,

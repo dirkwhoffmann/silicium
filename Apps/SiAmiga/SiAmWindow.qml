@@ -21,11 +21,17 @@ Window {
         controller: root.amiga
     }
 
-    // No menu/toolbar action opens this yet (see SiAmConfigWindow.qml) --
-    // wiring that in is a later step, alongside the panels' actual content.
+    // No menu/toolbar action opens either of these yet -- wiring that in is
+    // a later step, alongside the panels' actual content.
     SiAmConfigWindow {
 
         id: configWindow
         controller: root.amiga
+    }
+
+    SiAmAbout {
+
+        id: aboutWindow
+        visible: false
     }
 }
