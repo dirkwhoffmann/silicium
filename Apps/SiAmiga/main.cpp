@@ -10,6 +10,7 @@
 #include "config.h"
 #include "SiAmController.h"
 #include "SiAmRenderer.h"
+#include "SiAmActivityController.h"
 #include "Logger.h"
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -51,6 +52,7 @@ main(int argc, char *argv[])
 
     // Register types
     qmlRegisterType<SiAmRenderer>("Silicium.Controllers", 1, 0, "SiAmRenderer");
+    qmlRegisterType<SiAmActivityController>("Silicium.Controllers", 1, 0, "SiAmActivityController");
 
     // Register singletons
     qmlRegisterSingletonInstance("Silicium.Controllers", 1, 0, "SiAmController", &SiAmController::instance());

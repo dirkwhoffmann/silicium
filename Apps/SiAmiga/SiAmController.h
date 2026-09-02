@@ -13,6 +13,7 @@
 #include "Controller.h"
 #include "AudioController.h"
 #include "SiAmRenderer.h"
+#include "SiAmActivityController.h"
 
 class QCoreApplication;
 using vamiga::VAmiga;
@@ -35,6 +36,9 @@ class SiAmController : public Controller {
     // Video renderer. Owned by the QML scene graph (SiAmCanvas.qml), not
     // by this controller -- see setRenderer().
     class SiAmRenderer *m_renderer = nullptr;
+
+    // Subcontrollers
+    unique_ptr<SiAmActivityController> m_activityController;
 
 public:
 
@@ -98,6 +102,10 @@ public:
 
     class SiAmRenderer *getRenderer() const { return m_renderer; }
     void setRenderer(class SiAmRenderer *ptr);
+
+    Q_PROPERTY(SiAmActivityController *activityController READ getActivityController CONSTANT)
+
+    SiAmActivityController *getActivityController() const { return m_activityController.get(); }
 
 
     //

@@ -32,6 +32,8 @@ process(const void *listener, const Message msg)
 SiAmController::SiAmController()
 {
     LogTask task("Creating SiAmController...");
+
+    m_activityController = make_unique<SiAmActivityController>(this);
 }
 
 SiAmController &

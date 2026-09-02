@@ -85,8 +85,11 @@ SiAmRenderer::tick()
     frame++;
 
     auto &core = controller->core();
+    auto &cpuInfo = core.cpu.getInfo();
+    auto &amigaInfo = core.amiga.getInfo();
 
     controller->update();
+    controller->getActivityController()->update(cpuInfo.clock, amigaInfo.frame, frame);
 
     // Update texture
     core.videoPort.lockTexture();
