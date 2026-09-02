@@ -5,12 +5,12 @@ Rectangle {
 
     id: canvas
 
-    property SiAmigaController controller
+    property SiAmController controller
 
     anchors.fill: parent
     color: "black"
 
-    SiAmigaRenderer {
+    SiAmRenderer {
 
         id: texture
         controller: canvas.controller

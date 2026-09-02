@@ -12,7 +12,7 @@
 #include "VAmiga.h"
 #include "Controller.h"
 #include "AudioController.h"
-#include "SiAmigaRenderer.h"
+#include "SiAmRenderer.h"
 
 class QCoreApplication;
 using vamiga::VAmiga;
@@ -22,7 +22,7 @@ using vamiga::VAmiga;
 // the Amiga core and render its frames, without the media/inspector/RPC
 // surface C64Controller carries for the fully built-out SiC64 app. Those
 // land in later steps as SiAmiga grows.
-class SiAmigaController : public Controller {
+class SiAmController : public Controller {
 
     Q_OBJECT
 
@@ -32,15 +32,15 @@ class SiAmigaController : public Controller {
     // Gateway to the host audio backend
     AudioController m_audio;
 
-    // Video renderer. Owned by the QML scene graph (SiAmigaCanvas.qml), not
+    // Video renderer. Owned by the QML scene graph (SiAmCanvas.qml), not
     // by this controller -- see setRenderer().
-    class SiAmigaRenderer *m_renderer = nullptr;
+    class SiAmRenderer *m_renderer = nullptr;
 
 public:
 
-    SiAmigaController();
+    SiAmController();
 
-    static SiAmigaController &instance();
+    static SiAmController &instance();
     static VAmiga &core();
 
     void initialize();
@@ -94,10 +94,10 @@ public:
     // sceneGraphInitialized/destroyed signals to windowDidOpen()/windowDidClose().
     void attachWindow(QQuickWindow *window);
 
-    Q_PROPERTY(SiAmigaRenderer *renderer READ getRenderer WRITE setRenderer NOTIFY rendererChanged)
+    Q_PROPERTY(SiAmRenderer *renderer READ getRenderer WRITE setRenderer NOTIFY rendererChanged)
 
-    class SiAmigaRenderer *getRenderer() const { return m_renderer; }
-    void setRenderer(class SiAmigaRenderer *ptr);
+    class SiAmRenderer *getRenderer() const { return m_renderer; }
+    void setRenderer(class SiAmRenderer *ptr);
 
 
     //

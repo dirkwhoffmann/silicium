@@ -10,11 +10,11 @@
 #pragma once
 
 #include "Renderer.h"
-#include "SiAmigaController.h"
+#include "SiAmController.h"
 #include "utl/common.h"
 #include <QImage>
 
-class SiAmigaRenderer : public Renderer {
+class SiAmRenderer : public Renderer {
 
     Q_OBJECT
 
@@ -22,7 +22,7 @@ class SiAmigaRenderer : public Renderer {
     // Members
     //
 
-    class SiAmigaController *controller = nullptr;
+    class SiAmController *controller = nullptr;
     u32 *tex                            = nullptr;
 
     // Frame counter
@@ -36,7 +36,7 @@ class SiAmigaRenderer : public Renderer {
     QMetaObject::Connection m_frameConnection;
 
     Q_PROPERTY(
-        SiAmigaController *controller READ getController WRITE setController NOTIFY controllerChanged)
+        SiAmController *controller READ getController WRITE setController NOTIFY controllerChanged)
 
     //
     // Methods
@@ -46,8 +46,8 @@ class SiAmigaRenderer : public Renderer {
 
     using Renderer::Renderer;
 
-    SiAmigaController *getController() const { return controller; }
-    void setController(SiAmigaController *ptr);
+    SiAmController *getController() const { return controller; }
+    void setController(SiAmController *ptr);
 
     void start() override;
     void stop() override;

@@ -6,7 +6,7 @@ Window {
 
     id: root
 
-    property SiAmigaController amiga: SiAmigaController
+    property SiAmController amiga: SiAmController
 
     visible: true
     width: 800
@@ -16,7 +16,7 @@ Window {
     title: "SiAmiga"
     color: "black"
 
-    SiAmigaCanvas {
+    SiAmCanvas {
 
         controller: root.amiga
     }

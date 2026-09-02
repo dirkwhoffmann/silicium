@@ -7,8 +7,8 @@
 // See https://www.gnu.org for license information
 // -----------------------------------------------------------------------------
 
-#include "SiAmigaController.h"
-#include "SiAmigaRenderer.h"
+#include "SiAmController.h"
+#include "SiAmRenderer.h"
 #include "Logger.h"
 #include "DiagRom.h"
 #include <QCoreApplication>
@@ -22,34 +22,34 @@ using namespace vamiga;
 static void
 process(const void *listener, const Message msg)
 {
-    auto *con = static_cast<SiAmigaController *>(const_cast<void *>(listener));
+    auto *con = static_cast<SiAmController *>(const_cast<void *>(listener));
 
     QMetaObject::invokeMethod(con, [con, msg, att = std::string(msg.str ? msg.str : "")] {
         con->process(msg, att);
     }, Qt::QueuedConnection);
 }
 
-SiAmigaController::SiAmigaController()
+SiAmController::SiAmController()
 {
-    LogTask task("Creating SiAmigaController...");
+    LogTask task("Creating SiAmController...");
 }
 
-SiAmigaController &
-SiAmigaController::instance()
+SiAmController &
+SiAmController::instance()
 {
-    static SiAmigaController controller;
+    static SiAmController controller;
     return controller;
 }
 
 VAmiga &
-SiAmigaController::core()
+SiAmController::core()
 {
     static VAmiga core;
     return core;
 }
 
 void
-SiAmigaController::initialize()
+SiAmController::initialize()
 {
     // There is no free, redistributable Kickstart ROM, so the stub plugs in
     // DiagRom (an open-source diagnostic ROM) instead -- the same one the
@@ -64,19 +64,19 @@ SiAmigaController::initialize()
 }
 
 void
-SiAmigaController::start()
+SiAmController::start()
 {
-    qCDebug(siLog) << "Starting SiAmigaController...";
+    qCDebug(siLog) << "Starting SiAmController...";
 }
 
 void
-SiAmigaController::stop()
+SiAmController::stop()
 {
-    qCDebug(siLog) << "Stopping SiAmigaController...";
+    qCDebug(siLog) << "Stopping SiAmController...";
 }
 
 void
-SiAmigaController::setState(VMState state)
+SiAmController::setState(VMState state)
 {
     if (m_state != state) {
 
@@ -86,7 +86,7 @@ SiAmigaController::setState(VMState state)
 }
 
 void
-SiAmigaController::attachWindow(QQuickWindow *window)
+SiAmController::attachWindow(QQuickWindow *window)
 {
     m_window = window;
     if (!m_window) return;
@@ -109,7 +109,7 @@ SiAmigaController::attachWindow(QQuickWindow *window)
 }
 
 void
-SiAmigaController::windowDidOpen()
+SiAmController::windowDidOpen()
 {
     core().powerOn();
 
@@ -125,7 +125,7 @@ SiAmigaController::windowDidOpen()
 }
 
 void
-SiAmigaController::windowDidClose()
+SiAmController::windowDidClose()
 {
     stopRenderer();
 
@@ -138,7 +138,7 @@ SiAmigaController::windowDidClose()
 }
 
 void
-SiAmigaController::setRenderer(SiAmigaRenderer *ptr)
+SiAmController::setRenderer(SiAmRenderer *ptr)
 {
     if (m_renderer != ptr) {
 
@@ -148,19 +148,19 @@ SiAmigaController::setRenderer(SiAmigaRenderer *ptr)
 }
 
 void
-SiAmigaController::startRenderer()
+SiAmController::startRenderer()
 {
     if (m_renderer) m_renderer->start();
 }
 
 void
-SiAmigaController::stopRenderer()
+SiAmController::stopRenderer()
 {
     if (m_renderer) m_renderer->stop();
 }
 
 void
-SiAmigaController::linkAudioSink(QAudioSink *sink, QAudioFormat &format)
+SiAmController::linkAudioSink(QAudioSink *sink, QAudioFormat &format)
 {
     auto sampleRate = format.sampleRate();
     core().set(Opt::HOST_SAMPLE_RATE, sampleRate);
@@ -173,7 +173,7 @@ SiAmigaController::linkAudioSink(QAudioSink *sink, QAudioFormat &format)
 }
 
 void
-SiAmigaController::run()
+SiAmController::run()
 {
     try {
         core().run();
@@ -183,20 +183,20 @@ SiAmigaController::run()
 }
 
 void
-SiAmigaController::pause()
+SiAmController::pause()
 {
     core().pause();
 }
 
 void
-SiAmigaController::reset()
+SiAmController::reset()
 {
     core().hardReset();
     core().run();
 }
 
 void
-SiAmigaController::powerOn()
+SiAmController::powerOn()
 {
     try {
         core().run();
@@ -206,43 +206,43 @@ SiAmigaController::powerOn()
 }
 
 void
-SiAmigaController::powerOff()
+SiAmController::powerOff()
 {
     core().powerOff();
 }
 
 void
-SiAmigaController::didPowerOn()
+SiAmController::didPowerOn()
 {
     setState(VMState::PAUSED);
 }
 
 void
-SiAmigaController::didPowerOff()
+SiAmController::didPowerOff()
 {
     setState(VMState::OFF);
 }
 
 void
-SiAmigaController::didRun()
+SiAmController::didRun()
 {
     setState(VMState::RUNNING);
 }
 
 void
-SiAmigaController::didPause()
+SiAmController::didPause()
 {
     setState(VMState::PAUSED);
 }
 
 void
-SiAmigaController::didShutdown()
+SiAmController::didShutdown()
 {
     setState(VMState::HALTED);
 }
 
 void
-SiAmigaController::process(const Message &msg, const string &attachment)
+SiAmController::process(const Message &msg, const string &attachment)
 {
     switch (msg.type) {
 
@@ -278,7 +278,7 @@ SiAmigaController::process(const Message &msg, const string &attachment)
 }
 
 void
-SiAmigaController::update()
+SiAmController::update()
 {
     // Placeholder for coalesced per-frame UI updates (config/info dirty
     // flags and the like), following the same rhythm as C64Controller::update().

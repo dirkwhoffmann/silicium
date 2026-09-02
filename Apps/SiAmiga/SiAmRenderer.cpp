@@ -7,7 +7,7 @@
 // See https://www.gnu.org for license information
 // -----------------------------------------------------------------------------
 
-#include "SiAmigaRenderer.h"
+#include "SiAmRenderer.h"
 #include "Logger.h"
 #include "Constants.h"
 #include "VAmiga.h"
@@ -23,7 +23,7 @@ static constexpr isize texWidth  = 2 * vamiga::HPIXELS;
 static constexpr isize texHeight = vamiga::VPIXELS;
 
 void
-SiAmigaRenderer::setController(SiAmigaController *ptr)
+SiAmRenderer::setController(SiAmController *ptr)
 {
     if (controller != ptr) {
 
@@ -33,7 +33,7 @@ SiAmigaRenderer::setController(SiAmigaController *ptr)
 }
 
 void
-SiAmigaRenderer::start()
+SiAmRenderer::start()
 {
     LogTask task("Starting renderer...");
 
@@ -64,7 +64,7 @@ SiAmigaRenderer::start()
 }
 
 void
-SiAmigaRenderer::stop()
+SiAmRenderer::stop()
 {
     qCDebug(siLog) << "Stopping renderer...";
 
@@ -78,7 +78,7 @@ SiAmigaRenderer::stop()
 }
 
 void
-SiAmigaRenderer::tick()
+SiAmRenderer::tick()
 {
     if (!controller) return;
 
@@ -98,7 +98,7 @@ SiAmigaRenderer::tick()
 }
 
 QSGNode *
-SiAmigaRenderer::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
+SiAmRenderer::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
 {
     if (!tex || width <= 0 || height <= 0) {
         delete node;
@@ -122,7 +122,7 @@ SiAmigaRenderer::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
 }
 
 void
-SiAmigaRenderer::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
+SiAmRenderer::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
     QQuickItem::geometryChange(newGeometry, oldGeometry);
 
@@ -138,13 +138,13 @@ SiAmigaRenderer::geometryChange(const QRectF &newGeometry, const QRectF &oldGeom
 }
 
 TexRect
-SiAmigaRenderer::entire() const
+SiAmRenderer::entire() const
 {
     return { 0, 0, double(texWidth), double(texHeight) };
 }
 
 TexRect
-SiAmigaRenderer::normalize(TexRect rect) const
+SiAmRenderer::normalize(TexRect rect) const
 {
     return { .x = rect.x / texWidth,
              .y = rect.y / texHeight,

@@ -8,8 +8,8 @@
 // -----------------------------------------------------------------------------
 
 #include "config.h"
-#include "SiAmigaController.h"
-#include "SiAmigaRenderer.h"
+#include "SiAmController.h"
+#include "SiAmRenderer.h"
 #include "Logger.h"
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -50,15 +50,15 @@ main(int argc, char *argv[])
     app.setWindowIcon(QIcon(":/assets/images/app-icon.png"));
 
     // Register types
-    qmlRegisterType<SiAmigaRenderer>("Silicium.Controllers", 1, 0, "SiAmigaRenderer");
+    qmlRegisterType<SiAmRenderer>("Silicium.Controllers", 1, 0, "SiAmRenderer");
 
     // Register singletons
-    qmlRegisterSingletonInstance("Silicium.Controllers", 1, 0, "SiAmigaController", &SiAmigaController::instance());
+    qmlRegisterSingletonInstance("Silicium.Controllers", 1, 0, "SiAmController", &SiAmController::instance());
 
     // Launch the emulator core
-    SiAmigaController::instance().initialize();
+    SiAmController::instance().initialize();
 
-    const QUrl url(QStringLiteral("qrc:/qt/qml/siamigaUI/SiAmiga/SiAmigaWindow.qml"));
+    const QUrl url(QStringLiteral("qrc:/qt/qml/siamigaUI/SiAmiga/SiAmWindow.qml"));
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreated,
@@ -72,9 +72,9 @@ main(int argc, char *argv[])
 
             if (url != objUrl) return;
 
-            // Wire the main window's lifetime to the SiAmigaController
+            // Wire the main window's lifetime to the SiAmController
             if (auto *window = qobject_cast<QQuickWindow *>(obj)) {
-                SiAmigaController::instance().attachWindow(window);
+                SiAmController::instance().attachWindow(window);
             }
         });
     engine.load(url);
