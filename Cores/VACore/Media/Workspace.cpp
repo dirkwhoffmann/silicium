@@ -1,0 +1,37 @@
+// -----------------------------------------------------------------------------
+// This file is part of vAmiga
+//
+// Copyright (C) Dirk W. Hoffmann. www.dirkwhoffmann.de
+// Licensed under the Mozilla Public License v2
+//
+// See https://mozilla.org/MPL/2.0 for license information
+// -----------------------------------------------------------------------------
+
+#include "vaconfig.h"
+#include "Workspace.h"
+#include "utl/io.h"
+#include "utl/support/Strings.h"
+
+#include <sstream>
+
+namespace vamiga {
+
+bool
+Workspace::isCompatible(const fs::path &path)
+{
+    if (!utl::isDirectory(path)) return false;
+    
+    auto suffix = utl::uppercased(path.extension().string());
+    return suffix == ".VAMIGA";
+}
+
+void
+Workspace::init(const fs::path &path)
+{
+    // Only proceed if the provided filename points to a directory
+    if (!isCompatiblePath(path)) throw IOError(IOError::FILE_TYPE_MISMATCH);
+
+    this->path = path;
+}
+
+}

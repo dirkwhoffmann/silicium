@@ -1,0 +1,130 @@
+// -----------------------------------------------------------------------------
+// This file is part of vAmiga
+//
+// Copyright (C) Dirk W. Hoffmann. www.dirkwhoffmann.de
+// Licensed under the Mozilla Public License v2
+//
+// See https://mozilla.org/MPL/2.0 for license information
+// -----------------------------------------------------------------------------
+
+#include "vaconfig.h"
+#include "UART.h"
+#include "Agnus.h"
+#include "Paula.h"
+#include "SerialPort.h"
+#include "Amiga.h"
+#include "MidiManager.h"
+
+namespace vamiga {
+
+void
+UART::serviceTxdEvent(EventID id)
+{
+    logmsg(LOG_SER, "serveTxdEvent(%d)\n", id);
+
+    switch (id) {
+
+        case TXD_BIT:
+
+            if (shiftRegEmpty()) {
+
+                // Check if there is a new data packet to send
+                if (transmitBuffer) {
+
+                    // Copy new packet into shift register
+                    logmsg(LOG_SER, "Transmitting first packet %x\n", transmitBuffer);
+                    copyToTransmitShiftRegister();
+
+                } else {
+
+                    // Abort the transmission
+                    logmsg(LOG_SER, "All packets sent\n");
+                    agnus.cancel<SLOT_TXD>();
+                    break;
+                }
+
+            } else {
+
+                // Run the shift register
+                logmsg(LOG_SER, "Transmitting bit %d\n", transmitShiftReg & 1);
+                transmitShiftReg >>= 1;
+
+                if (!transmitShiftReg && transmitBuffer) {
+
+                    // Copy next packet into shift register
+                    logmsg(LOG_SER, "Transmitting next packet %x\n", transmitBuffer);
+                    copyToTransmitShiftRegister();
+                }
+            }
+
+            // Let the bit appear on the TXD line
+            outBit = transmitShiftReg & 1;
+            updateTXD();
+
+            // Schedule next event
+            agnus.scheduleRel<SLOT_TXD>(pulseWidth(), TXD_BIT);
+            break;
+
+        default:
+            fatalError;
+    }
+}
+
+void
+UART::serviceRxdEvent(EventID id)
+{
+    // logmsg(LOG_SER, "serveRxdEvent(%d)\n", id);
+
+    // Shift in the next bit from the RXD line
+    bool rxd = serialPort.getRXD();
+    REPLACE_BIT(receiveShiftReg, recCnt++, rxd);
+
+    // Check if this was the last bit to receive
+    if (recCnt >= packetLength() + 2) {
+
+    if (!payload.empty()) {
+
+            SYNCHRONIZED
+
+            auto c = payload[0];
+
+            // Overwrite the shift register contents
+            receiveShiftReg = c;
+
+            // Remove the character from the buffer
+            payload.erase(0, 1);
+
+            // Send a stop bit if necessary
+            rxd = payload.empty();
+        }
+
+        // Check for MIDI input
+        else if (serialPort.config.device == SerialPortDevice::MIDI) {
+            
+            uint8_t midiByte;
+            if (amiga.midiManager.receiveByte(&midiByte)) {
+                receiveShiftReg = midiByte;
+                // Continue receiving if more MIDI data available
+                rxd = !amiga.midiManager.hasInput();
+            }
+        }
+
+        // Copy shift register contents into the receive buffer
+        copyFromReceiveShiftRegister();
+        logmsg(LOG_SER, "Received packet %X (%c) (%ld)\n", receiveBuffer, (char)receiveBuffer, packetLength());
+
+        // Stop receiving if the last bit was a stop bit
+        if (rxd) {
+            agnus.cancel<SLOT_RXD>();
+            return;
+        } else {
+            // Prepare for the next packet
+            recCnt = 0;
+        }
+    }
+
+    // Schedule the next reception event
+    agnus.scheduleRel<SLOT_RXD>(pulseWidth(), RXD_BIT);
+}
+
+}

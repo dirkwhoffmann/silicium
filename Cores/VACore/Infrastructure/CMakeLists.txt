@@ -1,0 +1,9 @@
+target_include_directories(VACore PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+file(GLOB VA_CORE_SOURCES CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+)
+
+target_sources(VACore PRIVATE ${VA_CORE_SOURCES})

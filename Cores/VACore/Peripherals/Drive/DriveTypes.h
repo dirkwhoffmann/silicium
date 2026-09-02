@@ -1,0 +1,71 @@
+// -----------------------------------------------------------------------------
+// This file is part of vAmiga
+//
+// Copyright (C) Dirk W. Hoffmann. www.dirkwhoffmann.de
+// Licensed under the Mozilla Public License v2
+//
+// See https://mozilla.org/MPL/2.0 for license information
+// -----------------------------------------------------------------------------
+
+#pragma once
+
+#include "DeviceTypes.h"
+#include "Aliases.h"
+
+namespace vamiga {
+
+using namespace retro::vault;
+
+//
+// Enumerations
+//
+
+enum class DiskFlags
+{
+    PROTECTED  = 1,
+    MODIFIED   = 2,
+    BOOTABLE   = 4
+};
+
+struct DiskFlagsEnum : Reflectable<DiskFlagsEnum, DiskFlags>
+{
+    static constexpr long minVal = 1;
+    static constexpr long maxVal = long(DiskFlags::BOOTABLE);
+    
+    static const char *_key(DiskFlags value)
+    {
+        switch (value) {
+                
+            case DiskFlags::PROTECTED:    return "PROTECTED";
+            case DiskFlags::MODIFIED:     return "MODIFIED";
+            case DiskFlags::BOOTABLE:     return "BOOTABLE";
+        }
+        return "???";
+    }
+    static const char *help(DiskFlags value)
+    {
+        switch (value) {
+                
+            case DiskFlags::PROTECTED:    return "Write protected disk";
+            case DiskFlags::MODIFIED:     return "Modified disk contents";
+            case DiskFlags::BOOTABLE:     return "Bootable disk";
+        }
+        return "???";
+    }
+};
+
+
+//
+// Structures
+//
+
+struct DriveHead
+{
+    CylNr cylinder;
+    HeadNr head;
+    isize offset;
+
+    isize track() const { return 2 * cylinder + head; }
+};
+
+}

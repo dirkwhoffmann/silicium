@@ -1,0 +1,276 @@
+// -----------------------------------------------------------------------------
+// This file is part of vAmiga
+//
+// Copyright (C) Dirk W. Hoffmann. www.dirkwhoffmann.de
+// Licensed under the Mozilla Public License v2
+//
+// See https://mozilla.org/MPL/2.0 for license information
+// -----------------------------------------------------------------------------
+
+#include "vaconfig.h"
+#include "RpcServer.h"
+#include "Emulator.h"
+#include "json.h"
+#include "httplib.h"
+#include "utl/support.h"
+#include <thread>
+
+namespace vamiga {
+
+using nlohmann::json;
+
+void
+RpcServer::_initialize()
+{
+    // The RPC server drives its own shell, independent of the GUI's one
+    rpcShell.console.delegates.push_back(this);
+}
+
+void
+RpcServer::_dump(Category category, std::ostream &os) const
+{
+    RemoteServer::_dump(category, os);
+}
+
+Transport &
+RpcServer::transport()
+{
+    switch (config.transport) {
+
+        case TransportProtocol::STDIO: return stdio;
+        case TransportProtocol::TCP:   return tcp;
+        case TransportProtocol::HTTP:  return http;
+
+        default:
+            fatalError;
+    }
+}
+
+const Transport &
+RpcServer::transport() const
+{
+    return const_cast<RpcServer *>(this)->transport();
+}
+
+bool
+RpcServer::isSupported(TransportProtocol protocol) const
+{
+    switch (protocol) {
+
+        case TransportProtocol::STDIO:  return true;
+        case TransportProtocol::TCP:    return true;
+        case TransportProtocol::HTTP:   return true;
+
+        default:
+            return false;
+    }
+}
+
+void
+RpcServer::didConnect()
+{
+    // Hand the client a fresh shell
+    rpcShell.newSession();
+}
+
+void
+RpcServer::didDisconnect()
+{
+    // Discard the client's session
+    rpcShell.newSession();
+}
+
+void
+RpcServer::didStart()
+{
+    if (config.verbose) {
+
+        *this << "Remote server is listening at port " << config.port << "\n";
+    }
+}
+
+void
+RpcServer::send(const string &payload)
+{
+    transport().send(payload);
+
+    if (config.verbose) {
+
+        retroShell << "T: " << utl::makePrintable(payload) << "\n";
+        printf("T: %s\n", utl::makePrintable(payload).c_str());
+    }
+}
+
+void
+RpcServer::didReceive(const string &payload)
+{
+    // Remove LF and CR (if present)
+    auto trimmed = utl::rtrim(payload, "\n\r");
+
+    if (config.verbose) {
+
+        retroShell << "R: " << utl::makePrintable(trimmed) << "\n";
+        printf("R: %s\n", utl::makePrintable(trimmed).c_str());
+    }
+
+    if (auto response = process(trimmed, false); response) {
+
+        send(*response);
+    }
+}
+
+void
+RpcServer::didReceive(const httplib::Request &req, httplib::Response &res)
+{
+    if (auto response = process(req.body, true); response) {
+        res.set_content(*response, "text/plain");
+    }
+}
+
+optional<string>
+RpcServer::process(const string &payload, bool blocking)
+{
+    try {
+
+        json request = json::parse(payload);
+
+        // Check input format
+        if (!request.contains("method")) {
+            throw CoreError(RPC::INVALID_REQUEST, "Missing 'method'");
+        }
+        if (!request.contains("params")) {
+            throw CoreError(RPC::INVALID_REQUEST, "Missing 'params'");
+        }
+        if (!request["method"].is_string()) {
+            throw CoreError(RPC::INVALID_PARAMS, "'method' must be a string");
+        }
+        if (!request["params"].is_string()) {
+            throw CoreError(RPC::INVALID_PARAMS, "'params' must be a string");
+        }
+        if (request["method"] != "retroshell") {
+            throw CoreError(RPC::INVALID_PARAMS, "method  must be 'retroshell'");
+        }
+
+        auto id = request.value("id", 0);
+
+        if (blocking) {
+            return execBlocking(request["params"], id);
+        } else {
+            return execNonBlocking(request["params"], id);
+        }
+
+    } catch (const json::parse_error &) {
+
+        json response = {
+
+            {"jsonrpc", "2.0"},
+            {"error", {{"code", RPC::PARSE_ERROR}, {"message", "Parse error: " + payload}}},
+            {"id", nullptr}
+        };
+        return response.dump();
+
+    } catch (const CoreError &e) {
+
+        json response = {
+
+            {"jsonrpc", "2.0"},
+            {"error", {{"code", e.payload}, {"message", e.what()}}},
+            {"id", nullptr}
+        };
+        return response.dump();
+    }
+}
+
+optional<string>
+RpcServer::execNonBlocking(const string &command, isize id)
+{
+    // Feed the command into the command queue and return a nullopt
+    rpcShell.asyncExec(InputLine {
+
+        .id = id,
+        .type = InputLine::Source::RPC,
+        .input = command
+    });
+
+    return { };
+}
+
+optional<string>
+RpcServer::execBlocking(const string &command, isize id)
+{
+    // To block the caller, we pass a promise to RetroShell
+    auto p = std::make_shared<std::promise<string>>();
+    auto future = p->get_future();
+
+    // Feed the command, with the promise attached, into the command queue
+    rpcShell.asyncExec(InputLine {
+
+        .id = id,
+        .type = InputLine::Source::RPC,
+        .input = command,
+        .promise = p
+    });
+
+    // Wait until the promise gets fulfilled
+    return future.get();
+}
+
+void
+RpcServer::willExecute(const InputLine &input)
+{
+
+}
+
+void
+RpcServer::didExecute(const InputLine& input, std::stringstream &ss)
+{
+    if (!input.isRpcCommand()) return;
+
+    json response = {
+
+        {"jsonrpc", "2.0"},
+        {"result", ss.str()},
+        {"id", input.id}
+    };
+
+    // If a promise is attached, fulfill it
+    if (input.promise) { input.promise->set_value(response.dump()); }
+
+    send(response.dump());
+}
+
+void
+RpcServer::didExecute(const InputLine& input, std::stringstream &ss, std::exception &exc)
+{
+    if (!input.isRpcCommand()) return;
+
+    // By default, signal an internal error
+    i64 code = -32603;
+
+    // For parse errors, use a value from the server-defined error range
+    if (dynamic_cast<const utl::ParseError *>(&exc)) {
+        code = -32000;
+    }
+
+    // For application errors, use the fault identifier
+    if (const auto *error = dynamic_cast<const CoreError *>(&exc)) {
+        code = i64(error->fault());
+    }
+
+    json response = {
+
+        {"jsonrpc", "2.0"},
+        {"error", {
+            {"code", code},
+            {"message", exc.what()}
+        }},
+        {"id", input.id}
+    };
+
+    // If a promise is attached, fulfill it
+    if (input.promise) { input.promise->set_value(response.dump()); }
+
+    send(response.dump());
+}
+
+}

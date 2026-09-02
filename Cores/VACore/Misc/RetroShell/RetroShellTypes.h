@@ -1,0 +1,147 @@
+// -----------------------------------------------------------------------------
+// This file is part of vAmiga
+//
+// Copyright (C) Dirk W. Hoffmann. www.dirkwhoffmann.de
+// Licensed under the Mozilla Public License v2
+//
+// See https://mozilla.org/MPL/2.0 for license information
+// -----------------------------------------------------------------------------
+
+#pragma once
+
+#include "BasicTypes.h"
+#include <future>
+
+namespace vamiga {
+
+//
+// Enumerations
+//
+
+enum class CommandSet
+{
+    Commander,      // Commands for controlling the emulator
+    Debugger,       // Commands for debugging the emulator
+    Navigator,      // Commands for browsing Amiga file systems
+    CBMNavigator    // Commands for browsing CBM file systems
+};
+
+struct CommandSetEnum : Reflectable<CommandSetEnum, CommandSet>
+{
+    static constexpr long minVal = 0;
+    static constexpr long maxVal = long(CommandSet::CBMNavigator);
+
+    static const char *_key(CommandSet value)
+    {
+        switch (value) {
+
+            case CommandSet::Commander:     return "COMMANDER";
+            case CommandSet::Debugger:      return "DEBUGGER";
+            case CommandSet::Navigator:     return "NAVIGATOR";
+            case CommandSet::CBMNavigator:  return "CBM_NAVIGATOR";
+        }
+        return "???";
+    }
+    static const char *help(CommandSet value)
+    {
+        return "";
+    }
+};
+
+enum class RSKey
+{
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+    PAGE_UP,
+    PAGE_DOWN,
+    DEL,
+    CUT,
+    BACKSPACE,
+    HOME,
+    END,
+    TAB,
+    RETURN,
+    CR
+};
+
+struct RSKeyEnum : Reflectable<RSKeyEnum, RSKey>
+{
+    static constexpr long minVal = 0;
+    static constexpr long maxVal = long(RSKey::CR);
+    
+    static const char *_key(RSKey value)
+    {
+        switch (value) {
+                
+            case RSKey::UP:          return "UP";
+            case RSKey::DOWN:        return "DOWN";
+            case RSKey::LEFT:        return "LEFT";
+            case RSKey::RIGHT:       return "RIGHT";
+            case RSKey::PAGE_UP:     return "PAGE_UP";
+            case RSKey::PAGE_DOWN:   return "PAGE_DOWN";
+            case RSKey::DEL:         return "DEL";
+            case RSKey::CUT:         return "CUT";
+            case RSKey::BACKSPACE:   return "BACKSPACE";
+            case RSKey::HOME:        return "HOME";
+            case RSKey::END:         return "END";
+            case RSKey::TAB:         return "TAB";
+            case RSKey::RETURN:      return "RETURN";
+            case RSKey::CR:          return "CR";
+        }
+        return "???";
+    }
+    static const char *help(RSKey value)
+    {
+        return "";
+    }
+};
+
+//
+// Structures
+//
+
+struct InputLine {
+
+    enum class Source {
+
+        USER,       // User-typed command
+        SCRIPT,     // Script command
+        RPC,        // JSON RPC request
+        RSH         // RemoteShell request
+    };
+
+    // Line number, RPC identifier, etc.
+    isize id;
+
+    // Indicates where the command comes from
+    Source type;
+
+    // The command to execute
+    string input;
+
+    // A pointer to a promise (may be nullptr)
+    std::shared_ptr<std::promise<string>> promise;
+
+    bool isUserCommand() const { return type == Source::USER; }
+    bool isScriptCommand() const { return type == Source::SCRIPT; }
+    bool isRpcCommand() const { return type == Source::RPC; }
+    bool isRshCommand() const { return type == Source::RSH; }
+    bool isComment() const { return input.size() != 0 && input[0] == '#'; }
+};
+
+typedef struct
+{
+    // Active console
+    isize console;
+    
+    // Relative position of the cursor
+    isize cursorRel;
+}
+RetroShellInfo;
+
+// Used in operator overloads
+struct vspace { isize lines = 0; };
+
+}
