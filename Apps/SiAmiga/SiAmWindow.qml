@@ -56,6 +56,11 @@ ApplicationWindow {
 
         onOpenAbout: aboutWindow.show()
         onOpenConfigurator: (page) => configWindow.showPage(page)
+        onOpenKeyboard: {
+            keyboardWindow.show()
+            keyboardWindow.raise()
+            keyboardWindow.requestActivate()
+        }
 
         compactMenu: root.compactMenu
 
@@ -74,12 +79,15 @@ ApplicationWindow {
         visible: root.statusBarVisible
     }
 
-    // No menu action opens the keyboard window yet -- there's no
-    // SiAmKeyboardWindow.qml to show (see SiC64KeyboardWindow.qml for what
-    // that eventually looks like).
     SiAmConfigWindow {
 
         id: configWindow
+        controller: root.amiga
+    }
+
+    SiAmKeyboardWindow {
+
+        id: keyboardWindow
         controller: root.amiga
     }
 

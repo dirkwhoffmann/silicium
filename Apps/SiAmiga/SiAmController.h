@@ -15,6 +15,7 @@
 #include "SiAmRenderer.h"
 #include "SiAmActivityController.h"
 #include "Config/SiAmConfigController.h"
+#include "Keyboard/SiAmKeyboardController.h"
 #include <QUrl>
 
 class QCoreApplication;
@@ -46,6 +47,7 @@ class SiAmController : public Controller {
     // Subcontrollers
     unique_ptr<SiAmActivityController> m_activityController;
     unique_ptr<SiAmConfigController> m_configController;
+    unique_ptr<SiAmKeyboardController> m_keyboardController;
 
 public:
 
@@ -191,6 +193,10 @@ public:
     Q_PROPERTY(SiAmConfigController *configController READ getConfigController CONSTANT)
 
     SiAmConfigController *getConfigController() const { return m_configController.get(); }
+
+    Q_PROPERTY(SiAmKeyboardController *keyboardController READ getKeyboardController CONSTANT)
+
+    SiAmKeyboardController *getKeyboardController() const { return m_keyboardController.get(); }
 
 
     //

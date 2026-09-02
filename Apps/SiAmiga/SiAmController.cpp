@@ -35,6 +35,7 @@ SiAmController::SiAmController()
 
     m_activityController = make_unique<SiAmActivityController>(this);
     m_configController = make_unique<SiAmConfigController>(this);
+    m_keyboardController = make_unique<SiAmKeyboardController>(this);
 }
 
 SiAmController &
