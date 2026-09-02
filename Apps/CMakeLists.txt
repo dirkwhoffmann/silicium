@@ -261,6 +261,62 @@ qt_add_qml_module(SiC64
         QML_FILES ${SIC64_QML_SOURCES})
 
 #
+# SiAmiga
+#
+# Stub only: proves VACore links and runs inside a standalone app, and that
+# the build chain accommodates a third executable alongside silicium and
+# SiC64. The real Amiga backend (an equivalent of C64Controller and friends)
+# is built out in a later step, once the Amiga UI work begins in earnest.
+# There is no dedicated Amiga app icon yet, so this reuses silicium's
+# ICON_FILE rather than fabricating a placeholder asset.
+#
+
+qt_add_executable(SiAmiga
+        MACOSX_BUNDLE
+        "SiAmiga/main.cpp"
+        ${ICON_FILE})
+
+# The target name matches this source subdirectory's name, which would
+# otherwise collide with the build-tree mirror CMake creates for it. Give
+# the binary its own output directory to avoid that clash.
+set_target_properties(SiAmiga PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Apps/bin"
+        MACOSX_BUNDLE_ICON_FILE AppIcon.icns
+        MACOSX_BUNDLE_BUNDLE_NAME "SiAmiga"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "${SI_BUNDLE_PREFIX}.SiAmiga"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "${SI_VERSION}"
+        MACOSX_BUNDLE_BUNDLE_VERSION "${SI_BUILD_VERSION}"
+        MACOSX_BUNDLE_COPYRIGHT "${SI_COPYRIGHT}")
+
+# The binary dir carries the generated version.h, which config.h includes.
+target_include_directories(SiAmiga PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_BINARY_DIR})
+
+target_link_libraries(SiAmiga PRIVATE
+        utlib
+        rvlib
+        VACore
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Quick
+        Qt6::QuickControls2)
+
+# SiAmiga embeds the same Shared/Assets tree as the other two apps.
+qt_add_resources(SiAmiga "assets_files"
+        PREFIX "/"
+        BASE "${CMAKE_CURRENT_SOURCE_DIR}/Shared/Assets"
+        FILES ${ASSET_RESOURCES})
+
+# SiAmiga's module needs its own URI, for the same reason SiC64's does (see
+# the comment above qt_add_qml_module(SiC64, ...)).
+qt_add_qml_module(SiAmiga
+        URI siamigaUI
+        VERSION 1.0
+        OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/SiAmiga/siamigaUI"
+        QML_FILES "SiAmiga/SiAmigaWindow.qml")
+
+#
 # Subdirectories
 #
 
