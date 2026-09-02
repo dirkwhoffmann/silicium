@@ -66,6 +66,14 @@ ApplicationWindow {
         onToggleStatusBar: root.statusBarVisible = !root.statusBarVisible
     }
 
+    footer: SiAmStatusbar {
+
+        id: statusbar
+        amiga: root.amiga
+
+        visible: root.statusBarVisible
+    }
+
     // No menu action opens the keyboard window yet -- there's no
     // SiAmKeyboardWindow.qml to show (see SiC64KeyboardWindow.qml for what
     // that eventually looks like).

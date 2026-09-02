@@ -31,6 +31,7 @@ class SiAmController : public Controller {
 
     // Current state
     VMState m_state = VMState::HIBERNATED;
+    bool m_warping = false;
 
     // Always empty for now -- see getErrorMessage() below.
     QString errorMessage;
@@ -78,6 +79,13 @@ public:
     bool isPoweredOn() const { return m_state == VMState::PAUSED || m_state == VMState::RUNNING; }
     bool isRunning() { return m_state == VMState::RUNNING; }
     bool isPaused() { return m_state == VMState::PAUSED; }
+
+    // Sampled once per rendered frame (see update()) rather than read
+    // straight off the core, so the status bar's warp icon gets a change
+    // notification instead of having to poll.
+    Q_PROPERTY(bool warping READ warping NOTIFY warpingChanged)
+
+    bool warping() const { return m_warping; }
 
     // Always empty for now -- this stub has no command-line/SVM parsing
     // yet (see C64Controller::parseArguments for what it will eventually
@@ -129,6 +137,9 @@ public:
     Q_INVOKABLE bool driveHasDisk(int nr) const;
     Q_INVOKABLE bool driveWriteProtected(int nr) const;
     Q_INVOKABLE bool driveModified(int nr) const;
+    Q_INVOKABLE bool driveMotor(int nr) const;
+    Q_INVOKABLE bool driveWriting(int nr) const;
+    Q_INVOKABLE int driveTrack(int nr) const;
     Q_INVOKABLE void insertDisk(int nr, const QUrl &url, bool wp = false);
     Q_INVOKABLE void newDisk(int nr);
     Q_INVOKABLE void ejectDisk(int nr);
@@ -217,4 +228,5 @@ signals:
     void shutdown();
     void captureChanged();
     void mouseWasCaptured();
+    void warpingChanged();
 };

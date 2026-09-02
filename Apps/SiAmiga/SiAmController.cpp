@@ -302,6 +302,24 @@ SiAmController::driveModified(int nr) const
     return core().df[nr]->getInfo().hasModifiedDisk;
 }
 
+bool
+SiAmController::driveMotor(int nr) const
+{
+    return core().df[nr]->getInfo().motor;
+}
+
+bool
+SiAmController::driveWriting(int nr) const
+{
+    return core().df[nr]->getInfo().writing;
+}
+
+int
+SiAmController::driveTrack(int nr) const
+{
+    return (int)core().df[nr]->getInfo().head.track();
+}
+
 void
 SiAmController::insertDisk(int nr, const QUrl &url, bool wp)
 {
@@ -492,5 +510,13 @@ SiAmController::update()
 {
     // Placeholder for coalesced per-frame UI updates (config/info dirty
     // flags and the like), following the same rhythm as C64Controller::update().
-    // Nothing needs coalescing yet -- this stub has no inspector panels.
+    // Warping is the one piece of state so far that changes on its own
+    // (AUTO mode kicks in without any user action), so it's sampled here
+    // rather than read straight off the core -- see the warping property.
+    bool warping = core().isWarping();
+    if (warping != m_warping) {
+
+        m_warping = warping;
+        emit warpingChanged();
+    }
 }
