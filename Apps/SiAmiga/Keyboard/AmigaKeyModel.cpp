@@ -224,10 +224,11 @@ AmigaKeyModel::buildA500Ansi()
 }
 
 // Layout: A500, ISO (international) -- vAmiga's A500ISO.xib, content view
-// 883x270. The two ISO-only keys ("#" next to Return, "<" next to left
-// Shift) each occupy a slot that the ANSI layout leaves for a neighboring
-// key's notch or a wider neighbor -- so unlike the ANSI Return, this one is
-// a plain rectangle.
+// 883x270. The "<" key next to left Shift occupies a slot the ANSI layout
+// gives to a wider neighbor. Return's own frame here is already narrower
+// than the ANSI one (54 vs 81 -- the "#" key takes up the rest of that
+// row), but it keeps the same notch as every other layout's Return so it
+// still reads as the same shaped key, just narrower.
 void
 AmigaKeyModel::buildA500Iso()
 {
@@ -294,7 +295,7 @@ AmigaKeyModel::buildA500Iso()
     add(keys, 41, ";", 425, 142, 36, 36);
     add(keys, 42, "'", 461, 142, 36, 36);
     add(keys, 43, "#", 497, 142, 36, 36);
-    add(keys, 68, "Return", 524, 106, 54, 72);
+    add(keys, 68, "Return", 524, 106, 54, 72, /* notchWidth */ 27, /* notchHeight */ 36);
     add(keys, 76, "Up", 632, 142, 36, 36);
     add(keys, 45, "4", 722, 142, 36, 36);
     add(keys, 46, "5", 757, 142, 36, 36);

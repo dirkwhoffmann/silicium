@@ -161,15 +161,20 @@ ColumnLayout {
                     id: returnShape
                     visible: keyItem.isReturn
                     anchors.fill: parent
+                    // ShapePath strokes are centered on the path, unlike
+                    // Rectangle.border (drawn inward) -- every other key
+                    // uses a Rectangle background, so without this inset the
+                    // stroke's outer half would spill half a pixel past
+                    // keyItem's bounds on every edge, making Return look
+                    // very slightly larger than its neighbors.
+                    anchors.margins: strokeHalf
                     antialiasing: true
 
-                    // Corner radius matching SiButton's own background
-                    // Rectangle (radius: Style.radius), so the Return key
-                    // reads the same as every other key.
+                    readonly property real strokeHalf: 0.5
                     readonly property real nw: model.notchWidth * root.scale
                     readonly property real nh: model.notchHeight * root.scale
-                    readonly property real kw: keyItem.width
-                    readonly property real kh: keyItem.height
+                    readonly property real kw: width
+                    readonly property real kh: height
                     readonly property real r: Style.radius
 
                     // SiButton gets its visual weight from a lighter-to-darker
@@ -192,20 +197,18 @@ ColumnLayout {
                         id: returnPath
 
                         // Palette.widget itself (this Shape's natural
-                        // "unpressed" tone, same as every SiButton) renders
-                        // fine everywhere else, but on some of this notch's
-                        // smaller instances (e.g. the A1000 layouts) it's
-                        // close enough to the panel background that this
-                        // Shape's fill silently fails to paint at all --
-                        // reproducible, but not tied to any one platform
-                        // renderer we tried (GeometryRenderer/CurveRenderer
-                        // made no difference), so it looks like an
-                        // antialiasing/coverage edge case specific to a
-                        // small, mostly-notched fill this close in tone to
-                        // its surroundings. Darkening it is a large enough
-                        // margin to reliably dodge that (verified against
-                        // both the failing and working cases above).
-                        fillColor: keyItem.pressed ? Palette.accentElevated : Qt.darker(Palette.widget, 1.8)
+                        // "unpressed" tone, same as every SiButton) silently
+                        // fails to paint at all as ShapePath.fillColor on
+                        // some of the notch's smaller instances (e.g. the
+                        // A1000 layouts) -- reproducible, but not tied to any
+                        // one renderer backend (GeometryRenderer/
+                        // CurveRenderer made no difference), and not fixable
+                        // by routing the same color through a Rectangle used
+                        // as a MultiEffect mask source either (that came out
+                        // washed out instead of merely invisible). A modest
+                        // darkening is the smallest margin found that
+                        // reliably avoids it everywhere.
+                        fillColor: keyItem.pressed ? Palette.accentElevated : Qt.darker(Palette.widget, 1.65)
                         strokeColor: keyItem.pressed ? Palette.accent : Palette.widgetShadow
                         strokeWidth: 1
                         joinStyle: ShapePath.RoundJoin
