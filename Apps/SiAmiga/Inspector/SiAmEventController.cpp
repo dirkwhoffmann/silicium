@@ -21,21 +21,27 @@ SiAmEventController::SiAmEventController(SiAmController *parent)
 void
 SiAmEventController::refreshData()
 {
-    // Read AmigaInfo (progress counters) and AgnusInfo (the event slot
-    // table) from the shared info controller. The base class has already
-    // requested an AMIGA sample for the beam position, so that half is
-    // coalesced onto the same query; AGNUS is requested here for the first
-    // time this tick.
+    // Read AgnusInfo (both the progress counters, via its nested eventInfo,
+    // and the event slot table) from the shared info controller. Mirrors
+    // vAmiga's own GUI/Inspector/EventPanel.swift's refreshEvents(), which
+    // sources every one of these from agnusInfo.eventInfo too.
     auto *infoController = parent->getInfoController();
-    infoController->requestUpdate(SiAmInfoController::AMIGA | SiAmInfoController::AGNUS, 0.25);
+    infoController->requestUpdate(SiAmInfoController::AGNUS, 0.25);
 
-    auto &amigaInfo = infoController->amigaInfo();
     auto &agnusInfo = infoController->agnusInfo();
+    auto &eventInfo = agnusInfo.eventInfo;
 
-    m_cpuProgress   = amigaInfo.cpuClock;
-    m_agnusProgress = amigaInfo.dmaClock;
-    m_ciaAProgress  = amigaInfo.ciaAClock;
-    m_ciaBProgress  = amigaInfo.ciaBClock;
+    // Master-cycle counts, and the same four converted to the pace their
+    // driving component runs at -- CPU: master/4, DMA (Agnus): master/8,
+    // CIA: master/40 -- exactly as EventPanel.swift's refreshEvents() does.
+    m_cpuProgress    = eventInfo.cpuClock;
+    m_cpuProgress2   = eventInfo.cpuCycles;
+    m_agnusProgress  = eventInfo.dmaClock;
+    m_agnusProgress2 = eventInfo.dmaClock / 8;
+    m_ciaAProgress   = eventInfo.ciaAClock;
+    m_ciaAProgress2  = eventInfo.ciaAClock / 40;
+    m_ciaBProgress   = eventInfo.ciaBClock;
+    m_ciaBProgress2  = eventInfo.ciaBClock / 40;
 
     QVector<SiAmEventTableModel::Row> rows;
     rows.reserve(SLOT_COUNT);

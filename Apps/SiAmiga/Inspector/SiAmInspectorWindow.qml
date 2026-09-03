@@ -58,8 +58,9 @@ Window {
     minimumHeight: 320
     color: Palette.background
 
-    onVisibleChanged: inspectorController.active = visible
-    Component.onCompleted: inspectorController.active = visible
+    onVisibleChanged: { inspectorController.active = visible; updateActiveController() }
+    onCurrentIndexChanged: updateActiveController()
+    Component.onCompleted: { inspectorController.active = visible; updateActiveController() }
 
     // Brings the window to the front, optionally switching to a specific page
     function showPage(page) {
@@ -69,6 +70,18 @@ Window {
         show()
         raise()
         requestActivate()
+    }
+
+    // Per-panel controllers (SiAmEventController, SiAmCIAController, ...)
+    // each carry their own 'active' flag inherited from
+    // SiAmInspectorController -- unlike SiC64's one-window-per-panel
+    // shape, where a window's own onVisibleChanged sets its single
+    // panel's controller active, this window hosts every panel, so
+    // 'active' here means "window visible AND this is the selected page."
+    // Extend this switch as more panels grow real controllers to activate.
+    function updateActiveController() {
+
+        controller.eventController.active = visible && currentIndex === SiAmInspectorWindow.Page.Events
     }
 
     ColumnLayout {
