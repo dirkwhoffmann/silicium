@@ -46,6 +46,7 @@ SiAmController::SiAmController()
     m_paulaController = make_unique<SiAmPaulaController>(this);
     m_busController = make_unique<SiAmBusController>(this);
     m_cpuController = make_unique<SiAmCPUController>(this);
+    m_deniseController = make_unique<SiAmDeniseController>(this);
 }
 
 SiAmController &

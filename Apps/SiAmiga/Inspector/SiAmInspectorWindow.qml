@@ -83,6 +83,7 @@ Window {
 
         controller.eventController.active = visible && currentIndex === SiAmInspectorWindow.Page.Events
         controller.cpuController.active = visible && currentIndex === SiAmInspectorWindow.Page.CPU
+        controller.deniseController.active = visible && currentIndex === SiAmInspectorWindow.Page.Denise
         controller.busController.active = visible && currentIndex === SiAmInspectorWindow.Page.Bus
         controller.ciaController.active = visible && currentIndex === SiAmInspectorWindow.Page.CIA
         controller.memoryController.active = visible && currentIndex === SiAmInspectorWindow.Page.Memory

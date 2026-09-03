@@ -25,6 +25,7 @@
 #include "Inspector/SiAmPaulaController.h"
 #include "Inspector/SiAmBusController.h"
 #include "Inspector/SiAmCPUController.h"
+#include "Inspector/SiAmDeniseController.h"
 #include "SiAmInfoController.h"
 #include <QUrl>
 
@@ -80,6 +81,7 @@ class SiAmController : public Controller {
     unique_ptr<SiAmPaulaController> m_paulaController;
     unique_ptr<SiAmBusController> m_busController;
     unique_ptr<SiAmCPUController> m_cpuController;
+    unique_ptr<SiAmDeniseController> m_deniseController;
 
 public:
 
@@ -295,6 +297,10 @@ public:
     Q_PROPERTY(SiAmCPUController *cpuController READ getCPUController CONSTANT)
 
     SiAmCPUController *getCPUController() const { return m_cpuController.get(); }
+
+    Q_PROPERTY(SiAmDeniseController *deniseController READ getDeniseController CONSTANT)
+
+    SiAmDeniseController *getDeniseController() const { return m_deniseController.get(); }
 
 
     //
