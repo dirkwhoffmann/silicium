@@ -12,6 +12,7 @@
 #include "Controller.h"
 #include "VAmiga.h"
 #include "utl/chrono/Time.h"
+#include <QUrl>
 
 //
 // Port of SiC64InfoController: the single, shared proxy to the emulator's
@@ -149,9 +150,31 @@ class SiAmInfoController : public Controller {
     // Machine status
     //
 
+    // Worst state across all remote servers (same SrvState encoding as the
+    // per-server properties below), which colors the statusbar icon.
+    Q_PROPERTY(int serverState READ serverState NOTIFY infoChanged)
     Q_PROPERTY(bool tracking READ tracking NOTIFY infoChanged)
     Q_PROPERTY(bool mute READ mute NOTIFY infoChanged)
     Q_PROPERTY(bool warping READ warping NOTIFY infoChanged)
+
+    // Per-server connection state (SrvState: 0 = OFF, 1 = WAITING,
+    // 2 = STARTING, 3 = LISTENING, 4 = CONNECTED, 5 = STOPPING,
+    // 6 = INVALID -- vAmiga's SrvState carries the extra WAITING entry
+    // C64's own SrvState doesn't, for GdbServer's "waiting for the named
+    // process to launch" and SerServer's "waiting for null-modem device
+    // selection" states).
+    Q_PROPERTY(int rshServerState READ rshServerState NOTIFY infoChanged)
+    Q_PROPERTY(int rpcServerState READ rpcServerState NOTIFY infoChanged)
+    Q_PROPERTY(int gdbServerState READ gdbServerState NOTIFY infoChanged)
+    Q_PROPERTY(int promServerState READ promServerState NOTIFY infoChanged)
+    Q_PROPERTY(int serServerState READ serServerState NOTIFY infoChanged)
+
+    // Presentation helpers for a SrvState value (the encoding above). Single
+    // source of truth for how a server state reads in the UI, so the
+    // statusbar icon and the server config panel can't drift apart.
+    Q_INVOKABLE QUrl serverStateLed(int state) const;
+    Q_INVOKABLE QString serverStateIcon(int state) const;
+    Q_INVOKABLE QString serverStateName(int state) const;
 
     //
     // Drives (df0..df3)
@@ -207,9 +230,17 @@ class SiAmInfoController : public Controller {
 
     // Machine status. These read live core state, so they aren't inline.
     // All change on info-dirty events, which drive infoChanged.
+    int serverState() const;
     bool tracking() const;
     bool mute() const;
     bool warping() const;
+
+    // Individual remote-server states, read from the cached RemoteManagerInfo.
+    int rshServerState() const;
+    int rpcServerState() const;
+    int gdbServerState() const;
+    int promServerState() const;
+    int serServerState() const;
 
     // Drive 0..3 state, read from the cached FloppyDriveInfo. 'track'
     // combines cylinder and head the same way SiAmController::driveTrack()

@@ -133,6 +133,101 @@ SiAmInfoController::grab(Component component)
     }
 }
 
+int
+SiAmInfoController::serverState() const
+{
+    // The state of the worst-off server, which drives the color of the
+    // statusbar icon. "Worst" ranks an error above a pending transition,
+    // that above an established connection, and that above a server which
+    // is simply switched off or waiting on its launch condition -- i.e. red
+    // beats yellow beats green beats gray, matching the LED colors the
+    // server popup shows per server.
+    auto rank = [](SrvState s) {
+
+        switch (s) {
+
+            case SrvState::STOPPING:
+            case SrvState::INVALID:   return 3;     // red
+            case SrvState::STARTING:
+            case SrvState::LISTENING: return 2;     // yellow
+            case SrvState::CONNECTED: return 1;     // green
+            default:                  return 0;     // gray (OFF, WAITING)
+        }
+    };
+
+    auto &srv = SiAmController::core().remoteManager.getInfo();
+    auto worst = SrvState::OFF;
+
+    for (auto s : { srv.rshInfo.state, srv.rpcInfo.state,
+                    srv.gdbInfo.state, srv.promInfo.state, srv.serInfo.state }) {
+
+        if (rank(s) > rank(worst)) worst = s;
+    }
+
+    return int(worst);
+}
+
+QUrl
+SiAmInfoController::serverStateLed(int state) const
+{
+    switch (SrvState(state)) {
+
+        case SrvState::CONNECTED:
+            return QUrl("qrc:/images/led-round-green.png");
+
+        case SrvState::STARTING:
+        case SrvState::LISTENING:
+            return QUrl("qrc:/images/led-round-yellow.png");
+
+        case SrvState::STOPPING:
+        case SrvState::INVALID:
+            return QUrl("qrc:/images/led-round-red.png");
+
+        default:
+            return QUrl("qrc:/images/led-round-gray.png"); // OFF, WAITING
+    }
+}
+
+QString
+SiAmInfoController::serverStateIcon(int state) const
+{
+    // A Phosphor wifi glyph: no bars while off/waiting, rising bars while
+    // starting up / listening / connected, and a broken icon once a server
+    // has stopped or gone invalid. Kept in step with serverStateLed()'s
+    // grouping.
+    switch (SrvState(state)) {
+
+        case SrvState::CONNECTED:
+            return "wifi-high";
+
+        case SrvState::STARTING:
+        case SrvState::LISTENING:
+            return "wifi-medium";
+
+        case SrvState::STOPPING:
+        case SrvState::INVALID:
+            return "wifi-x";
+
+        default:
+            return "wifi-slash"; // OFF, WAITING
+    }
+}
+
+QString
+SiAmInfoController::serverStateName(int state) const
+{
+    switch (SrvState(state)) {
+
+        case SrvState::WAITING:   return "Waiting";
+        case SrvState::STARTING:  return "Starting";
+        case SrvState::LISTENING: return "Listening";
+        case SrvState::CONNECTED: return "Connected";
+        case SrvState::STOPPING:  return "Stopping";
+        case SrvState::INVALID:   return "Halted";
+        default:                  return "Off"; // OFF
+    }
+}
+
 bool
 SiAmInfoController::tracking() const
 {
@@ -153,4 +248,34 @@ SiAmInfoController::warping() const
 {
     // The emulator is currently running in warp (turbo) mode.
     return SiAmController::core().isWarping();
+}
+
+int
+SiAmInfoController::rshServerState() const
+{
+    return int(SiAmController::core().remoteManager.getInfo().rshInfo.state);
+}
+
+int
+SiAmInfoController::rpcServerState() const
+{
+    return int(SiAmController::core().remoteManager.getInfo().rpcInfo.state);
+}
+
+int
+SiAmInfoController::gdbServerState() const
+{
+    return int(SiAmController::core().remoteManager.getInfo().gdbInfo.state);
+}
+
+int
+SiAmInfoController::promServerState() const
+{
+    return int(SiAmController::core().remoteManager.getInfo().promInfo.state);
+}
+
+int
+SiAmInfoController::serServerState() const
+{
+    return int(SiAmController::core().remoteManager.getInfo().serInfo.state);
 }
