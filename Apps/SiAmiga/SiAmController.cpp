@@ -37,6 +37,7 @@ SiAmController::SiAmController()
     m_configController = make_unique<SiAmConfigController>(this);
     m_keyboardController = make_unique<SiAmKeyboardController>(this);
     m_inspectorController = make_unique<SiAmInspectorController>(this);
+    m_infoController = make_unique<SiAmInfoController>(this);
 }
 
 SiAmController &
@@ -556,19 +557,27 @@ SiAmController::process(const Message &msg, const string &attachment)
 {
     switch (msg.type) {
 
+        case Msg::CONFIG:
+
+            m_infoIsDirty = true;
+            break;
+
         case Msg::POWER:
 
             msg.value ? didPowerOn() : didPowerOff();
+            m_infoIsDirty = true;
             break;
 
         case Msg::RUN:
 
             didRun();
+            m_infoIsDirty = true;
             break;
 
         case Msg::PAUSE:
 
             didPause();
+            m_infoIsDirty = true;
             break;
 
         case Msg::SHUTDOWN:
@@ -579,6 +588,35 @@ SiAmController::process(const Message &msg, const string &attachment)
         case Msg::ABORT:
 
             qApp->exit((int)msg.value);
+            break;
+
+        case Msg::RESET:
+        case Msg::WARP:
+        case Msg::TRACK:
+        case Msg::MUTE:
+        case Msg::CPU_HALT:
+
+            m_infoIsDirty = true;
+            break;
+
+        case Msg::DRIVE_CONNECT:
+        case Msg::DRIVE_SELECT:
+        case Msg::DRIVE_READ:
+        case Msg::DRIVE_WRITE:
+        case Msg::DRIVE_LED:
+        case Msg::DRIVE_MOTOR:
+        case Msg::DRIVE_STEP:
+        case Msg::DISK_INSERT:
+        case Msg::DISK_EJECT:
+        case Msg::DISK_PROTECTED:
+        case Msg::HDC_CONNECT:
+        case Msg::HDC_STATE:
+        case Msg::HDR_STEP:
+        case Msg::HDR_READ:
+        case Msg::HDR_WRITE:
+        case Msg::HDR_IDLE:
+
+            m_infoIsDirty = true;
             break;
 
         case Msg::RSH_CLOSE:
@@ -615,5 +653,11 @@ SiAmController::update()
 
         emit retroShellTextChanged();
         m_retroShellIsDirty = false;
+    }
+
+    if (m_infoIsDirty) {
+
+        m_infoController->refresh();
+        m_infoIsDirty = false;
     }
 }

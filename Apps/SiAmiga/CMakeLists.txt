@@ -8,4 +8,5 @@ target_sources(SiAmiga PRIVATE
         Config/SiAmConfigController.cpp
         Keyboard/AmigaKeyModel.cpp
         Keyboard/SiAmKeyboardController.cpp
-        Inspector/SiAmInspectorController.cpp)
+        Inspector/SiAmInspectorController.cpp
+        SiAmInfoController.cpp)

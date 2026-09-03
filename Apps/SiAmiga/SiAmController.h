@@ -17,6 +17,7 @@
 #include "Config/SiAmConfigController.h"
 #include "Keyboard/SiAmKeyboardController.h"
 #include "Inspector/SiAmInspectorController.h"
+#include "SiAmInfoController.h"
 #include <QUrl>
 
 class QCoreApplication;
@@ -38,6 +39,11 @@ class SiAmController : public Controller {
     // Debug panel visibility (see SiAmDevPanel.qml)
     bool m_debugPanel = false;
 
+    // Set by process() whenever a message implies the cached info structs
+    // (see SiAmInfoController) are stale; update() clears it by forcing an
+    // immediate refresh(), mirroring C64Controller's m_infoIsDirty.
+    bool m_infoIsDirty = false;
+
     // Indicates if the RetroShell panel is open (see SiAmRetroShell.qml)
     bool m_retroShell = false;
     bool m_retroShellIsDirty = false;
@@ -57,6 +63,7 @@ class SiAmController : public Controller {
     unique_ptr<SiAmConfigController> m_configController;
     unique_ptr<SiAmKeyboardController> m_keyboardController;
     unique_ptr<SiAmInspectorController> m_inspectorController;
+    unique_ptr<SiAmInfoController> m_infoController;
 
 public:
 
@@ -236,6 +243,10 @@ public:
     Q_PROPERTY(SiAmInspectorController *inspectorController READ getInspectorController CONSTANT)
 
     SiAmInspectorController *getInspectorController() const { return m_inspectorController.get(); }
+
+    Q_PROPERTY(SiAmInfoController *info READ getInfoController CONSTANT)
+
+    SiAmInfoController *getInfoController() const { return m_infoController.get(); }
 
 
     //
