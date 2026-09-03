@@ -90,6 +90,11 @@ SiAmInfoController::grab(Component component)
         case PAULA:
 
             m_paulaInfo = core.paula.getInfo();
+            m_audioInfo[0] = core.paula.audioChannel0.getInfo();
+            m_audioInfo[1] = core.paula.audioChannel1.getInfo();
+            m_audioInfo[2] = core.paula.audioChannel2.getInfo();
+            m_audioInfo[3] = core.paula.audioChannel3.getInfo();
+            m_diskControllerInfo = core.paula.diskController.getInfo();
             break;
 
         case MEMORY:

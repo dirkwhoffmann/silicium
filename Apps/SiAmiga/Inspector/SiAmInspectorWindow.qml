@@ -86,6 +86,7 @@ Window {
         controller.memoryController.active = visible && currentIndex === SiAmInspectorWindow.Page.Memory
         controller.copperController.active = visible && currentIndex === SiAmInspectorWindow.Page.Copper
         controller.blitterController.active = visible && currentIndex === SiAmInspectorWindow.Page.Blitter
+        controller.paulaController.active = visible && currentIndex === SiAmInspectorWindow.Page.Paula
     }
 
     ColumnLayout {
