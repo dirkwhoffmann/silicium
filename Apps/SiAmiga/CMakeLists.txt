@@ -9,4 +9,7 @@ target_sources(SiAmiga PRIVATE
         Keyboard/AmigaKeyModel.cpp
         Keyboard/SiAmKeyboardController.cpp
         Inspector/SiAmInspectorController.cpp
+        Inspector/SiAmCIAController.cpp
+        Inspector/SiAmEventController.cpp
+        Inspector/SiAmEventTableModel.cpp
         SiAmInfoController.cpp)

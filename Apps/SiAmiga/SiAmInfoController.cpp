@@ -73,6 +73,8 @@ SiAmInfoController::grab(Component component)
 
             m_ciaInfo[0] = core.ciaA.getInfo();
             m_ciaInfo[1] = core.ciaB.getInfo();
+            m_ciaMetrics[0] = core.ciaA.getMetrics();
+            m_ciaMetrics[1] = core.ciaB.getMetrics();
             break;
 
         case AGNUS:

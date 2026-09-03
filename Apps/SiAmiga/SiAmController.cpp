@@ -38,6 +38,8 @@ SiAmController::SiAmController()
     m_keyboardController = make_unique<SiAmKeyboardController>(this);
     m_inspectorController = make_unique<SiAmInspectorController>(this);
     m_infoController = make_unique<SiAmInfoController>(this);
+    m_ciaController = make_unique<SiAmCIAController>(this);
+    m_eventController = make_unique<SiAmEventController>(this);
 }
 
 SiAmController &

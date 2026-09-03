@@ -17,6 +17,8 @@
 #include "Config/SiAmConfigController.h"
 #include "Keyboard/SiAmKeyboardController.h"
 #include "Inspector/SiAmInspectorController.h"
+#include "Inspector/SiAmCIAController.h"
+#include "Inspector/SiAmEventController.h"
 #include "SiAmInfoController.h"
 #include <QUrl>
 
@@ -64,6 +66,8 @@ class SiAmController : public Controller {
     unique_ptr<SiAmKeyboardController> m_keyboardController;
     unique_ptr<SiAmInspectorController> m_inspectorController;
     unique_ptr<SiAmInfoController> m_infoController;
+    unique_ptr<SiAmCIAController> m_ciaController;
+    unique_ptr<SiAmEventController> m_eventController;
 
 public:
 
@@ -247,6 +251,14 @@ public:
     Q_PROPERTY(SiAmInfoController *info READ getInfoController CONSTANT)
 
     SiAmInfoController *getInfoController() const { return m_infoController.get(); }
+
+    Q_PROPERTY(SiAmCIAController *ciaController READ getCIAController CONSTANT)
+
+    SiAmCIAController *getCIAController() const { return m_ciaController.get(); }
+
+    Q_PROPERTY(SiAmEventController *eventController READ getEventController CONSTANT)
+
+    SiAmEventController *getEventController() const { return m_eventController.get(); }
 
 
     //

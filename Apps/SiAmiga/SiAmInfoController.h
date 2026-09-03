@@ -54,6 +54,7 @@ class SiAmInfoController : public Controller {
     // selector points at.
     vamiga::CPUInfo m_cpuInfo = { };
     vamiga::CIAInfo m_ciaInfo[2] = { };
+    vamiga::CIAMetrics m_ciaMetrics[2] = { };
     vamiga::AgnusInfo m_agnusInfo = { };
     vamiga::DeniseInfo m_deniseInfo = { };
     vamiga::PaulaInfo m_paulaInfo = { };
@@ -102,6 +103,7 @@ class SiAmInfoController : public Controller {
     // Cached info accessors, for other controllers'/panels' C++ side.
     const vamiga::CPUInfo &cpuInfo() const { return m_cpuInfo; }
     const vamiga::CIAInfo &ciaInfo(int nr) const { return m_ciaInfo[nr]; }
+    const vamiga::CIAMetrics &ciaMetrics(int nr) const { return m_ciaMetrics[nr]; }
     const vamiga::AgnusInfo &agnusInfo() const { return m_agnusInfo; }
     const vamiga::DeniseInfo &deniseInfo() const { return m_deniseInfo; }
     const vamiga::PaulaInfo &paulaInfo() const { return m_paulaInfo; }
