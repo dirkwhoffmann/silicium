@@ -276,7 +276,7 @@ class SiAmConfigController : public Controller {
 
     Q_PROPERTY(int CIA_A_TODBUG READ ciaATodBug WRITE setCiaATodBug NOTIFY configChanged)
     Q_PROPERTY(int CIA_B_TODBUG READ ciaBTodBug WRITE setCiaBTodBug NOTIFY configChanged)
-    Q_PROPERTY(bool SER_DEVICE READ serDevice WRITE setSerDevice NOTIFY configChanged)
+    Q_PROPERTY(int SER_DEVICE READ serDevice WRITE setSerDevice NOTIFY configChanged)
     Q_PROPERTY(bool SER_VERBOSE READ serVerbose WRITE setSerVerbose NOTIFY configChanged)
     Q_PROPERTY(int MIDI_DEVICE_OUT READ midiDeviceOut WRITE setMidiDeviceOut NOTIFY configChanged)
     Q_PROPERTY(int MIDI_DEVICE_IN READ midiDeviceIn WRITE setMidiDeviceIn NOTIFY configChanged)
@@ -323,8 +323,8 @@ class SiAmConfigController : public Controller {
     void setCiaATodBug(int value) { set(vamiga::Opt::CIA_TODBUG, (i64)value, CiaA); }
     int ciaBTodBug() const { return (int)get(vamiga::Opt::CIA_TODBUG, CiaB); }
     void setCiaBTodBug(int value) { set(vamiga::Opt::CIA_TODBUG, (i64)value, CiaB); }
-    bool serDevice() const { return (bool)get(vamiga::Opt::SER_DEVICE); }
-    void setSerDevice(bool value) { set(vamiga::Opt::SER_DEVICE, (i64)value); }
+    int serDevice() const { return (int)get(vamiga::Opt::SER_DEVICE); }
+    void setSerDevice(int value) { set(vamiga::Opt::SER_DEVICE, (i64)value); }
     bool serVerbose() const { return (bool)get(vamiga::Opt::SER_VERBOSE); }
     void setSerVerbose(bool value) { set(vamiga::Opt::SER_VERBOSE, (i64)value); }
     int midiDeviceOut() const { return (int)get(vamiga::Opt::MIDI_DEVICE_OUT); }
