@@ -26,4 +26,5 @@ target_sources(SiAmiga PRIVATE
         Inspector/SiAmCPUController.cpp
         Inspector/SiAmDeniseController.cpp
         Inspector/SiAmSpriteView.cpp
+        Inspector/SiAmPortController.cpp
         SiAmInfoController.cpp)
