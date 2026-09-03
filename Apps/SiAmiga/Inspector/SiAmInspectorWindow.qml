@@ -82,6 +82,7 @@ Window {
     function updateActiveController() {
 
         controller.eventController.active = visible && currentIndex === SiAmInspectorWindow.Page.Events
+        controller.ciaController.active = visible && currentIndex === SiAmInspectorWindow.Page.CIA
     }
 
     ColumnLayout {
