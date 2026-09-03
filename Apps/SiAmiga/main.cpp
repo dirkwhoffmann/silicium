@@ -66,6 +66,7 @@ main(int argc, char *argv[])
 
     // Register singletons
     qmlRegisterSingletonInstance("Silicium.Assets", 1, 0, "Assets", Assets::instance());
+    qmlRegisterSingletonInstance("Silicium.Components", 1, 0, "Logger", Logger::instance());
     qmlRegisterSingletonInstance("Silicium.Controllers", 1, 0, "AppController", &AppController::instance());
     qmlRegisterSingletonInstance("Silicium.Controllers", 1, 0, "SiAmController", &SiAmController::instance());
     qmlRegisterSingletonInstance("Silicium.Preferences", 1, 0, "Preferences", &Preferences::instance());

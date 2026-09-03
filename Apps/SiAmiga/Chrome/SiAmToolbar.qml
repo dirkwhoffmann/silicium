@@ -17,12 +17,14 @@ import Silicium.Theme
 
 //
 // Combined toolbar / menubar. Port of SiC64Toolbar.qml, trimmed the same way
-// SiAmMenu.qml was trimmed relative to SiC64Menu.qml: the Inspector/
-// RetroShell/Logger buttons and the workspace/snapshot save/load buttons
-// aren't wired to anything because none of those subsystems exist in
-// SiAmiga yet. There's also no per-button "actions" object to inject (see
-// SiC64Toolbar's window.actions.* calls) -- buttons call SiAmController
-// directly instead, the same choice SiAmMenu.qml made.
+// SiAmMenu.qml was trimmed relative to SiC64Menu.qml: the workspace/snapshot
+// save/load buttons aren't wired to anything because that subsystem doesn't
+// exist in SiAmiga yet. The Configurator/Inspector/RetroShell/Logger buttons
+// are wired, in the same grouping and order as SiC64Toolbar's. There's also
+// no per-button "actions" object to inject (see SiC64Toolbar's
+// window.actions.* calls) -- buttons call SiAmController (and, for the
+// RetroShell/Logger mutual-exclusion, root.window) directly instead, the
+// same choice SiAmMenu.qml made.
 //
 
 ToolBar {
@@ -216,6 +218,51 @@ ToolBar {
 
             NavDivider {}
 
+            NavTextButtonFlat {
+
+                phosphor: "magnifying-glass"
+                text: qsTr("Inspector")
+                onClicked: root.openInspector()
+            }
+
+            NavDivider {}
+
+            NavTextButtonFlat {
+
+                phosphor: "terminal-window"
+                text: qsTr("RetroShell")
+                checkable: true
+                checked: root.amiga.retroShell
+                onClicked: {
+                    if (root.amiga.retroShell) {
+                        root.amiga.retroShell = false
+                    } else {
+                        root.window.loggerOpen = false
+                        root.amiga.retroShell = true
+                    }
+                }
+            }
+
+            NavDivider {}
+
+            NavTextButtonFlat {
+
+                phosphor: "clipboard"
+                text: qsTr("Logger")
+                checkable: true
+                checked: root.window.loggerOpen
+                onClicked: {
+                    if (root.window.loggerOpen) {
+                        root.window.loggerOpen = false
+                    } else {
+                        root.amiga.retroShell = false
+                        root.window.loggerOpen = true
+                    }
+                }
+            }
+
+            NavDivider {}
+
             HSpacer {}
 
             NavDivider {}
@@ -254,15 +301,18 @@ ToolBar {
 
             NavDivider {}
 
-            NavTextButtonFlat {
-                phosphor: "bug"
-                text: qsTr("Inspector")
-                onClicked: root.openInspector()
-            }
+            HSpacer {}
 
             NavDivider {}
 
-            HSpacer {}
+            NavTextButtonFlat {
+                visible: Preferences.developerMode
+                phosphor: "bug-beetle"
+                text: qsTr("Debug Panel")
+                checkable: true
+                checked: root.amiga.debugPanel
+                onClicked: root.amiga.toggleDebugPanel()
+            }
 
             NavDivider {}
 

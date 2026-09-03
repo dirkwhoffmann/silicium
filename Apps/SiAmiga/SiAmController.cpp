@@ -101,6 +101,76 @@ SiAmController::setDebugPanel(bool value)
 }
 
 void
+SiAmController::setRetroShell(bool value)
+{
+    if (m_retroShell != value) {
+
+        m_retroShell = value;
+        emit retroShellChanged();
+    }
+}
+
+QString
+SiAmController::getRetroShellText()
+{
+    auto *text = core().retroShell.text();
+    return QString::fromUtf8(text);
+}
+
+int
+SiAmController::getCursorPos()
+{
+    const auto &info = core().retroShell.getInfo();
+    return (int)info.cursorRel;
+}
+
+void
+SiAmController::pressRetroShellKey(int key, int modifiers, const QString &text)
+{
+    const bool shift = modifiers & Qt::ShiftModifier;
+    const bool ctrl  = modifiers & Qt::ControlModifier;
+
+    if (ctrl) {
+
+        switch (key) {
+
+            case Qt::Key_A: core().retroShell.press(RSKey::HOME, shift); return;
+            case Qt::Key_E: core().retroShell.press(RSKey::END, shift); return;
+            case Qt::Key_K: core().retroShell.press(RSKey::CUT, shift); return;
+            default:        break;
+        }
+    }
+
+    switch (key) {
+
+        case Qt::Key_Up:        core().retroShell.press(RSKey::UP, shift); break;
+        case Qt::Key_Down:      core().retroShell.press(RSKey::DOWN, shift); break;
+        case Qt::Key_Left:      core().retroShell.press(RSKey::LEFT, shift); break;
+        case Qt::Key_Right:     core().retroShell.press(RSKey::RIGHT, shift); break;
+        case Qt::Key_PageUp:    core().retroShell.press(RSKey::PAGE_UP, shift); break;
+        case Qt::Key_PageDown:  core().retroShell.press(RSKey::PAGE_DOWN, shift); break;
+        case Qt::Key_Home:      core().retroShell.press(RSKey::HOME, shift); break;
+        case Qt::Key_End:       core().retroShell.press(RSKey::END, shift); break;
+        case Qt::Key_Backspace: core().retroShell.press(RSKey::BACKSPACE, shift); break;
+        case Qt::Key_Delete:    core().retroShell.press(RSKey::DEL, shift); break;
+        case Qt::Key_Return:    core().retroShell.press(RSKey::RETURN, shift); break;
+        case Qt::Key_Enter:     core().retroShell.press(RSKey::RETURN, shift); break;
+        case Qt::Key_Tab:       core().retroShell.press(RSKey::TAB, shift); break;
+        case Qt::Key_Backtab:   core().retroShell.press(RSKey::TAB, true); break;
+        case Qt::Key_Escape:    setRetroShell(false); break;
+
+        default:
+            if (!text.isEmpty()) {
+                char c = text.toUtf8().at(0);
+                core().retroShell.press(c);
+            }
+            break;
+    }
+
+    m_retroShellIsDirty = true;
+}
+
+void
 SiAmController::attachWindow(QQuickWindow *window)
 {
     m_window = window;
@@ -511,6 +581,15 @@ SiAmController::process(const Message &msg, const string &attachment)
             qApp->exit((int)msg.value);
             break;
 
+        case Msg::RSH_CLOSE:
+        case Msg::RSH_UPDATE:
+        case Msg::RSH_SWITCH:
+        case Msg::RSH_WAIT:
+        case Msg::RSH_ERROR:
+
+            m_retroShellIsDirty = true;
+            break;
+
         default:
 
             break;
@@ -530,5 +609,11 @@ SiAmController::update()
 
         m_warping = warping;
         emit warpingChanged();
+    }
+
+    if (m_retroShellIsDirty) {
+
+        emit retroShellTextChanged();
+        m_retroShellIsDirty = false;
     }
 }

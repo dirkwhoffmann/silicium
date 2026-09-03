@@ -38,6 +38,10 @@ class SiAmController : public Controller {
     // Debug panel visibility (see SiAmDevPanel.qml)
     bool m_debugPanel = false;
 
+    // Indicates if the RetroShell panel is open (see SiAmRetroShell.qml)
+    bool m_retroShell = false;
+    bool m_retroShellIsDirty = false;
+
     // Always empty for now -- see getErrorMessage() below.
     QString errorMessage;
 
@@ -102,6 +106,23 @@ public:
     bool getDebugPanel() const { return m_debugPanel; }
     void setDebugPanel(bool value);
     Q_INVOKABLE void toggleDebugPanel() { setDebugPanel(!m_debugPanel); }
+
+
+    //
+    // RetroShell
+    //
+
+    Q_PROPERTY(bool retroShell READ getRetroShell WRITE setRetroShell NOTIFY retroShellChanged)
+    Q_PROPERTY(QString retroShellText READ getRetroShellText NOTIFY retroShellTextChanged)
+    Q_PROPERTY(int cursorPos READ getCursorPos NOTIFY retroShellTextChanged)
+
+    bool getRetroShell() const { return m_retroShell; }
+    void setRetroShell(bool value);
+
+    QString getRetroShellText();
+    int getCursorPos();
+
+    Q_INVOKABLE void pressRetroShellKey(int key, int modifiers, const QString &text);
 
     // Always empty for now -- this stub has no command-line/SVM parsing
     // yet (see C64Controller::parseArguments for what it will eventually
@@ -254,4 +275,6 @@ signals:
     void mouseWasCaptured();
     void warpingChanged();
     void debugPanelChanged();
+    void retroShellChanged();
+    void retroShellTextChanged();
 };
