@@ -42,8 +42,16 @@ ApplicationWindow {
 
     SiAmCanvas {
 
+        id: canvas
         anchors.fill: parent
         controller: root.amiga
+    }
+
+    SiAmDropOverlay {
+
+        anchors.fill: canvas
+        controller: root.amiga
+        window: root
     }
 
     SiAmDevPanel {

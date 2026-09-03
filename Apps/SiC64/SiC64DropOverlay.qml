@@ -96,9 +96,5 @@ DropOverlay {
         }
     }
 
-    action1: drive8Action
-    action2: drive9Action
-    action3: memoryAction
-    action4: expansionAction
-    action5: datasetteAction
+    actions: [drive8Action, drive9Action, memoryAction, expansionAction, datasetteAction]
 }

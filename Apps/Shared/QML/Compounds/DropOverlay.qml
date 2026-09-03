@@ -7,28 +7,34 @@ Item {
 
     id: root
 
-    property alias action1: zone1.action
-    property alias action2: zone2.action
-    property alias action3: zone3.action
-    property alias action4: zone4.action
-    property alias action5: zone5.action
+    // The drop targets shown in the sliding panel, left to right. Was
+    // action1..action5 (a fixed five zones) until the Amiga port needed a
+    // variable count -- four zones, whose four Actions themselves change
+    // (df0..df3 vs. hd0..hd3) depending on what's being dragged -- see
+    // SiAmDropOverlay.qml. A plain list covers both: SiC64DropOverlay binds
+    // five Actions once, SiAmDropOverlay rebinds four whenever the dragged
+    // file's extension changes.
+    property list<Action> actions
 
     property string path: ""
     property string extension: ""
     property bool initialized: false
 
-    readonly property int zoneWidth: Math.min((width - 6 * Style.mediumSpacing)  / 5, 128)
+    readonly property int zoneCount: Math.max(1, actions.length)
+    readonly property int zoneWidth: Math.min((width - (zoneCount + 1) * Style.mediumSpacing) / zoneCount, 128)
 
     // property bool active: false
     property bool mouseInRect: false
+
+    // Number of zones currently under a drag, tallied by each DropZone
+    // delegate below (see zoneRepeater) since a dynamic Repeater has no
+    // fixed zone1..zoneN ids to list here individually.
+    property int zoneDragCount: 0
+
     readonly property bool active:
         windowDropArea.containsDrag ||
         overlayDragArea.containsDrag ||
-        zone1.containsDrag ||
-        zone2.containsDrag ||
-        zone3.containsDrag ||
-        zone4.containsDrag ||
-        zone5.containsDrag
+        zoneDragCount > 0
 
     Component.onCompleted: {
         initialized = true;
@@ -140,39 +146,31 @@ Item {
 
             HSpacer {}
 
-            DropZone {
+            Repeater {
 
-                id: zone1
-                enabled: action1.enabled
-                zoneWidth: root.zoneWidth
-            }
+                id: zoneRepeater
+                model: root.actions
 
-            DropZone {
+                delegate: DropZone {
 
-                id: zone2
-                enabled: action2.enabled
-                zoneWidth: root.zoneWidth
-            }
+                    id: zoneDelegate
 
-            DropZone {
+                    required property Action modelData
 
-                id: zone3
-                enabled: action3.enabled
-                zoneWidth: root.zoneWidth
-            }
+                    action: modelData
+                    enabled: modelData.enabled
+                    zoneWidth: root.zoneWidth
 
-            DropZone {
+                    onContainsDragChanged: root.zoneDragCount += containsDrag ? 1 : -1
 
-                id: zone4
-                enabled: action4.enabled
-                zoneWidth: root.zoneWidth
-            }
-
-            DropZone {
-
-                id: zone5
-                enabled: action5.enabled
-                zoneWidth: root.zoneWidth
+                    // A reassigned actions list (SiAmDropOverlay swaps all
+                    // four when the dragged file's extension changes)
+                    // destroys and recreates every delegate -- if one was
+                    // mid-drag when that happened, its contribution to
+                    // zoneDragCount would otherwise never get subtracted
+                    // back out.
+                    Component.onDestruction: if (containsDrag) root.zoneDragCount -= 1
+                }
             }
 
             HSpacer {}
