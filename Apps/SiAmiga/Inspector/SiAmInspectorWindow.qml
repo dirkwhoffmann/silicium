@@ -84,6 +84,8 @@ Window {
         controller.eventController.active = visible && currentIndex === SiAmInspectorWindow.Page.Events
         controller.ciaController.active = visible && currentIndex === SiAmInspectorWindow.Page.CIA
         controller.memoryController.active = visible && currentIndex === SiAmInspectorWindow.Page.Memory
+        controller.copperController.active = visible && currentIndex === SiAmInspectorWindow.Page.Copper
+        controller.blitterController.active = visible && currentIndex === SiAmInspectorWindow.Page.Blitter
     }
 
     ColumnLayout {

@@ -20,6 +20,8 @@
 #include "Inspector/SiAmCIAController.h"
 #include "Inspector/SiAmEventController.h"
 #include "Inspector/SiAmMemoryController.h"
+#include "Inspector/SiAmCopperController.h"
+#include "Inspector/SiAmBlitterController.h"
 #include "SiAmInfoController.h"
 #include <QUrl>
 
@@ -70,6 +72,8 @@ class SiAmController : public Controller {
     unique_ptr<SiAmCIAController> m_ciaController;
     unique_ptr<SiAmEventController> m_eventController;
     unique_ptr<SiAmMemoryController> m_memoryController;
+    unique_ptr<SiAmCopperController> m_copperController;
+    unique_ptr<SiAmBlitterController> m_blitterController;
 
 public:
 
@@ -265,6 +269,14 @@ public:
     Q_PROPERTY(SiAmMemoryController *memoryController READ getMemoryController CONSTANT)
 
     SiAmMemoryController *getMemoryController() const { return m_memoryController.get(); }
+
+    Q_PROPERTY(SiAmCopperController *copperController READ getCopperController CONSTANT)
+
+    SiAmCopperController *getCopperController() const { return m_copperController.get(); }
+
+    Q_PROPERTY(SiAmBlitterController *blitterController READ getBlitterController CONSTANT)
+
+    SiAmBlitterController *getBlitterController() const { return m_blitterController.get(); }
 
 
     //

@@ -25,7 +25,7 @@ SiAmInfoController::requestUpdate(int components, double interval)
     // past the interval. Independent per-component timers mean several
     // inspectors interested in different subsystems each get fresh data
     // without dragging in the others or resetting each other's throttle.
-    static constexpr Component all[NumComponents] = { CPU, CIA, AGNUS, DENISE, PAULA, MEMORY, DRIVE, HD, AMIGA };
+    static constexpr Component all[NumComponents] = { CPU, CIA, AGNUS, DENISE, PAULA, MEMORY, DRIVE, HD, AMIGA, COPPER, BLITTER };
 
     auto now = utl::Time::now();
     bool changed = false;
@@ -46,7 +46,7 @@ SiAmInfoController::requestUpdate(int components, double interval)
 void
 SiAmInfoController::refresh()
 {
-    static constexpr Component all[NumComponents] = { CPU, CIA, AGNUS, DENISE, PAULA, MEMORY, DRIVE, HD, AMIGA };
+    static constexpr Component all[NumComponents] = { CPU, CIA, AGNUS, DENISE, PAULA, MEMORY, DRIVE, HD, AMIGA, COPPER, BLITTER };
 
     auto now = utl::Time::now();
     for (int i = 0; i < NumComponents; i++) {
@@ -111,6 +111,16 @@ SiAmInfoController::grab(Component component)
         case AMIGA:
 
             m_amigaInfo = core.amiga.getInfo();
+            break;
+
+        case COPPER:
+
+            m_copperInfo = core.agnus.copper.getInfo();
+            break;
+
+        case BLITTER:
+
+            m_blitterInfo = core.agnus.blitter.getInfo();
             break;
 
         default:

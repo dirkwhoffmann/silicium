@@ -41,6 +41,8 @@ SiAmController::SiAmController()
     m_ciaController = make_unique<SiAmCIAController>(this);
     m_eventController = make_unique<SiAmEventController>(this);
     m_memoryController = make_unique<SiAmMemoryController>(this);
+    m_copperController = make_unique<SiAmCopperController>(this);
+    m_blitterController = make_unique<SiAmBlitterController>(this);
 }
 
 SiAmController &

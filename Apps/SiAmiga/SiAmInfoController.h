@@ -63,9 +63,11 @@ class SiAmInfoController : public Controller {
     vamiga::FloppyDriveInfo m_driveInfo[4] = { };
     vamiga::HardDriveInfo m_hdInfo[4] = { };
     vamiga::AmigaInfo m_amigaInfo = { };
+    vamiga::CopperInfo m_copperInfo = { };
+    vamiga::BlitterInfo m_blitterInfo = { };
 
     // Number of samplable components (see the Component flags below).
-    static constexpr int NumComponents = 9;
+    static constexpr int NumComponents = 11;
 
     // Per-component wall-clock time of the last sample. Indexed by the bit
     // position of the Component flags below, so each subsystem is throttled
@@ -89,7 +91,9 @@ class SiAmInfoController : public Controller {
         DRIVE  = 1 << 6,
         HD     = 1 << 7,
         AMIGA  = 1 << 8,
-        ALL    = CPU | CIA | AGNUS | DENISE | PAULA | MEMORY | DRIVE | HD | AMIGA
+        COPPER = 1 << 9,
+        BLITTER = 1 << 10,
+        ALL    = CPU | CIA | AGNUS | DENISE | PAULA | MEMORY | DRIVE | HD | AMIGA | COPPER | BLITTER
     };
 
     // Asks for the given 'components' to be no older than 'interval'
@@ -113,6 +117,8 @@ class SiAmInfoController : public Controller {
     const vamiga::FloppyDriveInfo &driveInfo(int nr) const { return m_driveInfo[nr]; }
     const vamiga::HardDriveInfo &hdInfo(int nr) const { return m_hdInfo[nr]; }
     const vamiga::AmigaInfo &amigaInfo() const { return m_amigaInfo; }
+    const vamiga::CopperInfo &copperInfo() const { return m_copperInfo; }
+    const vamiga::BlitterInfo &blitterInfo() const { return m_blitterInfo; }
 
     //
     // CPU (68000)

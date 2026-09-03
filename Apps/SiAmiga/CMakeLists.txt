@@ -14,4 +14,8 @@ target_sources(SiAmiga PRIVATE
         Inspector/SiAmEventTableModel.cpp
         Inspector/SiAmMemoryController.cpp
         Inspector/SiAmMemDumpModel.cpp
+        Inspector/SiAmCopperController.cpp
+        Inspector/SiAmCopperListModel.cpp
+        Inspector/SiAmGuardModel.cpp
+        Inspector/SiAmBlitterController.cpp
         SiAmInfoController.cpp)
