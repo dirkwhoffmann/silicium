@@ -10,6 +10,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Silicium.Assets
 import Silicium.Controllers
 import Silicium.Theme
 
@@ -21,16 +22,13 @@ import Silicium.Theme
 // controller.paulaController.active for it, the same way it already does
 // for the other panels.
 //
-// The one piece with no off-the-shelf Silicium control to reuse is the
-// four "State machine N" diagrams -- the Swift reference swaps in one of
-// five bitmap assets (Resources/Assets.xcassets/Audio/state0Template.pdf
-// .. state5Template.pdf) showing a 5-node graph with the active node
-// filled in. Rather than ship five new bitmap assets, StateDiagram below
-// draws the same 5-node graph (and the same 7 edges connecting them --
-// see SiAmPaulaController's class comment for the exact transition table
-// the filled node follows) with a plain QtQuick Canvas, so the "state"
-// numbering and the topology are pixel-for-pixel decisions made once here
-// rather than baked into images.
+// The four "State machine N" diagrams use the same five bitmap assets the
+// Swift reference does (Resources/Assets.xcassets/Audio/state0Template.pdf
+// .. state5Template.pdf there, registered here as Assets.State0..State5 --
+// see Assets.h/.cpp), each already drawing the 5-node graph with one node
+// filled in. StateDiagram below just swaps between them by index, keyed
+// off SiAmPaulaController::displayState() -- see that controller's class
+// comment for the transition table deciding which one shows.
 Item {
 
     id: root
@@ -82,108 +80,27 @@ Item {
         }
     }
 
-    // Five-node DMA state-machine diagram -- see the class comment. Nodes
-    // are laid out A(state0, left) - B(state1) - C(state5) - D(state2,
-    // right) along the top, with E(state3) at the bottom; edges: A->B,
-    // A->D (direct, taken when DMA is off), B->C, C->D, D->E, E->D and
-    // E->A, matching SiAmPaulaController's transition table exactly.
-    component StateDiagram: Canvas {
-
-        id: diagram
+    // Five-node DMA state-machine diagram -- one of five pre-rendered
+    // template images (see the class comment), picked by currentState (0,
+    // 1, 2, 3 or 5 -- anything else falls back to the idle/state0 image).
+    // SiTemplateImage (not a plain Image) so the line art tints with
+    // Palette.primary the same way the toolbar's MousePress/MousePush
+    // icons already do, instead of showing whatever raw color the PNGs
+    // happen to be.
+    component StateDiagram: SiTemplateImage {
 
         property int currentState: 0
 
         implicitWidth: 150
-        implicitHeight: 120
+        implicitHeight: 150
 
-        readonly property var nodes: ({
-            0: Qt.point(20, 60),
-            1: Qt.point(58, 32),
-            5: Qt.point(96, 32),
-            2: Qt.point(132, 60),
-            3: Qt.point(96, 96)
-        })
-
-        onCurrentStateChanged: requestPaint()
-        Component.onCompleted: requestPaint()
-
-        onPaint: {
-
-            var ctx = getContext("2d")
-            ctx.reset()
-
-            var r = 9
-            var lineColor = Palette.tertiary
-
-            function drawArrow(from, to, bend) {
-
-                // Control point offset perpendicular to the from->to line,
-                // so 'bend' > 0 curves one way and < 0 the other -- lets
-                // the direct A->D and E->A edges arc well clear of the
-                // short chain between them.
-                var mx = (from.x + to.x) / 2
-                var my = (from.y + to.y) / 2
-                var dx = to.x - from.x
-                var dy = to.y - from.y
-                var len = Math.max(1, Math.sqrt(dx * dx + dy * dy))
-                var nx = -dy / len
-                var ny = dx / len
-                var cx = mx + nx * bend
-                var cy = my + ny * bend
-
-                // Shorten the line so it doesn't dive under the node
-                // circles.
-                var t0 = r / len
-                var sx = from.x + dx * t0
-                var sy = from.y + dy * t0
-                var ex = to.x - dx * t0
-                var ey = to.y - dy * t0
-
-                ctx.strokeStyle = lineColor
-                ctx.lineWidth = 1.4
-                ctx.beginPath()
-                ctx.moveTo(sx, sy)
-                ctx.quadraticCurveTo(cx, cy, ex, ey)
-                ctx.stroke()
-
-                // Arrowhead pointing along the curve's tangent at the end.
-                var tx = ex - cx
-                var ty = ey - cy
-                var tl = Math.max(1, Math.sqrt(tx * tx + ty * ty))
-                tx /= tl; ty /= tl
-
-                var ah = 6
-                ctx.fillStyle = lineColor
-                ctx.beginPath()
-                ctx.moveTo(ex, ey)
-                ctx.lineTo(ex - ah * tx + ah * 0.5 * ty, ey - ah * ty - ah * 0.5 * tx)
-                ctx.lineTo(ex - ah * tx - ah * 0.5 * ty, ey - ah * ty + ah * 0.5 * tx)
-                ctx.closePath()
-                ctx.fill()
-            }
-
-            drawArrow(nodes[0], nodes[1], -10)
-            drawArrow(nodes[0], nodes[2], -34)
-            drawArrow(nodes[1], nodes[5], -8)
-            drawArrow(nodes[5], nodes[2], -8)
-            drawArrow(nodes[2], nodes[3], 14)
-            drawArrow(nodes[3], nodes[2], -14)
-            drawArrow(nodes[3], nodes[0], 34)
-
-            for (var key in nodes) {
-
-                var p = nodes[key]
-                var active = Number(key) === currentState
-
-                ctx.beginPath()
-                ctx.arc(p.x, p.y, r, 0, 2 * Math.PI)
-                ctx.fillStyle = active ? Palette.primary : Palette.background
-                ctx.fill()
-                ctx.strokeStyle = lineColor
-                ctx.lineWidth = 1.4
-                ctx.stroke()
-            }
-        }
+        source: Assets.iconUrl(
+            currentState === 0 ? Assets.State0 :
+            currentState === 1 ? Assets.State1 :
+            currentState === 2 ? Assets.State2 :
+            currentState === 3 ? Assets.State3 :
+            currentState === 5 ? Assets.State5 :
+            Assets.State0)
     }
 
     RowLayout {

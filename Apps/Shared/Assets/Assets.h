@@ -121,6 +121,11 @@ public:
         RomDiag,
         RomEmutos,
         Snapshot,
+        State0,
+        State1,
+        State2,
+        State3,
+        State5,
 
         // Keyboard
         Key,

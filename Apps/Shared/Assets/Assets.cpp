@@ -106,6 +106,11 @@ Assets::getIconUrl(Icon icon)
         case Icon::RomDiag:             return QUrl("qrc:/images/rom-diag.png");
         case Icon::RomEmutos:           return QUrl("qrc:/images/rom-emutos.png");
         case Icon::Snapshot:            return QUrl("qrc:/images/snapshot.png");
+        case Icon::State0:              return QUrl("qrc:/images/state0.png");
+        case Icon::State1:              return QUrl("qrc:/images/state1.png");
+        case Icon::State2:              return QUrl("qrc:/images/state2.png");
+        case Icon::State3:              return QUrl("qrc:/images/state3.png");
+        case Icon::State5:              return QUrl("qrc:/images/state5.png");
 
         case Icon::Key:                 return QUrl("qrc:/images/key.png");
         case Icon::KeyRed:              return QUrl("qrc:/images/key-red.png");
