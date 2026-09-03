@@ -90,6 +90,7 @@ SiAmRenderer::tick()
 
     controller->update();
     controller->getActivityController()->update(cpuInfo.clock, amigaInfo.frame, frame);
+    controller->getInspectorController()->tick();
 
     // Update texture
     core.videoPort.lockTexture();

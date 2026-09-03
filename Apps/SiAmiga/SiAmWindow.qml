@@ -61,6 +61,7 @@ ApplicationWindow {
             keyboardWindow.raise()
             keyboardWindow.requestActivate()
         }
+        onOpenInspector: inspectorWindow.showPage(inspectorWindow.currentIndex)
 
         compactMenu: root.compactMenu
 
@@ -88,6 +89,12 @@ ApplicationWindow {
     SiAmKeyboardWindow {
 
         id: keyboardWindow
+        controller: root.amiga
+    }
+
+    SiAmInspectorWindow {
+
+        id: inspectorWindow
         controller: root.amiga
     }
 

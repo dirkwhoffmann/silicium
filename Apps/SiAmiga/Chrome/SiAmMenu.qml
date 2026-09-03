@@ -50,6 +50,9 @@ SiMenuBar {
     // without touching this menu again.
     signal openKeyboard()
 
+    // Emitted by the Debug menu's "Show Inspector..." item.
+    signal openInspector()
+
     // Reflects the current visibility of the toolbar (which now includes the
     // menu row) and the status bar, so the View menu's checkable items can
     // show the right state. The window owns the actual visibility and
@@ -403,6 +406,25 @@ SiMenuBar {
         Action {
             text: qsTr("Reset Keyboard Handler")
             onTriggered: amiga.resetKeyboardMatrix()
+        }
+    }
+
+    //
+    // Debug Menu
+    //
+    // Just the one item for now -- SiAmInspectorWindow's sidebar is where
+    // the actual per-panel content lives (see that file); SiC64's separate
+    // per-panel Inspector menu items have no counterpart yet since there's
+    // only the one window to show.
+    //
+
+    SiMenu {
+        title: qsTr("&Debug")
+
+        Action {
+            text: qsTr("Show Inspector...")
+            shortcut: "Ctrl+I"
+            onTriggered: openInspector()
         }
     }
 }

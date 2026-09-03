@@ -7,4 +7,5 @@ target_sources(SiAmiga PRIVATE
         SiAmActivityController.cpp
         Config/SiAmConfigController.cpp
         Keyboard/AmigaKeyModel.cpp
-        Keyboard/SiAmKeyboardController.cpp)
+        Keyboard/SiAmKeyboardController.cpp
+        Inspector/SiAmInspectorController.cpp)

@@ -41,6 +41,9 @@ ToolBar {
     // SiAmMenu.qml and SiAmWindow.qml for why there's no window to show yet.
     signal openKeyboard()
 
+    // Emitted by the Debug menu's/button's "Show Inspector..." item.
+    signal openInspector()
+
     required property SiAmWindow window
 
     // Reflects the current visibility of the toolbar (which now includes the
@@ -167,6 +170,7 @@ ToolBar {
                 onOpenConfigurator: (page) => root.openConfigurator(page)
                 onOpenAbout: root.openAbout()
                 onOpenKeyboard: root.openKeyboard()
+                onOpenInspector: root.openInspector()
 
                 toolbarVisible: root.toolbarVisible
                 statusBarVisible: root.statusBarVisible
@@ -246,6 +250,14 @@ ToolBar {
                 phosphor: "keyboard"
                 text: qsTr("Keyboard")
                 onClicked: root.openKeyboard()
+            }
+
+            NavDivider {}
+
+            NavTextButtonFlat {
+                phosphor: "bug"
+                text: qsTr("Inspector")
+                onClicked: root.openInspector()
             }
 
             NavDivider {}
