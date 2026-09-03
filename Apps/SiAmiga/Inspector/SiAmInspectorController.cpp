@@ -70,6 +70,20 @@ SiAmInspectorController::tick()
 void
 SiAmInspectorController::refresh()
 {
+    // The beam position comes from the shared AmigaInfo; sample it through
+    // the info controller so every open inspector coalesces onto one query
+    // -- mirrors SiC64InspectorController::refresh() sampling C64Info via
+    // SiC64InfoController.
+    auto *infoController = parent->getInfoController();
+    infoController->requestUpdate(SiAmInfoController::AMIGA, 0.25);
+    auto &info = infoController->amigaInfo();
+
+    m_beamPosition = QString("%1:%2:%3")
+        .arg(formatNumber(info.frame, 0))
+        .arg(formatNumber(info.vpos, 3))
+        .arg(formatNumber(info.hpos, 3));
+    emit beamPositionChanged();
+
     refreshData();
 }
 

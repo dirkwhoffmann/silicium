@@ -22,13 +22,16 @@
 // Denise, Port, Events) as stub content behind one sidebar instead of one
 // window per panel -- so for now there is exactly one instance of this
 // class, owned by SiAmController and shared by every panel, rather than one
-// per panel. It carries just the two things every future panel controller
-// will need regardless of what it samples: the "is any inspector panel
-// currently visible" flag driving a throttled tick(), and the hex/decimal
-// number-format toggle the shared toolbar exposes. Panel-specific data
-// controllers (an eventual SiAmCPUController, SiAmAgnusController, ...) are
-// expected to derive from this the way SiC64's do from SiC64InspectorController,
-// once a given panel grows real content.
+// per panel. It carries the things every future panel controller will need
+// regardless of what it samples: the "is any inspector panel currently
+// visible" flag driving a throttled tick(), the hex/decimal number-format
+// toggle the shared toolbar exposes, and (now that SiAmInfoController
+// exists) the frame:vpos:hpos beam-position readout the toolbar shows --
+// mirrors SiC64InspectorController::refresh() sampling C64Info through
+// SiC64InfoController the same way. Panel-specific data controllers (an
+// eventual SiAmCPUController, SiAmAgnusController, ...) are expected to
+// derive from this the way SiC64's do from SiC64InspectorController, once a
+// given panel grows real content.
 class SiAmInspectorController : public Controller {
 
     Q_OBJECT
@@ -45,6 +48,12 @@ class SiAmInspectorController : public Controller {
     // SiAmToolbar.qml), so these live here as plain properties instead.
     bool m_hex = true;
     bool m_padded = false;
+
+    // frame:vpos:hpos readout, formatted per formatNumber() below. Shown in
+    // the shared toolbar (SiAmInspectorToolbar) regardless of which panel
+    // is on screen -- see SiC64InspectorController's own m_beamPosition for
+    // why this lives on the shared base rather than a specific panel.
+    QString m_beamPosition;
 
     // Wall-clock time of the last refresh, used to throttle tick() to ~4 Hz
     utl::Time lastRefresh = 0;
@@ -65,6 +74,7 @@ class SiAmInspectorController : public Controller {
     Q_PROPERTY(bool active READ isActive WRITE setActive NOTIFY activeChanged)
     Q_PROPERTY(bool hex READ isHex WRITE setHex NOTIFY formatChanged)
     Q_PROPERTY(bool padded READ isPadded WRITE setPadded NOTIFY formatChanged)
+    Q_PROPERTY(QString beamPosition READ beamPosition NOTIFY beamPositionChanged)
 
     bool isActive() const { return m_active; }
     void setActive(bool value);
@@ -74,6 +84,8 @@ class SiAmInspectorController : public Controller {
 
     bool isPadded() const { return m_padded; }
     void setPadded(bool value);
+
+    QString beamPosition() const { return m_beamPosition; }
 
   protected:
 
@@ -95,4 +107,5 @@ class SiAmInspectorController : public Controller {
 
     void activeChanged();
     void formatChanged();
+    void beamPositionChanged();
 };

@@ -18,9 +18,10 @@ import Silicium.Theme
 // its buttons to a shared C64Actions object (root.actions.pause, ...) so
 // they stay in sync with the main window's menu/toolbar; SiAmiga has no such
 // Actions object yet (see SiAmToolbar.qml's own comment on the same point),
-// so these buttons call SiAmController directly instead, and the beam-
-// position readout SiC64's toolbar shows is left out until a panel actually
-// samples Agnus's frame/vpos/hpos to feed it.
+// so these buttons call SiAmController directly instead. The beam-position
+// readout is wired the same way SiC64's is: inspectorController.beamPosition
+// comes from SiAmInspectorController::refresh() sampling AmigaInfo's
+// frame/vpos/hpos through SiAmInfoController.
 
 ToolBar {
 
@@ -116,6 +117,25 @@ ToolBar {
             }
 
             HSpacer { }
+
+            Rectangle {
+
+                Layout.preferredWidth: 128
+                Layout.preferredHeight: 26
+                color: Palette.control
+                border.width: 1
+                border.color: Palette.controlBorder
+                radius: 12
+
+                SiText {
+
+                    anchors.centerIn: parent
+                    text: root.inspectorController.beamPosition
+                    font.family: Fonts.mono
+                    Layout.preferredWidth: 110
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            }
 
             NavBarGroup {
 
