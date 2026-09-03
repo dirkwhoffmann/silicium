@@ -24,6 +24,7 @@
 #include "Inspector/SiAmBlitterController.h"
 #include "Inspector/SiAmPaulaController.h"
 #include "Inspector/SiAmBusController.h"
+#include "Inspector/SiAmCPUController.h"
 #include "SiAmInfoController.h"
 #include <QUrl>
 
@@ -78,6 +79,7 @@ class SiAmController : public Controller {
     unique_ptr<SiAmBlitterController> m_blitterController;
     unique_ptr<SiAmPaulaController> m_paulaController;
     unique_ptr<SiAmBusController> m_busController;
+    unique_ptr<SiAmCPUController> m_cpuController;
 
 public:
 
@@ -289,6 +291,10 @@ public:
     Q_PROPERTY(SiAmBusController *busController READ getBusController CONSTANT)
 
     SiAmBusController *getBusController() const { return m_busController.get(); }
+
+    Q_PROPERTY(SiAmCPUController *cpuController READ getCPUController CONSTANT)
+
+    SiAmCPUController *getCPUController() const { return m_cpuController.get(); }
 
 
     //

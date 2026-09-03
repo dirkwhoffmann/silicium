@@ -45,6 +45,7 @@ SiAmController::SiAmController()
     m_blitterController = make_unique<SiAmBlitterController>(this);
     m_paulaController = make_unique<SiAmPaulaController>(this);
     m_busController = make_unique<SiAmBusController>(this);
+    m_cpuController = make_unique<SiAmCPUController>(this);
 }
 
 SiAmController &
