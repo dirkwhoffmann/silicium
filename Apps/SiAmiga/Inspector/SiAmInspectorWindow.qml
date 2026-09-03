@@ -46,6 +46,7 @@ Window {
     }
 
     required property SiAmController controller
+    required property SiAmActions actions
     readonly property var inspectorController: controller.inspectorController
     property int currentIndex: 0
 
@@ -79,6 +80,7 @@ Window {
 
             Layout.fillWidth: true
             amiga: root.controller
+            actions: root.actions
             inspectorController: root.inspectorController
         }
 

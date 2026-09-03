@@ -158,6 +158,27 @@ ApplicationWindow {
 
     Component.onCompleted: updateOverlayStack()
 
+    //
+    // Actions
+    //
+
+    // All window actions live in SiAmActions. SiAmToolbar and SiAmMenu pull
+    // this window in directly (as SiAmWindow, not a generic base) to reach
+    // them -- mirrors SiC64Window's own actions wiring.
+    SiAmActions {
+
+        id: siActions
+        hostWindow: root
+        amiga: root.amiga
+        configWindowRef: configWindow
+        keyboardWindowRef: keyboardWindow
+        inspectorWindowRef: inspectorWindow
+    }
+
+    // Single injection point for every window action. Consumers reach
+    // individual actions via window.actions.xxx (e.g. window.actions.reset).
+    property alias actions: siActions
+
     // Floats over the canvas (z above it) rather than using header:, which
     // would reserve its own layout slot above the content area -- see
     // SiC64Window.qml for the full rationale (auto-hide reveals the canvas
@@ -175,13 +196,6 @@ ApplicationWindow {
         window: root
 
         onOpenAbout: aboutWindow.show()
-        onOpenConfigurator: (page) => configWindow.showPage(page)
-        onOpenKeyboard: {
-            keyboardWindow.show()
-            keyboardWindow.raise()
-            keyboardWindow.requestActivate()
-        }
-        onOpenInspector: inspectorWindow.showPage(inspectorWindow.currentIndex)
 
         compactMenu: root.compactMenu
 
@@ -216,6 +230,7 @@ ApplicationWindow {
 
         id: inspectorWindow
         controller: root.amiga
+        actions: root.actions
     }
 
     SiAmAbout {

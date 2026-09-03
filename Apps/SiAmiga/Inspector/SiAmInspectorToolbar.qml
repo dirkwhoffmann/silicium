@@ -14,20 +14,20 @@ import Silicium.Controllers
 import Silicium.Theme
 
 // Port of SiC64InspectorToolbar.qml, shared by every panel behind
-// SiAmInspectorWindow's sidebar (see that file). SiC64's toolbar forwards
-// its buttons to a shared C64Actions object (root.actions.pause, ...) so
-// they stay in sync with the main window's menu/toolbar; SiAmiga has no such
-// Actions object yet (see SiAmToolbar.qml's own comment on the same point),
-// so these buttons call SiAmController directly instead. The beam-position
-// readout is wired the same way SiC64's is: inspectorController.beamPosition
-// comes from SiAmInspectorController::refresh() sampling AmigaInfo's
-// frame/vpos/hpos through SiAmInfoController.
+// SiAmInspectorWindow's sidebar (see that file). Now that SiAmActions
+// exists, this forwards its buttons to it (root.actions.pause, ...) the
+// same way SiC64's toolbar does, instead of calling SiAmController
+// directly. The beam-position readout is wired the same way SiC64's is:
+// inspectorController.beamPosition comes from
+// SiAmInspectorController::refresh() sampling AmigaInfo's frame/vpos/hpos
+// through SiAmInfoController.
 
 ToolBar {
 
     id: root
 
     required property SiAmController amiga
+    required property SiAmActions actions
 
     // Untyped: SiAmInspectorController isn't registered as a QML type
     // (unlike SiC64InspectorController), matching how SiAmiga's other
@@ -72,19 +72,17 @@ ToolBar {
 
                 NavTextButton {
 
+                    action: root.actions.pause
                     symbol: root.amiga.isPaused ? "play_circle" : "pause_circle"
-                    onClicked: root.amiga.runOrPause()
                 }
             }
 
             NavBarGroup {
 
-                enabled: root.amiga.isPaused
-
                 NavTextButton {
 
+                    action: root.actions.stepInto
                     symbol: "step_into"
-                    onClicked: root.amiga.stepInto()
                 }
 
                 NavDivider {
@@ -92,8 +90,8 @@ ToolBar {
 
                 NavTextButton {
 
+                    action: root.actions.stepOver
                     symbol: "step_over"
-                    onClicked: root.amiga.stepOver()
                 }
 
                 NavDivider {
@@ -101,9 +99,9 @@ ToolBar {
 
                 NavTextButton {
 
+                    action: root.actions.finishLine
                     symbol: "text_select_move_down"
                     rotate: -90
-                    onClicked: root.amiga.finishLine()
                 }
 
                 NavDivider {
@@ -111,8 +109,8 @@ ToolBar {
 
                 NavTextButton {
 
+                    action: root.actions.finishFrame
                     symbol: "text_select_move_down"
-                    onClicked: root.amiga.finishFrame()
                 }
             }
 
@@ -155,28 +153,16 @@ ToolBar {
                         y: formatButton.height
 
                         SiMenuItem {
-                            text: qsTr("Hex")
-                            checkable: true
-                            checked: root.inspectorController.hex && !root.inspectorController.padded
-                            onTriggered: { root.inspectorController.hex = true; root.inspectorController.padded = false }
+                            action: root.actions.formatHex
                         }
                         SiMenuItem {
-                            text: qsTr("Hex (padded)")
-                            checkable: true
-                            checked: root.inspectorController.hex && root.inspectorController.padded
-                            onTriggered: { root.inspectorController.hex = true; root.inspectorController.padded = true }
+                            action: root.actions.formatHexPadded
                         }
                         SiMenuItem {
-                            text: qsTr("Decimal")
-                            checkable: true
-                            checked: !root.inspectorController.hex && !root.inspectorController.padded
-                            onTriggered: { root.inspectorController.hex = false; root.inspectorController.padded = false }
+                            action: root.actions.formatDecimal
                         }
                         SiMenuItem {
-                            text: qsTr("Decimal (padded)")
-                            checkable: true
-                            checked: !root.inspectorController.hex && root.inspectorController.padded
-                            onTriggered: { root.inspectorController.hex = false; root.inspectorController.padded = true }
+                            action: root.actions.formatDecimalPadded
                         }
                     }
                 }

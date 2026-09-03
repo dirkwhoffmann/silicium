@@ -19,12 +19,8 @@ import Silicium.Theme
 // Combined toolbar / menubar. Port of SiC64Toolbar.qml, trimmed the same way
 // SiAmMenu.qml was trimmed relative to SiC64Menu.qml: the workspace/snapshot
 // save/load buttons aren't wired to anything because that subsystem doesn't
-// exist in SiAmiga yet. The Configurator/Inspector/RetroShell/Logger buttons
-// are wired, in the same grouping and order as SiC64Toolbar's. There's also
-// no per-button "actions" object to inject (see SiC64Toolbar's
-// window.actions.* calls) -- buttons call SiAmController (and, for the
-// RetroShell/Logger mutual-exclusion, root.window) directly instead, the
-// same choice SiAmMenu.qml made.
+// exist in SiAmiga yet. Every other button is wired via root.window.actions
+// (see SiAmActions.qml), same as SiC64Toolbar's window.actions.* calls.
 //
 
 ToolBar {
@@ -33,18 +29,10 @@ ToolBar {
 
     required property SiAmController amiga
 
-    // Emitted when a menu item wants to open the Configurator on a specific page
-    signal openConfigurator(int page)
-
-    // Emitted by the Amiga menu's "About" item
+    // Emitted by the Amiga menu's "About" item -- the one menu command with
+    // no SiAmActions entry (see that file's class comment; C64Actions has
+    // none either).
     signal openAbout()
-
-    // Emitted by the Keyboard menu's/button's "Show..." item -- see
-    // SiAmMenu.qml and SiAmWindow.qml for why there's no window to show yet.
-    signal openKeyboard()
-
-    // Emitted by the Debug menu's/button's "Show Inspector..." item.
-    signal openInspector()
 
     required property SiAmWindow window
 
@@ -169,10 +157,7 @@ ToolBar {
                 Layout.alignment: Qt.AlignVCenter
                 amiga: root.amiga
                 window: root.window
-                onOpenConfigurator: (page) => root.openConfigurator(page)
                 onOpenAbout: root.openAbout()
-                onOpenKeyboard: root.openKeyboard()
-                onOpenInspector: root.openInspector()
 
                 toolbarVisible: root.toolbarVisible
                 statusBarVisible: root.statusBarVisible
@@ -212,8 +197,7 @@ ToolBar {
             NavTextButtonFlat {
 
                 phosphor: "gear"
-                text: qsTr("Settings...")
-                onClicked: root.openConfigurator(0)
+                action: root.window.actions.config
             }
 
             NavDivider {}
@@ -221,8 +205,7 @@ ToolBar {
             NavTextButtonFlat {
 
                 phosphor: "magnifying-glass"
-                text: qsTr("Inspector")
-                onClicked: root.openInspector()
+                action: root.window.actions.openInspector
             }
 
             NavDivider {}
@@ -230,17 +213,9 @@ ToolBar {
             NavTextButtonFlat {
 
                 phosphor: "terminal-window"
-                text: qsTr("RetroShell")
+                action: root.window.actions.retroShell
                 checkable: true
                 checked: root.amiga.retroShell
-                onClicked: {
-                    if (root.amiga.retroShell) {
-                        root.amiga.retroShell = false
-                    } else {
-                        root.window.loggerOpen = false
-                        root.amiga.retroShell = true
-                    }
-                }
             }
 
             NavDivider {}
@@ -248,17 +223,9 @@ ToolBar {
             NavTextButtonFlat {
 
                 phosphor: "clipboard"
-                text: qsTr("Logger")
+                action: root.window.actions.logger
                 checkable: true
-                checked: root.window.loggerOpen
-                onClicked: {
-                    if (root.window.loggerOpen) {
-                        root.window.loggerOpen = false
-                    } else {
-                        root.amiga.retroShell = false
-                        root.window.loggerOpen = true
-                    }
-                }
+                checked: root.window.actions.logger.isOpen
             }
 
             NavDivider {}
@@ -295,8 +262,7 @@ ToolBar {
 
             NavTextButtonFlat {
                 phosphor: "keyboard"
-                text: qsTr("Keyboard")
-                onClicked: root.openKeyboard()
+                action: root.window.actions.keyboard
             }
 
             NavDivider {}
@@ -308,34 +274,30 @@ ToolBar {
             NavTextButtonFlat {
                 visible: Preferences.developerMode
                 phosphor: "bug-beetle"
-                text: qsTr("Debug Panel")
+                action: root.window.actions.debug
                 checkable: true
                 checked: root.amiga.debugPanel
-                onClicked: root.amiga.toggleDebugPanel()
             }
 
             NavDivider {}
 
             NavTextButtonFlat {
                 phosphor: root.amiga.isPaused ? "play-circle" : "pause-circle"
-                text: root.amiga.isPaused ? qsTr("Run") : qsTr("Pause")
-                onClicked: root.amiga.runOrPause()
+                action: root.window.actions.pause
             }
 
             NavDivider {}
 
             NavTextButtonFlat {
                 phosphor: "arrows-clockwise"
-                text: qsTr("Reset")
-                onClicked: root.amiga.reset()
+                action: root.window.actions.reset
             }
 
             NavDivider {}
 
             NavTextButtonFlat {
                 phosphor: "power"
-                text: root.amiga.isPoweredOn ? qsTr("Power Off") : qsTr("Power On")
-                onClicked: root.amiga.powerOnOrOff()
+                action: root.window.actions.power
             }
         }
     }

@@ -17,16 +17,15 @@ import Silicium.Theme
 
 //
 // Port of SiC64Menu.qml for the Amiga. The C64 menu becomes "Amiga"; Edit and
-// View keep the same items (rewired to SiAmController's equivalents -- see
-// that class for stepOver/stepInto/toggleWarp/captureOrReleaseMouse and
-// friends, added there for this menu). There's no Datasette or Expansion Port
-// on an Amiga, so those menus are dropped; a Keyboard menu is kept, trimmed
-// to what vAmiga's own menu offers (MainMenu.xib has no C64-style "type this
-// string" shortcuts -- there's no BASIC to type into). The Inspector/
-// RetroShell/Logger items from the C64 menu, and the file-dialog-backed
-// actions the drive/hard-drive menus trigger (New/Insert/Attach/Export...),
-// aren't wired to a window yet -- SiAmWindow.qml has none of that
-// infrastructure built out yet, same as the Configurator/About windows.
+// View keep the same items, wired via window.actions.xxx (see SiAmActions.qml)
+// the same way SiC64Menu's are. There's no Datasette or Expansion Port on an
+// Amiga, so those menus are dropped; a Keyboard menu is kept, trimmed to what
+// vAmiga's own menu offers (MainMenu.xib has no C64-style "type this string"
+// shortcuts -- there's no BASIC to type into). RetroShell/Logger live in the
+// Debug menu here rather than the Amiga menu (see that menu below). The
+// file-dialog-backed actions the drive/hard-drive menus trigger (New/Insert/
+// Attach/Export...) aren't wired to a window yet -- SiAmWindow.qml has none
+// of that infrastructure built out yet, same as the About window.
 //
 
 SiMenuBar {
@@ -37,21 +36,10 @@ SiMenuBar {
     required property SiAmWindow window
     readonly property SiAmConfigController config: amiga.configController
 
-    // Emitted when a menu item wants to open the Configurator on a specific
-    // page (see SiAmConfigWindow.Page). The window handles the actual display.
-    signal openConfigurator(int page)
-
     // Emitted by the Amiga menu's "About" item. The window handles the
-    // actual display (see SiAmAbout.qml).
+    // actual display (see SiAmAbout.qml). The one menu command with no
+    // SiAmActions entry -- see that file's class comment.
     signal openAbout()
-
-    // Emitted by the Keyboard menu's "Show..." item. There's no virtual
-    // keyboard window yet -- this is here so the window can wire one up
-    // without touching this menu again.
-    signal openKeyboard()
-
-    // Emitted by the Debug menu's "Show Inspector..." item.
-    signal openInspector()
 
     // Reflects the current visibility of the toolbar (which now includes the
     // menu row) and the status bar, so the View menu's checkable items can
@@ -77,10 +65,9 @@ SiMenuBar {
 
         SiMenuSeparator { }
 
-        Action {
+        SiMenuItem {
+            action: window.actions.config
             text: qsTr("Settings...")
-            shortcut: StandardKey.Preferences
-            onTriggered: openConfigurator(0)
         }
 
         SiMenuSeparator { }
@@ -93,71 +80,53 @@ SiMenuBar {
     }
 
     //
-    // Edit Menu (unchanged from SiC64Menu, rewired to SiAmController)
+    // Edit Menu (unchanged from SiC64Menu, wired via window.actions)
     //
 
     SiMenu {
         title: qsTr("&Edit")
 
-        Action {
-            text: amiga.mouseCaptured ? qsTr("Release Mouse") : qsTr("Capture Mouse")
-            shortcut: Preferences.mouseHotkey
-            onTriggered: amiga.captureOrReleaseMouse()
+        SiMenuItem {
+            action: window.actions.captureOrReleaseMouse
         }
 
         SiMenuSeparator { }
 
-        Action {
-            text: amiga.isPaused ? qsTr("Run") : qsTr("Pause")
-            onTriggered: amiga.runOrPause()
+        SiMenuItem {
+            action: window.actions.pause
         }
-        Action {
-            text: qsTr("Hard Reset")
-            shortcut: "Ctrl+Meta+R"
-            onTriggered: amiga.reset()
+        SiMenuItem {
+            action: window.actions.hardReset
         }
-        Action {
-            text: qsTr("Soft Reset")
-            onTriggered: amiga.softReset()
+        SiMenuItem {
+            action: window.actions.softReset
         }
-        Action {
-            text: amiga.isPoweredOn ? qsTr("Power Off") : qsTr("Power On")
-            onTriggered: amiga.powerOnOrOff()
+        SiMenuItem {
+            action: window.actions.power
         }
-        Action {
-            text: qsTr("BRK")
-            onTriggered: amiga.brk()
+        SiMenuItem {
+            action: window.actions.brk
         }
 
         SiMenuSeparator { }
 
-        Action {
-            text: qsTr("Step Over")
-            enabled: amiga.isPaused
-            onTriggered: amiga.stepOver()
+        SiMenuItem {
+            action: window.actions.stepOver
         }
-        Action {
-            text: qsTr("Step Into")
-            enabled: amiga.isPaused
-            onTriggered: amiga.stepInto()
+        SiMenuItem {
+            action: window.actions.stepInto
         }
-        Action {
-            text: qsTr("Finish Line")
-            enabled: amiga.isPaused
-            onTriggered: amiga.finishLine()
+        SiMenuItem {
+            action: window.actions.finishLine
         }
-        Action {
-            text: qsTr("Finish Frame")
-            enabled: amiga.isPaused
-            onTriggered: amiga.finishFrame()
+        SiMenuItem {
+            action: window.actions.finishFrame
         }
 
         SiMenuSeparator { }
 
-        Action {
-            text: qsTr("Toggle Warp Mode")
-            shortcut: "Meta+Tab"
-            onTriggered: amiga.toggleWarp()
+        SiMenuItem {
+            action: window.actions.toggleWarp
         }
     }
 
@@ -386,10 +355,9 @@ SiMenuBar {
     SiMenu {
         title: qsTr("&Keyboard")
 
-        Action {
+        SiMenuItem {
+            action: window.actions.keyboard
             text: qsTr("Show...")
-            shortcut: "Ctrl+K"
-            onTriggered: openKeyboard()
         }
 
         SiMenuSeparator { }
@@ -412,28 +380,35 @@ SiMenuBar {
     //
     // Debug Menu
     //
-    // Just the one item for now -- SiAmInspectorWindow's sidebar is where
-    // the actual per-panel content lives (see that file); SiC64's separate
-    // per-panel Inspector menu items have no counterpart yet since there's
-    // only the one window to show.
+    // Groups what SiC64Menu.qml splits across its C64 menu (Inspector/
+    // RetroShell/Logger) and toolbar (Debug Panel) -- SiAmInspectorWindow's
+    // sidebar is where the actual per-panel content lives (see that file),
+    // so there's a single "Show Inspector..." item rather than SiC64's
+    // per-panel submenu.
     //
 
     SiMenu {
         title: qsTr("&Debug")
 
-        Action {
-            text: qsTr("Show Inspector...")
-            shortcut: "Ctrl+I"
-            onTriggered: openInspector()
+        SiMenuItem {
+            action: window.actions.openInspector
         }
 
         SiMenuSeparator { }
 
-        Action {
-            text: qsTr("Debug Panel")
+        SiMenuItem {
+            action: window.actions.retroShell
+        }
+        SiMenuItem {
+            action: window.actions.logger
+        }
+
+        SiMenuSeparator { }
+
+        SiMenuItem {
+            action: window.actions.debug
             checkable: true
             checked: amiga.debugPanel
-            onTriggered: amiga.toggleDebugPanel()
         }
     }
 }
