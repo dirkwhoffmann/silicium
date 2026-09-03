@@ -19,4 +19,6 @@ target_sources(SiAmiga PRIVATE
         Inspector/SiAmGuardModel.cpp
         Inspector/SiAmBlitterController.cpp
         Inspector/SiAmPaulaController.cpp
+        Inspector/SiAmBusController.cpp
+        Inspector/SiAmLogicView.cpp
         SiAmInfoController.cpp)

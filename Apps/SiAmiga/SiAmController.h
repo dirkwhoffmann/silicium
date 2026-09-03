@@ -23,6 +23,7 @@
 #include "Inspector/SiAmCopperController.h"
 #include "Inspector/SiAmBlitterController.h"
 #include "Inspector/SiAmPaulaController.h"
+#include "Inspector/SiAmBusController.h"
 #include "SiAmInfoController.h"
 #include <QUrl>
 
@@ -76,6 +77,7 @@ class SiAmController : public Controller {
     unique_ptr<SiAmCopperController> m_copperController;
     unique_ptr<SiAmBlitterController> m_blitterController;
     unique_ptr<SiAmPaulaController> m_paulaController;
+    unique_ptr<SiAmBusController> m_busController;
 
 public:
 
@@ -283,6 +285,10 @@ public:
     Q_PROPERTY(SiAmPaulaController *paulaController READ getPaulaController CONSTANT)
 
     SiAmPaulaController *getPaulaController() const { return m_paulaController.get(); }
+
+    Q_PROPERTY(SiAmBusController *busController READ getBusController CONSTANT)
+
+    SiAmBusController *getBusController() const { return m_busController.get(); }
 
 
     //

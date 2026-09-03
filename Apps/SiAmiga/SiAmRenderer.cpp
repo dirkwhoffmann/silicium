@@ -97,6 +97,7 @@ SiAmRenderer::tick()
     controller->getCopperController()->tick();
     controller->getBlitterController()->tick();
     controller->getPaulaController()->tick();
+    controller->getBusController()->tick();
 
     // Update texture
     core.videoPort.lockTexture();

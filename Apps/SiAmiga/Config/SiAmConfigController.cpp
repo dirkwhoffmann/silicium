@@ -334,12 +334,16 @@ SiAmConfigController::restoreServerDefaults()
 QColor
 SiAmConfigController::dmaColor(Opt opt) const
 {
+    // vAmiga packs DMA_DEBUG_COLORx as r<<24 | g<<16 | b<<8 (see
+    // RgbColor(u32 rgba) in Core/Components/Denise/Colors.h) -- a different
+    // layout than SiC64ConfigController::dmaColor's r<<16 | g<<8 | b, so
+    // that shift pattern can't be copied verbatim here.
     u32 v = (u32)get(opt);
-    return QColor((v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF);
+    return QColor((v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF);
 }
 
 void
 SiAmConfigController::setDmaColor(Opt opt, const QColor &c)
 {
-    set(opt, (i64(c.red()) << 16) | (i64(c.green()) << 8) | i64(c.blue()));
+    set(opt, (i64(c.red()) << 24) | (i64(c.green()) << 16) | (i64(c.blue()) << 8));
 }

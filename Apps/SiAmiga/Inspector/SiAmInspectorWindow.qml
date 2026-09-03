@@ -82,6 +82,7 @@ Window {
     function updateActiveController() {
 
         controller.eventController.active = visible && currentIndex === SiAmInspectorWindow.Page.Events
+        controller.busController.active = visible && currentIndex === SiAmInspectorWindow.Page.Bus
         controller.ciaController.active = visible && currentIndex === SiAmInspectorWindow.Page.CIA
         controller.memoryController.active = visible && currentIndex === SiAmInspectorWindow.Page.Memory
         controller.copperController.active = visible && currentIndex === SiAmInspectorWindow.Page.Copper
