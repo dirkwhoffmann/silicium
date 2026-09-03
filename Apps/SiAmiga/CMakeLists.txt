@@ -12,4 +12,6 @@ target_sources(SiAmiga PRIVATE
         Inspector/SiAmCIAController.cpp
         Inspector/SiAmEventController.cpp
         Inspector/SiAmEventTableModel.cpp
+        Inspector/SiAmMemoryController.cpp
+        Inspector/SiAmMemDumpModel.cpp
         SiAmInfoController.cpp)

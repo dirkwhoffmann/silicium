@@ -59,6 +59,7 @@ class SiAmInfoController : public Controller {
     vamiga::DeniseInfo m_deniseInfo = { };
     vamiga::PaulaInfo m_paulaInfo = { };
     vamiga::MemInfo m_memInfo = { };
+    vamiga::MemConfig m_memConfig = { };
     vamiga::FloppyDriveInfo m_driveInfo[4] = { };
     vamiga::HardDriveInfo m_hdInfo[4] = { };
     vamiga::AmigaInfo m_amigaInfo = { };
@@ -108,6 +109,7 @@ class SiAmInfoController : public Controller {
     const vamiga::DeniseInfo &deniseInfo() const { return m_deniseInfo; }
     const vamiga::PaulaInfo &paulaInfo() const { return m_paulaInfo; }
     const vamiga::MemInfo &memInfo() const { return m_memInfo; }
+    const vamiga::MemConfig &memConfig() const { return m_memConfig; }
     const vamiga::FloppyDriveInfo &driveInfo(int nr) const { return m_driveInfo[nr]; }
     const vamiga::HardDriveInfo &hdInfo(int nr) const { return m_hdInfo[nr]; }
     const vamiga::AmigaInfo &amigaInfo() const { return m_amigaInfo; }

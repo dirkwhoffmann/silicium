@@ -40,6 +40,7 @@ SiAmController::SiAmController()
     m_infoController = make_unique<SiAmInfoController>(this);
     m_ciaController = make_unique<SiAmCIAController>(this);
     m_eventController = make_unique<SiAmEventController>(this);
+    m_memoryController = make_unique<SiAmMemoryController>(this);
 }
 
 SiAmController &

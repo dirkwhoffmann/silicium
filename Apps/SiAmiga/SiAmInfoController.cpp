@@ -95,6 +95,7 @@ SiAmInfoController::grab(Component component)
         case MEMORY:
 
             m_memInfo = core.mem.getInfo();
+            m_memConfig = core.mem.getConfig();
             break;
 
         case DRIVE:

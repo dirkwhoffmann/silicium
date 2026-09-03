@@ -19,6 +19,7 @@
 #include "Inspector/SiAmInspectorController.h"
 #include "Inspector/SiAmCIAController.h"
 #include "Inspector/SiAmEventController.h"
+#include "Inspector/SiAmMemoryController.h"
 #include "SiAmInfoController.h"
 #include <QUrl>
 
@@ -68,6 +69,7 @@ class SiAmController : public Controller {
     unique_ptr<SiAmInfoController> m_infoController;
     unique_ptr<SiAmCIAController> m_ciaController;
     unique_ptr<SiAmEventController> m_eventController;
+    unique_ptr<SiAmMemoryController> m_memoryController;
 
 public:
 
@@ -259,6 +261,10 @@ public:
     Q_PROPERTY(SiAmEventController *eventController READ getEventController CONSTANT)
 
     SiAmEventController *getEventController() const { return m_eventController.get(); }
+
+    Q_PROPERTY(SiAmMemoryController *memoryController READ getMemoryController CONSTANT)
+
+    SiAmMemoryController *getMemoryController() const { return m_memoryController.get(); }
 
 
     //

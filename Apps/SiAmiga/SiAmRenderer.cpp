@@ -93,6 +93,7 @@ SiAmRenderer::tick()
     controller->getInspectorController()->tick();
     controller->getCIAController()->tick();
     controller->getEventController()->tick();
+    controller->getMemoryController()->tick();
 
     // Update texture
     core.videoPort.lockTexture();
