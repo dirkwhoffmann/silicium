@@ -91,6 +91,16 @@ SiAmController::setState(VMState state)
 }
 
 void
+SiAmController::setDebugPanel(bool value)
+{
+    if (m_debugPanel != value) {
+
+        m_debugPanel = value;
+        emit debugPanelChanged();
+    }
+}
+
+void
 SiAmController::attachWindow(QQuickWindow *window)
 {
     m_window = window;

@@ -426,5 +426,14 @@ SiMenuBar {
             shortcut: "Ctrl+I"
             onTriggered: openInspector()
         }
+
+        SiMenuSeparator { }
+
+        Action {
+            text: qsTr("Debug Panel")
+            checkable: true
+            checked: amiga.debugPanel
+            onTriggered: amiga.toggleDebugPanel()
+        }
     }
 }

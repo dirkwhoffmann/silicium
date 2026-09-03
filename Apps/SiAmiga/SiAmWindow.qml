@@ -38,6 +38,19 @@ ApplicationWindow {
         controller: root.amiga
     }
 
+    SiAmDevPanel {
+
+        controller: root.amiga
+        x: 20
+        // Unlike SiC64Window's canvas (which starts below the toolbar
+        // unless auto-hide is on), SiAmToolbar always floats above the
+        // canvas at z: 10 -- see its own header comment. Anchoring under it
+        // here, rather than reusing SiC64DevPanel's fixed y: 20, keeps this
+        // panel from starting out hidden under that opaque toolbar.
+        y: toolbar.height + Style.mediumSpacing
+        visible: root.amiga.debugPanel && Preferences.developerMode
+    }
+
     // Floats over the canvas (z above it) rather than using header:, which
     // would reserve its own layout slot above the content area -- see
     // SiC64Window.qml for the full rationale (auto-hide reveals the canvas

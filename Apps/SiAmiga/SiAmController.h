@@ -35,6 +35,9 @@ class SiAmController : public Controller {
     VMState m_state = VMState::HIBERNATED;
     bool m_warping = false;
 
+    // Debug panel visibility (see SiAmDevPanel.qml)
+    bool m_debugPanel = false;
+
     // Always empty for now -- see getErrorMessage() below.
     QString errorMessage;
 
@@ -90,6 +93,15 @@ public:
     Q_PROPERTY(bool warping READ warping NOTIFY warpingChanged)
 
     bool warping() const { return m_warping; }
+
+    // Toggled by the Debug menu's "Debug Panel" item (see SiAmMenu.qml);
+    // shown when both this and Preferences.developerMode are true (see
+    // SiAmWindow.qml's SiAmDevPanel instantiation).
+    Q_PROPERTY(bool debugPanel READ getDebugPanel WRITE setDebugPanel NOTIFY debugPanelChanged)
+
+    bool getDebugPanel() const { return m_debugPanel; }
+    void setDebugPanel(bool value);
+    Q_INVOKABLE void toggleDebugPanel() { setDebugPanel(!m_debugPanel); }
 
     // Always empty for now -- this stub has no command-line/SVM parsing
     // yet (see C64Controller::parseArguments for what it will eventually
@@ -241,4 +253,5 @@ signals:
     void captureChanged();
     void mouseWasCaptured();
     void warpingChanged();
+    void debugPanelChanged();
 };
