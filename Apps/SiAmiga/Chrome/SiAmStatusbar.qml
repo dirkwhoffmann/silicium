@@ -16,16 +16,17 @@ import Silicium.Preferences
 import Silicium.Theme
 
 //
-// Port of SiC64Statusbar.qml. SiAmiga has no SiC64InfoController counterpart
-// yet -- that's what fed the C64 status bar's drive LEDs, tape/cartridge
-// icons, jammed/tracking/mute pictograms and server-state popup from a
-// single polled snapshot. Rather than invent that whole subsystem for a
-// status bar, the floppy indicators below call SiAmController's per-drive
-// getters (driveMotor/driveWriting/driveTrack/...) directly and re-evaluate
-// them off a local Timer tick (see 'tick' below) instead of a real change
-// notification. The tape, cartridge, pictogram row and server popup have no
-// Amiga equivalent or backing state at all yet, so they're dropped rather
-// than wired to nothing -- same trim SiAmMenu.qml and SiAmToolbar.qml made.
+// Port of SiC64Statusbar.qml. SiAmiga's SiAmInfoController (unlike the
+// original port note here) now does back the server-state popup -- see
+// SiAmServerConfig.qml, which uses the same serverState/serverStateIcon/
+// serverStateName machinery. The floppy indicators below still call
+// SiAmController's per-drive getters (driveMotor/driveWriting/driveTrack/
+// ...) directly and re-evaluate them off a local Timer tick (see 'tick'
+// below) instead of a real change notification, since those aren't
+// NOTIFY-backed properties. The tape, cartridge and jammed/tracking/mute
+// pictogram row have no Amiga equivalent or backing state at all yet, so
+// they're still dropped rather than wired to nothing -- same trim
+// SiAmMenu.qml and SiAmToolbar.qml made.
 //
 
 Rectangle {
@@ -35,6 +36,10 @@ Rectangle {
     required property SiAmController amiga
     readonly property SiAmConfigController config: amiga.configController
     readonly property SiAmActivityController activity: amiga.activityController
+    // SiAmInfoController isn't registered via qmlRegisterType (unlike
+    // SiC64InfoController), so it's referenced as 'var' here too, matching
+    // every other SiAmiga panel that reads controller.info.
+    readonly property var info: amiga.info
 
     property int metric: 0
 
@@ -67,6 +72,14 @@ Rectangle {
     //
     // Pictogram
     //
+
+    component Pictogram: SiSymbolButton {
+
+        property bool state: true
+
+        visible: state || Preferences.qtDebug
+        color: Palette.tertiary
+    }
 
     component PictogramIcon: SiImageButton {
 
@@ -150,6 +163,67 @@ Rectangle {
                 padding: 3
                 running: busy
             }
+        }
+    }
+
+    //
+    // Server row (one line of the server popup)
+    //
+
+    component ServerRow: Rectangle {
+
+        required property string label
+        property int srvState: 0
+
+        signal toggled()
+
+        implicitWidth: Math.max(180, rowLayout.implicitWidth + 2 * Style.mediumSpacing)
+        implicitHeight: 28
+        radius: Style.radius
+        color: rowMouse.containsMouse ? Qt.alpha(Palette.accent, 0.15) : "transparent"
+
+        RowLayout {
+
+            id: rowLayout
+
+            anchors.fill: parent
+            anchors.leftMargin: Style.mediumSpacing
+            anchors.rightMargin: Style.mediumSpacing
+            spacing: Style.smallSpacing
+
+            Image {
+
+                source: info.serverStateLed(srvState)
+                sourceSize.width: 12
+                sourceSize.height: 12
+                Layout.preferredWidth: 12
+                Layout.preferredHeight: 12
+            }
+
+            SiText {
+
+                text: label
+                font.pixelSize: Style.small
+                color: Palette.primary
+                Layout.fillWidth: true
+            }
+
+            SiText {
+
+                text: info.serverStateName(srvState)
+                font.pixelSize: Style.tiny
+                color: Palette.tertiary
+            }
+        }
+
+        MouseArea {
+
+            id: rowMouse
+
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: toggled()
         }
     }
 
@@ -448,6 +522,71 @@ Rectangle {
         //
 
         Speedometer { }
+
+        //
+        // Server status
+        //
+
+        Pictogram {
+
+            id: serverButton
+
+            state: true
+            phosphor: info.serverStateIcon(info.serverState)
+            onClicked: serverPopup.open()
+
+            Popup {
+
+                id: serverPopup
+
+                y: -height - Style.smallSpacing
+                x: serverButton.width - width
+                padding: Style.smallSpacing
+                modal: true
+                dim: false
+                focus: true
+                closePolicy: Popup.CloseOnPressOutside | Popup.CloseOnEscape
+
+                background: Rectangle {
+
+                    color: Qt.alpha(Palette.background, 0.96)
+                    radius: Style.radius
+                    border.color: Palette.border
+                    border.width: 1
+                }
+
+                contentItem: ColumnLayout {
+
+                    spacing: 0
+
+                    ServerRow {
+                        label: "Remote Shell"
+                        srvState: info.rshServerState
+                        onToggled: config.SRV_RSH_ENABLE = !config.SRV_RSH_ENABLE
+                    }
+                    ServerRow {
+                        label: "RPC Server"
+                        srvState: info.rpcServerState
+                        onToggled: config.SRV_RPC_ENABLE = !config.SRV_RPC_ENABLE
+                    }
+                    ServerRow {
+                        label: "GDB Server"
+                        srvState: info.gdbServerState
+                        onToggled: config.SRV_GDB_ENABLE = !config.SRV_GDB_ENABLE
+                    }
+                    ServerRow {
+                        label: "Prometheus Server"
+                        srvState: info.promServerState
+                        onToggled: config.SRV_PROM_ENABLE = !config.SRV_PROM_ENABLE
+                    }
+                    ServerRow {
+                        label: "Serial Port Server"
+                        srvState: info.serServerState
+                        onToggled: config.SRV_SER_ENABLE = !config.SRV_SER_ENABLE
+                    }
+                }
+            }
+        }
 
         HSpacer {
             size: Style.smallSpacing
