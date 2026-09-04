@@ -39,14 +39,42 @@ class SiAmController : public Controller {
 
     Q_OBJECT
 
+    // Command line arguments
+    vector<string> execCommands;
+
     // Associated SVM file
     unique_ptr<SVMFile> svm;
+
+    // Describes why the SVM file could not be opened, set by parseArguments()
+    QString errorMessage;
+
+
+    //
+    // Components
+    //
 
     // Video renderer
     class SiAmRenderer *m_renderer = nullptr;
 
     // Audio backend
     AudioController m_audio;
+
+    // Subcontrollers
+    unique_ptr<SiAmActivityController> m_activityController;
+    unique_ptr<SiAmConfigController> m_configController;
+    unique_ptr<SiAmKeyboardController> m_keyboardController;
+    unique_ptr<SiAmInspectorController> m_inspectorController;
+    unique_ptr<SiAmInfoController> m_infoController;
+    unique_ptr<SiAmCIAController> m_ciaController;
+    unique_ptr<SiAmEventController> m_eventController;
+    unique_ptr<SiAmMemoryController> m_memoryController;
+    unique_ptr<SiAmCopperController> m_copperController;
+    unique_ptr<SiAmBlitterController> m_blitterController;
+    unique_ptr<SiAmPaulaController> m_paulaController;
+    unique_ptr<SiAmBusController> m_busController;
+    unique_ptr<SiAmCPUController> m_cpuController;
+    unique_ptr<SiAmDeniseController> m_deniseController;
+    unique_ptr<SiAmPortController> m_portController;
 
 
     //
@@ -82,40 +110,19 @@ class SiAmController : public Controller {
 
     bool m_warping = false;
 
-    // Set by process() whenever a message implies the cached info structs
-    // (see SiAmInfoController) are stale; update() clears it by forcing an
-    // immediate refresh(), mirroring C64Controller's m_infoIsDirty.
-    bool m_infoIsDirty = false;
+    //
+    // Message and signal processing
+    //
 
+    // Coalescing update signals
+    bool m_configIsDirty = false;
+    bool m_infoIsDirty = false;
     bool m_retroShellIsDirty = false;
 
-    // Always empty for now -- see getErrorMessage() below.
-    QString errorMessage;
-
-    // Commands to execute after startup, collected from --exec (-e)
-    // arguments by parseArguments(). Run once the window opens (see
-    // windowDidOpen()), mirroring C64Controller's execCommands.
-    vector<string> execCommands;
 
     //
-    // Subcontrollers
+    // Initializing
     //
-
-    unique_ptr<SiAmActivityController> m_activityController;
-    unique_ptr<SiAmConfigController> m_configController;
-    unique_ptr<SiAmKeyboardController> m_keyboardController;
-    unique_ptr<SiAmInspectorController> m_inspectorController;
-    unique_ptr<SiAmInfoController> m_infoController;
-    unique_ptr<SiAmCIAController> m_ciaController;
-    unique_ptr<SiAmEventController> m_eventController;
-    unique_ptr<SiAmMemoryController> m_memoryController;
-    unique_ptr<SiAmCopperController> m_copperController;
-    unique_ptr<SiAmBlitterController> m_blitterController;
-    unique_ptr<SiAmPaulaController> m_paulaController;
-    unique_ptr<SiAmBusController> m_busController;
-    unique_ptr<SiAmCPUController> m_cpuController;
-    unique_ptr<SiAmDeniseController> m_deniseController;
-    unique_ptr<SiAmPortController> m_portController;
 
 public:
 
@@ -131,6 +138,9 @@ public:
     // C64Controller::parseArguments, there is no SVM/workspace file to
     // require here, so this never fails.
     void parseArguments(const QCoreApplication &app);
+
+    Q_PROPERTY(QString errorMessage READ getErrorMessage CONSTANT)
+    const QString &getErrorMessage() const { return errorMessage; }
 
 
     //
@@ -188,13 +198,6 @@ public:
     int getCursorPos();
 
     Q_INVOKABLE void pressRetroShellKey(int key, int modifiers, const QString &text);
-
-    // Always empty for now -- parseArguments() has nothing that can fail
-    // (there is no required SVM/workspace file to open, unlike
-    // C64Controller::parseArguments). Kept so SiAmAbout.qml's error path
-    // binds to something real.
-    Q_PROPERTY(QString errorMessage READ getErrorMessage CONSTANT)
-    const QString &getErrorMessage() const { return errorMessage; }
 
 
     //

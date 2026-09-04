@@ -139,9 +139,18 @@ public:
 
     void initialize();
 
+    // Parses the command line, opens the SVM file it names into 'svm', and
+    // collects any --exec (-e) commands into execCommands. Returns false if
+    // no SVM file was given or it could not be opened, in which case
+    // errorMessage describes the failure.
+    bool parseArguments(const QCoreApplication &app);
+
+    Q_PROPERTY(QString errorMessage READ getErrorMessage CONSTANT)
+    const QString &getErrorMessage() const { return errorMessage; }
+
 
     //
-    // Lifetime management
+    // Managing lifetime
     //
 
 public:
@@ -149,9 +158,74 @@ public:
     void start() override;
     Q_INVOKABLE void stop() override;
 
+    // Starts the emulator core once the window's scene graph is ready, and
+    // halts it when the window is destroyed (see attachWindow() below).
+    void windowDidOpen();
+    void windowDidClose();
+
+    void startRenderer();
+    void stopRenderer();
+
+    // Associates this controller with its emulator window and wires up the
+    // sceneGraphInitialized/destroyed signals to windowDidOpen()/windowDidClose().
+    void attachWindow(QQuickWindow *window);
+
 
     //
-    // Virtual machine properties
+    // Getters and setters
+    //
+
+    Q_PROPERTY(SiC64ActivityController *activityController READ getActivityController CONSTANT)
+    Q_PROPERTY(SiC64BusController *busController READ getBusController CONSTANT)
+    Q_PROPERTY(SiC64CIAController *ciaController READ getCIAController CONSTANT)
+    Q_PROPERTY(SiC64CPUController *cpuController READ getCPUController CONSTANT)
+    Q_PROPERTY(SiC64MemoryController *memoryController READ getMemoryController CONSTANT)
+    Q_PROPERTY(SiC64VICController *vicController READ getVICController CONSTANT)
+    Q_PROPERTY(SiC64SIDController *sidController READ getSIDController CONSTANT)
+    Q_PROPERTY(SiC64ConfigController *configController READ getConfigController CONSTANT)
+    Q_PROPERTY(SiC64EventController *eventController READ getEventController CONSTANT)
+    Q_PROPERTY(SiC64InfoController *info READ getInfoController CONSTANT)
+    Q_PROPERTY(SiC64KeyboardController *keyboardController READ getKeyboardController CONSTANT)
+    Q_PROPERTY(SiC64StatusbarController *statusbarController READ getStatusbarController CONSTANT)
+    Q_PROPERTY(SiC64Renderer *renderer READ getRenderer WRITE setRenderer NOTIFY rendererChanged)
+
+    SiC64ActivityController *getActivityController() const { return m_activityController.get(); }
+    SiC64BusController *getBusController() const { return m_busController.get(); }
+    SiC64CIAController *getCIAController() const { return m_ciaController.get(); }
+    SiC64CPUController *getCPUController() const { return m_cpuController.get(); }
+    SiC64MemoryController *getMemoryController() const { return m_memoryController.get(); }
+    SiC64VICController *getVICController() const { return m_vicController.get(); }
+    SiC64SIDController *getSIDController() const { return m_sidController.get(); }
+    SiC64ConfigController *getConfigController() const { return m_configController.get(); }
+    SiC64EventController *getEventController() const { return m_eventController.get(); }
+    SiC64InfoController *getInfoController() const { return m_infoController.get(); }
+    SiC64KeyboardController *getKeyboardController() const { return m_keyboardController.get(); }
+    SiC64StatusbarController *getStatusbarController() const { return m_statusbarController.get(); }
+
+    class SiC64Renderer *getRenderer() const { return m_renderer; }
+    void setRenderer(class SiC64Renderer *ptr);
+
+    Q_PROPERTY(bool retroShell READ getRetroShell WRITE setRetroShell NOTIFY retroShellChanged)
+    Q_PROPERTY(int port0 READ getPort0 WRITE setPort0 NOTIFY port0Changed)
+    Q_PROPERTY(int port1 READ getPort1 WRITE setPort1 NOTIFY port1Changed)
+    Q_PROPERTY(bool debugPanel READ getDebugPanel WRITE setDebugPanel NOTIFY debugPanelChanged)
+    Q_INVOKABLE void toggleDebugPanel() { setDebugPanel(!m_debugPanel); }
+
+    bool getRetroShell() const { return m_retroShell; }
+    void setRetroShell(bool value);
+
+    int getPort0() const { return m_port0; }
+    void setPort0(int value);
+
+    int getPort1() const { return m_port1; }
+    void setPort1(int value);
+
+    bool getDebugPanel() const { return m_debugPanel; }
+    void setDebugPanel(bool value);
+
+
+    //
+    // Managing state
     //
 
 public:
@@ -173,6 +247,15 @@ public:
     bool getReadOnly() const;
     QString getUUID() const;
     QString getName() const;
+
+    Q_INVOKABLE void run();
+    Q_INVOKABLE void pause();
+    Q_INVOKABLE void runOrPause() { isPaused() ? run() : pause(); }
+    Q_INVOKABLE void reset();
+    Q_INVOKABLE void powerOn();
+    Q_INVOKABLE void powerOff();
+    Q_INVOKABLE void powerOnOrOff() { isPoweredOn() ? powerOff() : powerOn(); }
+    Q_INVOKABLE void hibernate(bool hibernateSnapshot, bool hibernateWorkspace);
 
 
     //
@@ -196,28 +279,11 @@ public:
     //
     //
 
-    Q_PROPERTY(bool retroShell READ getRetroShell WRITE setRetroShell NOTIFY retroShellChanged)
-    Q_PROPERTY(int port0 READ getPort0 WRITE setPort0 NOTIFY port0Changed)
-    Q_PROPERTY(int port1 READ getPort1 WRITE setPort1 NOTIFY port1Changed)
-    Q_PROPERTY(bool debugPanel READ getDebugPanel WRITE setDebugPanel NOTIFY debugPanelChanged)
 
-    bool getRetroShell() const { return m_retroShell; }
-    void setRetroShell(bool value);
-
-    int getPort0() const { return m_port0; }
-    void setPort0(int value);
-
-    int getPort1() const { return m_port1; }
-    void setPort1(int value);
-
-    bool getDebugPanel() const { return m_debugPanel; }
-    void setDebugPanel(bool value);
-
-    Q_INVOKABLE void hibernate(bool hibernateSnapshot, bool hibernateWorkspace);
 
 
     //
-    // Debug state (captured mouse and joystick values, shown by the dev panel)
+    // Handling input devices
     //
 
     Q_PROPERTY(float dx READ getDx WRITE setDx NOTIFY dxChanged)
@@ -275,63 +341,12 @@ public:
 
 
     //
-    // Controlling the emulator
     //
-
-    Q_INVOKABLE void run();
-    Q_INVOKABLE void pause();
-    Q_INVOKABLE void runOrPause() { isPaused() ? run() : pause(); }
-    Q_INVOKABLE void reset();
-    Q_INVOKABLE void powerOn();
-    Q_INVOKABLE void powerOff();
-    Q_INVOKABLE void powerOnOrOff() { isPoweredOn() ? powerOff() : powerOn(); }
-    Q_INVOKABLE void toggleDebugPanel() { setDebugPanel(!m_debugPanel); }
-
-    // Starts the emulator core once the window's scene graph is ready, and
-    // halts it when the window is destroyed (see attachWindow() below).
-    void windowDidOpen();
-    void windowDidClose();
-
-    void startRenderer();
-    void stopRenderer();
-
-    // Associates this controller with its emulator window and wires up the
-    // sceneGraphInitialized/destroyed signals to windowDidOpen()/windowDidClose().
-    void attachWindow(QQuickWindow *window);
+    //
 
     // Hands the keyboard to the virtual machine or back to the app, from the
     // window's focus and whether RetroShell is up. Call after either changes.
     void updateKeyboardCapture();
-
-    Q_PROPERTY(SiC64ActivityController *activityController READ getActivityController CONSTANT)
-    Q_PROPERTY(SiC64BusController *busController READ getBusController CONSTANT)
-    Q_PROPERTY(SiC64CIAController *ciaController READ getCIAController CONSTANT)
-    Q_PROPERTY(SiC64CPUController *cpuController READ getCPUController CONSTANT)
-    Q_PROPERTY(SiC64MemoryController *memoryController READ getMemoryController CONSTANT)
-    Q_PROPERTY(SiC64VICController *vicController READ getVICController CONSTANT)
-    Q_PROPERTY(SiC64SIDController *sidController READ getSIDController CONSTANT)
-    Q_PROPERTY(SiC64ConfigController *configController READ getConfigController CONSTANT)
-    Q_PROPERTY(SiC64EventController *eventController READ getEventController CONSTANT)
-    Q_PROPERTY(SiC64InfoController *info READ getInfoController CONSTANT)
-    Q_PROPERTY(SiC64KeyboardController *keyboardController READ getKeyboardController CONSTANT)
-    Q_PROPERTY(SiC64StatusbarController *statusbarController READ getStatusbarController CONSTANT)
-    Q_PROPERTY(SiC64Renderer *renderer READ getRenderer WRITE setRenderer NOTIFY rendererChanged)
-
-    SiC64ActivityController *getActivityController() const { return m_activityController.get(); }
-    SiC64BusController *getBusController() const { return m_busController.get(); }
-    SiC64CIAController *getCIAController() const { return m_ciaController.get(); }
-    SiC64CPUController *getCPUController() const { return m_cpuController.get(); }
-    SiC64MemoryController *getMemoryController() const { return m_memoryController.get(); }
-    SiC64VICController *getVICController() const { return m_vicController.get(); }
-    SiC64SIDController *getSIDController() const { return m_sidController.get(); }
-    SiC64ConfigController *getConfigController() const { return m_configController.get(); }
-    SiC64EventController *getEventController() const { return m_eventController.get(); }
-    SiC64InfoController *getInfoController() const { return m_infoController.get(); }
-    SiC64KeyboardController *getKeyboardController() const { return m_keyboardController.get(); }
-    SiC64StatusbarController *getStatusbarController() const { return m_statusbarController.get(); }
-
-    class SiC64Renderer *getRenderer() const { return m_renderer; }
-    void setRenderer(class SiC64Renderer *ptr);
 
     // Shared inspector display format (see m_format above)
     Q_PROPERTY(int format READ format WRITE setFormat NOTIFY formatChanged)
@@ -342,14 +357,6 @@ public:
     bool isHex() const { return m_format == 0 || m_format == 1; }
     bool isPadded() const { return m_format == 1 || m_format == 3; }
 
-    // Parses the command line, opens the SVM file it names into 'svm', and
-    // collects any --exec (-e) commands into execCommands. Returns false if
-    // no SVM file was given or it could not be opened, in which case
-    // errorMessage describes the failure.
-    bool parseArguments(const QCoreApplication &app);
-
-    Q_PROPERTY(QString errorMessage READ getErrorMessage CONSTANT)
-    const QString &getErrorMessage() const { return errorMessage; }
 
     //
     // RetroShell
@@ -362,6 +369,7 @@ public:
     int getCursorPos();
 
     Q_INVOKABLE void pressRetroShellKey(int key, int modifiers, const QString &text);
+
 
     //
     // Methods from InputManagerDelegate
