@@ -13,21 +13,21 @@ import QtQuick.Layouts
 import Silicium.Controllers
 import Silicium.Theme
 
-// Port of vAmiga's own GUI/Inspector/CPUPanel.swift. A plain page inside
-// SiAmInspectorWindow's sidebar StackLayout (see that file), not its own
-// window, mirroring the other SiAmiga panels -- SiAmInspectorWindow.
-// updateActiveController() drives controller.cpuController.active for it.
+// Port of vAmiga's own GUI/Inspector/CPUPanel.swift. Its own top-level
+// window (see SiAmInspectorWindow.qml), mirroring SiC64CPUPanel.qml, so it
+// can stay open alongside any of the other panels.
 //
 // Unlike SiC64CPUPanel.qml's two-way Program/Debug segmented control
 // (Program showing disassembly and trace side by side), this uses a
 // three-way Program/Trace/Debug tab bar -- the 68000's variable-length
 // instructions make each disassembly/trace column wider than the 6510's, so
 // there isn't room to show two of the three side by side the way SiC64 does.
-Item {
+SiAmInspectorWindow {
 
     id: root
 
-    required property SiAmController controller
+    title: qsTr("CPU Inspector")
+    currentController: controller.cpuController
 
     readonly property var cpu: controller.cpuController
     readonly property var cc: controller.configController

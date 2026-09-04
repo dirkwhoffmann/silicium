@@ -13,13 +13,8 @@ import QtQuick.Layouts
 import Silicium.Controllers
 import Silicium.Theme
 
-// Port of SiC64CIAPanel.qml. Unlike SiC64's per-panel inspector windows,
-// this is a plain page inside SiAmInspectorWindow's sidebar StackLayout
-// (see that file), not its own window -- so there's no
-// SiC64InspectorWindow-style base and no title/currentController wiring
-// here; SiAmInspectorWindow.updateActiveController() drives
-// controller.ciaController.active for it based on which sidebar page is
-// selected, the same way it already does for the Events panel.
+// Port of SiC64CIAPanel.qml. Its own top-level window (see
+// SiAmInspectorWindow.qml), same as SiC64's per-panel inspector windows.
 //
 // Three real differences from the C64 version, all traced back to
 // SiAmCIAController's own class comment:
@@ -32,11 +27,12 @@ import Silicium.Theme
 //  - Number formatting reads controller.inspectorController's hex/padded
 //    booleans instead of C64Controller's single 0..3 'format' enum (see
 //    SiAmInspectorController).
-Item {
+SiAmInspectorWindow {
 
     id: root
 
-    required property SiAmController controller
+    title: qsTr("CIA Inspector")
+    currentController: controller.ciaController
 
     readonly property var cia: controller.ciaController
     readonly property var ic: controller.inspectorController

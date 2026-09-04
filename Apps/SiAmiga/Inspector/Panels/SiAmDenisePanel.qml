@@ -15,13 +15,13 @@ import Silicium.Controllers
 import Silicium.Theme
 
 // Port of vAmiga's own GUI/Inspector/DenisePanel.swift + SpriteTableView.swift.
-// A plain page inside SiAmInspectorWindow's sidebar StackLayout (see that
-// file), not its own window, mirroring the other SiAmiga panels.
-Item {
+// Its own top-level window (see SiAmInspectorWindow.qml).
+SiAmInspectorWindow {
 
     id: root
 
-    required property SiAmController controller
+    title: qsTr("Denise Inspector")
+    currentController: controller.deniseController
 
     readonly property var denise: controller.deniseController
     readonly property var ic: controller.inspectorController

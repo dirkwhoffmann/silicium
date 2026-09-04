@@ -16,11 +16,8 @@ import Silicium.Theme
 
 // Port of vAmiga's own GUI/Inspector/PaulaPanel.swift -- there is no C64
 // counterpart to port from (Paula's interrupt controller, disk controller
-// and audio DMA state machines have no C64 equivalent). A plain page
-// inside SiAmInspectorWindow's sidebar StackLayout (see that file), not
-// its own window; SiAmInspectorWindow.updateActiveController() drives
-// controller.paulaController.active for it, the same way it already does
-// for the other panels.
+// and audio DMA state machines have no C64 equivalent). Its own top-level
+// window (see SiAmInspectorWindow.qml).
 //
 // The four "State machine N" diagrams use the same five bitmap assets the
 // Swift reference does (Resources/Assets.xcassets/Audio/state0Template.pdf
@@ -29,11 +26,12 @@ import Silicium.Theme
 // filled in. StateDiagram below just swaps between them by index, keyed
 // off SiAmPaulaController::displayState() -- see that controller's class
 // comment for the transition table deciding which one shows.
-Item {
+SiAmInspectorWindow {
 
     id: root
 
-    required property SiAmController controller
+    title: qsTr("Paula Inspector")
+    currentController: controller.paulaController
 
     readonly property var paula: controller.paulaController
     readonly property var ic: controller.inspectorController

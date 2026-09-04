@@ -12,15 +12,19 @@ import QtQuick.Controls
 import Silicium.Controllers
 import Silicium.Theme
 
-// Stub page for SiAmInspectorWindow's sidebar. Empty for now -- content
-// lands once SiAmAgnusPanel grows a data controller of its own (see
+// Stub window (see SiAmInspectorWindow.qml). Empty for now -- content lands
+// once SiAmAgnusPanel grows a data controller of its own (see
 // SiAmInspectorController's class comment for how that's expected to plug
-// in, mirroring SiC64's per-panel controllers).
-Item {
+// in, mirroring SiC64's per-panel controllers). Until then this borrows
+// SiAmController's shared inspectorController instance as a placeholder
+// currentController -- harmless since it carries no panel-specific data,
+// just the active flag this window needs to toggle on show/hide.
+SiAmInspectorWindow {
 
     id: root
 
-    required property SiAmController controller
+    title: qsTr("Agnus Inspector")
+    currentController: controller.inspectorController
 
     SiText {
 

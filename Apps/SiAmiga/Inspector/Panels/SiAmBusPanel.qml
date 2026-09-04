@@ -14,9 +14,10 @@ import Silicium.Components
 import Silicium.Controllers
 import Silicium.Theme
 
-// Port of vAmiga's own GUI/Inspector/BusPanel.swift + LogicView.swift. Two
-// boxes, matching the Swift window: a "Logic Analyzer" box (the 228-cycle
-// DMA timing-diagram grid -- SiAmLogicView, a QQuickPaintedItem port of
+// Port of vAmiga's own GUI/Inspector/BusPanel.swift + LogicView.swift. Its
+// own top-level window (see SiAmInspectorWindow.qml). Two boxes, matching
+// the Swift window: a "Logic Analyzer" box (the 228-cycle DMA
+// timing-diagram grid -- SiAmLogicView, a QQuickPaintedItem port of
 // LogicView.swift's drawHairlines/drawLabels/drawSignal -- plus its four
 // probe selectors, a zoom slider and the Symbolic checkbox) and a "DMA
 // Debugger" box (the eight visualize-channel checkboxes/colors plus the
@@ -25,11 +26,12 @@ import Silicium.Theme
 // ChannelRow, just eight channels instead of six and no separate "show as
 // overlay" toggle, since vAmiga has no DMA_DEBUG_OVERLAY option distinct
 // from DMA_DEBUG_ENABLE).
-Item {
+SiAmInspectorWindow {
 
     id: root
 
-    required property SiAmController controller
+    title: qsTr("Bus Inspector")
+    currentController: controller.busController
 
     readonly property var bus: controller.busController
     readonly property var cc: controller.configController

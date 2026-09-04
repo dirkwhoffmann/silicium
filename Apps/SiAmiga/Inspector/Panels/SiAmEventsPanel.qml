@@ -13,13 +13,8 @@ import QtQuick.Layouts
 import Silicium.Controllers
 import Silicium.Theme
 
-// Port of SiC64EventsPanel.qml. Unlike SiC64's per-panel inspector windows,
-// this is a plain page inside SiAmInspectorWindow's sidebar StackLayout
-// (see that file), not its own window -- so there's no
-// SiC64InspectorWindow-style base and no title/currentController wiring
-// here; SiAmInspectorWindow.updateActiveController() drives
-// controller.eventController.active for it based on which sidebar page is
-// selected.
+// Port of SiC64EventsPanel.qml. Its own top-level window (see
+// SiAmInspectorWindow.qml), same as SiC64's per-panel inspector windows.
 //
 // The progress-counter row is reshaped for the Amiga's own event scheduler
 // rather than the C64's. C64Info's four counters (CPU/VICII/CIA1/CIA2) are
@@ -31,11 +26,13 @@ import Silicium.Theme
 // pairs instead of C64's one, and Agnus (the DMA controller whose dmaClock
 // is being tracked) takes VICII's box, since there's no frame-progress
 // counter in this row on the Amiga side.
-Item {
+SiAmInspectorWindow {
 
     id: root
 
-    required property SiAmController controller
+    title: qsTr("Events Inspector")
+    currentController: controller.eventController
+
     readonly property var ec: controller.eventController
 
     ColumnLayout {

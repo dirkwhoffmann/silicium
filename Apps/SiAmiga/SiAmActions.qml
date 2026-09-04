@@ -16,10 +16,10 @@ import Silicium.Preferences
 // Central definition of all SiAmiga window actions. Port of SiC64Actions.qml,
 // trimmed to what SiAmiga actually has: the per-panel inspector actions
 // below (openCPUInspector, openBusInspector, ...) mirror C64Actions' own
-// set, but each just switches SiAmInspectorWindow's page rather than
-// raising a distinct window -- SiAmiga hosts every panel in one shared
-// window instead of SiC64's one-window-per-panel set (see that file). No
-// saveWorkspace/saveSnapshot/loadSnapshot or stopAndGo (no workspace/
+// set one-for-one, each raising its own top-level window (see
+// SiAmInspectorWindow.qml) so several inspectors can stay open side by
+// side, exactly like SiC64. No saveWorkspace/saveSnapshot/loadSnapshot or
+// stopAndGo (no workspace/
 // snapshot persistence or datasette-era pause alias exist here), and no
 // keyboardWindowAction distinct from a sheet-based 'keyboard' action --
 // SiAmiga's keyboard is a standalone window only, so the one 'keyboard'
@@ -39,10 +39,19 @@ Item {
     required property SiAmController amiga
     required property var configWindowRef
     required property var keyboardWindowRef
-    required property var inspectorWindowRef
+    required property var cpuInspectorRef
+    required property var busInspectorRef
+    required property var ciaInspectorRef
+    required property var memoryInspectorRef
+    required property var agnusInspectorRef
+    required property var copperInspectorRef
+    required property var blitterInspectorRef
+    required property var paulaInspectorRef
+    required property var deniseInspectorRef
+    required property var portInspectorRef
+    required property var eventsInspectorRef
 
     property alias config: configAction
-    property alias openInspector: openInspectorAction
     property alias openCPUInspector: openCPUInspectorAction
     property alias openBusInspector: openBusInspectorAction
     property alias openCIAInspector: openCIAInspectorAction
@@ -83,32 +92,22 @@ Item {
         onTriggered: configWindowRef.showPage(configWindowRef.currentIndex)
     }
 
-    // Reopens the Inspector on whichever page it last showed -- kept as a
-    // plain keyboard-shortcut entry point. The toolbar's Inspector button
-    // (SiAmToolbar.qml) and the Debug menu's "Inspector" submenu
-    // (SiAmMenu.qml) instead use the eleven per-panel actions below, one
-    // shared Inspector window standing in for SiC64's one-window-per-panel
-    // set (see SiAmInspectorWindow.qml) -- each action just switches that
-    // window's page instead of raising a distinct window.
-    Action {
-
-        id: openInspectorAction
-        text: qsTr("Show Inspector...")
-        shortcut: "Ctrl+I"
-        onTriggered: {
-
-            inspectorWindowRef.showPage(inspectorWindowRef.currentIndex)
-            inspectorWindowRef.raise()
-            inspectorWindowRef.requestActivate()
-        }
-    }
-
+    // The toolbar's Inspector button (SiAmToolbar.qml) and the Debug menu's
+    // "Inspector" submenu (SiAmMenu.qml) both show a small picker ("CPU...",
+    // "Bus...") rather than triggering one of these directly; each shows or
+    // raises its window (there's exactly one of each -- see SiAmWindow.qml)
+    // when picked, mirroring SiC64Actions' own per-panel actions.
     Action {
 
         id: openCPUInspectorAction
         text: qsTr("CPU...")
         icon.name: "memory"
-        onTriggered: inspectorWindowRef.showPage(0)
+        onTriggered: {
+
+            cpuInspectorRef.show()
+            cpuInspectorRef.raise()
+            cpuInspectorRef.requestActivate()
+        }
     }
 
     Action {
@@ -116,7 +115,12 @@ Item {
         id: openBusInspectorAction
         text: qsTr("Bus...")
         icon.name: "cable"
-        onTriggered: inspectorWindowRef.showPage(1)
+        onTriggered: {
+
+            busInspectorRef.show()
+            busInspectorRef.raise()
+            busInspectorRef.requestActivate()
+        }
     }
 
     Action {
@@ -124,7 +128,12 @@ Item {
         id: openCIAInspectorAction
         text: qsTr("CIA...")
         icon.name: "developer_board"
-        onTriggered: inspectorWindowRef.showPage(2)
+        onTriggered: {
+
+            ciaInspectorRef.show()
+            ciaInspectorRef.raise()
+            ciaInspectorRef.requestActivate()
+        }
     }
 
     Action {
@@ -132,7 +141,12 @@ Item {
         id: openMemoryInspectorAction
         text: qsTr("Memory...")
         icon.name: "memory_alt"
-        onTriggered: inspectorWindowRef.showPage(3)
+        onTriggered: {
+
+            memoryInspectorRef.show()
+            memoryInspectorRef.raise()
+            memoryInspectorRef.requestActivate()
+        }
     }
 
     Action {
@@ -140,7 +154,12 @@ Item {
         id: openAgnusInspectorAction
         text: qsTr("Agnus...")
         icon.name: "hub"
-        onTriggered: inspectorWindowRef.showPage(4)
+        onTriggered: {
+
+            agnusInspectorRef.show()
+            agnusInspectorRef.raise()
+            agnusInspectorRef.requestActivate()
+        }
     }
 
     Action {
@@ -148,7 +167,12 @@ Item {
         id: openCopperInspectorAction
         text: qsTr("Copper...")
         icon.name: "content_copy"
-        onTriggered: inspectorWindowRef.showPage(5)
+        onTriggered: {
+
+            copperInspectorRef.show()
+            copperInspectorRef.raise()
+            copperInspectorRef.requestActivate()
+        }
     }
 
     Action {
@@ -156,7 +180,12 @@ Item {
         id: openBlitterInspectorAction
         text: qsTr("Blitter...")
         icon.name: "bolt"
-        onTriggered: inspectorWindowRef.showPage(6)
+        onTriggered: {
+
+            blitterInspectorRef.show()
+            blitterInspectorRef.raise()
+            blitterInspectorRef.requestActivate()
+        }
     }
 
     Action {
@@ -164,7 +193,12 @@ Item {
         id: openPaulaInspectorAction
         text: qsTr("Paula...")
         icon.name: "music_note_2"
-        onTriggered: inspectorWindowRef.showPage(7)
+        onTriggered: {
+
+            paulaInspectorRef.show()
+            paulaInspectorRef.raise()
+            paulaInspectorRef.requestActivate()
+        }
     }
 
     Action {
@@ -172,7 +206,12 @@ Item {
         id: openDeniseInspectorAction
         text: qsTr("Denise...")
         icon.name: "monitor"
-        onTriggered: inspectorWindowRef.showPage(8)
+        onTriggered: {
+
+            deniseInspectorRef.show()
+            deniseInspectorRef.raise()
+            deniseInspectorRef.requestActivate()
+        }
     }
 
     Action {
@@ -180,7 +219,12 @@ Item {
         id: openPortInspectorAction
         text: qsTr("Ports...")
         icon.name: "usb"
-        onTriggered: inspectorWindowRef.showPage(9)
+        onTriggered: {
+
+            portInspectorRef.show()
+            portInspectorRef.raise()
+            portInspectorRef.requestActivate()
+        }
     }
 
     Action {
@@ -188,7 +232,12 @@ Item {
         id: openEventsInspectorAction
         text: qsTr("Events...")
         icon.name: "schedule"
-        onTriggered: inspectorWindowRef.showPage(10)
+        onTriggered: {
+
+            eventsInspectorRef.show()
+            eventsInspectorRef.raise()
+            eventsInspectorRef.requestActivate()
+        }
     }
 
     // RetroShell and the Logger share a single overlay slot (see

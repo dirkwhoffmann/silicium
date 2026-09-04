@@ -14,11 +14,8 @@ import Silicium.Controllers
 import Silicium.Theme
 
 // Port of vAmiga's own GUI/Inspector/BlitterPanel.swift -- there is no C64
-// counterpart to port from (the Blitter is Amiga-only). A plain page inside
-// SiAmInspectorWindow's sidebar StackLayout (see that file), not its own
-// window; SiAmInspectorWindow.updateActiveController() drives
-// controller.blitterController.active for it, the same way it already does
-// for the other panels.
+// counterpart to port from (the Blitter is Amiga-only). Its own top-level
+// window (see SiAmInspectorWindow.qml).
 //
 // One deliberate departure from every other ported panel here: number
 // formatting does NOT follow controller.inspectorController's shared hex/
@@ -32,11 +29,12 @@ import Silicium.Theme
 // the Inspector set to. This file reproduces that fixed-format-per-field
 // scheme exactly rather than wiring these to root.numBase like
 // SiAmCIAPanel/SiAmCopperPanel do.
-Item {
+SiAmInspectorWindow {
 
     id: root
 
-    required property SiAmController controller
+    title: qsTr("Blitter Inspector")
+    currentController: controller.blitterController
 
     readonly property var blitter: controller.blitterController
 

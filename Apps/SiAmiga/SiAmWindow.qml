@@ -172,7 +172,17 @@ ApplicationWindow {
         amiga: root.amiga
         configWindowRef: configWindow
         keyboardWindowRef: keyboardWindow
-        inspectorWindowRef: inspectorWindow
+        cpuInspectorRef: cpuInspectorWindow
+        busInspectorRef: busInspectorWindow
+        ciaInspectorRef: ciaInspectorWindow
+        memoryInspectorRef: memoryInspectorWindow
+        agnusInspectorRef: agnusInspectorWindow
+        copperInspectorRef: copperInspectorWindow
+        blitterInspectorRef: blitterInspectorWindow
+        paulaInspectorRef: paulaInspectorWindow
+        deniseInspectorRef: deniseInspectorWindow
+        portInspectorRef: portInspectorWindow
+        eventsInspectorRef: eventsInspectorWindow
     }
 
     // Single injection point for every window action. Consumers reach
@@ -226,9 +236,79 @@ ApplicationWindow {
         controller: root.amiga
     }
 
-    SiAmInspectorWindow {
+    SiAmCPUPanel {
 
-        id: inspectorWindow
+        id: cpuInspectorWindow
+        controller: root.amiga
+        actions: root.actions
+    }
+
+    SiAmBusPanel {
+
+        id: busInspectorWindow
+        controller: root.amiga
+        actions: root.actions
+    }
+
+    SiAmCIAPanel {
+
+        id: ciaInspectorWindow
+        controller: root.amiga
+        actions: root.actions
+    }
+
+    SiAmMemoryPanel {
+
+        id: memoryInspectorWindow
+        controller: root.amiga
+        actions: root.actions
+    }
+
+    SiAmAgnusPanel {
+
+        id: agnusInspectorWindow
+        controller: root.amiga
+        actions: root.actions
+    }
+
+    SiAmCopperPanel {
+
+        id: copperInspectorWindow
+        controller: root.amiga
+        actions: root.actions
+    }
+
+    SiAmBlitterPanel {
+
+        id: blitterInspectorWindow
+        controller: root.amiga
+        actions: root.actions
+    }
+
+    SiAmPaulaPanel {
+
+        id: paulaInspectorWindow
+        controller: root.amiga
+        actions: root.actions
+    }
+
+    SiAmDenisePanel {
+
+        id: deniseInspectorWindow
+        controller: root.amiga
+        actions: root.actions
+    }
+
+    SiAmPortPanel {
+
+        id: portInspectorWindow
+        controller: root.amiga
+        actions: root.actions
+    }
+
+    SiAmEventsPanel {
+
+        id: eventsInspectorWindow
         controller: root.amiga
         actions: root.actions
     }

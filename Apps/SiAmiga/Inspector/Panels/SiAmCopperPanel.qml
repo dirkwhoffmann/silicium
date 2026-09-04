@@ -15,15 +15,12 @@ import Silicium.Theme
 
 // Port of vAmiga's own GUI/Inspector/CopperPanel.swift, CopperTableView.swift
 // and GuardTableView.swift's CopperBreakTableView -- there is no C64
-// counterpart to port from (the Copper is Amiga-only). A plain page inside
-// SiAmInspectorWindow's sidebar StackLayout (see that file), not its own
-// window; SiAmInspectorWindow.updateActiveController() drives
-// controller.copperController.active for it, the same way it already does
-// for the other panels. The two disassembly tables and the breakpoint
-// table below all reuse SiAmMemoryPanel's plain header-row-plus-ListView
-// table style (colored header, alternating row shading, a thin
-// Palette.surfaceBorder rule between columns) rather than inventing a new
-// look, per the explicit ask.
+// counterpart to port from (the Copper is Amiga-only). Its own top-level
+// window (see SiAmInspectorWindow.qml). The two disassembly tables and the
+// breakpoint table below all reuse SiAmMemoryPanel's plain
+// header-row-plus-ListView table style (colored header, alternating row
+// shading, a thin Palette.surfaceBorder rule between columns) rather than
+// inventing a new look, per the explicit ask.
 //
 // SiAmCopperController's own class comment covers the real behavioral
 // differences from the Swift reference (breakpoint editing simplified to
@@ -31,11 +28,12 @@ import Silicium.Theme
 // row); this file just lays out three boxes matching vAmiga's own
 // Inspector layout: Copper List 1, Copper List 2, and a right column with
 // Registers above Breakpoints.
-Item {
+SiAmInspectorWindow {
 
     id: root
 
-    required property SiAmController controller
+    title: qsTr("Copper Inspector")
+    currentController: controller.copperController
 
     readonly property var copper: controller.copperController
     readonly property var ic: controller.inspectorController

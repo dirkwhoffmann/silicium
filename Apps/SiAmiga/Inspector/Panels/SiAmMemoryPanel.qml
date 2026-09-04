@@ -13,13 +13,8 @@ import QtQuick.Layouts
 import Silicium.Controllers
 import Silicium.Theme
 
-// Port of SiC64MemoryPanel.qml. Unlike SiC64's per-panel inspector windows,
-// this is a plain page inside SiAmInspectorWindow's sidebar StackLayout
-// (see that file), not its own window -- so there's no
-// SiC64InspectorWindow-style base and no title/currentController wiring
-// here; SiAmInspectorWindow.updateActiveController() drives
-// controller.memoryController.active for it, the same way it already does
-// for the Events and CIA panels.
+// Port of SiC64MemoryPanel.qml. Its own top-level window (see
+// SiAmInspectorWindow.qml), same as SiC64's per-panel inspector windows.
 //
 // The differences from the C64 version all trace back to
 // SiAmMemoryController's own class comment:
@@ -41,11 +36,12 @@ import Silicium.Theme
 //    which six get a size label in the Swift reference.
 //  - No Heatmap sub-view or view selector -- vAmiga's core has no
 //    MEM_HEATMAP-style option to back one (see SiAmMemoryController).
-Item {
+SiAmInspectorWindow {
 
     id: root
 
-    required property SiAmController controller
+    title: qsTr("Memory Inspector")
+    currentController: controller.memoryController
 
     readonly property var mem: controller.memoryController
     readonly property var ic: controller.inspectorController

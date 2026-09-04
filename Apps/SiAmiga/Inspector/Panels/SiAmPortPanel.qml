@@ -16,12 +16,14 @@ import Silicium.Theme
 // Port of vAmiga's own GUI/Inspector/PortPanel.swift: the two control ports
 // (joystick/mouse quadrature signals + the shared POTGO/POTGOR
 // paddle-control bits) and the serial port (UART shift registers/buffers,
-// modem control lines, and the outgoing/incoming byte logs).
-Item {
+// modem control lines, and the outgoing/incoming byte logs). Its own
+// top-level window (see SiAmInspectorWindow.qml).
+SiAmInspectorWindow {
 
     id: root
 
-    required property SiAmController controller
+    title: qsTr("Ports Inspector")
+    currentController: controller.portController
 
     readonly property var po: controller.portController
     readonly property var ic: controller.inspectorController
