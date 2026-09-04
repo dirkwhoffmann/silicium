@@ -61,6 +61,11 @@ class SiAmController : public Controller {
     // Always empty for now -- see getErrorMessage() below.
     QString errorMessage;
 
+    // Commands to execute after startup, collected from --exec (-e)
+    // arguments by parseArguments(). Run once the window opens (see
+    // windowDidOpen()), mirroring C64Controller's execCommands.
+    vector<string> execCommands;
+
     // Gateway to the host audio backend
     AudioController m_audio;
 
@@ -93,6 +98,12 @@ public:
     static VAmiga &core();
 
     void initialize();
+
+    // Parses the command line and collects any --exec (-e) commands into
+    // execCommands, run once the window opens (see windowDidOpen()). Unlike
+    // C64Controller::parseArguments, there is no SVM/workspace file to
+    // require here, so this never fails.
+    void parseArguments(const QCoreApplication &app);
 
 
     //
@@ -151,9 +162,10 @@ public:
 
     Q_INVOKABLE void pressRetroShellKey(int key, int modifiers, const QString &text);
 
-    // Always empty for now -- this stub has no command-line/SVM parsing
-    // yet (see C64Controller::parseArguments for what it will eventually
-    // mirror). Kept so SiAmAbout.qml's error path binds to something real.
+    // Always empty for now -- parseArguments() has nothing that can fail
+    // (there is no required SVM/workspace file to open, unlike
+    // C64Controller::parseArguments). Kept so SiAmAbout.qml's error path
+    // binds to something real.
     Q_PROPERTY(QString errorMessage READ getErrorMessage CONSTANT)
     const QString &getErrorMessage() const { return errorMessage; }
 

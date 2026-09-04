@@ -11,6 +11,7 @@
 #include "SiAmRenderer.h"
 #include "Logger.h"
 #include "DiagRom.h"
+#include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QMetaObject>
 
@@ -77,6 +78,35 @@ SiAmController::initialize()
     // together on this core's API (unlike VirtualC64, which splits them into
     // launch() and a separate setListener()).
     core().launch(this, ::process);
+}
+
+void
+SiAmController::parseArguments(const QCoreApplication &app)
+{
+    /* SiAmiga [options]
+     *
+     * Options:
+     *   -e, --exec <cmd>   Execute a command after startup. This option may be
+     *                      specified multiple times and commands are executed
+     *                      in the order they appear on the command line.
+     */
+
+    QCommandLineOption execOption(
+            QStringList() << "e" << "exec",
+            "Executes a command after startup. May be given multiple times.",
+            "command");
+
+    QCommandLineParser parser;
+    parser.setApplicationDescription("SiAmiga - Amiga emulator");
+    parser.addHelpOption();
+    parser.addOption(execOption);
+
+    parser.process(app);
+
+    execCommands.clear();
+    for (const QString &command : parser.values(execOption)) {
+        execCommands.push_back(command.toStdString());
+    }
 }
 
 void
@@ -208,6 +238,12 @@ void
 SiAmController::windowDidOpen()
 {
     core().powerOn();
+
+    for (const auto &command : execCommands) {
+
+        qCDebug(siLog).noquote() << "Executing command: '" << command << "'";
+        core().retroShell.execScript(command);
+    }
 
     // Kick the machine into motion right away -- the stub has no play/pause
     // overlay yet (see VMWindow.qml for how SiC64 wires that up), and the

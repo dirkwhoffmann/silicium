@@ -76,6 +76,9 @@ main(int argc, char *argv[])
     qmlRegisterSingletonInstance("Silicium.Preferences", 1, 0, "Preferences", &Preferences::instance());
     qmlRegisterSingletonInstance("Silicium.Theme", 1, 0, "Shortcuts", &Shortcuts::instance());
 
+    // Parse the command line, collecting any --exec (-e) commands
+    SiAmController::instance().parseArguments(app);
+
     // Launch the emulator core
     SiAmController::instance().initialize();
 
