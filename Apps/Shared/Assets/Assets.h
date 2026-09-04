@@ -74,7 +74,6 @@ public:
         C64Core,
         C64Logo,
         C64Monitor,
-        ComingSoon,
         CommodoreLogo,
         Help,
         LedGray,

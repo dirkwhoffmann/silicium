@@ -108,27 +108,7 @@ Item {
 
                     text: "Save..."
                     font.pixelSize: Style.large
-                    onClicked: {
-
-                        /* Routed through HubController, not the onboarding
-                         * controller's own showError: nothing listens for
-                         * that signal (see OnboardingView.qml, whose
-                         * Connections to onboardingController only handles
-                         * onPageChanged), so it would never reach the screen.
-                         * HubDialogs.qml is what actually owns a visible
-                         * alert, and it listens to HubController.
-                         */
-                        if (controller.platform === "amiga") {
-
-                            HubController.showError(
-                                "Amiga Support Coming Soon",
-                                "Amiga emulation is not implemented yet. Support for Amiga machines is coming in a future update.")
-
-                        } else {
-
-                            saveDialog.open()
-                        }
-                    }
+                    onClicked: { saveDialog.open() }
                 }
             }
         }

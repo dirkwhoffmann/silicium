@@ -58,7 +58,6 @@ Assets::getIconUrl(Icon icon)
         case Icon::C64Logo:             return QUrl("qrc:/images/c64-logo.png");
         case Icon::C64Monitor:          return QUrl("qrc:/images/c64-monitor.png");
         case Icon::CommodoreLogo:       return QUrl("qrc:/images/commodore-logo.png");
-        case Icon::ComingSoon:          return QUrl("qrc:/images/coming-soon.png");
         case Icon::Help:                return QUrl("qrc:/images/help.png");
         case Icon::LedGray:             return QUrl("qrc:/images/led-gray.png");
         case Icon::LedGrayDark:         return QUrl("qrc:/images/led-gray-dark.png");

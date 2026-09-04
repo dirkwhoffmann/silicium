@@ -123,7 +123,6 @@ Pane {
         title: vName
         author: vAuthor
         description: vDescription
-        comingSoon: vPlatform === "AMIGA"
     }
 
     SiOverlayRect {

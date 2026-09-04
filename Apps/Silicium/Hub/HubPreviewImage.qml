@@ -20,7 +20,6 @@ Image {
     property string title: ""
     property string author: ""
     property string description: ""
-    property bool comingSoon: false
 
     fillMode: Image.PreserveAspectCrop
     smooth: true
@@ -151,16 +150,6 @@ Image {
             }
         }
         */
-
-        Image {
-
-            visible: comingSoon
-            anchors.centerIn: parent
-            source: Assets.iconUrl(Assets.ComingSoon)
-            sourceSize.width: 400
-            fillMode: Image.PreserveAspectFit
-            rotation: 0
-        }
     }
 
     //
