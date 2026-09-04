@@ -12,6 +12,7 @@
 #include "VAmiga.h"
 #include "Controller.h"
 #include "AudioController.h"
+#include "SVMFile.h"
 #include "SiAmRenderer.h"
 #include "SiAmActivityController.h"
 #include "Config/SiAmConfigController.h"
@@ -32,30 +33,60 @@
 
 class QCoreApplication;
 using vamiga::VAmiga;
+using retro::vault::SVMFile;
 
-// A trimmed-down counterpart to C64Controller: enough structure (singleton
-// core access, window lifecycle, message pump, renderer hookup) to power on
-// the Amiga core and render its frames, without the media/inspector/RPC
-// surface C64Controller carries for the fully built-out SiC64 app. Those
-// land in later steps as SiAmiga grows.
 class SiAmController : public Controller {
 
     Q_OBJECT
 
+    // Associated SVM file
+    unique_ptr<SVMFile> svm;
+
+    // Video renderer
+    class SiAmRenderer *m_renderer = nullptr;
+
+    // Audio backend
+    AudioController m_audio;
+
+
+    //
+    // Virtual machine state
+    //
+
     // Current state
     VMState m_state = VMState::HIBERNATED;
-    bool m_warping = false;
 
-    // Debug panel visibility (see SiAmDevPanel.qml)
+    // Indicates whether RetroShell is open
+    bool m_retroShell = false;
+
+    // Indicates whether the debug panel is visible
     bool m_debugPanel = false;
+
+    // Game port mapping
+    int m_port0 = 0;
+    int m_port1 = 0;
+
+    // Captured mouse state
+    float m_dx       = 0;
+    float m_dy       = 0;
+    bool m_mb_left   = false;
+    bool m_mb_middle = false;
+    bool m_mb_right  = false;
+
+    // Captured joystick state
+    bool m_joy_up    = false;
+    bool m_joy_down  = false;
+    bool m_joy_left  = false;
+    bool m_joy_right = false;
+    bool m_joy_fire  = false;
+
+    bool m_warping = false;
 
     // Set by process() whenever a message implies the cached info structs
     // (see SiAmInfoController) are stale; update() clears it by forcing an
     // immediate refresh(), mirroring C64Controller's m_infoIsDirty.
     bool m_infoIsDirty = false;
 
-    // Indicates if the RetroShell panel is open (see SiAmRetroShell.qml)
-    bool m_retroShell = false;
     bool m_retroShellIsDirty = false;
 
     // Always empty for now -- see getErrorMessage() below.
@@ -66,14 +97,10 @@ class SiAmController : public Controller {
     // windowDidOpen()), mirroring C64Controller's execCommands.
     vector<string> execCommands;
 
-    // Gateway to the host audio backend
-    AudioController m_audio;
-
-    // Video renderer. Owned by the QML scene graph (SiAmCanvas.qml), not
-    // by this controller -- see setRenderer().
-    class SiAmRenderer *m_renderer = nullptr;
-
+    //
     // Subcontrollers
+    //
+
     unique_ptr<SiAmActivityController> m_activityController;
     unique_ptr<SiAmConfigController> m_configController;
     unique_ptr<SiAmKeyboardController> m_keyboardController;

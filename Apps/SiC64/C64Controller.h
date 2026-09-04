@@ -35,15 +35,58 @@ class C64Controller : public Controller {
 
     Q_OBJECT
 
+    // Command line arguments
+    vector<string> execCommands;
+
+    // Associated SVM file
+    unique_ptr<SVMFile> svm;
+
+    // Describes why the SVM file could not be opened, set by parseArguments()
+    QString errorMessage;
+
+    // Recently touched media files
+    QStringList m_recentDisks;
+    QStringList m_recentTapes;
+    QStringList m_recentCartridges;
+
+
     //
-    // Virtual machine state (formerly VMController)
+    // Components
     //
 
-    // Current State
+    // Video renderer
+    class SiC64Renderer *m_renderer = nullptr;
+
+    // Audio backend
+    AudioController m_audio;
+
+    // Subcontrollers
+    unique_ptr<SiC64ActivityController> m_activityController;
+    unique_ptr<SiC64BusController> m_busController;
+    unique_ptr<SiC64CIAController> m_ciaController;
+    unique_ptr<SiC64CPUController> m_cpuController;
+    unique_ptr<SiC64MemoryController> m_memoryController;
+    unique_ptr<SiC64VICController> m_vicController;
+    unique_ptr<SiC64SIDController> m_sidController;
+    unique_ptr<SiC64ConfigController> m_configController;
+    unique_ptr<SiC64EventController> m_eventController;
+    unique_ptr<SiC64InfoController> m_infoController;
+    unique_ptr<SiC64KeyboardController> m_keyboardController;
+    unique_ptr<SiC64StatusbarController> m_statusbarController;
+
+
+    //
+    // Virtual machine state
+    //
+
+    // Current state
     VMState m_state = VMState::HIBERNATED;
 
-    // Indicates if the RetroShell panel is open
+    // Indicates whether RetroShell is open
     bool m_retroShell = false;
+
+    // Indicates whether the debug panel is visible
+    bool m_debugPanel = false;
 
     // Game port mapping
     int m_port0 = 0;
@@ -63,75 +106,29 @@ class C64Controller : public Controller {
     bool m_joy_right = false;
     bool m_joy_fire  = false;
 
-    // Debug panel visibility
-    bool m_debugPanel = false;
 
-    // The associated SVM file
-    unique_ptr<SVMFile> svm;
-
-    // Gateway to the host audio backend. Hub controllers get one per VM;
-    // SiC64 manages a single VM per process, so this lives directly on
-    // C64Controller instead.
-    AudioController m_audio;
-
-    // Video renderer. Owned by the QML scene graph (SiC64Canvas.qml), not by
-    // this controller -- see setRenderer().
-    class SiC64Renderer *m_renderer = nullptr;
-
-    // Subcontrollers
-    unique_ptr<SiC64ActivityController> m_activityController;
-    unique_ptr<SiC64BusController> m_busController;
-    unique_ptr<SiC64CIAController> m_ciaController;
-    unique_ptr<SiC64CPUController> m_cpuController;
-    unique_ptr<SiC64MemoryController> m_memoryController;
-    unique_ptr<SiC64VICController> m_vicController;
-    unique_ptr<SiC64SIDController> m_sidController;
-    unique_ptr<SiC64ConfigController> m_configController;
-    unique_ptr<SiC64EventController> m_eventController;
-    unique_ptr<SiC64InfoController> m_infoController;
-    unique_ptr<SiC64KeyboardController> m_keyboardController;
-    unique_ptr<SiC64StatusbarController> m_statusbarController;
-
-    // Shared by every open inspector window (see SiC64InspectorToolbar's
-    // format combo box) -- the old Swift-based emulator's Inspector kept a
-    // separate hex/padding setting per window instance, but since SiC64's
-    // inspector sub-controllers (SiC64EventController, SiC64CIAController,
-    // ...) are themselves shared singletons rather than one-per-window, a
-    // single shared format setting is the simpler match for this
-    // architecture.
     //
-    // Values mirror the old Swift-based emulator's Inspector.format:
+    // Shared state
+    //
+
+    // Display format (shared by every open inspector window
     // 0 = hex, 1 = hex zero-padded, 2 = decimal, 3 = decimal zero-padded.
     int m_format = 0;
 
-    // Commands to execute after startup, collected from --exec (-e) arguments
-    vector<string> execCommands;
 
-    // Describes why the SVM file could not be opened, set by parseArguments()
-    QString errorMessage;
+    //
+    // Message and signal processing
+    //
 
     // Coalescing update signals
     bool m_configIsDirty = false;
     bool m_infoIsDirty = false;
     bool m_retroShellIsDirty = false;
 
-    // Recently inserted disks. Shared by both drives (matching the old
-    // Swift-based emulator's MediaManager.insertedFloppyDisks), newest
-    // first, capped at 10, no duplicate URLs.
-    QStringList m_recentDisks;
 
-    // Adds url to m_recentDisks if not already present, trimming the list to
-    // maxRecentDisks. Called after every successful disk insertion (both
-    // insertDisk and insertRecentDisk funnel through it).
-    void noteRecentlyInsertedDisk(const QUrl &url);
-
-    // Recently inserted tapes / attached cartridges. Same rationale as
-    // m_recentDisks above.
-    QStringList m_recentTapes;
-    QStringList m_recentCartridges;
-
-    void noteRecentlyInsertedTape(const QUrl &url);
-    void noteRecentlyAttachedCartridge(const QUrl &url);
+    //
+    // Initializing
+    //
 
 public:
 
@@ -147,6 +144,8 @@ public:
     // Lifetime management
     //
 
+public:
+
     void start() override;
     Q_INVOKABLE void stop() override;
 
@@ -154,6 +153,8 @@ public:
     //
     // Virtual machine properties
     //
+
+public:
 
     Q_PROPERTY(VMState state READ getState WRITE setState NOTIFY stateChanged)
     Q_PROPERTY(bool isPoweredOn READ isPoweredOn NOTIFY stateChanged)
@@ -177,6 +178,8 @@ public:
     //
     // Controlling input devices
     //
+
+public:
 
     Q_PROPERTY(bool keyboardCaptured READ keyboardCaptured NOTIFY captureChanged)
     Q_PROPERTY(bool mouseCaptured READ mouseCaptured NOTIFY captureChanged)
@@ -482,6 +485,13 @@ public:
     bool drive9Modified() const { return core().drive9.getInfo().hasModifiedDisk; }
     bool drive8PoweredOn() const { return core().get(vc64::Opt::DRV_POWER_SWITCH, 0); }
     bool drive9PoweredOn() const { return core().get(vc64::Opt::DRV_POWER_SWITCH, 1); }
+
+    // Adds url to m_recentDisks if not already present, trimming the list to
+    // maxRecentDisks. Called after every successful disk insertion (both
+    // insertDisk and insertRecentDisk funnel through it).
+    void noteRecentlyInsertedDisk(const QUrl &url);
+    void noteRecentlyInsertedTape(const QUrl &url);
+    void noteRecentlyAttachedCartridge(const QUrl &url);
 
 
     //
