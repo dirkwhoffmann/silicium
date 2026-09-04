@@ -13,18 +13,16 @@ import QtQuick.Layouts
 import Silicium.Controllers
 import Silicium.Theme
 
-// Port of SiC64InspectorToolbar.qml. SiC64 gives each panel its own
-// top-level window, picked from a dropdown on the main toolbar's Inspector
-// button. SiAmiga instead hosts every panel in one window (see
-// SiAmInspectorWindow.qml), so the equivalent picker lives here instead --
-// the panel combo box below replaces that former sidebar, letting this one
-// toolbar (rather than the main window's toolbar) select which panel the
-// window's StackLayout shows. Now that SiAmActions exists, this forwards
-// its buttons to it (root.actions.pause, ...) the same way SiC64's toolbar
-// does, instead of calling SiAmController directly. The beam-position
-// readout is wired the same way SiC64's is: inspectorController.beamPosition
-// comes from SiAmInspectorController::refresh() sampling AmigaInfo's
-// frame/vpos/hpos through SiAmInfoController.
+// Port of SiC64InspectorToolbar.qml, shared by every panel behind
+// SiAmInspectorWindow's page switcher (see that file; the panel picker
+// itself lives in the main window's toolbar -- SiAmToolbar.qml's Inspector
+// button -- mirroring where SiC64's own per-panel picker lives). Now that
+// SiAmActions exists, this forwards its buttons to it (root.actions.pause,
+// ...) the same way SiC64's toolbar does, instead of calling SiAmController
+// directly. The beam-position readout is wired the same way SiC64's is:
+// inspectorController.beamPosition comes from
+// SiAmInspectorController::refresh() sampling AmigaInfo's frame/vpos/hpos
+// through SiAmInfoController.
 
 ToolBar {
 
@@ -38,25 +36,6 @@ ToolBar {
     // subcontrollers (e.g. SiAmKeyboardController) are passed around as
     // plain 'var' -- see SiAmKeyboardPanel.qml's 'kc' property.
     required property var inspectorController
-
-    // Selected page. Must match the order of panelModel below and of
-    // SiAmInspectorWindow's Page enum / StackLayout children.
-    property int currentIndex: 0
-
-    // Same name/symbol pairs the old sidebar ListView used.
-    readonly property var panelModel: [
-        {name: "CPU", symbol: "memory"},
-        {name: "Bus", symbol: "cable"},
-        {name: "CIA", symbol: "developer_board"},
-        {name: "Memory", symbol: "memory_alt"},
-        {name: "Agnus", symbol: "hub"},
-        {name: "Copper", symbol: "content_copy"},
-        {name: "Blitter", symbol: "bolt"},
-        {name: "Paula", symbol: "music_note_2"},
-        {name: "Denise", symbol: "monitor"},
-        {name: "Ports", symbol: "usb"},
-        {name: "Events", symbol: "schedule"},
-    ]
 
     topPadding: Style.mediumSpacing
     bottomPadding: Style.mediumSpacing
@@ -135,18 +114,6 @@ ToolBar {
                     action: root.actions.finishFrame
                     symbol: "text_select_move_down"
                 }
-            }
-
-            SiComboBox {
-
-                id: panelCombo
-
-                Layout.preferredWidth: 160
-                model: root.panelModel
-                textRole: "name"
-                iconRole: "symbol"
-                currentIndex: root.currentIndex
-                onCurrentIndexChanged: root.currentIndex = currentIndex
             }
 
             HSpacer { }

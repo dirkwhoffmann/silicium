@@ -14,10 +14,11 @@ import Silicium.Preferences
 
 //
 // Central definition of all SiAmiga window actions. Port of SiC64Actions.qml,
-// trimmed to what SiAmiga actually has: no per-panel inspector actions
-// (SiAmInspectorWindow is one window with a sidebar, not one window per
-// panel -- see that file -- so there's a single openInspector action rather
-// than C64Actions' openCPUInspector/openMemoryInspector/...), no
+// trimmed to what SiAmiga actually has: the per-panel inspector actions
+// below (openCPUInspector, openBusInspector, ...) mirror C64Actions' own
+// set, but each just switches SiAmInspectorWindow's page rather than
+// raising a distinct window -- SiAmiga hosts every panel in one shared
+// window instead of SiC64's one-window-per-panel set (see that file). No
 // saveWorkspace/saveSnapshot/loadSnapshot or stopAndGo (no workspace/
 // snapshot persistence or datasette-era pause alias exist here), and no
 // keyboardWindowAction distinct from a sheet-based 'keyboard' action --
@@ -42,6 +43,17 @@ Item {
 
     property alias config: configAction
     property alias openInspector: openInspectorAction
+    property alias openCPUInspector: openCPUInspectorAction
+    property alias openBusInspector: openBusInspectorAction
+    property alias openCIAInspector: openCIAInspectorAction
+    property alias openMemoryInspector: openMemoryInspectorAction
+    property alias openAgnusInspector: openAgnusInspectorAction
+    property alias openCopperInspector: openCopperInspectorAction
+    property alias openBlitterInspector: openBlitterInspectorAction
+    property alias openPaulaInspector: openPaulaInspectorAction
+    property alias openDeniseInspector: openDeniseInspectorAction
+    property alias openPortInspector: openPortInspectorAction
+    property alias openEventsInspector: openEventsInspectorAction
     property alias retroShell: retroShellAction
     property alias logger: loggerAction
     property alias keyboard: keyboardAction
@@ -71,10 +83,13 @@ Item {
         onTriggered: configWindowRef.showPage(configWindowRef.currentIndex)
     }
 
-    // The toolbar's Inspector button (SiAmToolbar.qml) and the Debug menu's
-    // "Show Inspector..." item (SiAmMenu.qml) both trigger this directly --
-    // unlike SiC64's per-panel actions, there's exactly one Inspector window
-    // to show or raise (see SiAmInspectorWindow.qml).
+    // Reopens the Inspector on whichever page it last showed -- kept as a
+    // plain keyboard-shortcut entry point. The toolbar's Inspector button
+    // (SiAmToolbar.qml) and the Debug menu's "Inspector" submenu
+    // (SiAmMenu.qml) instead use the eleven per-panel actions below, one
+    // shared Inspector window standing in for SiC64's one-window-per-panel
+    // set (see SiAmInspectorWindow.qml) -- each action just switches that
+    // window's page instead of raising a distinct window.
     Action {
 
         id: openInspectorAction
@@ -86,6 +101,94 @@ Item {
             inspectorWindowRef.raise()
             inspectorWindowRef.requestActivate()
         }
+    }
+
+    Action {
+
+        id: openCPUInspectorAction
+        text: qsTr("CPU...")
+        icon.name: "memory"
+        onTriggered: inspectorWindowRef.showPage(0)
+    }
+
+    Action {
+
+        id: openBusInspectorAction
+        text: qsTr("Bus...")
+        icon.name: "cable"
+        onTriggered: inspectorWindowRef.showPage(1)
+    }
+
+    Action {
+
+        id: openCIAInspectorAction
+        text: qsTr("CIA...")
+        icon.name: "developer_board"
+        onTriggered: inspectorWindowRef.showPage(2)
+    }
+
+    Action {
+
+        id: openMemoryInspectorAction
+        text: qsTr("Memory...")
+        icon.name: "memory_alt"
+        onTriggered: inspectorWindowRef.showPage(3)
+    }
+
+    Action {
+
+        id: openAgnusInspectorAction
+        text: qsTr("Agnus...")
+        icon.name: "hub"
+        onTriggered: inspectorWindowRef.showPage(4)
+    }
+
+    Action {
+
+        id: openCopperInspectorAction
+        text: qsTr("Copper...")
+        icon.name: "content_copy"
+        onTriggered: inspectorWindowRef.showPage(5)
+    }
+
+    Action {
+
+        id: openBlitterInspectorAction
+        text: qsTr("Blitter...")
+        icon.name: "bolt"
+        onTriggered: inspectorWindowRef.showPage(6)
+    }
+
+    Action {
+
+        id: openPaulaInspectorAction
+        text: qsTr("Paula...")
+        icon.name: "music_note_2"
+        onTriggered: inspectorWindowRef.showPage(7)
+    }
+
+    Action {
+
+        id: openDeniseInspectorAction
+        text: qsTr("Denise...")
+        icon.name: "monitor"
+        onTriggered: inspectorWindowRef.showPage(8)
+    }
+
+    Action {
+
+        id: openPortInspectorAction
+        text: qsTr("Ports...")
+        icon.name: "usb"
+        onTriggered: inspectorWindowRef.showPage(9)
+    }
+
+    Action {
+
+        id: openEventsInspectorAction
+        text: qsTr("Events...")
+        icon.name: "schedule"
+        onTriggered: inspectorWindowRef.showPage(10)
     }
 
     // RetroShell and the Logger share a single overlay slot (see

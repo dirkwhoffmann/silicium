@@ -381,17 +381,48 @@ SiMenuBar {
     // Debug Menu
     //
     // Groups what SiC64Menu.qml splits across its C64 menu (Inspector/
-    // RetroShell/Logger) and toolbar (Debug Panel) -- SiAmInspectorWindow's
-    // sidebar is where the actual per-panel content lives (see that file),
-    // so there's a single "Show Inspector..." item rather than SiC64's
-    // per-panel submenu.
+    // RetroShell/Logger) and toolbar (Debug Panel).
     //
 
     SiMenu {
         title: qsTr("&Debug")
 
-        SiMenuItem {
-            action: window.actions.openInspector
+        SiMenu {
+            title: qsTr("Inspector")
+
+            SiMenuItem {
+                action: window.actions.openCPUInspector
+            }
+            SiMenuItem {
+                action: window.actions.openBusInspector
+            }
+            SiMenuItem {
+                action: window.actions.openCIAInspector
+            }
+            SiMenuItem {
+                action: window.actions.openMemoryInspector
+            }
+            SiMenuItem {
+                action: window.actions.openAgnusInspector
+            }
+            SiMenuItem {
+                action: window.actions.openCopperInspector
+            }
+            SiMenuItem {
+                action: window.actions.openBlitterInspector
+            }
+            SiMenuItem {
+                action: window.actions.openPaulaInspector
+            }
+            SiMenuItem {
+                action: window.actions.openDeniseInspector
+            }
+            SiMenuItem {
+                action: window.actions.openPortInspector
+            }
+            SiMenuItem {
+                action: window.actions.openEventsInspector
+            }
         }
 
         SiMenuSeparator { }

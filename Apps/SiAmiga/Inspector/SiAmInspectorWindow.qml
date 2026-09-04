@@ -16,18 +16,19 @@ import Silicium.Theme
 // Amiga counterpart to SiC64's inspector windows -- but shaped differently.
 // SiC64 gives every panel (Events, CIA, Bus, CPU, Memory, VIC, SID) its own
 // top-level window, picked from a dropdown on the main toolbar's Inspector
-// button. The Amiga side has more panels (11 vs. SiC64's 7), so rather than
-// open 11 separate windows, this hosts every panel in a single window and
-// puts the equivalent dropdown picker in its own toolbar instead (see the
-// panel combo box in SiAmInspectorToolbar.qml) -- one toolbar, one set of
-// chrome, switching pages instead of switching windows.
+// button (SiAmToolbar.qml's inspectMenu, mirroring SiC64Toolbar.qml's own).
+// The Amiga side has more panels (11 vs. SiC64's 7), so rather than open 11
+// separate windows, this hosts every panel in a single window; the toolbar's
+// dropdown just calls showPage(n) below instead of raising a distinct
+// window per panel -- one toolbar, one set of chrome, switching pages
+// instead of switching windows.
 
 Window {
 
     id: root
 
-    // Page indices. Must match the order of the sidebar model and the
-    // StackLayout children below.
+    // Page indices. Must match the order of SiAmActions' per-panel
+    // openXxxInspector actions and the StackLayout children below.
     enum Page {
         CPU,
         Bus,
@@ -96,13 +97,10 @@ Window {
 
         SiAmInspectorToolbar {
 
-            id: toolbar
             Layout.fillWidth: true
             amiga: root.controller
             actions: root.actions
             inspectorController: root.inspectorController
-            currentIndex: root.currentIndex
-            onCurrentIndexChanged: root.currentIndex = currentIndex
         }
 
         StackLayout {

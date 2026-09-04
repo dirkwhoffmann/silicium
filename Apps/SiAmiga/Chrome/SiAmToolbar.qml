@@ -204,8 +204,50 @@ ToolBar {
 
             NavTextButtonFlat {
 
+                id: inspectButton
                 phosphor: "magnifying-glass"
-                action: root.window.actions.openInspector
+                text: qsTr("Inspector")
+                onClicked: inspectMenu.open()
+
+                SiMenu {
+
+                    id: inspectMenu
+                    y: inspectButton.height
+
+                    SiMenuItem {
+                        action: root.window.actions.openCPUInspector
+                    }
+                    SiMenuItem {
+                        action: root.window.actions.openBusInspector
+                    }
+                    SiMenuItem {
+                        action: root.window.actions.openCIAInspector
+                    }
+                    SiMenuItem {
+                        action: root.window.actions.openMemoryInspector
+                    }
+                    SiMenuItem {
+                        action: root.window.actions.openAgnusInspector
+                    }
+                    SiMenuItem {
+                        action: root.window.actions.openCopperInspector
+                    }
+                    SiMenuItem {
+                        action: root.window.actions.openBlitterInspector
+                    }
+                    SiMenuItem {
+                        action: root.window.actions.openPaulaInspector
+                    }
+                    SiMenuItem {
+                        action: root.window.actions.openDeniseInspector
+                    }
+                    SiMenuItem {
+                        action: root.window.actions.openPortInspector
+                    }
+                    SiMenuItem {
+                        action: root.window.actions.openEventsInspector
+                    }
+                }
             }
 
             NavDivider {}
