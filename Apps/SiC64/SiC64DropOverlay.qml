@@ -26,7 +26,7 @@ DropOverlay {
     function insertDroppedDisk(driveNr, url) {
 
         window.proceedWithUnsavedFloppyDisk(driveNr, function () {
-            controller.insertDisk(driveNr, url)
+            controller.media.insertDisk(driveNr, url)
         })
     }
 
@@ -66,7 +66,7 @@ DropOverlay {
 
         onTriggered: {
             console.log("Drop zone 3 action triggered")
-            controller.flash(path)
+            controller.media.flash(path)
         }
     }
 
@@ -79,7 +79,7 @@ DropOverlay {
 
         onTriggered: {
             console.log("Drop zone 4 action triggered")
-            controller.attachCartridge(path)
+            controller.media.attachCartridge(path)
         }
     }
 
@@ -92,7 +92,7 @@ DropOverlay {
 
         onTriggered: {
             console.log("Drop zone 5 action triggered")
-            controller.insertTape(path)
+            controller.media.insertTape(path)
         }
     }
 

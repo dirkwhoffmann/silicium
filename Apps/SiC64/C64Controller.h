@@ -17,6 +17,7 @@
 #include "SiC64InfoController.h"
 #include "SiC64ActivityController.h"
 #include "SiC64StatusbarController.h"
+#include "C64MediaController.h"
 #include "SiC64Renderer.h"
 #include "Keyboard/SiC64KeyboardController.h"
 #include "Inspector/SiC64EventController.h"
@@ -44,12 +45,6 @@ class C64Controller : public Controller {
     // Describes why the SVM file could not be opened, set by parseArguments()
     QString errorMessage;
 
-    // Recent media
-    QStringList m_recentDisks;
-    QStringList m_recentTapes;
-    QStringList m_recentCartridges;
-
-
     //
     // Components
     //
@@ -73,6 +68,7 @@ class C64Controller : public Controller {
     unique_ptr<SiC64InfoController> m_infoController;
     unique_ptr<SiC64KeyboardController> m_keyboardController;
     unique_ptr<SiC64StatusbarController> m_statusbarController;
+    unique_ptr<C64MediaController> m_mediaController;
 
 
     //
@@ -108,7 +104,7 @@ class C64Controller : public Controller {
 
 
     //
-    // Shared state
+    // Shared inspector state
     //
 
     // Display format (shared by every open inspector window
@@ -155,6 +151,10 @@ public:
 
 public:
 
+    Q_PROPERTY(VMState state READ getState WRITE setState NOTIFY stateChanged)
+    VMState getState() const { return m_state; }
+    void setState(VMState state);
+
     void start() override;
     Q_INVOKABLE void stop() override;
 
@@ -172,12 +172,11 @@ public:
 
 
     //
-    // Managing state
+    // Managing the emulator state
     //
 
 public:
 
-    Q_PROPERTY(VMState state READ getState WRITE setState NOTIFY stateChanged)
     Q_PROPERTY(bool isPoweredOn READ isPoweredOn NOTIFY stateChanged)
     Q_PROPERTY(bool isRunning READ isRunning NOTIFY stateChanged)
     Q_PROPERTY(bool isPaused READ isPaused NOTIFY stateChanged)
@@ -185,9 +184,6 @@ public:
 
     Q_PROPERTY(QString uuid READ getUUID CONSTANT)
     Q_PROPERTY(QString name READ getName CONSTANT)
-
-    VMState getState() const { return m_state; }
-    void setState(VMState state);
 
     bool isPoweredOn() const { return m_state == VMState::PAUSED || m_state == VMState::RUNNING; }
     bool isRunning() { return m_state == VMState::RUNNING; }
@@ -239,11 +235,6 @@ public:
     Q_INVOKABLE void saveSnapshot();
     Q_INVOKABLE void revertSnapshot();
 
-
-    //
-    // Accessing subcomponents
-    //
-
     Q_PROPERTY(SiC64ActivityController *activityController READ getActivityController CONSTANT)
     Q_PROPERTY(SiC64BusController *busController READ getBusController CONSTANT)
     Q_PROPERTY(SiC64CIAController *ciaController READ getCIAController CONSTANT)
@@ -257,6 +248,7 @@ public:
     Q_PROPERTY(SiC64KeyboardController *keyboardController READ getKeyboardController CONSTANT)
     Q_PROPERTY(SiC64StatusbarController *statusbarController READ getStatusbarController CONSTANT)
     Q_PROPERTY(SiC64Renderer *renderer READ getRenderer WRITE setRenderer NOTIFY rendererChanged)
+    Q_PROPERTY(C64MediaController *media READ media CONSTANT)
 
     SiC64ActivityController *getActivityController() const { return m_activityController.get(); }
     SiC64BusController *getBusController() const { return m_busController.get(); }
@@ -273,6 +265,8 @@ public:
 
     class SiC64Renderer *getRenderer() const { return m_renderer; }
     void setRenderer(class SiC64Renderer *ptr);
+
+    C64MediaController *media() const { return m_mediaController.get(); }
 
 
     //
@@ -363,7 +357,7 @@ public:
 
 
     //
-    // RetroShell
+    // Working with RetroShell
     //
 
 public:
@@ -398,6 +392,7 @@ public:
     void warpToCenter() override;
     void joystickMotionEvent(int port, u64 timestamp, bool state[5]) override;
 
+
     //
     // Methods from AudioControllerDelegate
     //
@@ -415,181 +410,6 @@ public:
 
     Q_INVOKABLE void shrinkSnapshotStorage(int count);
 
-
-    //
-    // Media files
-    //
-
-public:
-
-    // 'drive' is 8 or 9 throughout this class' public API (matching the UI's
-    // drive numbers), converted to the core's 0/1 indexing internally.
-    //
-    // Q_INVOKABLE methods must stay in a public: section -- QML's method
-    // dispatch silently ignores ones declared under private:/protected:
-    // (calling them reports "is not a function" instead of erroring at
-    // registration time), which is why this was moved out of the private
-    // block below that still holds the plain C++ helpers.
-    Q_INVOKABLE void insertDisk(int drive, const QUrl &url, bool wp = false);
-
-    // Flashes a program file (PRG / P00 / T64) straight into the running
-    // machine's RAM, making it immediately runnable -- the "Memory" drop zone.
-    // Mirrors the old Swift-based emulator's MediaManager.flashFile(url:).
-    Q_INVOKABLE void flash(const QUrl &url);
-
-    // Creates and inserts a blank disk. 'fsFormat' is a retro::vault::cbm::FSFormat
-    // value (0 = NODOS, 1 = CBM), matching the "File system" combo box in
-    // SiC64DiskCreator.
-    Q_INVOKABLE void newDisk(int drive, int fsFormat, const QString &name);
-
-    // Whether the drive currently holds a disk with unsaved changes (see
-    // SiC64Window's proceedWithUnsavedFloppyDisk).
-    Q_INVOKABLE bool hasModifiedDisk(int drive) const;
-
-    // Exports the current disk to an image file. Only D64 is supported by
-    // the core's codec right now (see FloppyDisk::writeToFile), which is why
-    // SiC64DiskExporter doesn't offer T64/PRG like the old Swift-based
-    // emulator did.
-    Q_INVOKABLE void exportDisk(int drive, const QUrl &url);
-
-    // Exports the current disk's file system as a folder of plain files.
-    Q_INVOKABLE void exportDiskFolder(int drive, const QUrl &url);
-
-    // Ejects the current disk. Callers are expected to run this through
-    // SiC64Window's proceedWithUnsavedFloppyDisk first, same as insert/new.
-    Q_INVOKABLE void ejectDisk(int drive);
-
-    // Toggles write-protection on the current disk.
-    Q_INVOKABLE void toggleWriteProtection(int drive);
-
-    // Toggles the modification flag ("unsaved changes") on the current disk.
-    // Developer-only escape hatch for exercising the unsaved-state UI (the
-    // eject/quit confirmation prompts) without having to actually modify a
-    // disk's contents first.
-    Q_INVOKABLE void toggleUnsavedState(int drive);
-
-    // Toggles the drive's own power switch (independent of the disk).
-    Q_INVOKABLE void toggleDrivePower(int drive);
-
-    // Per-drive state for the Drive menu's Eject/Export/Write Protected/Power
-    // items (enabled state and checkmarks). Two properties per state rather
-    // than a parameterized getter, since Q_INVOKABLE methods aren't reactive
-    // QML bindings and the menu needs to redraw as disks are
-    // inserted/ejected/protected. Refreshed alongside the rest of the polled
-    // "info" state -- see update().
-    Q_PROPERTY(bool drive8HasDisk READ drive8HasDisk NOTIFY driveStateChanged)
-    Q_PROPERTY(bool drive9HasDisk READ drive9HasDisk NOTIFY driveStateChanged)
-    Q_PROPERTY(bool drive8WriteProtected READ drive8WriteProtected NOTIFY driveStateChanged)
-    Q_PROPERTY(bool drive9WriteProtected READ drive9WriteProtected NOTIFY driveStateChanged)
-    Q_PROPERTY(bool drive8Modified READ drive8Modified NOTIFY driveStateChanged)
-    Q_PROPERTY(bool drive9Modified READ drive9Modified NOTIFY driveStateChanged)
-    Q_PROPERTY(bool drive8PoweredOn READ drive8PoweredOn NOTIFY driveStateChanged)
-    Q_PROPERTY(bool drive9PoweredOn READ drive9PoweredOn NOTIFY driveStateChanged)
-
-    bool drive8HasDisk() const { return core().drive8.getInfo().hasDisk; }
-    bool drive9HasDisk() const { return core().drive9.getInfo().hasDisk; }
-    bool drive8WriteProtected() const { return core().drive8.getInfo().hasProtectedDisk; }
-    bool drive9WriteProtected() const { return core().drive9.getInfo().hasProtectedDisk; }
-    bool drive8Modified() const { return core().drive8.getInfo().hasModifiedDisk; }
-    bool drive9Modified() const { return core().drive9.getInfo().hasModifiedDisk; }
-    bool drive8PoweredOn() const { return core().get(vc64::Opt::DRV_POWER_SWITCH, 0); }
-    bool drive9PoweredOn() const { return core().get(vc64::Opt::DRV_POWER_SWITCH, 1); }
-
-    // Adds url to m_recentDisks if not already present, trimming the list to
-    // maxRecentDisks. Called after every successful disk insertion (both
-    // insertDisk and insertRecentDisk funnel through it).
-    void noteRecentlyInsertedDisk(const QUrl &url);
-    void noteRecentlyInsertedTape(const QUrl &url);
-    void noteRecentlyAttachedCartridge(const QUrl &url);
-
-
-    //
-    // Datasette
-    //
-
-    Q_INVOKABLE void insertTape(const QUrl &url);
-    Q_INVOKABLE void ejectTape();
-    Q_INVOKABLE void exportTape(const QUrl &url);
-    Q_INVOKABLE void rewindTape();
-
-    // Presses the datasette's Play key, or Stop if it's already playing.
-    Q_INVOKABLE void playOrStopTape();
-
-    // Same rationale as the drive properties above: reused by the Datasette
-    // menu's enabled state and the Play/Stop item's dynamic title.
-    Q_PROPERTY(bool tapeInserted READ tapeInserted NOTIFY driveStateChanged)
-    Q_PROPERTY(bool tapePlaying READ tapePlaying NOTIFY driveStateChanged)
-
-    bool tapeInserted() const { return core().datasette.getInfo().hasTape; }
-    bool tapePlaying() const { return core().datasette.getInfo().playKey; }
-
-
-    //
-    // Cartridges
-    //
-
-    Q_INVOKABLE void attachCartridge(const QUrl &url);
-    Q_INVOKABLE void detachCartridge();
-    Q_INVOKABLE void attachReu(int capacity);
-    Q_INVOKABLE void attachGeoRam(int capacity);
-    Q_INVOKABLE void attachIsepic();
-    Q_INVOKABLE void exportCartridge(const QUrl &url);
-
-    // Presses the given cartridge button (1 or 2) briefly, then releases it.
-    Q_INVOKABLE void pressCartridgeButton(int nr);
-
-    // Sets the cartridge switch position: -1 = left, 0 = neutral, 1 = right.
-    Q_INVOKABLE void setCartridgeSwitch(int pos);
-
-    // Same rationale as the drive/tape properties above.
-    Q_PROPERTY(bool cartridgeAttached READ cartridgeAttached NOTIFY driveStateChanged)
-    Q_PROPERTY(bool cartridgeIsReu READ cartridgeIsReu NOTIFY driveStateChanged)
-    Q_PROPERTY(bool cartridgeIsGeoRam READ cartridgeIsGeoRam NOTIFY driveStateChanged)
-    Q_PROPERTY(bool cartridgeIsIsepic READ cartridgeIsIsepic NOTIFY driveStateChanged)
-    Q_PROPERTY(int cartridgeMemory READ cartridgeMemory NOTIFY driveStateChanged)
-    Q_PROPERTY(int cartridgeButtons READ cartridgeButtons NOTIFY driveStateChanged)
-    Q_PROPERTY(int cartridgeSwitches READ cartridgeSwitches NOTIFY driveStateChanged)
-    Q_PROPERTY(int cartridgeSwitchPos READ cartridgeSwitchPos NOTIFY driveStateChanged)
-
-    bool cartridgeAttached() const { return core().expansionPort.getCartridgeTraits().type != vc64::CartridgeType::NONE; }
-    bool cartridgeIsReu() const { return core().expansionPort.getCartridgeTraits().type == vc64::CartridgeType::REU; }
-    bool cartridgeIsGeoRam() const { return core().expansionPort.getCartridgeTraits().type == vc64::CartridgeType::GEO_RAM; }
-    bool cartridgeIsIsepic() const { return core().expansionPort.getCartridgeTraits().type == vc64::CartridgeType::ISEPIC; }
-    // CartridgeTraits::memory is in bytes; the REU/GeoRam submenus compare
-    // against KB capacities (128/256/512/...), matching attachReu/attachGeoRam's
-    // own KB-based parameter.
-    int cartridgeMemory() const { return (int)(core().expansionPort.getCartridgeTraits().memory / 1024); }
-    int cartridgeButtons() const { return (int)core().expansionPort.getCartridgeTraits().buttons; }
-    int cartridgeSwitches() const { return (int)core().expansionPort.getCartridgeTraits().switches; }
-    int cartridgeSwitchPos() const { return (int)core().expansionPort.getInfo().switchPos; }
-
-
-    //
-    // Recently used media -- see the Q_PROPERTY declarations further below;
-    // these Q_INVOKABLE methods must stay public for the same reason
-    // insertDisk/hasModifiedDisk were moved up here
-    //
-
-    // Inserts the recently used disk at the given position into the drive.
-    // The list itself is shared by both drives; only the target drive
-    // depends on which one's "Insert Recent" submenu was used.
-    Q_INVOKABLE void insertRecentDisk(int drive, int index);
-
-    // Clears the shared list of recently inserted disks
-    Q_INVOKABLE void clearRecentlyInsertedDisks();
-
-    // Inserts the recently used tape at the given position into the datasette
-    Q_INVOKABLE void insertRecentTape(int index);
-
-    // Clears the list of recently inserted tapes
-    Q_INVOKABLE void clearRecentlyInsertedTapes();
-
-    // Attaches the recently used cartridge at the given position
-    Q_INVOKABLE void attachRecentCartridge(int index);
-
-    // Clears the list of recently attached cartridges
-    Q_INVOKABLE void clearRecentlyAttachedCartridges();
-
 private:
 
     /* The unconditional half of saveSnapshot(): captures the machine and
@@ -602,8 +422,22 @@ private:
 public:
 
     //
-    // Managing the emulator state
+    // Processing messages
     //
+
+    // Receives messages from the emulator thread (see windowDidOpen()) and
+    // marshals them onto the GUI thread.
+    void process(const vc64::Message &msg, const string &attachment = "");
+    void update();
+
+private:
+
+    // Processes incoming RPC messages
+    void rpcReceive(const char *payload);
+    void rpcSend(const char *payload);
+
+    // Loads a specific snapshot from this VM's own SVM
+    void loadSnapshot(const utl::UUID &uuid);
 
     // Called within the message receiver
     void didPowerOn();
@@ -614,21 +448,10 @@ public:
 
 private:
 
-    // Updates the VM state and reports it to the Hub (if this instance was
-    // launched by one) by sending a "vmState" JSON-RPC notification through
-    // the RPC server. The Hub reads it over the process's stdout pipe to
-    // track our state -- see HubController::launch().
+    // Updates the VM state and reports it through the RPC server
     void reportState(VMState state);
 
-    /* Reports that the SVM file was just written to disk (workspace or
-     * snapshot save) by sending a "svmChanged" JSON-RPC notification through
-     * the RPC server. Lets the Hub know its in-memory manifest for this VM
-     * is stale -- see HubController::processRpcPacket().
-     *
-     * 'uuid' names the snapshot that was just created, when the write was a
-     * snapshot save. The Hub uses it to reveal and select the new item; it is
-     * left empty for anything else.
-     */
+    // Reports that the SVM file was just written to disk through the RPC server
     void notifySvmChanged(const QString &kind, const QString &uuid = {});
 
     /* Tells the Hub to pack the archive after we persisted into the root
@@ -647,55 +470,6 @@ public:
      * takes a title and a body.
      */
     Q_INVOKABLE void notifyFatalError(const QString &title, const QString &text);
-
-
-    //
-    // Processing methods
-    //
-
-    // Receives messages from the emulator thread (see windowDidOpen()) and
-    // marshals them onto the GUI thread.
-    void process(const vc64::Message &msg, const string &attachment = "");
-    void update();
-
-private:
-
-    // Processes incoming RPC messages
-    void rpcReceive(const char *payload);
-    void rpcSend(const char *payload);
-
-    // Loads a specific snapshot from this VM's own SVM. Invoked in response
-    // to a "loadSnapshot" RPC request from the Hub, sent when the user opens
-    // a snapshot of a machine that's already running (see
-    // HubController::open()).
-    void loadSnapshot(const utl::UUID &uuid);
-
-
-    //
-    // Recently inserted disks (shared by both drives)
-    //
-
-    Q_PROPERTY(QStringList recentDisks READ recentDisks NOTIFY recentDisksChanged)
-
-    QStringList recentDisks() const { return m_recentDisks; }
-
-
-    //
-    // Recently inserted tapes
-    //
-
-    Q_PROPERTY(QStringList recentTapes READ recentTapes NOTIFY recentTapesChanged)
-
-    QStringList recentTapes() const { return m_recentTapes; }
-
-
-    //
-    // Recently attached cartridges
-    //
-
-    Q_PROPERTY(QStringList recentCartridges READ recentCartridges NOTIFY recentCartridgesChanged)
-
-    QStringList recentCartridges() const { return m_recentCartridges; }
 
 signals:
 
@@ -724,9 +498,5 @@ signals:
     void workspaceSaved();
     void snapshotSaved(const QString &sUUID);
     void snapshotLimitReached();
-    void driveStateChanged();
-    void recentDisksChanged();
-    void recentTapesChanged();
-    void recentCartridgesChanged();
     void formatChanged();
 };

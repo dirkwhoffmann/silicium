@@ -165,7 +165,7 @@ VMWindow {
 
     function proceedWithUnsavedFloppyDisk(driveNr, proceed) {
 
-        if (Preferences.ejectWithoutAsking || !c64.hasModifiedDisk(driveNr)) {
+        if (Preferences.ejectWithoutAsking || !c64.media.hasModifiedDisk(driveNr)) {
             proceed()
             return
         }
@@ -203,14 +203,14 @@ VMWindow {
     function ejectDiskAction(driveNr) {
 
         proceedWithUnsavedFloppyDisk(driveNr, function () {
-            c64.ejectDisk(driveNr)
+            c64.media.ejectDisk(driveNr)
         })
     }
 
     function insertRecentDiskAction(driveNr, index) {
 
         proceedWithUnsavedFloppyDisk(driveNr, function () {
-            c64.insertRecentDisk(driveNr, index)
+            c64.media.insertRecentDisk(driveNr, index)
         })
     }
 
@@ -238,7 +238,7 @@ VMWindow {
 
         property int driveNr: 8
 
-        onAccepted: root.c64.insertDisk(driveNr, selectedFile)
+        onAccepted: root.c64.media.insertDisk(driveNr, selectedFile)
     }
 
     SiC64DiskCreator {
@@ -259,7 +259,7 @@ VMWindow {
         title: qsTr("Insert Tape")
         nameFilters: [qsTr("Tape images (*.tap *.zip *.gz)"), qsTr("All files (*)")]
 
-        onAccepted: root.c64.insertTape(selectedFile)
+        onAccepted: root.c64.media.insertTape(selectedFile)
     }
 
     FileDialog {
@@ -270,7 +270,7 @@ VMWindow {
         nameFilters: [qsTr("Tape image (*.tap)")]
         defaultSuffix: "tap"
 
-        onAccepted: root.c64.exportTape(selectedFile)
+        onAccepted: root.c64.media.exportTape(selectedFile)
     }
 
     FileDialog {
@@ -279,7 +279,7 @@ VMWindow {
         title: qsTr("Attach Cartridge")
         nameFilters: [qsTr("Cartridge images (*.crt *.zip *.gz)"), qsTr("All files (*)")]
 
-        onAccepted: root.c64.attachCartridge(selectedFile)
+        onAccepted: root.c64.media.attachCartridge(selectedFile)
     }
 
     FileDialog {
@@ -290,7 +290,7 @@ VMWindow {
         nameFilters: [qsTr("Cartridge image (*.crt)")]
         defaultSuffix: "crt"
 
-        onAccepted: root.c64.exportCartridge(selectedFile)
+        onAccepted: root.c64.media.exportCartridge(selectedFile)
     }
 
     Connections {

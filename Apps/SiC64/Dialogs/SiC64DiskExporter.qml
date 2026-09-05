@@ -162,7 +162,7 @@ SiDialog {
         defaultSuffix: "d64"
 
         onAccepted: {
-            root.c64.exportDisk(root.driveNr, selectedFile)
+            root.c64.media.exportDisk(root.driveNr, selectedFile)
             root.close()
         }
     }
@@ -173,7 +173,7 @@ SiDialog {
         title: qsTr("Export Disk")
 
         onAccepted: {
-            root.c64.exportDiskFolder(root.driveNr, selectedFolder)
+            root.c64.media.exportDiskFolder(root.driveNr, selectedFolder)
             root.close()
         }
     }

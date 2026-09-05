@@ -191,10 +191,10 @@ SiMenuBar {
         required property int driveNr   // 8 or 9
 
         readonly property bool connected: driveNr === 8 ? config.DRIVE8_CONNECTED : config.DRIVE9_CONNECTED
-        readonly property bool hasDisk: driveNr === 8 ? c64.drive8HasDisk : c64.drive9HasDisk
-        readonly property bool writeProtected: driveNr === 8 ? c64.drive8WriteProtected : c64.drive9WriteProtected
-        readonly property bool modified: driveNr === 8 ? c64.drive8Modified : c64.drive9Modified
-        readonly property bool poweredOn: driveNr === 8 ? c64.drive8PoweredOn : c64.drive9PoweredOn
+        readonly property bool hasDisk: driveNr === 8 ? c64.media.drive8HasDisk : c64.media.drive9HasDisk
+        readonly property bool writeProtected: driveNr === 8 ? c64.media.drive8WriteProtected : c64.media.drive9WriteProtected
+        readonly property bool modified: driveNr === 8 ? c64.media.drive8Modified : c64.media.drive9Modified
+        readonly property bool poweredOn: driveNr === 8 ? c64.media.drive8PoweredOn : c64.media.drive9PoweredOn
 
         // While disconnected, there's nothing to insert/eject/export for
         // hardware that isn't part of the current setup, so every other item
@@ -241,15 +241,15 @@ SiMenuBar {
                 // stray separator and a lone "Clear Menu". Unlike 'visible',
                 // a nested Menu's 'enabled' does propagate to its row in the
                 // parent (and stays bound), which is what dims it here.
-                enabled: c64.recentDisks.length > 0
+                enabled: c64.media.recentDisks.length > 0
 
                 // Dynamically generate one MenuItem per recently inserted disk.
-                // The model (c64.recentDisks) is shared by both drives -- only
+                // The model (c64.media.recentDisks) is shared by both drives -- only
                 // the insert target (driveNr) differs between the Drive 8 and
                 // Drive 9 submenus. The Instantiator keeps the menu in sync with
                 // it, inserting/removing items as the list changes.
                 Instantiator {
-                    model: c64.recentDisks
+                    model: c64.media.recentDisks
                     delegate: SiMenuItem {
                         text: modelData.substring(modelData.lastIndexOf("/") + 1)
                         onTriggered: window.insertRecentDiskAction(driveNr, index)
@@ -261,7 +261,7 @@ SiMenuBar {
                 SiMenuSeparator { }
                 Action {
                     text: qsTr("Clear Menu")
-                    onTriggered: c64.clearRecentlyInsertedDisks()
+                    onTriggered: c64.media.clearRecentlyInsertedDisks()
                 }
             }
         }
@@ -320,7 +320,7 @@ SiMenuBar {
             visible: connected
             enabled: hasDisk
             checked: writeProtected
-            onTriggered: c64.toggleWriteProtection(driveNr)
+            onTriggered: c64.media.toggleWriteProtection(driveNr)
         }
 
         SiMenuItem {
@@ -329,14 +329,14 @@ SiMenuBar {
             visible: connected && Preferences.developerMode
             enabled: hasDisk
             checked: modified
-            onTriggered: c64.toggleUnsavedState(driveNr)
+            onTriggered: c64.media.toggleUnsavedState(driveNr)
         }
         SiMenuSeparator { visible: connected }
 
         SiMenuItem {
             text: poweredOn ? qsTr("Switch Off") : qsTr("Switch On")
             visible: connected
-            onTriggered: c64.toggleDrivePower(driveNr)
+            onTriggered: c64.media.toggleDrivePower(driveNr)
         }
     }
 
@@ -455,14 +455,14 @@ SiMenuBar {
                 title: qsTr("Insert Recent")
 
                 // Grayed out while the list is empty -- see insertRecentMenu.
-                enabled: c64.recentTapes.length > 0
+                enabled: c64.media.recentTapes.length > 0
 
                 // Dynamically generate one MenuItem per recently inserted tape.
                 Instantiator {
-                    model: c64.recentTapes
+                    model: c64.media.recentTapes
                     delegate: SiMenuItem {
                         text: modelData.substring(modelData.lastIndexOf("/") + 1)
-                        onTriggered: c64.insertRecentTape(index)
+                        onTriggered: c64.media.insertRecentTape(index)
                     }
                     onObjectAdded: (index, object) => insertRecentTapeMenu.insertItem(index, object)
                     onObjectRemoved: (index, object) => insertRecentTapeMenu.removeItem(object)
@@ -471,7 +471,7 @@ SiMenuBar {
                 SiMenuSeparator { }
                 Action {
                     text: qsTr("Clear Menu")
-                    onTriggered: c64.clearRecentlyInsertedTapes()
+                    onTriggered: c64.media.clearRecentlyInsertedTapes()
                 }
             }
         }
@@ -502,14 +502,14 @@ SiMenuBar {
         SiMenuItem {
             text: qsTr("Eject Tape")
             visible: connected
-            enabled: c64.tapeInserted
-            onTriggered: c64.ejectTape()
+            enabled: c64.media.tapeInserted
+            onTriggered: c64.media.ejectTape()
         }
         SiMenuItem {
             text: qsTr("Rewind Tape")
             visible: connected
-            enabled: c64.tapeInserted
-            onTriggered: c64.rewindTape()
+            enabled: c64.media.tapeInserted
+            onTriggered: c64.media.rewindTape()
         }
 
         SiMenuSeparator { visible: connected }
@@ -517,17 +517,17 @@ SiMenuBar {
         SiMenuItem {
             text: qsTr("Export Tape...")
             visible: connected
-            enabled: c64.tapeInserted
+            enabled: c64.media.tapeInserted
             onTriggered: window.exportTapeAction()
         }
 
         SiMenuSeparator { visible: connected }
 
         SiMenuItem {
-            text: c64.tapePlaying ? qsTr("Press Stop Key") : qsTr("Press Play On Tape")
+            text: c64.media.tapePlaying ? qsTr("Press Stop Key") : qsTr("Press Play On Tape")
             visible: connected
-            enabled: c64.tapeInserted
-            onTriggered: c64.playOrStopTape()
+            enabled: c64.media.tapeInserted
+            onTriggered: c64.media.playOrStopTape()
         }
     }
 
@@ -548,14 +548,14 @@ SiMenuBar {
             title: qsTr("Attach Recent")
 
             // Grayed out while the list is empty -- see insertRecentMenu.
-            enabled: c64.recentCartridges.length > 0
+            enabled: c64.media.recentCartridges.length > 0
 
             // Dynamically generate one MenuItem per recently attached cartridge.
             Instantiator {
-                model: c64.recentCartridges
+                model: c64.media.recentCartridges
                 delegate: SiMenuItem {
                     text: modelData.substring(modelData.lastIndexOf("/") + 1)
-                    onTriggered: c64.attachRecentCartridge(index)
+                    onTriggered: c64.media.attachRecentCartridge(index)
                 }
                 onObjectAdded: (index, object) => attachRecentMenu.insertItem(index, object)
                 onObjectRemoved: (index, object) => attachRecentMenu.removeItem(object)
@@ -564,7 +564,7 @@ SiMenuBar {
             SiMenuSeparator { }
             Action {
                 text: qsTr("Clear Menu")
-                onTriggered: c64.clearRecentlyAttachedCartridges()
+                onTriggered: c64.media.clearRecentlyAttachedCartridges()
             }
         }
 
@@ -572,40 +572,40 @@ SiMenuBar {
 
         Action {
             text: qsTr("Detach Cartridge")
-            enabled: c64.cartridgeAttached
-            onTriggered: c64.detachCartridge()
+            enabled: c64.media.cartridgeAttached
+            onTriggered: c64.media.detachCartridge()
         }
 
         SiMenuSeparator { }
 
         SiMenu {
             title: qsTr("Attach REU")
-            Action { text: qsTr("REU 1700 (128 KB)");     checkable: true; checked: c64.cartridgeIsReu && c64.cartridgeMemory === 128;  onTriggered: c64.attachReu(128)  }
-            Action { text: qsTr("REU 1764 (256 KB)");     checkable: true; checked: c64.cartridgeIsReu && c64.cartridgeMemory === 256;  onTriggered: c64.attachReu(256)  }
-            Action { text: qsTr("REU 1750 (512 KB)");     checkable: true; checked: c64.cartridgeIsReu && c64.cartridgeMemory === 512;  onTriggered: c64.attachReu(512)  }
-            Action { text: qsTr("REU 1750 XL (2048 KB)"); checkable: true; checked: c64.cartridgeIsReu && c64.cartridgeMemory === 2048; onTriggered: c64.attachReu(2048) }
+            Action { text: qsTr("REU 1700 (128 KB)");     checkable: true; checked: c64.media.cartridgeIsReu && c64.media.cartridgeMemory === 128;  onTriggered: c64.media.attachReu(128)  }
+            Action { text: qsTr("REU 1764 (256 KB)");     checkable: true; checked: c64.media.cartridgeIsReu && c64.media.cartridgeMemory === 256;  onTriggered: c64.media.attachReu(256)  }
+            Action { text: qsTr("REU 1750 (512 KB)");     checkable: true; checked: c64.media.cartridgeIsReu && c64.media.cartridgeMemory === 512;  onTriggered: c64.media.attachReu(512)  }
+            Action { text: qsTr("REU 1750 XL (2048 KB)"); checkable: true; checked: c64.media.cartridgeIsReu && c64.media.cartridgeMemory === 2048; onTriggered: c64.media.attachReu(2048) }
         }
 
         SiMenu {
             title: qsTr("Attach GEO/NEO Ram")
-            Action { text: qsTr("GEO RAM (512 KB)");  checkable: true; checked: c64.cartridgeIsGeoRam && c64.cartridgeMemory === 512;  onTriggered: c64.attachGeoRam(512)  }
-            Action { text: qsTr("NEO RAM (1024 KB)"); checkable: true; checked: c64.cartridgeIsGeoRam && c64.cartridgeMemory === 1024; onTriggered: c64.attachGeoRam(1024) }
-            Action { text: qsTr("NEO RAM (2048 KB)"); checkable: true; checked: c64.cartridgeIsGeoRam && c64.cartridgeMemory === 2048; onTriggered: c64.attachGeoRam(2048) }
-            Action { text: qsTr("NEO RAM (4096 KB)"); checkable: true; checked: c64.cartridgeIsGeoRam && c64.cartridgeMemory === 4096; onTriggered: c64.attachGeoRam(4096) }
+            Action { text: qsTr("GEO RAM (512 KB)");  checkable: true; checked: c64.media.cartridgeIsGeoRam && c64.media.cartridgeMemory === 512;  onTriggered: c64.media.attachGeoRam(512)  }
+            Action { text: qsTr("NEO RAM (1024 KB)"); checkable: true; checked: c64.media.cartridgeIsGeoRam && c64.media.cartridgeMemory === 1024; onTriggered: c64.media.attachGeoRam(1024) }
+            Action { text: qsTr("NEO RAM (2048 KB)"); checkable: true; checked: c64.media.cartridgeIsGeoRam && c64.media.cartridgeMemory === 2048; onTriggered: c64.media.attachGeoRam(2048) }
+            Action { text: qsTr("NEO RAM (4096 KB)"); checkable: true; checked: c64.media.cartridgeIsGeoRam && c64.media.cartridgeMemory === 4096; onTriggered: c64.media.attachGeoRam(4096) }
         }
 
         Action {
             text: qsTr("Attach Isepic Cartridge")
             checkable: true
-            checked: c64.cartridgeIsIsepic
-            onTriggered: c64.attachIsepic()
+            checked: c64.media.cartridgeIsIsepic
+            onTriggered: c64.media.attachIsepic()
         }
 
         SiMenuSeparator { }
 
         Action {
             text: qsTr("Export Cartridge...")
-            enabled: c64.cartridgeAttached
+            enabled: c64.media.cartridgeAttached
             onTriggered: window.exportCartridgeAction()
         }
         Action {
@@ -617,17 +617,17 @@ SiMenuBar {
 
         SiMenu {
             title: qsTr("Buttons")
-            enabled: c64.cartridgeButtons > 0
-            Action { text: qsTr("Press Button 1"); onTriggered: c64.pressCartridgeButton(1) }
-            Action { text: qsTr("Press Button 2"); onTriggered: c64.pressCartridgeButton(2) }
+            enabled: c64.media.cartridgeButtons > 0
+            Action { text: qsTr("Press Button 1"); onTriggered: c64.media.pressCartridgeButton(1) }
+            Action { text: qsTr("Press Button 2"); onTriggered: c64.media.pressCartridgeButton(2) }
         }
 
         SiMenu {
             title: qsTr("Switch")
-            enabled: c64.cartridgeSwitches > 0
-            Action { text: qsTr("Pull Left");    checkable: true; checked: c64.cartridgeSwitchPos < 0;  onTriggered: c64.setCartridgeSwitch(-1) }
-            Action { text: qsTr("Set Neutral");  checkable: true; checked: c64.cartridgeSwitchPos === 0; onTriggered: c64.setCartridgeSwitch(0)  }
-            Action { text: qsTr("Pull Right");   checkable: true; checked: c64.cartridgeSwitchPos > 0;   onTriggered: c64.setCartridgeSwitch(1)  }
+            enabled: c64.media.cartridgeSwitches > 0
+            Action { text: qsTr("Pull Left");    checkable: true; checked: c64.media.cartridgeSwitchPos < 0;  onTriggered: c64.media.setCartridgeSwitch(-1) }
+            Action { text: qsTr("Set Neutral");  checkable: true; checked: c64.media.cartridgeSwitchPos === 0; onTriggered: c64.media.setCartridgeSwitch(0)  }
+            Action { text: qsTr("Pull Right");   checkable: true; checked: c64.media.cartridgeSwitchPos > 0;   onTriggered: c64.media.setCartridgeSwitch(1)  }
         }
     }
 

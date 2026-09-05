@@ -37,7 +37,7 @@ SiDialog {
     function insert() {
 
         console.log("Inserting...", nameField.text)
-        c64.newDisk(driveNr, cbmSelected ? 1 : 0, nameField.text)
+        c64.media.newDisk(driveNr, cbmSelected ? 1 : 0, nameField.text)
         root.close()
     }
 

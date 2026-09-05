@@ -8,6 +8,7 @@ target_include_directories(SiC64 PUBLIC
 
 target_sources(SiC64 PRIVATE
         C64Controller.cpp
+        C64MediaController.cpp
         SiC64Renderer.cpp
         Config/SiC64ConfigController.cpp
         SiC64InfoController.cpp
