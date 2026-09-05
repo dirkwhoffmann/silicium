@@ -44,7 +44,7 @@ class C64Controller : public Controller {
     // Describes why the SVM file could not be opened, set by parseArguments()
     QString errorMessage;
 
-    // Recently touched media files
+    // Recent media
     QStringList m_recentDisks;
     QStringList m_recentTapes;
     QStringList m_recentCartridges;
@@ -127,7 +127,7 @@ class C64Controller : public Controller {
 
 
     //
-    // Initializing
+    // Constructing and initializing
     //
 
 public:
@@ -172,7 +172,76 @@ public:
 
 
     //
-    // Getters and setters
+    // Managing state
+    //
+
+public:
+
+    Q_PROPERTY(VMState state READ getState WRITE setState NOTIFY stateChanged)
+    Q_PROPERTY(bool isPoweredOn READ isPoweredOn NOTIFY stateChanged)
+    Q_PROPERTY(bool isRunning READ isRunning NOTIFY stateChanged)
+    Q_PROPERTY(bool isPaused READ isPaused NOTIFY stateChanged)
+    Q_PROPERTY(bool readOnly READ getReadOnly CONSTANT)
+
+    Q_PROPERTY(QString uuid READ getUUID CONSTANT)
+    Q_PROPERTY(QString name READ getName CONSTANT)
+
+    VMState getState() const { return m_state; }
+    void setState(VMState state);
+
+    bool isPoweredOn() const { return m_state == VMState::PAUSED || m_state == VMState::RUNNING; }
+    bool isRunning() { return m_state == VMState::RUNNING; }
+    bool isPaused() { return m_state == VMState::PAUSED; }
+    bool getReadOnly() const;
+    QString getUUID() const;
+    QString getName() const;
+
+    Q_INVOKABLE void powerOn();
+    Q_INVOKABLE void powerOff();
+    Q_INVOKABLE void powerOnOrOff() { isPoweredOn() ? powerOff() : powerOn(); }
+    Q_INVOKABLE void run();
+    Q_INVOKABLE void pause();
+    Q_INVOKABLE void runOrPause() { isPaused() ? run() : pause(); }
+    Q_INVOKABLE void hibernate(bool hibernateSnapshot, bool hibernateWorkspace);
+
+    Q_INVOKABLE void reset();
+    Q_INVOKABLE void softReset();
+    Q_INVOKABLE void brk();
+    Q_INVOKABLE void stopAndGo(); // DEPRECATED
+    Q_INVOKABLE void stepOver();
+    Q_INVOKABLE void stepInto();
+    Q_INVOKABLE void stepCycle();
+    Q_INVOKABLE void finishLine();
+    Q_INVOKABLE void finishFrame();
+    Q_INVOKABLE void toggleWarp();
+
+
+    //
+    // Handling subcomponents
+    //
+
+    Q_PROPERTY(bool retroShell READ getRetroShell WRITE setRetroShell NOTIFY retroShellChanged)
+    Q_PROPERTY(bool debugPanel READ getDebugPanel WRITE setDebugPanel NOTIFY debugPanelChanged)
+
+    bool getRetroShell() const { return m_retroShell; }
+    void setRetroShell(bool value);
+
+    bool getDebugPanel() const { return m_debugPanel; }
+    void setDebugPanel(bool value);
+
+    Q_INVOKABLE void toggleDebugPanel() { setDebugPanel(!m_debugPanel); }
+
+    Q_INVOKABLE void openConfigurator() {}
+    Q_INVOKABLE void openInspector() {}
+    Q_INVOKABLE void openKeyboard() {}
+
+    Q_INVOKABLE void saveWorkspace();
+    Q_INVOKABLE void saveSnapshot();
+    Q_INVOKABLE void revertSnapshot();
+
+
+    //
+    // Accessing subcomponents
     //
 
     Q_PROPERTY(SiC64ActivityController *activityController READ getActivityController CONSTANT)
@@ -205,64 +274,21 @@ public:
     class SiC64Renderer *getRenderer() const { return m_renderer; }
     void setRenderer(class SiC64Renderer *ptr);
 
-    Q_PROPERTY(bool retroShell READ getRetroShell WRITE setRetroShell NOTIFY retroShellChanged)
-    Q_PROPERTY(int port0 READ getPort0 WRITE setPort0 NOTIFY port0Changed)
-    Q_PROPERTY(int port1 READ getPort1 WRITE setPort1 NOTIFY port1Changed)
-    Q_PROPERTY(bool debugPanel READ getDebugPanel WRITE setDebugPanel NOTIFY debugPanelChanged)
-    Q_INVOKABLE void toggleDebugPanel() { setDebugPanel(!m_debugPanel); }
-
-    bool getRetroShell() const { return m_retroShell; }
-    void setRetroShell(bool value);
-
-    int getPort0() const { return m_port0; }
-    void setPort0(int value);
-
-    int getPort1() const { return m_port1; }
-    void setPort1(int value);
-
-    bool getDebugPanel() const { return m_debugPanel; }
-    void setDebugPanel(bool value);
-
-
-    //
-    // Managing state
-    //
-
-public:
-
-    Q_PROPERTY(VMState state READ getState WRITE setState NOTIFY stateChanged)
-    Q_PROPERTY(bool isPoweredOn READ isPoweredOn NOTIFY stateChanged)
-    Q_PROPERTY(bool isRunning READ isRunning NOTIFY stateChanged)
-    Q_PROPERTY(bool isPaused READ isPaused NOTIFY stateChanged)
-    Q_PROPERTY(bool readOnly READ getReadOnly CONSTANT)
-
-    Q_PROPERTY(QString uuid READ getUUID CONSTANT)
-    Q_PROPERTY(QString name READ getName CONSTANT)
-
-    VMState getState() const { return m_state; }
-    void setState(VMState state);
-    bool isPoweredOn() const { return m_state == VMState::PAUSED || m_state == VMState::RUNNING; }
-    bool isRunning() { return m_state == VMState::RUNNING; }
-    bool isPaused() { return m_state == VMState::PAUSED; }
-    bool getReadOnly() const;
-    QString getUUID() const;
-    QString getName() const;
-
-    Q_INVOKABLE void run();
-    Q_INVOKABLE void pause();
-    Q_INVOKABLE void runOrPause() { isPaused() ? run() : pause(); }
-    Q_INVOKABLE void reset();
-    Q_INVOKABLE void powerOn();
-    Q_INVOKABLE void powerOff();
-    Q_INVOKABLE void powerOnOrOff() { isPoweredOn() ? powerOff() : powerOn(); }
-    Q_INVOKABLE void hibernate(bool hibernateSnapshot, bool hibernateWorkspace);
-
 
     //
     // Controlling input devices
     //
 
 public:
+
+    Q_PROPERTY(int port0 READ getPort0 WRITE setPort0 NOTIFY port0Changed)
+    Q_PROPERTY(int port1 READ getPort1 WRITE setPort1 NOTIFY port1Changed)
+
+    int getPort0() const { return m_port0; }
+    void setPort0(int value);
+
+    int getPort1() const { return m_port1; }
+    void setPort1(int value);
 
     Q_PROPERTY(bool keyboardCaptured READ keyboardCaptured NOTIFY captureChanged)
     Q_PROPERTY(bool mouseCaptured READ mouseCaptured NOTIFY captureChanged)
@@ -273,18 +299,6 @@ public:
 
     bool mouseCaptured();
     bool keyboardCaptured();
-
-
-    //
-    //
-    //
-
-
-
-
-    //
-    // Handling input devices
-    //
 
     Q_PROPERTY(float dx READ getDx WRITE setDx NOTIFY dxChanged)
     Q_PROPERTY(float dy READ getDy WRITE setDy NOTIFY dyChanged)
@@ -329,20 +343,10 @@ public:
 
 
     //
-    // General action
+    // Managing the shared display state
     //
 
-    Q_INVOKABLE void openConfigurator() {}
-    Q_INVOKABLE void openInspector() {}
-    Q_INVOKABLE void saveWorkspace();
-    Q_INVOKABLE void saveSnapshot();
-    Q_INVOKABLE void revertSnapshot();
-    Q_INVOKABLE void openKeyboard() {}
-
-
-    //
-    //
-    //
+public:
 
     // Hands the keyboard to the virtual machine or back to the app, from the
     // window's focus and whether RetroShell is up. Call after either changes.
@@ -362,6 +366,8 @@ public:
     // RetroShell
     //
 
+public:
+
     Q_PROPERTY(QString retroShellText READ getRetroShellText NOTIFY retroShellTextChanged)
     Q_PROPERTY(int cursorPos READ getCursorPos NOTIFY retroShellTextChanged)
 
@@ -374,6 +380,8 @@ public:
     //
     // Methods from InputManagerDelegate
     //
+
+public:
 
     void keyDown(QKeyEvent *event, KeyModifier modifiers) override;
     void keyUp(QKeyEvent *event, KeyModifier modifiers) override;
@@ -394,25 +402,16 @@ public:
     // Methods from AudioControllerDelegate
     //
 
+public:
+
     void linkAudioSink(QAudioSink *sink, QAudioFormat &format) override;
-
-
-    // Additional emulator control actions (see SiC64Actions' Edit menu
-    // commands, wired up in SiC64Menu.qml).
-    Q_INVOKABLE void stopAndGo();
-    Q_INVOKABLE void softReset();
-    Q_INVOKABLE void brk();
-    Q_INVOKABLE void stepOver();
-    Q_INVOKABLE void stepInto();
-    Q_INVOKABLE void stepCycle();
-    Q_INVOKABLE void finishLine();
-    Q_INVOKABLE void finishFrame();
-    Q_INVOKABLE void toggleWarp();
 
 
     //
     // Snapshots and workspaces
     //
+
+public:
 
     Q_INVOKABLE void shrinkSnapshotStorage(int count);
 
@@ -420,6 +419,8 @@ public:
     //
     // Media files
     //
+
+public:
 
     // 'drive' is 8 or 9 throughout this class' public API (matching the UI's
     // drive numbers), converted to the core's 0/1 indexing internally.
