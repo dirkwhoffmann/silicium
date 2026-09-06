@@ -22,11 +22,10 @@ import Silicium.Theme
 // (MEM_EXT_START, valid only as $E0 or $F0 -- see Memory::checkOption).
 //
 // The AROS/EmuTOS/DiagROM one-click installer presets
-// (RomSettingsViewController.preset(tag:)) are wired up below as a plain row
-// of buttons rather than vAmiga's own preset popup -- there's only one
-// bundled version of each (see SiAmMediaController's own header comment), so
-// there's nothing for a popup to pick between yet. SiAmConfigController has
-// no installOpenRoms()/loadMostRecentRoms() equivalent, so drag-and-drop and
+// (RomSettingsViewController.preset(tag:)) live in the toolbar's burger menu
+// below, one item per bundled version -- see ConfigToolbar's menuContent --
+// in place of vAmiga's own preset popup. SiAmConfigController has no
+// installOpenRoms()/loadMostRecentRoms() equivalent, so drag-and-drop and
 // the file-picker/delete buttons remain the only other way in.
 Item {
 
@@ -172,6 +171,59 @@ Item {
             ConfigToolbar {
 
                 heading: qsTr("ROM Settings")
+
+                // One-click Rom presets: AROS and DiagROM each get a submenu
+                // listing every bundled version (newest first), EmuTOS a
+                // single item since only one version is bundled -- see
+                // SiAmMediaController::installAros()/installDiagRom()/
+                // installEmuTOS(). The CRC32 passed to installAros()/
+                // installDiagRom() picks the version; it has to match one of
+                // the cases those functions switch on, which in turn has to
+                // match a Rom file actually bundled under Shared/Assets/Roms
+                // -- see their own comments for why not every version
+                // VACore's RomFileTypes.h knows about is offered here.
+                menuContent: [
+                    SiMenu {
+                        title: qsTr("Install AROS")
+                        enabled: !root.locked
+
+                        SiMenuItem {
+                            text: qsTr("Version 20260820 (newest)")
+                            onTriggered: controller.media.installAros(0x7ae94477)
+                        }
+                        SiMenuItem {
+                            text: qsTr("Version 20250219")
+                            onTriggered: controller.media.installAros(0xA3232963)
+                        }
+                        SiMenuItem {
+                            text: qsTr("SVN 55696 (SAE version)")
+                            onTriggered: controller.media.installAros(0x3F4FCC0A)
+                        }
+                        SiMenuItem {
+                            text: qsTr("SVN 54705 (UAE version)")
+                            onTriggered: controller.media.installAros(0x9CE0F009)
+                        }
+                    },
+                    SiMenu {
+                        title: qsTr("Install DiagROM")
+                        enabled: !root.locked
+
+                        SiMenuItem {
+                            text: qsTr("Version 1.3 (newest)")
+                            onTriggered: controller.media.installDiagRom(0x55E2E127)
+                        }
+                        SiMenuItem {
+                            text: qsTr("Version 1.2.1")
+                            onTriggered: controller.media.installDiagRom(0x850209CD)
+                        }
+                    },
+                    SiMenuItem {
+                        text: qsTr("Install EmuTOS 1.3")
+                        enabled: !root.locked
+                        onTriggered: controller.media.installEmuTOS()
+                    }
+                ]
+
                 HSpacer { }
                 ConfigLock {
                     lockText: root.locked
@@ -235,36 +287,6 @@ Item {
                         currentIndex: cc.MEM_EXT_START === 0xF0 ? 1 : 0
                         onCurrentIndexChanged: cc.MEM_EXT_START = currentIndex === 1 ? 0xF0 : 0xE0
                     }
-                }
-            }
-
-            VSpacer { size: Style.largeSpacing }
-
-            //
-            // One-click presets (Aros/DiagRom into the Kickstart slot,
-            // EmuTOS likewise -- all three are themselves Kickstart
-            // replacements, same as a real one loaded via the slot above)
-            //
-
-            RowLayout {
-
-                Layout.alignment: Qt.AlignHCenter
-                spacing: Style.mediumSpacing
-
-                SiButton {
-                    enabled: !root.locked
-                    text: qsTr("Install AROS")
-                    onClicked: controller.media.installAros()
-                }
-                SiButton {
-                    enabled: !root.locked
-                    text: qsTr("Install DiagROM")
-                    onClicked: controller.media.installDiagRom()
-                }
-                SiButton {
-                    enabled: !root.locked
-                    text: qsTr("Install EmuTOS")
-                    onClicked: controller.media.installEmuTOS()
                 }
             }
 

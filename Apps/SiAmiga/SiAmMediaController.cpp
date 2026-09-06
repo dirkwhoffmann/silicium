@@ -181,19 +181,31 @@ SiAmMediaController::readRomResource(const QString &resourcePath)
 }
 
 void
-SiAmMediaController::installAros()
+SiAmMediaController::installAros(quint32 crc32)
 {
     try {
 
-        // The newest AROS build bundled here (see the class header comment).
         // Ext(ension) is the second half of the pair -- both come from the
         // same AROS build and neither works without the other.
-        auto rom = readRomResource(":/Roms/aros-20260820-rom.bin");
-        auto ext = readRomResource(":/Roms/aros-20260820-ext.bin");
+        QString rom, ext;
+
+        switch (crc32) {
+
+            case CRC32_AROS_54705:    rom = "aros-svn54705-rom";  ext = "aros-svn54705-ext";  break; // UAE, May 2017
+            case CRC32_AROS_55696:    rom = "aros-svn55696-rom";  ext = "aros-svn55696-ext";  break; // SAE, Feb 2019
+            case CRC32_AROS_20250219: rom = "aros-20250219-rom";  ext = "aros-20250219-ext";  break; // Feb 2025
+            case CRC32_AROS_20260820: rom = "aros-20260820-rom";  ext = "aros-20260820-ext";  break; // newest
+
+            default:
+                throw std::runtime_error("No bundled AROS Rom matches this version.");
+        }
+
+        auto romData = readRomResource(":/Roms/" + rom + ".bin");
+        auto extData = readRomResource(":/Roms/" + ext + ".bin");
         auto &core = SiAmController::core();
 
-        core.mem.loadRom((const u8 *)rom.constData(), rom.size());
-        core.mem.loadExt((const u8 *)ext.constData(), ext.size());
+        core.mem.loadRom((const u8 *)romData.constData(), romData.size());
+        core.mem.loadExt((const u8 *)extData.constData(), extData.size());
 
         auto *config = parent->getConfigController();
 
@@ -214,15 +226,23 @@ SiAmMediaController::installAros()
 }
 
 void
-SiAmMediaController::installDiagRom()
+SiAmMediaController::installDiagRom(quint32 crc32)
 {
     try {
 
-        // Version 1.3 (April 2023); the newest bundled here.
-        auto rom = readRomResource(":/Roms/diagrom-13.bin");
-        auto &core = SiAmController::core();
+        QString rom;
 
-        core.mem.loadRom((const u8 *)rom.constData(), rom.size());
+        switch (crc32) {
+
+            case CRC32_DIAG121: rom = "diagrom-121"; break; // v1.2.1, Jul 2020
+            case CRC32_DIAG13:  rom = "diagrom-13";  break; // v1.3, Apr 2023 (newest)
+
+            default:
+                throw std::runtime_error("No bundled DiagROM matches this version.");
+        }
+
+        auto data = readRomResource(":/Roms/" + rom + ".bin");
+        SiAmController::core().mem.loadRom((const u8 *)data.constData(), data.size());
 
         parent->getConfigController()->queryRoms();
 

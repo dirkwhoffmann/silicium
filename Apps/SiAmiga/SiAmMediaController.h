@@ -10,6 +10,7 @@
 #pragma once
 
 #include "Controller.h"
+#include "VAmiga.h"
 #include <QByteArray>
 #include <QUrl>
 
@@ -71,16 +72,20 @@ public:
     // packaging step needed.
     //
     // Port of vAmiga's own MediaManager.installAros()/installDiagRom()
-    // (GUI/MediaManager.swift). There, each takes a CRC32 identifying which
-    // bundled version to install, defaulting to the newest; this app has no
-    // Rom-version picker yet for either preset (see SiAmRomConfig.qml's own
-    // header comment), so each simply installs the one newest version
-    // bundled here.
-    Q_INVOKABLE void installAros();
-    Q_INVOKABLE void installDiagRom();
+    // (GUI/MediaManager.swift) and, further out, its RomSettingsViewController's
+    // preset popup -- the "older version" entries that popup offers. Each
+    // takes the CRC32 of the bundled version to install (see VACore's
+    // RomFileTypes.h), defaulting to the newest; SiAmRomConfig.qml's burger
+    // menu is what actually offers the older ones, one item per bundled
+    // version, in place of vAmiga's own popup. Only bundles this app actually
+    // ships under Shared/Assets/Roms are accepted -- passing any other CRC32
+    // (including ones VACore knows about but this app has no Rom file for,
+    // like CRC32_AROS_1ED13DE6E3 or CRC32_DIAG20) throws.
+    Q_INVOKABLE void installAros(quint32 crc32 = vamiga::CRC32_AROS_20260820);
+    Q_INVOKABLE void installDiagRom(quint32 crc32 = vamiga::CRC32_DIAG13);
 
-    // No Swift counterpart (MediaManager.swift has no EmuTOS preset), but
-    // the same one-Rom-no-ext shape as installDiagRom() above.
+    // No Swift counterpart (MediaManager.swift has no EmuTOS preset), and
+    // only one version is bundled here, so there is nothing to parameterize.
     Q_INVOKABLE void installEmuTOS();
 
 private:
