@@ -47,6 +47,36 @@ ApplicationWindow {
         controller: root.amiga
     }
 
+    // Click-to-capture-the-mouse handler, mirroring SiC64Window's
+    // CanvasWrapper-provided MouseArea (see its own header comment). Declared
+    // right after the canvas -- and before SiAmDevPanel below -- so it sits
+    // underneath any interactive foreground content and doesn't swallow its
+    // clicks, while SiAmCanvas itself (a plain Rectangle) accepts no mouse
+    // events and lets clicks fall through to here.
+    MouseArea {
+
+        anchors.fill: canvas
+        hoverEnabled: true
+        preventStealing: true
+
+        onPressed: {
+
+            if (Preferences.retainMouseByClicking && !overlayPanel.visible) {
+                // Route through the controller (not the InputManager
+                // directly) so the capture hint gets shown via
+                // mouseWasCaptured().
+                root.amiga.captureMouse()
+            }
+        }
+
+        onDoubleClicked: {
+
+            if (Preferences.retainMouseByDoubleClicking && !overlayPanel.visible) {
+                root.amiga.captureMouse()
+            }
+        }
+    }
+
     SiAmDropOverlay {
 
         anchors.fill: canvas

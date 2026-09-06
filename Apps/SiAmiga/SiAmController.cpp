@@ -13,6 +13,7 @@
 #include "DiagRom.h"
 #include <QCommandLineParser>
 #include <QCoreApplication>
+#include <QCursor>
 #include <QMetaObject>
 
 using namespace vamiga;
@@ -31,6 +32,11 @@ process(const void *listener, const Message msg)
 SiAmController::SiAmController()
 {
     LogTask task("Creating SiAmController...");
+
+    // Keep the mouseCaptured/keyboardCaptured properties in sync with the
+    // input manager, which owns the actual capture state.
+    connect(&inputManager, &InputManager::captureMouseChanged,    this, &SiAmController::captureChanged);
+    connect(&inputManager, &InputManager::captureKeyboardChanged, this, &SiAmController::captureChanged);
 
     m_activityController = make_unique<SiAmActivityController>(this);
     m_configController = make_unique<SiAmConfigController>(this);
@@ -146,6 +152,7 @@ SiAmController::setRetroShell(bool value)
     if (m_retroShell != value) {
 
         m_retroShell = value;
+        updateKeyboardCapture();
         emit retroShellChanged();
     }
 }
@@ -214,6 +221,7 @@ void
 SiAmController::attachWindow(QQuickWindow *window)
 {
     m_window = window;
+    inputManager.setCaptureWindow(window);
     if (!m_window) return;
 
     if (m_window->isSceneGraphInitialized()) {
@@ -231,6 +239,22 @@ SiAmController::attachWindow(QQuickWindow *window)
         qCDebug(siLog) << "windowDidClose()";
         windowDidClose();
     });
+
+    connect(m_window, &QQuickWindow::activeChanged, this, [this]() {
+        updateKeyboardCapture();
+    });
+
+    updateKeyboardCapture();
+}
+
+void
+SiAmController::updateKeyboardCapture()
+{
+    // Decides who owns the keyboard: the virtual machine, or the app. See
+    // C64Controller::updateKeyboardCapture() for the full rationale --
+    // derived from window-active/RetroShell state rather than tracked as
+    // its own flag, so it cannot fall out of step with either.
+    inputManager.setCaptureKeyboard(m_window && m_window->isActive() && !m_retroShell);
 }
 
 void
@@ -251,6 +275,9 @@ SiAmController::windowDidOpen()
 
     startRenderer();
 
+    // Setup to receive input events
+    inputManager.setDelegate(this);
+
     m_audio.setDelegate(this);
     m_audio.start();
 }
@@ -259,6 +286,8 @@ void
 SiAmController::windowDidClose()
 {
     stopRenderer();
+
+    inputManager.removeDelegate(this);
 
     m_audio.removeDelegate(this);
     m_audio.stop();
@@ -410,6 +439,73 @@ void
 SiAmController::releaseMouse()
 {
     inputManager.setCaptureMouse(false);
+}
+
+bool
+SiAmController::keyboardCaptured()
+{
+    return inputManager.getCaptureKeyboard();
+}
+
+void
+SiAmController::capsLock(bool state)
+{
+    switch (preferences().getCapsLockAction()) {
+
+        case 1:
+            m_configController->setWarpMode(int(state ? Warp::ALWAYS : Warp::NEVER));
+            break;
+
+        default:
+            break;
+    }
+}
+
+void
+SiAmController::mouseDxDy(int port, u64 timestamp, float dx, float dy)
+{
+    auto &cp = port == 0 ? core().controlPort1 : core().controlPort2;
+
+    cp.mouse.setDxDy(dx, dy);
+}
+
+void
+SiAmController::mouseButton(int port, u64 timestamp, int button, bool down)
+{
+    auto &cp = port == 0 ? core().controlPort1 : core().controlPort2;
+    auto action = button == 0 ? GamePadAction::PRESS_LEFT : GamePadAction::PRESS_RIGHT;
+
+    cp.mouse.trigger(action);
+}
+
+bool
+SiAmController::detectShakeDxDy(float dx, float dy)
+{
+    return core().controlPort1.mouse.detectShakeDxDy(dx, dy);
+}
+
+void
+SiAmController::shakeDetected()
+{
+    if (preferences().getReleaseMouseByShaking()) {
+        inputManager.setCaptureMouse(false);
+    }
+}
+
+void
+SiAmController::warpToCenter()
+{
+    if (m_window) {
+
+        // Calculate the center of the window in local coordinates
+        QPoint localCenter(m_window->width() / 2, m_window->height() / 2);
+
+        // Map local center to global screen coordinates
+        QPoint globalCenter = m_window->mapToGlobal(localCenter);
+
+        // Warp the cursor back to the center
+        QCursor::setPos(globalCenter);
+    }
 }
 
 void

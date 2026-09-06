@@ -275,6 +275,7 @@ public:
 
 public:
 
+    Q_PROPERTY(bool keyboardCaptured READ keyboardCaptured NOTIFY captureChanged)
     Q_PROPERTY(bool mouseCaptured READ mouseCaptured NOTIFY captureChanged)
 
     Q_INVOKABLE void captureMouse();
@@ -282,6 +283,36 @@ public:
     Q_INVOKABLE void captureOrReleaseMouse() { mouseCaptured() ? releaseMouse() : captureMouse(); }
 
     bool mouseCaptured();
+    bool keyboardCaptured();
+
+    // Hands the keyboard to the virtual machine or back to the app, from the
+    // window's focus and whether RetroShell is up. Call after either changes.
+    void updateKeyboardCapture();
+
+
+    //
+    // Methods from InputManagerDelegate
+    //
+
+public:
+
+    // No physical-keyboard passthrough exists yet -- see SiAmKeyboardController's
+    // header comment -- so these consume the event (the keyboard capture
+    // state suppresses it app-wide, see InputManager::keyDownEventFilter)
+    // without forwarding it anywhere yet.
+    void keyDown(QKeyEvent *event, KeyModifier modifiers) override {}
+    void keyUp(QKeyEvent *event, KeyModifier modifiers) override {}
+    void keyCombo(KeyCombo combo, int count) override {}
+    void capsLock(bool state) override;
+
+    void mouseXY(int port, u64 timestamp, float x, float y) override {}
+    void mouseDxDy(int port, u64 timestamp, float dx, float dy) override;
+    void mouseButton(int port, u64 timestamp, int button, bool down) override;
+    bool detectShakeDxDy(float dx, float dy) override;
+
+    void shakeDetected() override;
+
+    void warpToCenter() override;
 
 
     //
