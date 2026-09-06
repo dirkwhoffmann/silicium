@@ -97,39 +97,50 @@ struct RamPatternEnum : Reflectable<RamPatternEnum, RamPattern> {
     }
 };
 
+/* Shared by all cores. The AMIGA_ entries are meaningless to the C64 and the
+ * C64 entries are meaningless to the Amiga, but both cores describe their Roms
+ * with the same RomTraits struct, so both need to name the same enum. VACore's
+ * copy in Media/Rom/RomFileTypes.h has to stay identical to this one.
+ */
 enum class RomType : long
 {
     BASIC,
     CHAR,
     KERNAL,
-    VC1541
+    VC1541,
+    AMIGA_KICKSTART,
+    AMIGA_BOOT
 };
 
 struct RomTypeEnum : Reflectable<RomTypeEnum, RomType> {
 
     static constexpr long minVal = 0;
-    static constexpr long maxVal = long(RomType::VC1541);
+    static constexpr long maxVal = long(RomType::AMIGA_BOOT);
 
     static const char *_key(RomType value)
     {
         switch (value) {
 
-            case RomType::BASIC:   return "BASIC";
-            case RomType::CHAR:    return "CHAR";
-            case RomType::KERNAL:  return "KERNAL";
-            case RomType::VC1541:  return "VC1541";
+            case RomType::BASIC:            return "BASIC";
+            case RomType::CHAR:             return "CHAR";
+            case RomType::KERNAL:           return "KERNAL";
+            case RomType::VC1541:           return "VC1541";
+            case RomType::AMIGA_KICKSTART:  return "AMIGA_KICKSTART";
+            case RomType::AMIGA_BOOT:       return "AMIGA_BOOT";
         }
         return "???";
     }
-    
+
     static const char *help(RomType value)
     {
         switch (value) {
 
-            case RomType::BASIC:   return "Basic ROM";
-            case RomType::CHAR:    return "Character ROM";
-            case RomType::KERNAL:  return "Kernal ROM";
-            case RomType::VC1541:  return "Floppy Drive ROM";
+            case RomType::BASIC:            return "Basic ROM";
+            case RomType::CHAR:             return "Character ROM";
+            case RomType::KERNAL:           return "Kernal ROM";
+            case RomType::VC1541:           return "Floppy Drive ROM";
+            case RomType::AMIGA_KICKSTART:  return "Kickstart ROM";
+            case RomType::AMIGA_BOOT:       return "Boot ROM";
         }
         return "";
     }
@@ -200,14 +211,19 @@ typedef struct
 }
 MemStats;
 
+/* Shared by all cores -- VACore's copy in Media/Rom/RomFileTypes.h has to stay
+ * identical to this one. Cores fill in what they can identify a Rom by: the
+ * C64 matches on 'fnv', the Amiga on 'crc'.
+ */
 typedef struct {
 
     u64 fnv;
     u32 crc;
 
     const char *title;
-    const char *subtitle;
     const char *revision;
+    const char *released;
+    const char *model;
 
     RomVendor vendor;
     RomType type;

@@ -37,8 +37,8 @@ Memory::_dump(Category category, std::ostream &os) const
             if (traits.crc) {
 
                 os << tab("Title") << traits.title << std::endl;
-                os << tab("Subtitle") << traits.subtitle << std::endl;
                 os << tab("Revision") << traits.revision << std::endl;
+                os << tab("Model") << traits.model << std::endl;
                 os << tab("CRC32") << hex(traits.crc) << std::endl;
                 os << tab("FNV64") << hex(traits.fnv) << std::endl;
             }

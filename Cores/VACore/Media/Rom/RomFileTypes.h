@@ -138,6 +138,58 @@ enum class RomVendor
     OTHER
 };
 
+/* Shared by all cores. The C64 entries are meaningless to the Amiga and the
+ * AMIGA_ entries are meaningless to the C64, but both cores describe their Roms
+ * with the same RomTraits struct, so both need to name the same enum. VCCore's
+ * copy in Components/Memory/MemoryTypes.h has to stay identical to this one.
+ *
+ * AMIGA_KICKSTART is the standard type for Amiga Roms; AMIGA_BOOT marks the
+ * two A1000 boot Roms, which used to carry a dedicated 'boot' flag.
+ */
+enum class RomType : long
+{
+    BASIC,
+    CHAR,
+    KERNAL,
+    VC1541,
+    AMIGA_KICKSTART,
+    AMIGA_BOOT
+};
+
+struct RomTypeEnum : Reflectable<RomTypeEnum, RomType> {
+
+    static constexpr long minVal = 0;
+    static constexpr long maxVal = long(RomType::AMIGA_BOOT);
+
+    static const char *_key(RomType value)
+    {
+        switch (value) {
+
+            case RomType::BASIC:            return "BASIC";
+            case RomType::CHAR:             return "CHAR";
+            case RomType::KERNAL:           return "KERNAL";
+            case RomType::VC1541:           return "VC1541";
+            case RomType::AMIGA_KICKSTART:  return "AMIGA_KICKSTART";
+            case RomType::AMIGA_BOOT:       return "AMIGA_BOOT";
+        }
+        return "???";
+    }
+
+    static const char *help(RomType value)
+    {
+        switch (value) {
+
+            case RomType::BASIC:            return "Basic ROM";
+            case RomType::CHAR:             return "Character ROM";
+            case RomType::KERNAL:           return "Kernal ROM";
+            case RomType::VC1541:           return "Floppy Drive ROM";
+            case RomType::AMIGA_KICKSTART:  return "Kickstart ROM";
+            case RomType::AMIGA_BOOT:       return "Boot ROM";
+        }
+        return "";
+    }
+};
+
 struct RomVendorEnum : Reflectable<RomVendorEnum, RomVendor> {
     
     static constexpr long minVal = 0;
@@ -168,19 +220,23 @@ struct RomVendorEnum : Reflectable<RomVendorEnum, RomVendor> {
 // Structures
 //
 
+/* Shared by all cores -- VCCore's copy in Components/Memory/MemoryTypes.h has
+ * to stay identical to this one. Cores fill in what they can identify a Rom by:
+ * the Amiga matches on 'crc', the C64 on 'fnv'.
+ */
 typedef struct {
-    
+
+    u64 fnv;
     u32 crc;
-    
+
     const char *title;
     const char *revision;
     const char *released;
     const char *model;
-    
+
     RomVendor vendor;
-    bool boot;
+    RomType type;
     bool patched;
-    bool relocated;
 }
 RomTraits;
 

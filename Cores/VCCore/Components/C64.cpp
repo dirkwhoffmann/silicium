@@ -1700,8 +1700,9 @@ C64::getRomTraits(u64 fnv)
 
     return RomTraits {
         .title = "Unknown ROM",
-        .subtitle = "",
         .revision = "",
+        .released = "",
+        .model = "",
         .vendor = RomVendor::UNKNOWN
     };
 }
@@ -1724,18 +1725,18 @@ C64::getRomTraits(RomType type) const
 
             case RomType::BASIC:
 
-                result.subtitle = "Free Basic Replacement";
+                result.model = "Free Basic Replacement";
                 result.revision =  mega65BasicRev();
                 break;
 
             case RomType::CHAR:
 
-                result.subtitle = "Free Charset Replacement";
+                result.model = "Free Charset Replacement";
                 break;
 
             case RomType::KERNAL:
 
-                result.subtitle = "Free Kernal Replacement";
+                result.model = "Free Kernal Replacement";
                 result.revision = mega65KernalRev();
                 break;
 
