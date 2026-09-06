@@ -855,7 +855,7 @@ static const std::vector<RomTraits> roms = {
         .released   = { 1991, 3 },
         .model      = RomModel::CDTV,
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::AMIGA_KICKSTART
+        .type       = RomType::AMIGA_EXTROM
     },{
         .crc        = CRC32_CDTV_EXT_ROM_2_3,
         .title      = "CDTV Extended ROM",
@@ -863,7 +863,7 @@ static const std::vector<RomTraits> roms = {
         .released   = { 1992, 0 },
         .model      = RomModel::CDTV,
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::AMIGA_KICKSTART
+        .type       = RomType::AMIGA_EXTROM
     },{
         .crc        = CRC32_CDTV_EXT_ROM_2_7,
         .title      = "CDTV Extended ROM",
@@ -871,7 +871,7 @@ static const std::vector<RomTraits> roms = {
         .released   = { 1992, 0 },
         .model      = RomModel::CDTV,
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::AMIGA_KICKSTART
+        .type       = RomType::AMIGA_EXTROM
     },{
         .crc        = CRC32_HYP314_46_143_A500,
         .title      = "Kickstart 3.1.4 (Hyperion)",
@@ -1095,7 +1095,7 @@ static const std::vector<RomTraits> roms = {
         .released   = { 2017, 5 },
         .model      = 0,
         .vendor     = RomVendor::AROS,
-        .type       = RomType::AMIGA_KICKSTART
+        .type       = RomType::AMIGA_EXTROM
     },{
         .crc        = CRC32_AROS_55696,
         .title      = "AROS Kickstart replacement",
@@ -1111,7 +1111,7 @@ static const std::vector<RomTraits> roms = {
         .released   = { 2019, 2 },
         .model      = 0,
         .vendor     = RomVendor::AROS,
-        .type       = RomType::AMIGA_KICKSTART
+        .type       = RomType::AMIGA_EXTROM
     },{
         .crc        = CRC32_AROS_1ED13DE6E3,
         .title      = "AROS Kickstart replacement",
@@ -1127,7 +1127,7 @@ static const std::vector<RomTraits> roms = {
         .released   = { 2021, 9 },
         .model      = 0,
         .vendor     = RomVendor::AROS,
-        .type       = RomType::AMIGA_KICKSTART
+        .type       = RomType::AMIGA_EXTROM
     },{
         .crc        = CRC32_AROS_20250219,
         .title      = "AROS Kickstart replacement",
@@ -1138,12 +1138,12 @@ static const std::vector<RomTraits> roms = {
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_AROS_20250219_EXT,
-        .title      = "AROS Kickstart replacement",
+        .title      = "AROS Kickstart extension",
         .revision   = "Version 20250219",
         .released   = { 2025, 2 },
         .model      = 0,
         .vendor     = RomVendor::AROS,
-        .type       = RomType::AMIGA_KICKSTART
+        .type       = RomType::AMIGA_EXTROM
     },{
         .crc        = CRC32_AROS_20260820,
         .title      = "AROS Kickstart replacement",
@@ -1154,12 +1154,12 @@ static const std::vector<RomTraits> roms = {
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_AROS_20260820_EXT,
-        .title      = "AROS Kickstart replacement",
+        .title      = "AROS Kickstart extension",
         .revision   = "Version 20260820",
         .released   = { 2026, 8 },
         .model      = 0,
         .vendor     = RomVendor::AROS,
-        .type       = RomType::AMIGA_KICKSTART
+        .type       = RomType::AMIGA_EXTROM
     },{
         .crc        = CRC32_EMUTOS13,
         .title      = "EmuTOS Kickstart replacement",

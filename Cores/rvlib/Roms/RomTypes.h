@@ -141,7 +141,10 @@ constexpr u32 CRC32_CPUBLTRO_FC_0_3_2        = 0x86CB5B1B;
  * Amiga-specific; a Rom of any type is described by the same RomTraits.
  *
  * AMIGA_KICKSTART is the standard type for Amiga Roms; AMIGA_BOOT marks the
- * two A1000 boot Roms, which used to carry a dedicated 'boot' flag.
+ * two A1000 boot Roms, which used to carry a dedicated 'boot' flag; AMIGA_EXTROM
+ * marks a Kickstart extension Rom (loaded alongside a Kickstart, not in place
+ * of it) -- currently the five AROS extension Roms. The CDTV Extended Rom is
+ * also an extension Rom in this sense but is still tagged AMIGA_KICKSTART.
  */
 enum class RomType : long
 {
@@ -150,13 +153,14 @@ enum class RomType : long
     C64_KERNAL,
     C64_VC1541,
     AMIGA_KICKSTART,
-    AMIGA_BOOT
+    AMIGA_BOOT,
+    AMIGA_EXTROM
 };
 
 struct RomTypeEnum : utl::Reflectable<RomTypeEnum, RomType> {
 
     static constexpr long minVal = 0;
-    static constexpr long maxVal = long(RomType::AMIGA_BOOT);
+    static constexpr long maxVal = long(RomType::AMIGA_EXTROM);
 
     static const char *_key(RomType value)
     {
@@ -168,6 +172,7 @@ struct RomTypeEnum : utl::Reflectable<RomTypeEnum, RomType> {
             case RomType::C64_VC1541:      return "C64_VC1541";
             case RomType::AMIGA_KICKSTART: return "AMIGA_KICKSTART";
             case RomType::AMIGA_BOOT:      return "AMIGA_BOOT";
+            case RomType::AMIGA_EXTROM:    return "AMIGA_EXTROM";
         }
         return "???";
     }
@@ -182,6 +187,7 @@ struct RomTypeEnum : utl::Reflectable<RomTypeEnum, RomType> {
             case RomType::C64_VC1541:      return "Floppy Drive ROM";
             case RomType::AMIGA_KICKSTART: return "Kickstart ROM";
             case RomType::AMIGA_BOOT:      return "Boot ROM";
+            case RomType::AMIGA_EXTROM:    return "Kickstart Extension ROM";
         }
         return "";
     }
