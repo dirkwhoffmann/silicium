@@ -1182,40 +1182,40 @@ static const std::vector<RomTraits> roms = {
         .revision   = "Version 1.1",
         .released   = { 2018, 10 },
         .model      = 0,
-        .vendor     = RomVendor::DIAG,
-        .type       = RomType::AMIGA_KICKSTART
+        .vendor     = RomVendor::OTHER,
+        .type       = RomType::AMIGA_DIAG
     },{
         .crc        = CRC32_DIAG12,
         .title      = "Amiga DiagROM",
         .revision   = "Version 1.2",
         .released   = { 2019, 8 },
         .model      = 0,
-        .vendor     = RomVendor::DIAG,
-        .type       = RomType::AMIGA_KICKSTART
+        .vendor     = RomVendor::OTHER,
+        .type       = RomType::AMIGA_DIAG
     },{
         .crc        = CRC32_DIAG121,
         .title      = "Amiga DiagROM",
         .revision   = "Version 1.2.1",
         .released   = { 2020, 7 },
         .model      = 0,
-        .vendor     = RomVendor::DIAG,
-        .type       = RomType::AMIGA_KICKSTART
+        .vendor     = RomVendor::OTHER,
+        .type       = RomType::AMIGA_DIAG
     },{
         .crc        = CRC32_DIAG13,
         .title      = "Amiga DiagROM",
         .revision   = "Version 1.3",
         .released   = { 2023, 4 },
         .model      = 0,
-        .vendor     = RomVendor::DIAG,
-        .type       = RomType::AMIGA_KICKSTART
+        .vendor     = RomVendor::OTHER,
+        .type       = RomType::AMIGA_DIAG
     },{
         .crc        = CRC32_DIAG20,
         .title      = "Amiga DiagROM",
         .revision   = "Version 2.0",
         .released   = { 2026, 3 },
         .model      = 0,
-        .vendor     = RomVendor::DIAG,
-        .type       = RomType::AMIGA_KICKSTART
+        .vendor     = RomVendor::OTHER,
+        .type       = RomType::AMIGA_DIAG
     },{
         .crc        = CRC32_CPUBLTRO_F8_0_3_2,
         .title      = "OCS CPUBLTRO",

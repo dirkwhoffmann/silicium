@@ -147,6 +147,8 @@ constexpr u32 CRC32_CPUBLTRO_FC_0_3_2        = 0x86CB5B1B;
  * also an extension Rom in this sense but is still tagged AMIGA_KICKSTART.
  * AMIGA_DEMO marks a chipset test/demo tool rather than a real Kickstart --
  * currently the two OCS CPUBLTRO Roms, formerly told apart by RomVendor::DEMO.
+ * AMIGA_DIAG marks a diagnostic Rom -- currently the five Amiga DiagROM
+ * versions, formerly told apart by RomVendor::DIAG.
  */
 enum class RomType : long
 {
@@ -157,13 +159,14 @@ enum class RomType : long
     AMIGA_KICKSTART,
     AMIGA_BOOT,
     AMIGA_EXTROM,
-    AMIGA_DEMO
+    AMIGA_DEMO,
+    AMIGA_DIAG
 };
 
 struct RomTypeEnum : utl::Reflectable<RomTypeEnum, RomType> {
 
     static constexpr long minVal = 0;
-    static constexpr long maxVal = long(RomType::AMIGA_DEMO);
+    static constexpr long maxVal = long(RomType::AMIGA_DIAG);
 
     static const char *_key(RomType value)
     {
@@ -177,6 +180,7 @@ struct RomTypeEnum : utl::Reflectable<RomTypeEnum, RomType> {
             case RomType::AMIGA_BOOT:      return "AMIGA_BOOT";
             case RomType::AMIGA_EXTROM:    return "AMIGA_EXTROM";
             case RomType::AMIGA_DEMO:      return "AMIGA_DEMO";
+            case RomType::AMIGA_DIAG:      return "AMIGA_DIAG";
         }
         return "???";
     }
@@ -193,6 +197,7 @@ struct RomTypeEnum : utl::Reflectable<RomTypeEnum, RomType> {
             case RomType::AMIGA_BOOT:      return "Boot ROM";
             case RomType::AMIGA_EXTROM:    return "Kickstart Extension ROM";
             case RomType::AMIGA_DEMO:      return "Demo/Test ROM";
+            case RomType::AMIGA_DIAG:      return "Diagnostic ROM";
         }
         return "";
     }
@@ -200,9 +205,10 @@ struct RomTypeEnum : utl::Reflectable<RomTypeEnum, RomType> {
 
 /* Rom vendors. UNKNOWN is the zero value, so a database entry that leaves
  * 'vendor' out gets it by default -- name the vendor explicitly wherever it
- * is known. Demo/test Roms are told apart by RomType::AMIGA_DEMO, not by a
- * vendor of their own -- they use whichever real vendor applies (OTHER for
- * homebrew ones without a formal vendor).
+ * is known. Demo/test Roms are told apart by RomType::AMIGA_DEMO and
+ * diagnostic Roms by RomType::AMIGA_DIAG, not by a vendor of their own --
+ * they use whichever real vendor applies (OTHER for homebrew ones without a
+ * formal vendor).
  */
 enum class RomVendor
 {
@@ -211,7 +217,6 @@ enum class RomVendor
     MEGA65,
     AROS,
     HYPERION,
-    DIAG,
     EMUTOS,
     OTHER
 };
@@ -230,7 +235,6 @@ struct RomVendorEnum : utl::Reflectable<RomVendorEnum, RomVendor> {
             case RomVendor::MEGA65:     return "MEGA65";
             case RomVendor::AROS:       return "AROS";
             case RomVendor::HYPERION:   return "HYPERION";
-            case RomVendor::DIAG:       return "DIAG";
             case RomVendor::EMUTOS:     return "EMUTOS";
             case RomVendor::OTHER:      return "OTHER";
         }
