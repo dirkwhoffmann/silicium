@@ -654,7 +654,7 @@ Memory::getRomTraits(u32 crc)
         .revision = "",
         .released = "",
         .model = "",
-        .vendor = RomVendor::OTHER
+        .vendor = RomVendor::UNKNOWN
     };
 
     return fallback;

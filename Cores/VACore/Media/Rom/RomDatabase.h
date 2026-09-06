@@ -21,6 +21,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "8K",
         .released   = "1985",
         .model      = "A1000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_BOOT
     },{
         .crc        = CRC32_BOOT_A1000_64K,
@@ -28,6 +29,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "64KB",
         .released   = "1985",
         .model      = "A1000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_BOOT
     },{
         .crc        = CRC32_KICK07_27_003_BETA,
@@ -35,6 +37,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 27.003 NTSC",
         .released   = "July 1985",
         .model      = "",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK10_30_NTSC,
@@ -42,6 +45,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 30.000 NTSC",
         .released   = "September 1985",
         .model      = "A1000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK11_31_034_NTSC,
@@ -49,6 +53,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 31.034 NTSC",
         .released   = "November 1985",
         .model      = "A1000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK11_32_034_PAL,
@@ -56,6 +61,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 32.034 PAL",
         .released   = "February 1986",
         .model      = "A1000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK12_33_166,
@@ -63,6 +69,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 33.166",
         .released   = "September 1986",
         .model      = "A1000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK12_33_180,
@@ -70,6 +77,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 33.180",
         .released   = "October 1986",
         .model      = "A500, A1000, A2000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK12_33_180_MRAS,
@@ -77,6 +85,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 33.180",
         .released   = "2022",
         .model      = "MRAS patch",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK12_33_180_G11R,
@@ -84,6 +93,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 33.180 (Guardian patch)",
         .released   = "1988",
         .model      = "",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART,
         .patched    = true
     },{
@@ -92,6 +102,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 34.004",
         .released   = "October 1986",
         .model      = "",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK13_34_005_A500,
@@ -99,6 +110,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 34.005",
         .released   = "December 1987",
         .model      = "A500, A1000, A2000, CDTV",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK13_34_005_A3000,
@@ -106,6 +118,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 34.005",
         .released   = "December 1987",
         .model      = "A3000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK13_34_005_G12R,
@@ -113,6 +126,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 34.005 (Guardian patch)",
         .released   = "1988",
         .model      = "",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART,
         .patched    = true
     },{
@@ -121,6 +135,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 36.015",
         .released   = "May 1989",
         .model      = "A2000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK14_36_002,
@@ -128,6 +143,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 36.020",
         .released   = "December 1989",
         .model      = "A3000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK20_36_028,
@@ -135,6 +151,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 36.028",
         .released   = "March 1990",
         .model      = "",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK201_36_143,
@@ -142,6 +159,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 36.143",
         .released   = "August 1990",
         .model      = "Amiga 3000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK202_36_207_A3000,
@@ -149,6 +167,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 36.207",
         .released   = "October 1990",
         .model      = "A3000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK204_37_175_A500,
@@ -156,6 +175,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 37.175",
         .released   = "May 1991",
         .model      = "A500",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK204_37_175_A3000,
@@ -163,6 +183,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 37.175",
         .released   = "May 1991",
         .model      = "A3000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK20x_37_210_A600,
@@ -170,6 +191,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 37.210",
         .released   = "November 1991",
         .model      = "A600",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK205_37_299_A600,
@@ -177,6 +199,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 37.299",
         .released   = "November 1991",
         .model      = "A600",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK205_37_300_A600HD,
@@ -184,6 +207,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 37.300",
         .released   = "November 1991",
         .model      = "",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK205_37_350_A600HD,
@@ -191,6 +215,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 37.350",
         .released   = "April 1992",
         .model      = "A600HD",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK30_39_106_A1200,
@@ -198,6 +223,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 39.106",
         .released   = "September 1992",
         .model      = "A1200",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK30_39_106_A4000,
@@ -205,6 +231,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 39.106",
         .released   = "September 1992",
         .model      = "A4000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK31_40_055_A3000,
@@ -212,6 +239,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 40.055",
         .released   = "May 1993",
         .model      = "A3000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK31_40_060_CD32,
@@ -219,6 +247,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 40.060",
         .released   = "May 1993",
         .model      = "CD32",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK31_40_063_A500,
@@ -226,6 +255,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 40.063",
         .released   = "July 1993",
         .model      = "A500, A600, A2000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK31_40_063_A500_R,
@@ -233,6 +263,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 40.063 (patched)",
         .released   = "ReKick image",
         .model      = "",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK31_40_068_A1200,
@@ -240,6 +271,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 40.068",
         .released   = "December 1993",
         .model      = "A1200",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK31_40_068_A3000,
@@ -247,6 +279,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 40.068",
         .released   = "December 1993",
         .model      = "A3000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK31_40_068_A4000,
@@ -254,6 +287,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 40.068",
         .released   = "December 1993",
         .model      = "A4000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK31_40_069_A1200,
@@ -261,6 +295,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 40.069 Beta",
         .released   = "December 1993",
         .model      = "A1200",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK31_40_070_A4000T,
@@ -268,6 +303,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 40.070",
         .released   = "February 1994",
         .model      = "A4000T",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_KICK35_40_071_A4000,
@@ -275,6 +311,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 40.071",
         .released   = "",
         .model      = "A4000",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART,
         .patched    = true
     },{
@@ -283,6 +320,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 1.0",
         .released   = "March 1991",
         .model      = "CDTV",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_CDTV_EXT_ROM_2_3,
@@ -290,6 +328,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 2.3",
         .released   = "1992",
         .model      = "CDTV",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_CDTV_EXT_ROM_2_7,
@@ -297,6 +336,7 @@ static std::vector<RomTraits> roms = {
         .revision   = "Rev 2.7",
         .released   = "1992",
         .model      = "CDTV",
+        .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
         .crc        = CRC32_HYP314_46_143_A500,

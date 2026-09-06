@@ -127,9 +127,18 @@ static const u32 CRC32_CPUBLTRO_FC_0_3_2        = 0x86CB5B1B;
 // Enumerations
 //
 
+/* Shared by all cores -- VCCore's copy in Components/Memory/MemoryTypes.h has
+ * to stay identical to this one. Only AROS, HYPERION, DEMO and EMUTOS are
+ * Amiga-specific and only MEGA65 is C64-specific; the rest applies to both.
+ *
+ * UNKNOWN is the zero value, so a database entry that leaves 'vendor' out gets
+ * it by default -- name the vendor explicitly wherever it is known.
+ */
 enum class RomVendor
 {
+    UNKNOWN,
     COMMODORE,
+    MEGA65,
     AROS,
     HYPERION,
     DEMO,
@@ -199,7 +208,9 @@ struct RomVendorEnum : Reflectable<RomVendorEnum, RomVendor> {
     {
         switch (value) {
                 
+            case RomVendor::UNKNOWN:    return "UNKNOWN";
             case RomVendor::COMMODORE:  return "COMMODORE";
+            case RomVendor::MEGA65:     return "MEGA65";
             case RomVendor::AROS:       return "AROS";
             case RomVendor::HYPERION:   return "HYPERION";
             case RomVendor::DEMO:       return "DEMO";

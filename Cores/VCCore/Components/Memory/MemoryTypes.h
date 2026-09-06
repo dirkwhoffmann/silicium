@@ -146,12 +146,24 @@ struct RomTypeEnum : Reflectable<RomTypeEnum, RomType> {
     }
 };
 
+/* Shared by all cores -- VACore's copy in Media/Rom/RomFileTypes.h has to stay
+ * identical to this one. Only MEGA65 is C64-specific and only AROS, HYPERION,
+ * DEMO and EMUTOS are Amiga-specific; the rest applies to both.
+ *
+ * UNKNOWN is the zero value, so a database entry that leaves 'vendor' out gets
+ * it by default -- name the vendor explicitly wherever it is known.
+ */
 enum class RomVendor
 {
     UNKNOWN,
     COMMODORE,
     MEGA65,
-    OTHER,
+    AROS,
+    HYPERION,
+    DEMO,
+    DIAG,
+    EMUTOS,
+    OTHER
 };
 
 struct RomVendorEnum : Reflectable<RomVendorEnum, RomVendor> {
@@ -166,6 +178,11 @@ struct RomVendorEnum : Reflectable<RomVendorEnum, RomVendor> {
             case RomVendor::UNKNOWN:    return "UNKNOWN";
             case RomVendor::COMMODORE:  return "COMMODORE";
             case RomVendor::MEGA65:     return "MEGA65";
+            case RomVendor::AROS:       return "AROS";
+            case RomVendor::HYPERION:   return "HYPERION";
+            case RomVendor::DEMO:       return "DEMO";
+            case RomVendor::DIAG:       return "DIAG";
+            case RomVendor::EMUTOS:     return "EMUTOS";
             case RomVendor::OTHER:      return "OTHER";
         }
         return "???";
