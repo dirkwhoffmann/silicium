@@ -100,7 +100,7 @@ class SiAmConfigController : public Controller {
     QUrl getKickRomIcon() const { return getRomIcon(kickRom); }
     QString getKickRomTitle() const { return QString::fromUtf8(kickRom.title); }
     QString getKickRomRevision() const { return QString::fromUtf8(kickRom.revision); }
-    QString getKickRomReleased() const { return QString::fromUtf8(kickRom.released); }
+    QString getKickRomReleased() const { return QString::fromStdString(vamiga::RomDateToString(kickRom.released)); }
     QString getKickRomModel() const { return QString::fromUtf8(kickRom.model); }
     QString getKickRomVendor() const { return getRomVendor(kickRom); }
     bool hasPatchedKickRom() const { return kickRom.patched; }
@@ -110,7 +110,7 @@ class SiAmConfigController : public Controller {
     QUrl getExtRomIcon() const { return getRomIcon(extRom); }
     QString getExtRomTitle() const { return QString::fromUtf8(extRom.title); }
     QString getExtRomRevision() const { return QString::fromUtf8(extRom.revision); }
-    QString getExtRomReleased() const { return QString::fromUtf8(extRom.released); }
+    QString getExtRomReleased() const { return QString::fromStdString(vamiga::RomDateToString(extRom.released)); }
     QString getExtRomModel() const { return QString::fromUtf8(extRom.model); }
     QString getExtRomVendor() const { return getRomVendor(extRom); }
     bool hasPatchedExtRom() const { return extRom.patched; }

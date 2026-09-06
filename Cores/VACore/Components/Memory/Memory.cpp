@@ -53,13 +53,13 @@ Memory::_dump(Category category, std::ostream &os) const
 
         os << tab("Rom");
         os << hex(romTraits.crc) << " (CRC32)  ";
-        os << romTraits.title << " " << romTraits.released << std::endl;
+        os << romTraits.title << " " << RomDateToString(romTraits.released) << std::endl;
         os << tab("Wom");
         os << hex(womTraits.crc) << " (CRC32)  ";
-        os << womTraits.title << " " << womTraits.released << std::endl;
+        os << womTraits.title << " " << RomDateToString(womTraits.released) << std::endl;
         os << tab("Extended Rom");
         os << hex(extTraits.crc) << " (CRC32)  ";
-        os << extTraits.title << " " << extTraits.released << std::endl;
+        os << extTraits.title << " " << RomDateToString(extTraits.released) << std::endl;
         os << tab("Chip Ram");
         os << hex(Hashable::crc32(chip, config.chipSize)) << " (CRC32)  " << std::endl;
         os << tab("Slow Ram");
@@ -649,7 +649,6 @@ Memory::getRomTraits(u32 crc)
         .crc = crc,
         .title = crc ? "Unknown ROM" : "",
         .revision = "",
-        .released = "",
         .model = "",
         .vendor = RomVendor::UNKNOWN
     };

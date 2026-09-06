@@ -1700,7 +1700,6 @@ C64::getRomTraits(u64 fnv)
     return RomTraits {
         .title = "Unknown ROM",
         .revision = "",
-        .released = "",
         .model = "",
         .vendor = RomVendor::UNKNOWN
     };

@@ -15,6 +15,7 @@ namespace retro::vault {
 
 using utl::isize;
 using utl::u8;
+using utl::u16;
 using utl::u32;
 using utl::u64;
 
@@ -236,6 +237,20 @@ struct RomVendorEnum : utl::Reflectable<RomVendorEnum, RomVendor> {
 // Structures
 //
 
+/* A Rom's release date, precise to the month at best. A database entry for
+ * which only the year is known leaves 'month' at 0; one for which no date is
+ * known at all leaves both fields at 0.
+ */
+typedef struct {
+
+    u16 year;
+    u8 month;
+}
+RomDate;
+
+// Formats a RomDate for display, e.g. "April 2025", "2022", or "" if unknown
+string RomDateToString(RomDate date);
+
 /* Describes a single known Rom. Cores fill in whichever hash they identify
  * Roms by -- the C64 matches on 'fnv', the Amiga on 'crc' -- and leave the
  * other at zero.
@@ -247,7 +262,7 @@ typedef struct {
 
     const char *title;
     const char *revision;
-    const char *released;
+    RomDate released;
     const char *model;
 
     RomVendor vendor;
