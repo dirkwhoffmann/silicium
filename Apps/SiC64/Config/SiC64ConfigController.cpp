@@ -94,10 +94,10 @@ SiC64ConfigController::rememberRomPath(const QUrl &url, RomType type)
 
     switch (type) {
 
-        case RomType::BASIC:  prefs.setBasicPath(url);  break;
-        case RomType::CHAR:   prefs.setCharPath(url);   break;
-        case RomType::KERNAL: prefs.setKernalPath(url); break;
-        case RomType::VC1541: prefs.setVc1541Path(url); break;
+        case RomType::C64_BASIC:  prefs.setBasicPath(url);  break;
+        case RomType::C64_CHAR:   prefs.setCharPath(url);   break;
+        case RomType::C64_KERNAL: prefs.setKernalPath(url); break;
+        case RomType::C64_VC1541: prefs.setVc1541Path(url); break;
     }
 }
 
@@ -114,10 +114,10 @@ SiC64ConfigController::loadMostRecentRoms()
         }
     };
 
-    loadIfPresent(prefs.getBasicPath(),  RomType::BASIC);
-    loadIfPresent(prefs.getCharPath(),   RomType::CHAR);
-    loadIfPresent(prefs.getKernalPath(), RomType::KERNAL);
-    loadIfPresent(prefs.getVc1541Path(), RomType::VC1541);
+    loadIfPresent(prefs.getBasicPath(),  RomType::C64_BASIC);
+    loadIfPresent(prefs.getCharPath(),   RomType::C64_CHAR);
+    loadIfPresent(prefs.getKernalPath(), RomType::C64_KERNAL);
+    loadIfPresent(prefs.getVc1541Path(), RomType::C64_VC1541);
 }
 
 void
@@ -155,10 +155,10 @@ SiC64ConfigController::queryRoms()
 {
     auto &core = C64Controller::core();
 
-    basicRom  = core.c64.getRomTraits(RomType::BASIC);
-    kernalRom = core.c64.getRomTraits(RomType::KERNAL);
-    charRom   = core.c64.getRomTraits(RomType::CHAR);
-    vc1541Rom = core.c64.getRomTraits(RomType::VC1541);
+    basicRom  = core.c64.getRomTraits(RomType::C64_BASIC);
+    kernalRom = core.c64.getRomTraits(RomType::C64_KERNAL);
+    charRom   = core.c64.getRomTraits(RomType::C64_CHAR);
+    vc1541Rom = core.c64.getRomTraits(RomType::C64_VC1541);
 
     emit romConfigChanged();
 }

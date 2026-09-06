@@ -93,19 +93,19 @@ class SiC64ConfigController : public Controller {
     Q_PROPERTY(QString vc1541RomVendor READ getVC1541RomVendor NOTIFY romConfigChanged)
     Q_PROPERTY(bool hasPatchedVC1541Rom READ hasPatchedVC1541Rom NOTIFY romConfigChanged)
 
-    Q_INVOKABLE bool isBasicRom(const QUrl &url) const { return isRom(url, vc64::RomType::BASIC); }
-    Q_INVOKABLE bool isKernalRom(const QUrl &url) const { return isRom(url, vc64::RomType::KERNAL); }
-    Q_INVOKABLE bool isCharRom(const QUrl &url) const { return isRom(url, vc64::RomType::CHAR); }
-    Q_INVOKABLE bool isVC1541Rom(const QUrl &url) const { return isRom(url, vc64::RomType::VC1541); }
+    Q_INVOKABLE bool isBasicRom(const QUrl &url) const { return isRom(url, vc64::RomType::C64_BASIC); }
+    Q_INVOKABLE bool isKernalRom(const QUrl &url) const { return isRom(url, vc64::RomType::C64_KERNAL); }
+    Q_INVOKABLE bool isCharRom(const QUrl &url) const { return isRom(url, vc64::RomType::C64_CHAR); }
+    Q_INVOKABLE bool isVC1541Rom(const QUrl &url) const { return isRom(url, vc64::RomType::C64_VC1541); }
 
     Q_INVOKABLE void loadRom(const QUrl &url);
     Q_INVOKABLE void loadRom(const QUrl &url, vc64::RomType type);
 
     // Type-constrained loaders for use from QML, where RomType isn't accessible
-    Q_INVOKABLE void loadBasicRom(const QUrl &url) { loadRom(url, vc64::RomType::BASIC); }
-    Q_INVOKABLE void loadKernalRom(const QUrl &url) { loadRom(url, vc64::RomType::KERNAL); }
-    Q_INVOKABLE void loadCharRom(const QUrl &url) { loadRom(url, vc64::RomType::CHAR); }
-    Q_INVOKABLE void loadVC1541Rom(const QUrl &url) { loadRom(url, vc64::RomType::VC1541); }
+    Q_INVOKABLE void loadBasicRom(const QUrl &url) { loadRom(url, vc64::RomType::C64_BASIC); }
+    Q_INVOKABLE void loadKernalRom(const QUrl &url) { loadRom(url, vc64::RomType::C64_KERNAL); }
+    Q_INVOKABLE void loadCharRom(const QUrl &url) { loadRom(url, vc64::RomType::C64_CHAR); }
+    Q_INVOKABLE void loadVC1541Rom(const QUrl &url) { loadRom(url, vc64::RomType::C64_VC1541); }
 
     // Reloads the most recently used custom ROMs remembered in the user defaults
     Q_INVOKABLE void loadMostRecentRoms();
@@ -114,10 +114,10 @@ class SiC64ConfigController : public Controller {
     // free replacements for the BASIC, Kernal and Character ROMs; there is no
     // open VC1541 ROM, so that slot is left as it is.
     Q_INVOKABLE void installOpenRoms();
-    Q_INVOKABLE void deleteBasicRom() { deleteRom(vc64::RomType::BASIC); }
-    Q_INVOKABLE void deleteKernalRom() { deleteRom(vc64::RomType::KERNAL); }
-    Q_INVOKABLE void deleteCharRom() { deleteRom(vc64::RomType::CHAR); }
-    Q_INVOKABLE void deleteVC1541Rom() { deleteRom(vc64::RomType::VC1541); }
+    Q_INVOKABLE void deleteBasicRom() { deleteRom(vc64::RomType::C64_BASIC); }
+    Q_INVOKABLE void deleteKernalRom() { deleteRom(vc64::RomType::C64_KERNAL); }
+    Q_INVOKABLE void deleteCharRom() { deleteRom(vc64::RomType::C64_CHAR); }
+    Q_INVOKABLE void deleteVC1541Rom() { deleteRom(vc64::RomType::C64_VC1541); }
 
     // Updates all cached ROM traits
     Q_INVOKABLE void queryRoms();

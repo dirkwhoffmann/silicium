@@ -10,6 +10,7 @@
 #pragma once
 
 #include "Roms/RomTypes.h"
+#include <functional>
 #include <optional>
 #include <unordered_map>
 #include <vector>
@@ -68,6 +69,10 @@ public:
      * the file is unreadable or matches no database entry.
      */
     std::optional<RomTraits> resolve(const fs::path &path) const;
+
+    // Returns every database entry the filter accepts, e.g.:
+    // getRoms([](const RomTraits &t) { return t.vendor == RomVendor::AROS; })
+    std::vector<RomTraits> getRoms(const std::function<bool(const RomTraits &)> &filter) const;
 
     // Indicates whether a checksum belongs to a known Rom
     bool isKnownCRC32(u32 crc) const { return crc32Info.contains(crc); }

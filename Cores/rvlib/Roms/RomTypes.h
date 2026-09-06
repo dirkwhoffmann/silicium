@@ -144,10 +144,10 @@ constexpr u32 CRC32_CPUBLTRO_FC_0_3_2        = 0x86CB5B1B;
  */
 enum class RomType : long
 {
-    BASIC,
-    CHAR,
-    KERNAL,
-    VC1541,
+    C64_BASIC,
+    C64_CHAR,
+    C64_KERNAL,
+    C64_VC1541,
     AMIGA_KICKSTART,
     AMIGA_BOOT
 };
@@ -161,12 +161,12 @@ struct RomTypeEnum : utl::Reflectable<RomTypeEnum, RomType> {
     {
         switch (value) {
 
-            case RomType::BASIC:            return "BASIC";
-            case RomType::CHAR:             return "CHAR";
-            case RomType::KERNAL:           return "KERNAL";
-            case RomType::VC1541:           return "VC1541";
-            case RomType::AMIGA_KICKSTART:  return "AMIGA_KICKSTART";
-            case RomType::AMIGA_BOOT:       return "AMIGA_BOOT";
+            case RomType::C64_BASIC:       return "C64_BASIC";
+            case RomType::C64_CHAR:        return "C64_CHAR";
+            case RomType::C64_KERNAL:      return "C64_KERNAL";
+            case RomType::C64_VC1541:      return "C64_VC1541";
+            case RomType::AMIGA_KICKSTART: return "AMIGA_KICKSTART";
+            case RomType::AMIGA_BOOT:      return "AMIGA_BOOT";
         }
         return "???";
     }
@@ -175,12 +175,12 @@ struct RomTypeEnum : utl::Reflectable<RomTypeEnum, RomType> {
     {
         switch (value) {
 
-            case RomType::BASIC:            return "Basic ROM";
-            case RomType::CHAR:             return "Character ROM";
-            case RomType::KERNAL:           return "Kernal ROM";
-            case RomType::VC1541:           return "Floppy Drive ROM";
-            case RomType::AMIGA_KICKSTART:  return "Kickstart ROM";
-            case RomType::AMIGA_BOOT:       return "Boot ROM";
+            case RomType::C64_BASIC:       return "Basic ROM";
+            case RomType::C64_CHAR:        return "Character ROM";
+            case RomType::C64_KERNAL:      return "Kernal ROM";
+            case RomType::C64_VC1541:      return "Floppy Drive ROM";
+            case RomType::AMIGA_KICKSTART: return "Kickstart ROM";
+            case RomType::AMIGA_BOOT:      return "Boot ROM";
         }
         return "";
     }

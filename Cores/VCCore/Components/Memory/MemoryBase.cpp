@@ -44,13 +44,13 @@ Memory::_dump(Category category, std::ostream &os) const
             }
         };
 
-        info("Basic ROM", RomType::BASIC);
+        info("Basic ROM", RomType::C64_BASIC);
         os << std::endl;
-        info("Character ROM", RomType::CHAR);
+        info("Character ROM", RomType::C64_CHAR);
         os << std::endl;
-        info("Kernal ROM", RomType::KERNAL);
+        info("Kernal ROM", RomType::C64_KERNAL);
         os << std::endl;
-        info("Drive ROM", RomType::VC1541);
+        info("Drive ROM", RomType::C64_VC1541);
     }
 }
 

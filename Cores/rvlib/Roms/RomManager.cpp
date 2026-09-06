@@ -33,7 +33,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V2",
         .model      = "Generic C64",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::BASIC
+        .type       = RomType::C64_BASIC
     },
 
     //
@@ -46,70 +46,70 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V1",
         .model      = "Generic C64",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::CHAR
+        .type       = RomType::C64_CHAR
     },{
         .fnv        = 0x3CA9D37AA3DE0969,
         .title      = "Character Rom",
         .revision   = "",
         .model      = "Swedish C64 (C2D007)",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::CHAR
+        .type       = RomType::C64_CHAR
     },{
         .fnv        = 0x6E3827A65FFF116F,
         .title      = "Character Rom",
         .revision   = "",
         .model      = "Swedish C64",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::CHAR
+        .type       = RomType::C64_CHAR
     },{
         .fnv        = 0x623CDF045B74B691,
         .title      = "Character Rom",
         .revision   = "",
         .model      = "Spanish C64C",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::CHAR
+        .type       = RomType::C64_CHAR
     },{
         .fnv        = 0x79A236A3B3645231,
         .title      = "Character Rom",
         .revision   = "V3",
         .model      = "Danish C64",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::CHAR
+        .type       = RomType::C64_CHAR
     },{
         .fnv        = 0x8550B7ECEEED00C5,
         .title      = "Character Rom",
         .revision   = "",
         .model      = "Japanese C64",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::CHAR
+        .type       = RomType::C64_CHAR
     },{
         .fnv        = 0x2D5C504BBC4E5631,
         .title      = "Character Rom",
         .revision   = "",
         .model      = "Croatian C64",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::CHAR
+        .type       = RomType::C64_CHAR
     },{
         .fnv        = 0x4D31ECBF4F967DC3,
         .title      = "Character Rom",
         .revision   = "",
         .model      = "M.E.G.A C64 OpenROM",
         .vendor     = RomVendor::MEGA65,
-        .type       = RomType::CHAR
+        .type       = RomType::C64_CHAR
     },{
         .fnv        = 0x564e103e962682dd,
         .title      = "Character Rom",
         .revision   = "V2.3",
         .model      = "PXLfont",
         .vendor     = RomVendor::MEGA65,
-        .type       = RomType::CHAR
+        .type       = RomType::C64_CHAR
     },{
         .fnv        = 0x1130C1CE287876DD,
         .title      = "Patched Character Rom",
         .revision   = "",
         .model      = "Atari 800 Font",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::CHAR,
+        .type       = RomType::C64_CHAR,
         .patched    = true
     },{
         .fnv        = 0x975546A5B6168FFD,
@@ -117,7 +117,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "",
         .model      = "MSX Font",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::CHAR,
+        .type       = RomType::C64_CHAR,
         .patched    = true
     },{
         .fnv        = 0x7C74107C9365F735,
@@ -125,7 +125,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "",
         .model      = "ZX Spectrum Font",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::CHAR,
+        .type       = RomType::C64_CHAR,
         .patched    = true
     },{
         .fnv        = 0xAFFE8B0EE2176CBD,
@@ -133,7 +133,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "",
         .model      = "Amstrad Font",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::CHAR,
+        .type       = RomType::C64_CHAR,
         .patched    = true
     },{
         .fnv        = 0xD14C5BE4FEE17705,
@@ -141,7 +141,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "",
         .model      = "Topaz Font",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::CHAR,
+        .type       = RomType::C64_CHAR,
         .patched    = true
     },{
         .fnv        = 0xA2C6A6E2C0477981,
@@ -149,7 +149,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V2",
         .model      = "Topaz Font",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::CHAR,
+        .type       = RomType::C64_CHAR,
         .patched    = true
     },{
         .fnv        = 0x3BF55C821EE80365,
@@ -157,7 +157,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V2 (broken)",
         .model      = "Topaz Font",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::CHAR,
+        .type       = RomType::C64_CHAR,
         .patched    = true
     },{
         .fnv        = 0x19F0DD3F3F9C4FE9,
@@ -165,7 +165,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V2",
         .model      = "Topaz Font",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::CHAR,
+        .type       = RomType::C64_CHAR,
         .patched    = true
     },{
         .fnv        = 0xE527AD3E0DDE930D,
@@ -173,7 +173,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "",
         .model      = "Teletext Font",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::CHAR,
+        .type       = RomType::C64_CHAR,
         .patched    = true
     },
 
@@ -187,70 +187,70 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V1",
         .model      = "Generic C64",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::KERNAL
+        .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0x4232D81CCD24FAAE,
         .title      = "Kernal Rom",
         .revision   = "V2",
         .model      = "Generic C64",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::KERNAL
+        .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0x4AF60EE54BEC9701,
         .title      = "Kernal Rom",
         .revision   = "V3",
         .model      = "Generic C64",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::KERNAL
+        .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0x429EA22675CAB478,
         .title      = "Kernal Rom",
         .revision   = "V3",
         .model      = "Danish C64",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::KERNAL
+        .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0xF695289f3EC48A38,
         .title      = "Kernal Rom",
         .revision   = "",
         .model      = "Japanese C64",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::KERNAL
+        .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0x1124ECFFE9ED2FE9,
         .title      = "Kernal Rom",
         .revision   = "",
         .model      = "Croatian C64",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::KERNAL
+        .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0x8C4548E2202CB366,
         .title      = "Kernal Rom",
         .revision   = "",
         .model      = "Generic SX64",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::KERNAL
+        .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0x746EB1BC008B07E1,
         .title      = "Kernal Rom",
         .revision   = "",
         .model      = "Scandinavian SX64",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::KERNAL
+        .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0x49A7074F1E6A896F,
         .title      = "Kernal Rom",
         .revision   = "V1",
         .model      = "PET64",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::KERNAL
+        .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0xDE7F07008B787040,
         .title      = "Kernal Rom",
         .revision   = "",
         .model      = "JiffyDOS",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0xA9D2AD1A4E5F782C,
@@ -258,7 +258,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "",
         .model      = "JiffyDOS (SX64)",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0x750617B8DE6DBA82,
@@ -266,7 +266,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V1",
         .model      = "Turbo Rom",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0x7E0A124C3F192818,
@@ -274,7 +274,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V3.2+",
         .model      = "Datel Rom",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0x211EAC45AB03A2CA,
@@ -282,7 +282,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V3",
         .model      = "Exos Rom",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0xF2A39FF166D338AE,
@@ -290,14 +290,14 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V0.1",
         .model      = "Turbo Tape",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL
+        .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0xFD1EBD928024F8D5,
         .title      = "Patched Kernal Rom",
         .revision   = "V1.0",
         .model      = "Turbo 250",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0x7202DEA530E1C172,
@@ -305,7 +305,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V3",
         .model      = "64'er DOS",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0x7E3AEFF7886684A2,
@@ -313,7 +313,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "",
         .model      = "SpeedDOS Plus",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0x6E6190177D93D2BB,
@@ -321,7 +321,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V2.7",
         .model      = "SpeedDOS Plus (TRIAD)",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0x141A584872021C25,
@@ -329,7 +329,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V1.1",
         .model      = "Dolphin DOS2 (donnchawp)",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0xD135F409F4FA10F2,
@@ -337,7 +337,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V1.0",
         .model      = "Dolphin DOS",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0x32CAF94AAA196DB6,
@@ -345,7 +345,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V2.0 Rev 1",
         .model      = "Dolphin DOS",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0xAE3DEC803423CE60,
@@ -353,7 +353,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V2.0 Rev 1 (M.A.)",
         .model      = "Dolphin DOS",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0x4D3C32F9415972C3,
@@ -361,7 +361,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V2.0 Rev 2",
         .model      = "Dolphin DOS",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0xA5D930343EE32459,
@@ -369,7 +369,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V2.0 Rev 3",
         .model      = "Dolphin DOS",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0x7D34E8277F74A321,
@@ -377,7 +377,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V2.0 (SilverDream)",
         .model      = "Dolphin DOS",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0x877E38DA5DAFEC30,
@@ -385,7 +385,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V3.0",
         .model      = "Dolphin DOS",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0x2d7ca552f0332aef,
@@ -393,7 +393,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "2015",
         .model      = "JiffyDOS Dolphin Mod",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0x7D6153CE2E12474F,
@@ -401,7 +401,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V3.0",
         .model      = "Masterom (Norland)",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0x99692773DB9D7DF4,
@@ -409,7 +409,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V2.2",
         .model      = "SD2IEC",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },{
         .fnv        = 0x57C8266769C5B580,
@@ -417,7 +417,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V1.3",
         .model      = "JaffyDOS",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::KERNAL,
+        .type       = RomType::C64_KERNAL,
         .patched    = true
     },
 
@@ -433,35 +433,35 @@ static const std::vector<RomTraits> roms = {
         .revision   = "",
         .model      = "MOS 251968-01",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::VC1541
+        .type       = RomType::C64_VC1541
     },{
         .fnv        = 0xB938E2DA07F4FE40,
         .title      = "Floppy Drive Firmware",
         .revision   = "",
         .model      = "MOS 251968-02",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::VC1541
+        .type       = RomType::C64_VC1541
     },{
         .fnv        = 0x44BBA0EAC5898597,
         .title      = "Floppy Drive Firmware",
         .revision   = "",
         .model      = "MOS 251968-03",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::VC1541
+        .type       = RomType::C64_VC1541
     },{
         .fnv        = 0xA1D36980A17C8756,
         .title      = "Floppy Drive Firmware",
         .revision   = "",
         .model      = "MOS 355640-01",
         .vendor     = RomVendor::COMMODORE,
-        .type       = RomType::VC1541
+        .type       = RomType::C64_VC1541
     },{
         .fnv        = 0x47CBA55F16FB3E09,
         .title      = "Patched Drive Firmware",
         .revision   = "",
         .model      = "Relocation Patch",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::VC1541,
+        .type       = RomType::C64_VC1541,
         .patched    = true
     },{
         .fnv        = 0x8B2A523E29BED889,
@@ -469,7 +469,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "",
         .model      = "JiffyDOS Patch",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::VC1541,
+        .type       = RomType::C64_VC1541,
         .patched    = true
     },{
         .fnv        = 0xF7F4D931219DBB5D,
@@ -477,7 +477,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V6.0",
         .model      = "JiffyDOS Patch",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::VC1541,
+        .type       = RomType::C64_VC1541,
         .patched    = true
     },{
         .fnv        = 0xB4027D6D9D61378A,
@@ -485,7 +485,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V3",
         .model      = "64'er DOS",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::VC1541,
+        .type       = RomType::C64_VC1541,
         .patched    = true
     },{
         .fnv        = 0xC50EAFCBA50C4B63,
@@ -493,7 +493,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "",
         .model      = "SpeedDOS Plus",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::VC1541,
+        .type       = RomType::C64_VC1541,
         .patched    = true
     },{
         .fnv        = 0x92ADEBA1BCCD8D31,
@@ -501,7 +501,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V2.7 (TRIAD)",
         .model      = "SpeedDOS Plus",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::VC1541,
+        .type       = RomType::C64_VC1541,
         .patched    = true
     },{
         .fnv        = 0x682B5C77E7535B4A,
@@ -509,7 +509,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V1.1",
         .model      = "Dolphin DOS2 (donnchawp)",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::VC1541,
+        .type       = RomType::C64_VC1541,
         .patched    = true
     },{
         .fnv        = 0x28CD4E47A40C41CA,
@@ -517,7 +517,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V2.0",
         .model      = "Dolphin DOS",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::VC1541,
+        .type       = RomType::C64_VC1541,
         .patched    = true
     },{
         .fnv        = 0x1C1DDD64E02CAD32,
@@ -525,7 +525,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V2.0 (SilverDream)",
         .model      = "Dolphin DOS",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::VC1541,
+        .type       = RomType::C64_VC1541,
         .patched    = true
     },{
         .fnv        = 0x09D8FBAB61E59FF0,
@@ -533,7 +533,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V3.0",
         .model      = "Dolphin DOS",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::VC1541,
+        .type       = RomType::C64_VC1541,
         .patched    = true
     },{
         .fnv        = 0xF684F72388EE5364,
@@ -541,7 +541,7 @@ static const std::vector<RomTraits> roms = {
         .revision   = "V3.0 (SilverDream)",
         .model      = "Dolphin DOS",
         .vendor     = RomVendor::OTHER,
-        .type       = RomType::VC1541,
+        .type       = RomType::C64_VC1541,
         .patched    = true
     },
 
@@ -1273,6 +1273,18 @@ RomManager::resolveFNV64(u64 fnv) const
 {
     if (auto it = fnv64Info.find(fnv); it != fnv64Info.end()) return it->second;
     return std::nullopt;
+}
+
+std::vector<RomTraits>
+RomManager::getRoms(const std::function<bool(const RomTraits &)> &filter) const
+{
+    std::vector<RomTraits> result;
+
+    for (const auto &traits : roms) {
+        if (filter(traits)) result.push_back(traits);
+    }
+
+    return result;
 }
 
 std::optional<RomTraits>
