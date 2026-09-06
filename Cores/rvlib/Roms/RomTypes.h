@@ -145,6 +145,8 @@ constexpr u32 CRC32_CPUBLTRO_FC_0_3_2        = 0x86CB5B1B;
  * marks a Kickstart extension Rom (loaded alongside a Kickstart, not in place
  * of it) -- currently the five AROS extension Roms. The CDTV Extended Rom is
  * also an extension Rom in this sense but is still tagged AMIGA_KICKSTART.
+ * AMIGA_DEMO marks a chipset test/demo tool rather than a real Kickstart --
+ * currently the two OCS CPUBLTRO Roms, formerly told apart by RomVendor::DEMO.
  */
 enum class RomType : long
 {
@@ -154,13 +156,14 @@ enum class RomType : long
     C64_VC1541,
     AMIGA_KICKSTART,
     AMIGA_BOOT,
-    AMIGA_EXTROM
+    AMIGA_EXTROM,
+    AMIGA_DEMO
 };
 
 struct RomTypeEnum : utl::Reflectable<RomTypeEnum, RomType> {
 
     static constexpr long minVal = 0;
-    static constexpr long maxVal = long(RomType::AMIGA_EXTROM);
+    static constexpr long maxVal = long(RomType::AMIGA_DEMO);
 
     static const char *_key(RomType value)
     {
@@ -173,6 +176,7 @@ struct RomTypeEnum : utl::Reflectable<RomTypeEnum, RomType> {
             case RomType::AMIGA_KICKSTART: return "AMIGA_KICKSTART";
             case RomType::AMIGA_BOOT:      return "AMIGA_BOOT";
             case RomType::AMIGA_EXTROM:    return "AMIGA_EXTROM";
+            case RomType::AMIGA_DEMO:      return "AMIGA_DEMO";
         }
         return "???";
     }
@@ -188,6 +192,7 @@ struct RomTypeEnum : utl::Reflectable<RomTypeEnum, RomType> {
             case RomType::AMIGA_KICKSTART: return "Kickstart ROM";
             case RomType::AMIGA_BOOT:      return "Boot ROM";
             case RomType::AMIGA_EXTROM:    return "Kickstart Extension ROM";
+            case RomType::AMIGA_DEMO:      return "Demo/Test ROM";
         }
         return "";
     }
@@ -195,7 +200,9 @@ struct RomTypeEnum : utl::Reflectable<RomTypeEnum, RomType> {
 
 /* Rom vendors. UNKNOWN is the zero value, so a database entry that leaves
  * 'vendor' out gets it by default -- name the vendor explicitly wherever it
- * is known.
+ * is known. Demo/test Roms are told apart by RomType::AMIGA_DEMO, not by a
+ * vendor of their own -- they use whichever real vendor applies (OTHER for
+ * homebrew ones without a formal vendor).
  */
 enum class RomVendor
 {
@@ -204,7 +211,6 @@ enum class RomVendor
     MEGA65,
     AROS,
     HYPERION,
-    DEMO,
     DIAG,
     EMUTOS,
     OTHER
@@ -224,7 +230,6 @@ struct RomVendorEnum : utl::Reflectable<RomVendorEnum, RomVendor> {
             case RomVendor::MEGA65:     return "MEGA65";
             case RomVendor::AROS:       return "AROS";
             case RomVendor::HYPERION:   return "HYPERION";
-            case RomVendor::DEMO:       return "DEMO";
             case RomVendor::DIAG:       return "DIAG";
             case RomVendor::EMUTOS:     return "EMUTOS";
             case RomVendor::OTHER:      return "OTHER";

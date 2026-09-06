@@ -113,12 +113,13 @@ SiAmConfigController::getRomIcon(const RomTraits &traits) const
 {
     auto hasRom = traits.crc != 0;
 
+    if (traits.type == RomType::AMIGA_DEMO) return Assets::getIconUrl(Assets::Icon::RomDemo);
+
     switch (traits.vendor) {
 
         case RomVendor::COMMODORE: return Assets::getIconUrl(Assets::Icon::RomCommodore);
         case RomVendor::AROS:      return Assets::getIconUrl(Assets::Icon::RomAros);
         case RomVendor::HYPERION:  return Assets::getIconUrl(Assets::Icon::RomHyperion);
-        case RomVendor::DEMO:      return Assets::getIconUrl(Assets::Icon::RomDemo);
         case RomVendor::DIAG:      return Assets::getIconUrl(Assets::Icon::RomDiag);
         case RomVendor::EMUTOS:    return Assets::getIconUrl(Assets::Icon::RomEmutos);
         default:                   return Assets::getIconUrl(hasRom ? Assets::Icon::RomUnknown : Assets::Icon::RomPlain);

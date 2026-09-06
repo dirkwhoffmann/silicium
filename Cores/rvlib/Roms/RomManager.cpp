@@ -1222,16 +1222,16 @@ static const std::vector<RomTraits> roms = {
         .revision   = "Version 0.3.2 (512 KB)",
         .released   = { 2024, 11 },
         .model      = 0,
-        .vendor     = RomVendor::DEMO,
-        .type       = RomType::AMIGA_KICKSTART
+        .vendor     = RomVendor::OTHER,
+        .type       = RomType::AMIGA_DEMO
     },{
         .crc        = CRC32_CPUBLTRO_FC_0_3_2,
         .title      = "OCS CPUBLTRO",
         .revision   = "Version 0.3.2 (256 KB)",
         .released   = { 2024, 11 },
         .model      = 0,
-        .vendor     = RomVendor::DEMO,
-        .type       = RomType::AMIGA_KICKSTART
+        .vendor     = RomVendor::OTHER,
+        .type       = RomType::AMIGA_DEMO
     }
 };
 
