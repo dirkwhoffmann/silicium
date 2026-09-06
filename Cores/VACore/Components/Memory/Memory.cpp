@@ -20,7 +20,6 @@
 #include "RomFile.h"
 #include "RTC.h"
 #include "ZorroManager.h"
-#include "RomDatabase.h"
 #include "MediaError.h"
 #include "utl/io.h"
 
@@ -645,7 +644,7 @@ Memory::getRomTraits(u32 crc)
     static RomTraits fallback;
 
     // Crawl through the Rom database
-    for (auto &traits : roms) if (traits.crc == crc) return traits;
+    if (auto *traits = RomManager::findByCrc(crc)) return *traits;
 
     fallback = RomTraits {
 

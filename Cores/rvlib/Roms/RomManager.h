@@ -9,12 +9,20 @@
 
 #pragma once
 
+#include "Roms/RomTypes.h"
+#include <vector>
+
 namespace retro::vault {
 
-/* Will eventually hold the single, shared Rom database that SiC64's
- * VCCore and SiAmiga's VACore each keep their own copy of today (both
- * called RomDatabase.h). Nothing lives here yet -- this class is a
- * placeholder to build against while that unification is worked out.
+/* The Rom database. Holds every Rom RetroVault can put a name to, across all
+ * machines -- the C64 and Amiga tables used to live in a RomDatabase.h of their
+ * own inside VCCore and VACore respectively.
+ *
+ * Roms are identified by hash, and which hash depends on the machine: C64 Roms
+ * carry an FNV-1a, Amiga Roms a CRC32, and each entry leaves the other at zero.
+ * That is why the two lookups are named rather than overloaded, and why both
+ * refuse a zero key -- searching for one would otherwise match the entries of
+ * the other machine wholesale.
  */
 class RomManager {
 
@@ -22,6 +30,13 @@ public:
 
     RomManager();
     ~RomManager();
+
+    // Provides access to the raw database
+    static const std::vector<RomTraits> &database();
+
+    // Looks up a Rom by hash (returns nullptr if the Rom is unknown)
+    static const RomTraits *findByFnv(u64 fnv);
+    static const RomTraits *findByCrc(u32 crc);
 };
 
 }

@@ -15,7 +15,6 @@
 #include "Emulator.h"
 #include "Option.h"
 #include "Script.h"
-#include "RomDatabase.h"
 #include "OpenRoms.h"
 #include "utl/abilities/Hashable.h"
 #include "utl/chrono.h"
@@ -1696,7 +1695,7 @@ RomTraits
 C64::getRomTraits(u64 fnv)
 {
     // Crawl through the Rom database
-    for (auto &traits : roms) if (traits.fnv == fnv) return traits;
+    if (auto *traits = RomManager::findByFnv(fnv)) return *traits;
 
     return RomTraits {
         .title = "Unknown ROM",

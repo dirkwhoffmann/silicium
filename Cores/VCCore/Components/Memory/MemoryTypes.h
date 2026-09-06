@@ -14,8 +14,17 @@
 #pragma once
 
 #include "BasicTypes.h"
+#include "Roms/RomManager.h"
 
 namespace vc64 {
+
+// The Rom vocabulary is shared by all cores and lives in rvlib
+using retro::vault::RomType;
+using retro::vault::RomTypeEnum;
+using retro::vault::RomVendor;
+using retro::vault::RomVendorEnum;
+using retro::vault::RomTraits;
+using retro::vault::RomManager;
 
 //
 // Enumerations
@@ -97,104 +106,6 @@ struct RamPatternEnum : Reflectable<RamPatternEnum, RamPattern> {
     }
 };
 
-/* Shared by all cores. The AMIGA_ entries are meaningless to the C64 and the
- * C64 entries are meaningless to the Amiga, but both cores describe their Roms
- * with the same RomTraits struct, so both need to name the same enum. VACore's
- * copy in Media/Rom/RomFileTypes.h has to stay identical to this one.
- */
-enum class RomType : long
-{
-    BASIC,
-    CHAR,
-    KERNAL,
-    VC1541,
-    AMIGA_KICKSTART,
-    AMIGA_BOOT
-};
-
-struct RomTypeEnum : Reflectable<RomTypeEnum, RomType> {
-
-    static constexpr long minVal = 0;
-    static constexpr long maxVal = long(RomType::AMIGA_BOOT);
-
-    static const char *_key(RomType value)
-    {
-        switch (value) {
-
-            case RomType::BASIC:            return "BASIC";
-            case RomType::CHAR:             return "CHAR";
-            case RomType::KERNAL:           return "KERNAL";
-            case RomType::VC1541:           return "VC1541";
-            case RomType::AMIGA_KICKSTART:  return "AMIGA_KICKSTART";
-            case RomType::AMIGA_BOOT:       return "AMIGA_BOOT";
-        }
-        return "???";
-    }
-
-    static const char *help(RomType value)
-    {
-        switch (value) {
-
-            case RomType::BASIC:            return "Basic ROM";
-            case RomType::CHAR:             return "Character ROM";
-            case RomType::KERNAL:           return "Kernal ROM";
-            case RomType::VC1541:           return "Floppy Drive ROM";
-            case RomType::AMIGA_KICKSTART:  return "Kickstart ROM";
-            case RomType::AMIGA_BOOT:       return "Boot ROM";
-        }
-        return "";
-    }
-};
-
-/* Shared by all cores -- VACore's copy in Media/Rom/RomFileTypes.h has to stay
- * identical to this one. Only MEGA65 is C64-specific and only AROS, HYPERION,
- * DEMO and EMUTOS are Amiga-specific; the rest applies to both.
- *
- * UNKNOWN is the zero value, so a database entry that leaves 'vendor' out gets
- * it by default -- name the vendor explicitly wherever it is known.
- */
-enum class RomVendor
-{
-    UNKNOWN,
-    COMMODORE,
-    MEGA65,
-    AROS,
-    HYPERION,
-    DEMO,
-    DIAG,
-    EMUTOS,
-    OTHER
-};
-
-struct RomVendorEnum : Reflectable<RomVendorEnum, RomVendor> {
-
-    static constexpr long minVal = 0;
-    static constexpr long maxVal = long(RomVendor::OTHER);
-
-    static const char *_key(RomVendor value)
-    {
-        switch (value) {
-
-            case RomVendor::UNKNOWN:    return "UNKNOWN";
-            case RomVendor::COMMODORE:  return "COMMODORE";
-            case RomVendor::MEGA65:     return "MEGA65";
-            case RomVendor::AROS:       return "AROS";
-            case RomVendor::HYPERION:   return "HYPERION";
-            case RomVendor::DEMO:       return "DEMO";
-            case RomVendor::DIAG:       return "DIAG";
-            case RomVendor::EMUTOS:     return "EMUTOS";
-            case RomVendor::OTHER:      return "OTHER";
-        }
-        return "???";
-    }
-    
-    static const char *help(RomVendor value)
-    {
-        return "";
-    }
-};
-
-
 //
 // Structures
 //
@@ -228,24 +139,5 @@ typedef struct
 }
 MemStats;
 
-/* Shared by all cores -- VACore's copy in Media/Rom/RomFileTypes.h has to stay
- * identical to this one. Cores fill in what they can identify a Rom by: the
- * C64 matches on 'fnv', the Amiga on 'crc'.
- */
-typedef struct {
-
-    u64 fnv;
-    u32 crc;
-
-    const char *title;
-    const char *revision;
-    const char *released;
-    const char *model;
-
-    RomVendor vendor;
-    RomType type;
-    bool patched;
-}
-RomTraits;
 
 }
