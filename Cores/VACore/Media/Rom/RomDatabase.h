@@ -499,6 +499,20 @@ static std::vector<RomTraits> roms = {
         .model      = "",
         .vendor     = RomVendor::AROS
     },{
+        .crc        = CRC32_AROS_20260820,
+        .title      = "AROS Kickstart replacement",
+        .revision   = "Version 20260820",
+        .released   = "August 2026",
+        .model      = "",
+        .vendor     = RomVendor::AROS
+    },{
+        .crc        = CRC32_AROS_20260820_EXT,
+        .title      = "AROS Kickstart replacement",
+        .revision   = "Version 20260820",
+        .released   = "August 2026",
+        .model      = "",
+        .vendor     = RomVendor::AROS
+    },{
         .crc        = CRC32_EMUTOS13,
         .title      = "EmuTOS Kickstart replacement",
         .revision   = "Version 1.3",
@@ -538,6 +552,13 @@ static std::vector<RomTraits> roms = {
         .title      = "Amiga DiagROM",
         .revision   = "Version 1.3",
         .released   = "April 2023",
+        .model      = "",
+        .vendor     = RomVendor::DIAG
+    },{
+        .crc        = CRC32_DIAG20,
+        .title      = "Amiga DiagROM",
+        .revision   = "Version 2.0",
+        .released   = "March 2026",
         .model      = "",
         .vendor     = RomVendor::DIAG
     },{
