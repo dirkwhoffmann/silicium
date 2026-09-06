@@ -1695,7 +1695,7 @@ RomTraits
 C64::getRomTraits(u64 fnv)
 {
     // Crawl through the Rom database
-    if (auto *traits = RomManager::findByFnv(fnv)) return *traits;
+    if (auto traits = RomManager::shared().resolveFNV64(fnv)) return *traits;
 
     return RomTraits {
         .title = "Unknown ROM",

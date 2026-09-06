@@ -650,21 +650,21 @@ MemoryAPI::getCachedMetrics() const
     return mem->metrics.backed();
 }
 
-const RomTraits &
+RomTraits
 MemoryAPI::getRomTraits() const
 {
     VAMIGA_PUBLIC
     return mem->getRomTraits();
 }
 
-const RomTraits &
+RomTraits
 MemoryAPI::getWomTraits() const
 {
     VAMIGA_PUBLIC
     return mem->getWomTraits();
 }
 
-const RomTraits &
+RomTraits
 MemoryAPI::getExtTraits() const
 {
     VAMIGA_PUBLIC

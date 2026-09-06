@@ -638,15 +638,13 @@ Memory::fillRamWithInitPattern()
     }
 }
 
-const RomTraits &
+RomTraits
 Memory::getRomTraits(u32 crc)
 {
-    static RomTraits fallback;
-
     // Crawl through the Rom database
-    if (auto *traits = RomManager::findByCrc(crc)) return *traits;
+    if (auto traits = RomManager::shared().resolveCRC32(crc)) return *traits;
 
-    fallback = RomTraits {
+    return RomTraits {
 
         .crc = crc,
         .title = crc ? "Unknown ROM" : "",
@@ -655,23 +653,21 @@ Memory::getRomTraits(u32 crc)
         .model = "",
         .vendor = RomVendor::UNKNOWN
     };
-
-    return fallback;
 }
 
-const RomTraits &
+RomTraits
 Memory::getRomTraits() const
 {
     return getRomTraits(Hashable::crc32(rom, config.romSize));
 }
 
-const RomTraits &
+RomTraits
 Memory::getWomTraits() const
 {
     return getRomTraits(Hashable::crc32(wom, config.womSize));
 }
 
-const RomTraits &
+RomTraits
 Memory::getExtTraits() const
 {
     return getRomTraits(Hashable::crc32(ext, config.extSize));

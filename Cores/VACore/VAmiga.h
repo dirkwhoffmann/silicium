@@ -544,9 +544,9 @@ public:
 
     /** @brief  Provides details about the installed ROM, WOM, or ROM extension.
      */
-    const RomTraits &getRomTraits() const;
-    const RomTraits &getWomTraits() const;
-    const RomTraits &getExtTraits() const;
+    RomTraits getRomTraits() const;
+    RomTraits getWomTraits() const;
+    RomTraits getExtTraits() const;
 
     /// @}
     /// @name Handling ROMs

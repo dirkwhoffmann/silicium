@@ -13,6 +13,8 @@
 
 namespace retro::vault {
 
+using utl::isize;
+using utl::u8;
 using utl::u32;
 using utl::u64;
 
