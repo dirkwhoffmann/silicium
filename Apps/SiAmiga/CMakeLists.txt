@@ -3,6 +3,7 @@ target_include_directories(SiAmiga PUBLIC
 
 target_sources(SiAmiga PRIVATE
         SiAmController.cpp
+        SiAmMediaController.cpp
         SiAmRenderer.cpp
         SiAmActivityController.cpp
         Config/SiAmConfigController.cpp

@@ -63,11 +63,11 @@ Rectangle {
     readonly property string disk35:   "qrc:/images/media-35-dd-amiga.png"
     readonly property string disk35wp: "qrc:/images/media-35-dd-amiga-wp.png"
 
-    function redIcon(nr)   { tick; return amiga.driveMotor(nr) ? ledRed : ledGray }
-    function greenIcon(nr) { tick; return amiga.driveWriting(nr) ? ledGreen : ledGray }
-    function diskIcon(nr)  { tick; return amiga.driveHasDisk(nr) ? (amiga.driveWriteProtected(nr) ? disk35wp : disk35) : "" }
-    function track(nr)     { tick; return amiga.driveTrack(nr) }
-    function busy(nr)      { tick; return amiga.driveMotor(nr) }
+    function redIcon(nr)   { tick; return amiga.media.driveMotor(nr) ? ledRed : ledGray }
+    function greenIcon(nr) { tick; return amiga.media.driveWriting(nr) ? ledGreen : ledGray }
+    function diskIcon(nr)  { tick; return amiga.media.driveHasDisk(nr) ? (amiga.media.driveWriteProtected(nr) ? disk35wp : disk35) : "" }
+    function track(nr)     { tick; return amiga.media.driveTrack(nr) }
+    function busy(nr)      { tick; return amiga.media.driveMotor(nr) }
 
     //
     // Pictogram

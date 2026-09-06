@@ -56,12 +56,12 @@ DropOverlay {
 
     function insertDroppedDisk(driveNr, url) {
 
-        controller.insertDisk(driveNr, url)
+        controller.media.insertDisk(driveNr, url)
     }
 
     function attachDroppedHd(driveNr, url) {
 
-        controller.attachHd(driveNr, url)
+        controller.media.attachHd(driveNr, url)
     }
 
     // One Action per drive, built once and rebound into 'actions' below

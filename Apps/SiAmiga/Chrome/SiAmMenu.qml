@@ -164,8 +164,8 @@ SiMenuBar {
         required property int driveNr   // 0..3
 
         readonly property bool connected: config.driveConnected(driveNr)
-        readonly property bool hasDisk: amiga.driveHasDisk(driveNr)
-        readonly property bool writeProtected: amiga.driveWriteProtected(driveNr)
+        readonly property bool hasDisk: amiga.media.driveHasDisk(driveNr)
+        readonly property bool writeProtected: amiga.media.driveWriteProtected(driveNr)
 
         // While disconnected, there's nothing to insert/eject/export for
         // hardware that isn't part of the current setup, so every other item
@@ -185,7 +185,7 @@ SiMenuBar {
         SiMenuItem {
             text: qsTr("New")
             visible: connected
-            onTriggered: amiga.newDisk(driveNr)
+            onTriggered: amiga.media.newDisk(driveNr)
         }
         SiMenuItem {
             text: qsTr("Insert...")
@@ -197,7 +197,7 @@ SiMenuBar {
             text: qsTr("Eject")
             visible: connected
             enabled: hasDisk
-            onTriggered: amiga.ejectDisk(driveNr)
+            onTriggered: amiga.media.ejectDisk(driveNr)
         }
         SiMenuItem {
             text: qsTr("Export...")
@@ -212,7 +212,7 @@ SiMenuBar {
             visible: connected
             enabled: hasDisk
             checked: writeProtected
-            onTriggered: amiga.toggleWriteProtection(driveNr)
+            onTriggered: amiga.media.toggleWriteProtection(driveNr)
         }
     }
 
@@ -237,11 +237,11 @@ SiMenuBar {
         required property int driveNr   // 0..3
 
         readonly property bool connected: config.hdConnected(driveNr)
-        readonly property bool hasDisk: amiga.hdHasDisk(driveNr)
+        readonly property bool hasDisk: amiga.media.hdHasDisk(driveNr)
 
         SiMenuItem {
             text: connected ? qsTr("Detach") : qsTr("Connect")
-            onTriggered: connected ? amiga.detachHd(driveNr) : config.setHdConnected(driveNr, true)
+            onTriggered: connected ? amiga.media.detachHd(driveNr) : config.setHdConnected(driveNr, true)
         }
 
         SiMenuSeparator { visible: connected }
