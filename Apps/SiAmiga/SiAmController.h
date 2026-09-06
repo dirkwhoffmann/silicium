@@ -296,13 +296,9 @@ public:
 
 public:
 
-    // No physical-keyboard passthrough exists yet -- see SiAmKeyboardController's
-    // header comment -- so these consume the event (the keyboard capture
-    // state suppresses it app-wide, see InputManager::keyDownEventFilter)
-    // without forwarding it anywhere yet.
-    void keyDown(QKeyEvent *event, KeyModifier modifiers) override {}
-    void keyUp(QKeyEvent *event, KeyModifier modifiers) override {}
-    void keyCombo(KeyCombo combo, int count) override {}
+    void keyDown(QKeyEvent *event, KeyModifier modifiers) override;
+    void keyUp(QKeyEvent *event, KeyModifier modifiers) override;
+    void keyCombo(KeyCombo combo, int count) override;
     void capsLock(bool state) override;
 
     void mouseXY(int port, u64 timestamp, float x, float y) override {}

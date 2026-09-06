@@ -448,6 +448,41 @@ SiAmController::keyboardCaptured()
 }
 
 void
+SiAmController::keyDown(QKeyEvent *event, KeyModifier modifiers)
+{
+    if (keyboardCaptured()) {
+        m_keyboardController->keyDown(event, modifiers);
+    }
+}
+
+void
+SiAmController::keyUp(QKeyEvent *event, KeyModifier modifiers)
+{
+    /* Deliberately ungated, unlike keyDown() above.
+     *
+     * Capture can be withdrawn between a press and its release -- opening
+     * RetroShell with a key held down does exactly that -- and dropping the
+     * release would leave that key stuck down inside the Amiga with nothing
+     * left to lift it. Releasing a key the machine never saw pressed is
+     * harmless by comparison, which is the same reasoning that makes
+     * InputManager::keyUpEventFilter forward releases regardless of capture.
+     */
+    m_keyboardController->keyUp(event, modifiers);
+}
+
+void
+SiAmController::keyCombo(KeyCombo combo, int count)
+{
+    // Gated on the keyboard, not the mouse: for the Amiga these chords are
+    // ordinary keystrokes (Alt and the Amiga keys, see
+    // SiAmKeyboardController::keyCombo), so they belong to whoever owns the
+    // keyboard.
+    if (keyboardCaptured()) {
+        m_keyboardController->keyCombo(combo, count);
+    }
+}
+
+void
 SiAmController::capsLock(bool state)
 {
     switch (preferences().getCapsLockAction()) {
@@ -610,6 +645,30 @@ SiAmController::process(const Message &msg, const string &attachment)
         case Msg::HDR_IDLE:
 
             m_infoIsDirty = true;
+            break;
+
+        case Msg::KB_PRESS:
+
+            m_keyboardController->kbChanged((int)msg.value, true);
+            break;
+
+        case Msg::KB_RELEASE:
+
+            m_keyboardController->kbChanged((int)msg.value, false);
+            break;
+
+        case Msg::KB_LOCK:
+        case Msg::KB_UNLOCK:
+
+            m_infoIsDirty = true;
+            break;
+
+        case Msg::CTRL_AMIGA_AMIGA:
+
+            // Ctrl + both Amiga keys is the Amiga's own reset combo, and the
+            // core reports it rather than acting on it. vAmiga's Mac app
+            // answers with its reset action; so do we.
+            reset();
             break;
 
         case Msg::RSH_CLOSE:

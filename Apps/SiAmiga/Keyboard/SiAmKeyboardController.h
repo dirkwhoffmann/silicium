@@ -10,21 +10,34 @@
 #pragma once
 
 #include "Controller.h"
+#include "VAmiga.h"
+#include "InputManager.h"
 #include "AmigaKeyModel.h"
 #include <QQuickWindow>
 
-// Port of SiC64KeyboardController, trimmed to what the virtual on-screen
-// keyboard itself needs (press/release/toggle driven by mouse clicks on
-// SiAmKeyboardPanel's keys). SiC64KeyboardController's physical-keyboard
-// passthrough (translating real QKeyEvents into C64 key sequences,
-// positional vs. symbolic mapping, key combos, ...) has no counterpart
-// here yet -- that's a separate, substantial piece of work on top of this,
-// not something the virtual keyboard window itself needs.
+using vamiga::VAmiga;
+using vamiga::KeyboardAPI;
+
+/* Port of SiC64KeyboardController, minus its symbolic mode.
+ *
+ * The C64 offers two mapping schemes: positional (physical key -> the key
+ * sitting in the same spot on a C64 keyboard) and symbolic (physical key ->
+ * whatever C64 key produces the same character, shift keys included). The
+ * Amiga needs only the first one: its keyboard is laid out like a modern one,
+ * and the core's keycodes are themselves defined positionally ("These are key
+ * codes assigned to specific positions on the main body of the keyboard. The
+ * letters on the tops of these keys are different for each country" -- Amiga
+ * Hardware Reference), so a physical key maps to exactly one keycode and the
+ * Amiga's own keymap does the rest. There is no scheme to choose, and no
+ * key-sequence translation table.
+ */
 class SiAmKeyboardController : public Controller {
 
     Q_OBJECT
 
     class SiAmController *parent = nullptr;
+    VAmiga &core;
+    KeyboardAPI &keyboard;
 
 protected:
 
@@ -35,8 +48,48 @@ public:
 
     explicit SiAmKeyboardController(SiAmController *parent = nullptr);
 
+    /* Maps physical keys to Amiga keycodes. Ported from vAmiga's own
+     * isomac2amiga (GUI/Input/MacKey.swift), i.e. keyed by macOS virtual key
+     * code -- which is what InputManager::physicalKeyCode() hands back there.
+     *
+     * Unlike the C64's map, this one is fixed: SiC64's counterpart is stored
+     * in Preferences so the virtual keyboard's key-recording feature can
+     * override single entries (see Preferences::setC64KeyMapping), and there
+     * is no such editor on the Amiga side yet. Should one appear, this is the
+     * table its factory defaults come from -- the same role
+     * SiC64KeyboardController::defaultC64KeyMap() plays for the C64.
+     */
+    static const QHash<quint32, int> &defaultAmigaKeyMap();
+
     Q_PROPERTY(QQuickWindow *window MEMBER m_window)
     Q_PROPERTY(AmigaKeyModel *keyModel MEMBER m_keyModel CONSTANT)
+
+
+    //
+    // Keyboard state changes
+    //
+
+public:
+
+    // Called by SiAmController for every Msg::KB_PRESS / KB_RELEASE the core
+    // reports. Fans the raw keycode out to keyChanged() below -- the
+    // keyboard's own state changes don't go through the info controller's
+    // coalesced refresh, since they must land immediately and individually to
+    // keep the on-screen keyboard in step with the matrix. Routing every
+    // change through the core (rather than emitting from press()/release()
+    // directly) is also what lets physical typing move the on-screen keys.
+    void kbChanged(int nr, bool pressed);
+
+
+    //
+    // Methods from InputManagerDelegate
+    //
+
+public:
+
+    void keyDown(QKeyEvent *event, KeyModifier modifiers) override;
+    void keyUp(QKeyEvent *event, KeyModifier modifiers) override;
+    void keyCombo(KeyCombo combo, int count) override;
 
 
     //
