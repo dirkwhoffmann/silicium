@@ -649,7 +649,6 @@ Memory::getRomTraits(u32 crc)
         .crc = crc,
         .title = crc ? "Unknown ROM" : "",
         .revision = "",
-        .model = "",
         .vendor = RomVendor::UNKNOWN
     };
 }

@@ -251,6 +251,39 @@ RomDate;
 // Formats a RomDate for display, e.g. "April 2025", "2022", or "" if unknown
 string RomDateToString(RomDate date);
 
+// Hardware models a Rom is known to run on
+namespace RomModel {
+
+constexpr u32 C64       = 1u << 0;   // Breadbox
+constexpr u32 C64II     = 1u << 1;   // C64C
+constexpr u32 SX64      = 1u << 2;   // SX-64
+constexpr u32 PET64     = 1u << 3;   // Educator 64
+
+constexpr u32 VC1541    = 1u << 4;
+constexpr u32 VC1541C   = 1u << 5;
+constexpr u32 VC1541II  = 1u << 6;
+
+constexpr u32 A500    = 1u << 7;
+constexpr u32 A600    = 1u << 8;
+constexpr u32 A600HD  = 1u << 9;
+constexpr u32 A1000   = 1u << 10;
+constexpr u32 A1200   = 1u << 11;
+constexpr u32 A2000   = 1u << 12;
+constexpr u32 A3000   = 1u << 13;
+constexpr u32 A4000   = 1u << 14;
+constexpr u32 A4000T  = 1u << 15;
+constexpr u32 CD32    = 1u << 16;
+constexpr u32 CDTV    = 1u << 17;
+
+constexpr u32 GENERIC_C64     = C64 | C64II | SX64 | PET64;
+constexpr u32 GENERIC_VC1541  = VC1541 | VC1541C | VC1541II;
+constexpr u32 GENERIC_AMIGA   = A500 | A600 | A600HD | A1000 | A1200 | A2000 | A3000 | A4000 | A4000T | CD32 | CDTV;
+
+}
+
+// Formats a RomModel bitmask for display, e.g. "A500, A600, A2000", or "" if 0
+string RomModelToString(u32 model);
+
 /* Describes a single known Rom. Cores fill in whichever hash they identify
  * Roms by -- the C64 matches on 'fnv', the Amiga on 'crc' -- and leave the
  * other at zero.
@@ -263,7 +296,7 @@ typedef struct {
     const char *title;
     const char *revision;
     RomDate released;
-    const char *model;
+    u32 model;
 
     RomVendor vendor;
     RomType type;

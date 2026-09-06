@@ -23,6 +23,10 @@ using retro::vault::RomType;
 using retro::vault::RomTypeEnum;
 using retro::vault::RomVendor;
 using retro::vault::RomVendorEnum;
+using retro::vault::RomDate;
+using retro::vault::RomDateToString;
+namespace RomModel = retro::vault::RomModel;
+using retro::vault::RomModelToString;
 using retro::vault::RomTraits;
 using retro::vault::RomManager;
 
