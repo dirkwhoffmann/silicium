@@ -24,9 +24,7 @@ using retro::vault::ImageError;
 using retro::vault::SnapshotInfo;
 using retro::vault::Platform;
 
-// Receives messages from the emulator thread (registered as the launch()
-// listener in windowDidOpen()) and marshals them onto the GUI thread, where
-// it is safe to touch QObjects.
+// Receives messages from the emulator thread and marshals them onto the GUI thread
 static void
 process(const void *listener, const Message msg)
 {
