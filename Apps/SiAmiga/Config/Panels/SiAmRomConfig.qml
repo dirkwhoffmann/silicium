@@ -22,12 +22,12 @@ import Silicium.Theme
 // (MEM_EXT_START, valid only as $E0 or $F0 -- see Memory::checkOption).
 //
 // The AROS/EmuTOS/DiagROM one-click installer presets
-// (RomSettingsViewController.preset(tag:)) aren't ported here -- they embed
-// actual ROM binaries as app resources, which is a separate asset-bundling
-// task, not a UI one. SiAmConfigController doesn't have installOpenRoms()/
-// loadMostRecentRoms() counterparts yet either, so drag-and-drop and the
-// file-picker/delete buttons are the only ways in for now, matching what
-// the controller currently exposes.
+// (RomSettingsViewController.preset(tag:)) are wired up below as a plain row
+// of buttons rather than vAmiga's own preset popup -- there's only one
+// bundled version of each (see SiAmMediaController's own header comment), so
+// there's nothing for a popup to pick between yet. SiAmConfigController has
+// no installOpenRoms()/loadMostRecentRoms() equivalent, so drag-and-drop and
+// the file-picker/delete buttons remain the only other way in.
 Item {
 
     id: root
@@ -235,6 +235,36 @@ Item {
                         currentIndex: cc.MEM_EXT_START === 0xF0 ? 1 : 0
                         onCurrentIndexChanged: cc.MEM_EXT_START = currentIndex === 1 ? 0xF0 : 0xE0
                     }
+                }
+            }
+
+            VSpacer { size: Style.largeSpacing }
+
+            //
+            // One-click presets (Aros/DiagRom into the Kickstart slot,
+            // EmuTOS likewise -- all three are themselves Kickstart
+            // replacements, same as a real one loaded via the slot above)
+            //
+
+            RowLayout {
+
+                Layout.alignment: Qt.AlignHCenter
+                spacing: Style.mediumSpacing
+
+                SiButton {
+                    enabled: !root.locked
+                    text: qsTr("Install AROS")
+                    onClicked: controller.media.installAros()
+                }
+                SiButton {
+                    enabled: !root.locked
+                    text: qsTr("Install DiagROM")
+                    onClicked: controller.media.installDiagRom()
+                }
+                SiButton {
+                    enabled: !root.locked
+                    text: qsTr("Install EmuTOS")
+                    onClicked: controller.media.installEmuTOS()
                 }
             }
 

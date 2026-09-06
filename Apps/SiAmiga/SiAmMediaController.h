@@ -10,6 +10,7 @@
 #pragma once
 
 #include "Controller.h"
+#include <QByteArray>
 #include <QUrl>
 
 class SiAmController;
@@ -57,4 +58,36 @@ public:
     // "Detach" item does.
     Q_INVOKABLE void detachHd(int nr);
     Q_INVOKABLE void exportHd(int nr, const QUrl &url);
+
+
+    //
+    // Rom presets
+    //
+
+    // One-click installers for the Rom images bundled under Shared/Assets/Roms.
+    // That folder is embedded into both apps as Qt resources (see the
+    // ASSET_RESOURCES glob in Apps/CMakeLists.txt), so "Shared/Assets/Roms/
+    // foo.bin" is reachable at runtime as ":/Roms/foo.bin" -- no separate
+    // packaging step needed.
+    //
+    // Port of vAmiga's own MediaManager.installAros()/installDiagRom()
+    // (GUI/MediaManager.swift). There, each takes a CRC32 identifying which
+    // bundled version to install, defaulting to the newest; this app has no
+    // Rom-version picker yet for either preset (see SiAmRomConfig.qml's own
+    // header comment), so each simply installs the one newest version
+    // bundled here.
+    Q_INVOKABLE void installAros();
+    Q_INVOKABLE void installDiagRom();
+
+    // No Swift counterpart (MediaManager.swift has no EmuTOS preset), but
+    // the same one-Rom-no-ext shape as installDiagRom() above.
+    Q_INVOKABLE void installEmuTOS();
+
+private:
+
+    // Reads an embedded Rom image (e.g. ":/Roms/aros-20260820-rom.bin") into
+    // memory. Throws if the resource is missing -- callers are expected to
+    // wrap installAros()/installDiagRom() in a try/catch, same as every
+    // other media operation in this class.
+    static QByteArray readRomResource(const QString &resourcePath);
 };
