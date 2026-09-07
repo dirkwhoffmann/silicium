@@ -1716,9 +1716,8 @@ C64::getRomTraits(RomType type) const
 
         result.title = "M.E.G.A. C64 OpenROM";
         result.vendor = RomVendor::MEGA65;
-        result.patched = false;
-
-        result.model = RomModel::GENERIC_C64;
+        result.flags = 0;
+        result.platform = RomPlatform::C64;
 
         switch (type) {
 

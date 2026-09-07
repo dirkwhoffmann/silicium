@@ -31,7 +31,7 @@ static const std::vector<RomTraits> roms = {
         .fnv        = 0x20765FEA67A8762D,
         .title      = "Basic Rom",
         .revision   = "V2",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_BASIC
     },
@@ -44,137 +44,137 @@ static const std::vector<RomTraits> roms = {
         .fnv        = 0xACC576F7B332AC15,
         .title      = "Character Rom",
         .revision   = "V1",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_CHAR
     },{
         .fnv        = 0x3CA9D37AA3DE0969,
         .title      = "Character Rom",
         .revision   = "Swedish (C2D007)",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_CHAR
     },{
         .fnv        = 0x6E3827A65FFF116F,
         .title      = "Character Rom",
         .revision   = "Swedish",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_CHAR
     },{
         .fnv        = 0x623CDF045B74B691,
         .title      = "Character Rom",
         .revision   = "Spanish",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_CHAR
     },{
         .fnv        = 0x79A236A3B3645231,
         .title      = "Character Rom",
         .revision   = "Danish V3",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_CHAR
     },{
         .fnv        = 0x8550B7ECEEED00C5,
         .title      = "Character Rom",
         .revision   = "Japanese",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_CHAR
     },{
         .fnv        = 0x2D5C504BBC4E5631,
         .title      = "Character Rom",
         .revision   = "Croatian",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_CHAR
     },{
         .fnv        = 0x4D31ECBF4F967DC3,
         .title      = "Character Rom",
         .revision   = "M.E.G.A C64 OpenROM",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::MEGA65,
         .type       = RomType::C64_CHAR
     },{
         .fnv        = 0x564e103e962682dd,
         .title      = "Character Rom",
         .revision   = "PXLfont V2.3",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::MEGA65,
         .type       = RomType::C64_CHAR
     },{
         .fnv        = 0x1130C1CE287876DD,
         .title      = "Patched Character Rom",
         .revision   = "Atari 800 Font",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_CHAR,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x975546A5B6168FFD,
         .title      = "Patched Character Rom",
         .revision   = "MSX Font",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_CHAR,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x7C74107C9365F735,
         .title      = "Patched Character Rom",
         .revision   = "ZX Spectrum Font",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_CHAR,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0xAFFE8B0EE2176CBD,
         .title      = "Patched Character Rom",
         .revision   = "Amstrad Font",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_CHAR,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0xD14C5BE4FEE17705,
         .title      = "Patched Character Rom",
         .revision   = "Topaz Font",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_CHAR,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0xA2C6A6E2C0477981,
         .title      = "Patched Character Rom",
         .revision   = "Topaz Font V2",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_CHAR,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x3BF55C821EE80365,
         .title      = "Patched Character Rom",
         .revision   = "Topaz Font V2 (broken)",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_CHAR,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x19F0DD3F3F9C4FE9,
         .title      = "Patched Character Rom",
         .revision   = "Topaz Font V2",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_CHAR,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0xE527AD3E0DDE930D,
         .title      = "Patched Character Rom",
         .revision   = "Teletext Font",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_CHAR,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },
 
     //
@@ -185,240 +185,240 @@ static const std::vector<RomTraits> roms = {
         .fnv        = 0xFB166E49AF709AB8,
         .title      = "Kernal Rom",
         .revision   = "V1",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0x4232D81CCD24FAAE,
         .title      = "Kernal Rom",
         .revision   = "V2",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0x4AF60EE54BEC9701,
         .title      = "Kernal Rom",
         .revision   = "V3",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0x429EA22675CAB478,
         .title      = "Kernal Rom",
         .revision   = "Danish V3",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0xF695289f3EC48A38,
         .title      = "Kernal Rom",
         .revision   = "Japanese",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0x1124ECFFE9ED2FE9,
         .title      = "Kernal Rom",
         .revision   = "Croatian",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0x8C4548E2202CB366,
         .title      = "Kernal Rom",
         .revision   = "",
-        .model      = RomModel::SX64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0x746EB1BC008B07E1,
         .title      = "Kernal Rom",
         .revision   = "Scandinavian",
-        .model      = RomModel::SX64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0x49A7074F1E6A896F,
         .title      = "Kernal Rom",
         .revision   = "V1",
-        .model      = RomModel::PET64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0xDE7F07008B787040,
         .title      = "Kernal Rom",
         .revision   = "JiffyDOS",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0xA9D2AD1A4E5F782C,
         .title      = "Kernal Rom",
         .revision   = "JiffyDOS",
-        .model      = RomModel::SX64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x750617B8DE6DBA82,
         .title      = "Kernal Rom",
         .revision   = "Turbo Rom V1",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x7E0A124C3F192818,
         .title      = "Kernal Rom",
         .revision   = "Datel Rom V3.2+",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x211EAC45AB03A2CA,
         .title      = "Kernal Rom",
         .revision   = "Exos Rom V3",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0xF2A39FF166D338AE,
         .title      = "Kernal Rom",
         .revision   = "Turbo Tape V0.1",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0xFD1EBD928024F8D5,
         .title      = "Patched Kernal Rom",
         .revision   = "Turbo 250 V1.0",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x7202DEA530E1C172,
         .title      = "Patched Kernal Rom",
         .revision   = "64'er DOS V3",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x7E3AEFF7886684A2,
         .title      = "Patched Kernal Rom",
         .revision   = "SpeedDOS Plus",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x6E6190177D93D2BB,
         .title      = "Patched Kernal Rom",
         .revision   = "SpeedDOS Plus (TRIAD) V2.7",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x141A584872021C25,
         .title      = "Patched Kernal Rom",
         .revision   = "Dolphin DOS2 (donnchawp) V1.1",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0xD135F409F4FA10F2,
         .title      = "Patched Kernal Rom",
         .revision   = "Dolphin DOS V1.0",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x32CAF94AAA196DB6,
         .title      = "Patched Kernal Rom",
         .revision   = "Dolphin DOS V2.0 Rev 1",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0xAE3DEC803423CE60,
         .title      = "Patched Kernal Rom",
         .revision   = "Dolphin DOS V2.0 Rev 1 (M.A.)",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x4D3C32F9415972C3,
         .title      = "Patched Kernal Rom",
         .revision   = "Dolphin DOS V2.0 Rev 2",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0xA5D930343EE32459,
         .title      = "Patched Kernal Rom",
         .revision   = "Dolphin DOS V2.0 Rev 3",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x7D34E8277F74A321,
         .title      = "Patched Kernal Rom",
         .revision   = "Dolphin DOS V2.0 (SilverDream)",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x877E38DA5DAFEC30,
         .title      = "Patched Kernal Rom",
         .revision   = "Dolphin DOS V3.0",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x2d7ca552f0332aef,
         .title      = "Patched Kernal Rom",
         .revision   = "JiffyDOS Dolphin Mod 2015",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x7D6153CE2E12474F,
         .title      = "Patched Kernal Rom",
         .revision   = "Masterom (Norland) V3.0",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x99692773DB9D7DF4,
         .title      = "Patched Kernal Rom",
         .revision   = "SD2IEC V2.2",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x57C8266769C5B580,
         .title      = "Patched Kernal Rom",
         .revision   = "JaffyDOS V1.3",
-        .model      = RomModel::GENERIC_C64,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_KERNAL,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },
 
     //
@@ -431,118 +431,118 @@ static const std::vector<RomTraits> roms = {
         .fnv        = 0x361A1EC48F04F5A4,
         .title      = "Floppy Drive Firmware",
         .revision   = "MOS 251968-01",
-        .model      = RomModel::GENERIC_VC1541,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_VC1541
     },{
         .fnv        = 0xB938E2DA07F4FE40,
         .title      = "Floppy Drive Firmware",
         .revision   = "MOS 251968-02",
-        .model      = RomModel::GENERIC_VC1541,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_VC1541
     },{
         .fnv        = 0x44BBA0EAC5898597,
         .title      = "Floppy Drive Firmware",
         .revision   = "MOS 251968-03",
-        .model      = RomModel::GENERIC_VC1541,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_VC1541
     },{
         .fnv        = 0xA1D36980A17C8756,
         .title      = "Floppy Drive Firmware",
         .revision   = "MOS 355640-01",
-        .model      = RomModel::GENERIC_VC1541,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_VC1541
     },{
         .fnv        = 0x47CBA55F16FB3E09,
         .title      = "Patched Drive Firmware",
         .revision   = "Relocation Patch",
-        .model      = RomModel::GENERIC_VC1541,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_VC1541,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x8B2A523E29BED889,
         .title      = "Patched Drive Firmware",
         .revision   = "JiffyDOS Patch",
-        .model      = RomModel::GENERIC_VC1541,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_VC1541,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0xF7F4D931219DBB5D,
         .title      = "Patched Drive Firmware",
         .revision   = "JiffyDOS Patch V6.0",
-        .model      = RomModel::GENERIC_VC1541,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_VC1541,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0xB4027D6D9D61378A,
         .title      = "Patched Drive Firmware",
         .revision   = "64'er DOS V3",
-        .model      = RomModel::GENERIC_VC1541,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_VC1541,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0xC50EAFCBA50C4B63,
         .title      = "Patched Drive Firmware",
         .revision   = "SpeedDOS Plus",
-        .model      = RomModel::GENERIC_VC1541,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_VC1541,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x92ADEBA1BCCD8D31,
         .title      = "Patched Drive Firmware",
         .revision   = "SpeedDOS Plus V2.7 (TRIAD)",
-        .model      = RomModel::GENERIC_VC1541,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_VC1541,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x682B5C77E7535B4A,
         .title      = "Patched Drive Firmware",
         .revision   = "Dolphin DOS2 (donnchawp) V1.1",
-        .model      = RomModel::GENERIC_VC1541,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_VC1541,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x28CD4E47A40C41CA,
         .title      = "Patched Drive Firmware",
         .revision   = "Dolphin DOS V2.0",
-        .model      = RomModel::GENERIC_VC1541,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_VC1541,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x1C1DDD64E02CAD32,
         .title      = "Patched Drive Firmware",
         .revision   = "Dolphin DOS V2.0 (SilverDream)",
-        .model      = RomModel::GENERIC_VC1541,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_VC1541,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0x09D8FBAB61E59FF0,
         .title      = "Patched Drive Firmware",
         .revision   = "Dolphin DOS V3.0",
-        .model      = RomModel::GENERIC_VC1541,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_VC1541,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .fnv        = 0xF684F72388EE5364,
         .title      = "Patched Drive Firmware",
         .revision   = "Dolphin DOS V3.0 (SilverDream)",
-        .model      = RomModel::GENERIC_VC1541,
+        .platform   = RomPlatform::C64,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::C64_VC1541,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },
 
     //
@@ -554,7 +554,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Amiga 1000 Boot Rom",
         .revision   = "8K",
         .released   = { 1985, 0 },
-        .model      = RomModel::A1000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_BOOT
     },{
@@ -562,7 +562,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Amiga 1000 Boot Rom",
         .revision   = "64KB",
         .released   = { 1985, 0 },
-        .model      = RomModel::A1000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_BOOT
     },{
@@ -570,7 +570,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 0.7 Beta",
         .revision   = "Rev 27.003 NTSC",
         .released   = { 1985, 7 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -578,7 +578,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 1.0",
         .revision   = "Rev 30.000 NTSC",
         .released   = { 1985, 9 },
-        .model      = RomModel::A1000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -586,7 +586,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 1.1",
         .revision   = "Rev 31.034 NTSC",
         .released   = { 1985, 11 },
-        .model      = RomModel::A1000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -594,7 +594,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 1.1",
         .revision   = "Rev 32.034 PAL",
         .released   = { 1986, 2 },
-        .model      = RomModel::A1000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -602,7 +602,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 1.2",
         .revision   = "Rev 33.166",
         .released   = { 1986, 9 },
-        .model      = RomModel::A1000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -610,7 +610,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 1.2",
         .revision   = "Rev 33.180",
         .released   = { 1986, 10 },
-        .model      = RomModel::A500 | RomModel::A1000 | RomModel::A2000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -618,7 +618,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 1.2",
         .revision   = "Rev 33.180 (MRAS patch)",
         .released   = { 2022, 0 },
-        .model      = RomModel::A500 | RomModel::A1000 | RomModel::A2000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -626,16 +626,16 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 1.2",
         .revision   = "Rev 33.180 (Guardian patch)",
         .released   = { 1988, 0 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .crc        = CRC32_KICK121_34_004,
         .title      = "Kickstart 1.2",
         .revision   = "Rev 34.004",
         .released   = { 1986, 10 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -643,7 +643,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 1.3",
         .revision   = "Rev 34.005",
         .released   = { 1987, 12 },
-        .model      = RomModel::A500 | RomModel::A1000 | RomModel::A2000 | RomModel::CDTV,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -651,7 +651,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 1.3",
         .revision   = "Rev 34.005",
         .released   = { 1987, 12 },
-        .model      = RomModel::A3000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -659,16 +659,16 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 1.3",
         .revision   = "Rev 34.005 (Guardian patch)",
         .released   = { 1988, 0 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .crc        = CRC32_KICK14_36_015,
         .title      = "Kickstart 1.4 Alpha 15",
         .revision   = "Rev 36.015",
         .released   = { 1989, 5 },
-        .model      = RomModel::A2000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -676,7 +676,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 1.4 Alpha 18",
         .revision   = "Rev 36.020",
         .released   = { 1989, 12 },
-        .model      = RomModel::A3000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -684,7 +684,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 2.0",
         .revision   = "Rev 36.028",
         .released   = { 1990, 3 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -692,7 +692,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 2.01",
         .revision   = "Rev 36.143",
         .released   = { 1990, 8 },
-        .model      = RomModel::A3000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -700,7 +700,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 2.02",
         .revision   = "Rev 36.207",
         .released   = { 1990, 10 },
-        .model      = RomModel::A3000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -708,7 +708,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 2.04",
         .revision   = "Rev 37.175",
         .released   = { 1991, 5 },
-        .model      = RomModel::A500,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -716,7 +716,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 2.04",
         .revision   = "Rev 37.175",
         .released   = { 1991, 5 },
-        .model      = RomModel::A3000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -724,7 +724,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 2.0?",
         .revision   = "Rev 37.210",
         .released   = { 1991, 11 },
-        .model      = RomModel::A600,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -732,7 +732,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 2.05",
         .revision   = "Rev 37.299",
         .released   = { 1991, 11 },
-        .model      = RomModel::A600,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -740,7 +740,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 2.05",
         .revision   = "Rev 37.300",
         .released   = { 1991, 11 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -748,7 +748,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 2.05",
         .revision   = "Rev 37.350",
         .released   = { 1992, 4 },
-        .model      = RomModel::A600HD,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -756,7 +756,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.0",
         .revision   = "Rev 39.106",
         .released   = { 1992, 9 },
-        .model      = RomModel::A1200,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -764,7 +764,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.0",
         .revision   = "Rev 39.106",
         .released   = { 1992, 9 },
-        .model      = RomModel::A4000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -772,7 +772,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.1",
         .revision   = "Rev 40.055",
         .released   = { 1993, 5 },
-        .model      = RomModel::A3000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -780,7 +780,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.1",
         .revision   = "Rev 40.060",
         .released   = { 1993, 5 },
-        .model      = RomModel::CD32,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -788,7 +788,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.1",
         .revision   = "Rev 40.063",
         .released   = { 1993, 7 },
-        .model      = RomModel::A500 | RomModel::A600 | RomModel::A2000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -796,7 +796,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.1",
         .revision   = "Rev 40.063 (ReKick image)",
         .released   = { 0, 0 },
-        .model      = RomModel::A500 | RomModel::A600 | RomModel::A2000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -804,7 +804,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.1",
         .revision   = "Rev 40.068",
         .released   = { 1993, 12 },
-        .model      = RomModel::A1200,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -812,7 +812,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.1",
         .revision   = "Rev 40.068",
         .released   = { 1993, 12 },
-        .model      = RomModel::A3000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -820,7 +820,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.1",
         .revision   = "Rev 40.068",
         .released   = { 1993, 12 },
-        .model      = RomModel::A4000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -828,7 +828,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.1",
         .revision   = "Rev 40.069 Beta",
         .released   = { 1993, 12 },
-        .model      = RomModel::A1200,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -836,7 +836,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.1",
         .revision   = "Rev 40.070",
         .released   = { 1994, 2 },
-        .model      = RomModel::A4000T,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -844,16 +844,16 @@ static const std::vector<RomTraits> roms = {
         .title      = "Fake Kickstart 3.5",
         .revision   = "Rev 40.071",
         .released   = { 0, 0 },
-        .model      = RomModel::A4000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_KICKSTART,
-        .patched    = true
+        .flags      = RomFlags::Patched
     },{
         .crc        = CRC32_CDTV_EXT_ROM_1_0,
         .title      = "CDTV Extended ROM",
         .revision   = "Rev 1.0",
         .released   = { 1991, 3 },
-        .model      = RomModel::CDTV,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_EXTROM
     },{
@@ -861,7 +861,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "CDTV Extended ROM",
         .revision   = "Rev 2.3",
         .released   = { 1992, 0 },
-        .model      = RomModel::CDTV,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_EXTROM
     },{
@@ -869,7 +869,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "CDTV Extended ROM",
         .revision   = "Rev 2.7",
         .released   = { 1992, 0 },
-        .model      = RomModel::CDTV,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::AMIGA_EXTROM
     },{
@@ -877,7 +877,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.1.4 (Hyperion)",
         .revision   = "Rev 46.143",
         .released   = { 2018, 9 },
-        .model      = RomModel::A500 | RomModel::A600 | RomModel::A1000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -885,7 +885,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.1.4 (Hyperion)",
         .revision   = "Rev 46.143",
         .released   = { 2018, 9 },
-        .model      = RomModel::A1200,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -893,7 +893,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.1.4 (Hyperion)",
         .revision   = "Rev 46.143",
         .released   = { 2018, 9 },
-        .model      = RomModel::A2000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -901,7 +901,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.1.4 (Hyperion)",
         .revision   = "Rev 46.143",
         .released   = { 2018, 9 },
-        .model      = RomModel::A3000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -909,7 +909,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.1.4 (Hyperion)",
         .revision   = "Rev 46.143",
         .released   = { 2018, 9 },
-        .model      = RomModel::A4000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -917,7 +917,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.1.4 (Hyperion)",
         .revision   = "Rev 46.143",
         .released   = { 2021, 5 },
-        .model      = RomModel::A4000T,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -925,7 +925,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2 (Hyperion)",
         .revision   = "Rev 47.96",
         .released   = { 2021, 5 },
-        .model      = RomModel::A500 | RomModel::A600 | RomModel::A1000 | RomModel::A2000 | RomModel::CDTV,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -933,7 +933,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2 (Hyperion)",
         .revision   = "Rev 47.96",
         .released   = { 2021, 5 },
-        .model      = RomModel::A1200,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -941,7 +941,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2 (Hyperion)",
         .revision   = "Rev 47.96",
         .released   = { 2021, 5 },
-        .model      = RomModel::A3000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -949,7 +949,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2 (Hyperion)",
         .revision   = "Rev 47.96",
         .released   = { 2021, 5 },
-        .model      = RomModel::A4000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -957,7 +957,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2 (Hyperion)",
         .revision   = "Rev 47.96",
         .released   = { 2021, 5 },
-        .model      = RomModel::A4000T,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -965,7 +965,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2.1 (Hyperion)",
         .revision   = "Rev 47.102",
         .released   = { 2021, 12 },
-        .model      = RomModel::A500 | RomModel::A600 | RomModel::A1000 | RomModel::A2000 | RomModel::CDTV,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -973,7 +973,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2.1 (Hyperion)",
         .revision   = "Rev 47.102",
         .released   = { 2021, 12 },
-        .model      = RomModel::A1200,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -981,7 +981,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2.1 (Hyperion)",
         .revision   = "Rev 47.102",
         .released   = { 2021, 12 },
-        .model      = RomModel::A3000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -989,7 +989,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2.1 (Hyperion)",
         .revision   = "Rev 47.102",
         .released   = { 2021, 12 },
-        .model      = RomModel::A4000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -997,7 +997,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2.1 (Hyperion)",
         .revision   = "Rev 47.102",
         .released   = { 2021, 12 },
-        .model      = RomModel::A4000T,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -1005,7 +1005,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2.2 (Hyperion)",
         .revision   = "Rev 47.111",
         .released   = { 2023, 3 },
-        .model      = RomModel::A500 | RomModel::A600 | RomModel::A1000 | RomModel::A2000 | RomModel::CDTV,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -1013,7 +1013,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2.2 (Hyperion)",
         .revision   = "Rev 47.111",
         .released   = { 2023, 3 },
-        .model      = RomModel::A1200,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -1021,7 +1021,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2.2 (Hyperion)",
         .revision   = "Rev 47.111",
         .released   = { 2023, 3 },
-        .model      = RomModel::A3000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -1029,7 +1029,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2.2 (Hyperion)",
         .revision   = "Rev 47.111",
         .released   = { 2023, 3 },
-        .model      = RomModel::A4000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -1037,7 +1037,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2.2 (Hyperion)",
         .revision   = "Rev 47.111",
         .released   = { 2023, 3 },
-        .model      = RomModel::A4000T,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -1045,7 +1045,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2.3 (Hyperion)",
         .revision   = "Rev 47.115",
         .released   = { 2025, 4 },
-        .model      = RomModel::A500 | RomModel::A600 | RomModel::A1000 | RomModel::A2000 | RomModel::CDTV,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -1053,7 +1053,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2.3 (Hyperion)",
         .revision   = "Rev 47.115",
         .released   = { 2025, 4 },
-        .model      = RomModel::A1200,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -1061,7 +1061,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2.3 (Hyperion)",
         .revision   = "Rev 47.115",
         .released   = { 2025, 4 },
-        .model      = RomModel::A3000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -1069,7 +1069,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2.3 (Hyperion)",
         .revision   = "Rev 47.115",
         .released   = { 2025, 4 },
-        .model      = RomModel::A4000,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -1077,7 +1077,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Kickstart 3.2.3 (Hyperion)",
         .revision   = "Rev 47.115",
         .released   = { 2025, 4 },
-        .model      = RomModel::A4000T,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::HYPERION,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -1085,7 +1085,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "AROS Kickstart replacement",
         .revision   = "SVN 54705 (UAE version)",
         .released   = { 2017, 5 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::AROS,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -1093,7 +1093,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "AROS Kickstart extension",
         .revision   = "SVN 54705 (UAE version)",
         .released   = { 2017, 5 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::AROS,
         .type       = RomType::AMIGA_EXTROM
     },{
@@ -1101,7 +1101,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "AROS Kickstart replacement",
         .revision   = "SVN 55696 (SAE version)",
         .released   = { 2019, 2 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::AROS,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -1109,7 +1109,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "AROS Kickstart extension",
         .revision   = "SVN 55696 (SAE version)",
         .released   = { 2019, 2 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::AROS,
         .type       = RomType::AMIGA_EXTROM
     },{
@@ -1117,7 +1117,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "AROS Kickstart replacement",
         .revision   = "Version 1ed13de6e3",
         .released   = { 2021, 9 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::AROS,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -1125,7 +1125,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "AROS Kickstart extension",
         .revision   = "Version 1ed13de6e3",
         .released   = { 2021, 9 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::AROS,
         .type       = RomType::AMIGA_EXTROM
     },{
@@ -1133,7 +1133,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "AROS Kickstart replacement",
         .revision   = "Version 20250219",
         .released   = { 2025, 2 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::AROS,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -1141,7 +1141,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "AROS Kickstart extension",
         .revision   = "Version 20250219",
         .released   = { 2025, 2 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::AROS,
         .type       = RomType::AMIGA_EXTROM
     },{
@@ -1149,7 +1149,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "AROS Kickstart replacement",
         .revision   = "Version 20260820",
         .released   = { 2026, 8 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::AROS,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -1157,7 +1157,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "AROS Kickstart extension",
         .revision   = "Version 20260820",
         .released   = { 2026, 8 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::AROS,
         .type       = RomType::AMIGA_EXTROM
     },{
@@ -1165,7 +1165,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "EmuTOS Kickstart replacement",
         .revision   = "Version 1.3",
         .released   = { 2024, 3 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::EMUTOS,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -1173,7 +1173,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "EmuTOS Kickstart replacement",
         .revision   = "Version 1.4",
         .released   = { 2025, 6 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::EMUTOS,
         .type       = RomType::AMIGA_KICKSTART
     },{
@@ -1181,7 +1181,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Amiga DiagROM",
         .revision   = "Version 1.1",
         .released   = { 2018, 10 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::AMIGA_DIAG
     },{
@@ -1189,7 +1189,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Amiga DiagROM",
         .revision   = "Version 1.2",
         .released   = { 2019, 8 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::AMIGA_DIAG
     },{
@@ -1197,7 +1197,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Amiga DiagROM",
         .revision   = "Version 1.2.1",
         .released   = { 2020, 7 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::AMIGA_DIAG
     },{
@@ -1205,7 +1205,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Amiga DiagROM",
         .revision   = "Version 1.3",
         .released   = { 2023, 4 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::AMIGA_DIAG
     },{
@@ -1213,7 +1213,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "Amiga DiagROM",
         .revision   = "Version 2.0",
         .released   = { 2026, 3 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::AMIGA_DIAG
     },{
@@ -1221,7 +1221,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "OCS CPUBLTRO",
         .revision   = "Version 0.3.2 (512 KB)",
         .released   = { 2024, 11 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::AMIGA_DEMO
     },{
@@ -1229,7 +1229,7 @@ static const std::vector<RomTraits> roms = {
         .title      = "OCS CPUBLTRO",
         .revision   = "Version 0.3.2 (256 KB)",
         .released   = { 2024, 11 },
-        .model      = 0,
+        .platform   = RomPlatform::Amiga,
         .vendor     = RomVendor::OTHER,
         .type       = RomType::AMIGA_DEMO
     }
@@ -1247,38 +1247,6 @@ RomDateToString(RomDate date)
     if (date.month == 0 || date.month > 12) return std::to_string(date.year);
 
     return string(names[date.month]) + " " + std::to_string(date.year);
-}
-
-string
-RomModelToString(u32 model)
-{
-    if (model == 0) return "";
-    if (model == RomModel::GENERIC_C64) return "Any C64";
-    if (model == RomModel::GENERIC_VC1541) return "Any VC1541";
-    if (model == RomModel::GENERIC_AMIGA) return "Amiga";
-
-    static const std::pair<u32, const char *> names[] = {
-        { RomModel::C64,      "C64"     }, { RomModel::C64II,    "C64C"    },
-        { RomModel::SX64,     "SX64"    }, { RomModel::PET64,    "PET64"   },
-        { RomModel::VC1541,   "VC1541"  }, { RomModel::VC1541C,  "1541C"   },
-        { RomModel::VC1541II, "1541-II" },
-        { RomModel::A500,     "A500"    }, { RomModel::A600,     "A600"    },
-        { RomModel::A600HD,   "A600HD"  }, { RomModel::A1000,    "A1000"   },
-        { RomModel::A1200,    "A1200"   }, { RomModel::A2000,    "A2000"   },
-        { RomModel::A3000,    "A3000"   }, { RomModel::A4000,    "A4000"   },
-        { RomModel::A4000T,   "A4000T"  }, { RomModel::CD32,     "CD32"    },
-        { RomModel::CDTV,     "CDTV"    },
-    };
-
-    string result;
-    for (auto &[bit, name] : names) {
-
-        if (!(model & bit)) continue;
-        if (!result.empty()) result += ", ";
-        result += name;
-    }
-
-    return result;
 }
 
 RomManager::RomManager()

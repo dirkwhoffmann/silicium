@@ -266,38 +266,58 @@ RomDate;
 // Formats a RomDate for display, e.g. "April 2025", "2022", or "" if unknown
 string RomDateToString(RomDate date);
 
-// Hardware models a Rom is known to run on
-namespace RomModel {
+/* The machine a Rom belongs to. Unlike the former RomModel bitmask, this does
+ * not distinguish individual hardware models (SX-64, A1200, ...) -- RomType
+ * already says what kind of Rom it is (Kickstart, boot Rom, drive firmware,
+ * ...), and the C64/Amiga split is all that's left worth keeping structured.
+ * AtariST is a placeholder -- no known Rom carries it yet.
+ */
+enum class RomPlatform
+{
+    C64,
+    Amiga,
+    AtariST
+};
 
-constexpr u32 C64       = 1u << 0;   // Breadbox
-constexpr u32 C64II     = 1u << 1;   // C64C
-constexpr u32 SX64      = 1u << 2;   // SX-64
-constexpr u32 PET64     = 1u << 3;   // Educator 64
+struct RomPlatformEnum : utl::Reflectable<RomPlatformEnum, RomPlatform> {
 
-constexpr u32 VC1541    = 1u << 4;
-constexpr u32 VC1541C   = 1u << 5;
-constexpr u32 VC1541II  = 1u << 6;
+    static constexpr long minVal = 0;
+    static constexpr long maxVal = long(RomPlatform::AtariST);
 
-constexpr u32 A500    = 1u << 7;
-constexpr u32 A600    = 1u << 8;
-constexpr u32 A600HD  = 1u << 9;
-constexpr u32 A1000   = 1u << 10;
-constexpr u32 A1200   = 1u << 11;
-constexpr u32 A2000   = 1u << 12;
-constexpr u32 A3000   = 1u << 13;
-constexpr u32 A4000   = 1u << 14;
-constexpr u32 A4000T  = 1u << 15;
-constexpr u32 CD32    = 1u << 16;
-constexpr u32 CDTV    = 1u << 17;
+    static const char *_key(RomPlatform value)
+    {
+        switch (value) {
 
-constexpr u32 GENERIC_C64     = C64 | C64II | SX64 | PET64;
-constexpr u32 GENERIC_VC1541  = VC1541 | VC1541C | VC1541II;
-constexpr u32 GENERIC_AMIGA   = A500 | A600 | A600HD | A1000 | A1200 | A2000 | A3000 | A4000 | A4000T | CD32 | CDTV;
+            case RomPlatform::C64:     return "C64";
+            case RomPlatform::Amiga:   return "AMIGA";
+            case RomPlatform::AtariST: return "ATARIST";
+        }
+        return "???";
+    }
+
+    static const char *help(RomPlatform value)
+    {
+        switch (value) {
+
+            case RomPlatform::C64:     return "Commodore 64";
+            case RomPlatform::Amiga:   return "Amiga";
+            case RomPlatform::AtariST: return "Atari ST";
+        }
+        return "";
+    }
+};
+
+/* Properties a Rom can have, one bit each. A database entry ORs together
+ * every flag that applies; 0 means none of them do.
+ */
+namespace RomFlags {
+
+constexpr u32 Verified   = 1u << 0;   // Dump checked against a trusted source
+constexpr u32 Corrupted  = 1u << 1;   // Dump is known to be damaged
+constexpr u32 Patched    = 1u << 2;   // Modified from the original Rom
+constexpr u32 Relocated  = 1u << 3;   // Built to run from a non-standard address
 
 }
-
-// Formats a RomModel bitmask for display, e.g. "A500, A600, A2000", or "" if 0
-string RomModelToString(u32 model);
 
 /* Describes a single known Rom. Cores fill in whichever hash they identify
  * Roms by -- the C64 matches on 'fnv', the Amiga on 'crc' -- and leave the
@@ -311,11 +331,11 @@ typedef struct {
     const char *title;
     const char *revision;
     RomDate released;
-    u32 model;
+    RomPlatform platform;
 
     RomVendor vendor;
     RomType type;
-    bool patched;
+    u32 flags;
 }
 RomTraits;
 

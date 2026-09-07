@@ -129,40 +129,40 @@ class SiC64ConfigController : public Controller {
     u32 getBasicRomCrc() const { return basicRom.crc; }
     QUrl getBasicRomIcon() const { return getRomIcon(basicRom); }
     QString getBasicRomTitle() const { return QString::fromUtf8(basicRom.title); }
-    QString getBasicRomSubtitle() const { return QString::fromStdString(vc64::RomModelToString(basicRom.model)); }
+    QString getBasicRomSubtitle() const { return ((basicRom.flags & vc64::RomFlags::Patched) ? QStringLiteral("Patched") : QString()); }
     QString getBasicRomRevision() const { return QString::fromUtf8(basicRom.revision); }
     QString getBasicRomVendor() const { return getRomVendor(basicRom); }
-    bool hasPatchedBasicRom() const { return basicRom.patched; }
+    bool hasPatchedBasicRom() const { return (basicRom.flags & vc64::RomFlags::Patched) != 0; }
 
     bool hasKernalRom() const { return kernalRom.fnv != 0; }
     u64 getKernalRomFnv() const { return kernalRom.fnv; }
     u32 getKernalRomCrc() const { return kernalRom.crc; }
     QUrl getKernalRomIcon() const { return getRomIcon(kernalRom); }
     QString getKernalRomTitle() const { return QString::fromUtf8(kernalRom.title); }
-    QString getKernalRomSubtitle() const { return QString::fromStdString(vc64::RomModelToString(kernalRom.model)); }
+    QString getKernalRomSubtitle() const { return ((kernalRom.flags & vc64::RomFlags::Patched) ? QStringLiteral("Patched") : QString()); }
     QString getKernalRomRevision() const { return QString::fromUtf8(kernalRom.revision); }
     QString getKernalRomVendor() const { return getRomVendor(kernalRom); }
-    bool hasPatchedKernalRom() const { return kernalRom.patched; }
+    bool hasPatchedKernalRom() const { return (kernalRom.flags & vc64::RomFlags::Patched) != 0; }
 
     bool hasCharRom() const { return charRom.fnv != 0; }
     u64 getCharRomFnv() const { return charRom.fnv; }
     u32 getCharRomCrc() const { return charRom.crc; }
     QUrl getCharRomIcon() const { return getRomIcon(charRom); }
     QString getCharRomTitle() const { return QString::fromUtf8(charRom.title); }
-    QString getCharRomSubtitle() const { return QString::fromStdString(vc64::RomModelToString(charRom.model)); }
+    QString getCharRomSubtitle() const { return ((charRom.flags & vc64::RomFlags::Patched) ? QStringLiteral("Patched") : QString()); }
     QString getCharRomRevision() const { return QString::fromUtf8(charRom.revision); }
     QString getCharRomVendor() const { return getRomVendor(charRom); }
-    bool hasPatchedCharRom() const { return charRom.patched; }
+    bool hasPatchedCharRom() const { return (charRom.flags & vc64::RomFlags::Patched) != 0; }
 
     bool hasVC1541Rom() const { return vc1541Rom.fnv != 0; }
     u64 getVC1541RomFnv() const { return vc1541Rom.fnv; }
     u32 getVC1541RomCrc() const { return vc1541Rom.crc; }
     QUrl getVC1541RomIcon() const { return getRomIcon(vc1541Rom); }
     QString getVC1541RomTitle() const { return QString::fromUtf8(vc1541Rom.title); }
-    QString getVC1541RomSubtitle() const { return QString::fromStdString(vc64::RomModelToString(vc1541Rom.model)); }
+    QString getVC1541RomSubtitle() const { return ((vc1541Rom.flags & vc64::RomFlags::Patched) ? QStringLiteral("Patched") : QString()); }
     QString getVC1541RomRevision() const { return QString::fromUtf8(vc1541Rom.revision); }
     QString getVC1541RomVendor() const { return getRomVendor(vc1541Rom); }
-    bool hasPatchedVC1541Rom() const { return vc1541Rom.patched; }
+    bool hasPatchedVC1541Rom() const { return (vc1541Rom.flags & vc64::RomFlags::Patched) != 0; }
 
     QUrl getRomIcon(const vc64::RomTraits &traits) const;
     QString getRomVendor(const vc64::RomTraits &traits) const;

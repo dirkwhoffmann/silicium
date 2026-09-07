@@ -649,6 +649,7 @@ Memory::getRomTraits(u32 crc)
         .crc = crc,
         .title = crc ? "Unknown ROM" : "",
         .revision = "",
+        .platform = RomPlatform::Amiga,
         .vendor = RomVendor::UNKNOWN
     };
 }

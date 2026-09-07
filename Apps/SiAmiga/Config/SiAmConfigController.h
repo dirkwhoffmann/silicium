@@ -101,9 +101,9 @@ class SiAmConfigController : public Controller {
     QString getKickRomTitle() const { return QString::fromUtf8(kickRom.title); }
     QString getKickRomRevision() const { return QString::fromUtf8(kickRom.revision); }
     QString getKickRomReleased() const { return QString::fromStdString(vamiga::RomDateToString(kickRom.released)); }
-    QString getKickRomModel() const { return QString::fromStdString(vamiga::RomModelToString(kickRom.model)); }
+    QString getKickRomModel() const { return (kickRom.flags & vamiga::RomFlags::Patched) ? QStringLiteral("Patched") : QString(); }
     QString getKickRomVendor() const { return getRomVendor(kickRom); }
-    bool hasPatchedKickRom() const { return kickRom.patched; }
+    bool hasPatchedKickRom() const { return (kickRom.flags & vamiga::RomFlags::Patched) != 0; }
 
     bool hasExtRom() const { return extRom.crc != 0; }
     u32 getExtRomCrc() const { return extRom.crc; }
@@ -111,9 +111,9 @@ class SiAmConfigController : public Controller {
     QString getExtRomTitle() const { return QString::fromUtf8(extRom.title); }
     QString getExtRomRevision() const { return QString::fromUtf8(extRom.revision); }
     QString getExtRomReleased() const { return QString::fromStdString(vamiga::RomDateToString(extRom.released)); }
-    QString getExtRomModel() const { return QString::fromStdString(vamiga::RomModelToString(extRom.model)); }
+    QString getExtRomModel() const { return (extRom.flags & vamiga::RomFlags::Patched) ? QStringLiteral("Patched") : QString(); }
     QString getExtRomVendor() const { return getRomVendor(extRom); }
-    bool hasPatchedExtRom() const { return extRom.patched; }
+    bool hasPatchedExtRom() const { return (extRom.flags & vamiga::RomFlags::Patched) != 0; }
 
     QUrl getRomIcon(const vamiga::RomTraits &traits) const;
     QString getRomVendor(const vamiga::RomTraits &traits) const;

@@ -38,7 +38,7 @@ Memory::_dump(Category category, std::ostream &os) const
 
                 os << tab("Title") << traits.title << std::endl;
                 os << tab("Revision") << traits.revision << std::endl;
-                os << tab("Model") << RomModelToString(traits.model) << std::endl;
+                os << tab("Patched") << ((traits.flags & RomFlags::Patched) ? "Yes" : "No") << std::endl;
                 os << tab("CRC32") << hex(traits.crc) << std::endl;
                 os << tab("FNV64") << hex(traits.fnv) << std::endl;
             }
