@@ -12,6 +12,7 @@
 #include "VAmiga.h"
 #include "Controller.h"
 #include <QColor>
+#include <QStringList>
 #include <QUrl>
 
 //
@@ -79,6 +80,17 @@ class SiAmConfigController : public Controller {
     Q_PROPERTY(QString extRomVendor READ getExtRomVendor NOTIFY romConfigChanged)
     Q_PROPERTY(bool hasPatchedExtRom READ hasPatchedExtRom NOTIFY romConfigChanged)
 
+    // Titles of the Roms found in the Rom library (see
+    // SiAmController::romLibraryDir()), for the two bookmarks dropdowns:
+    // every Rom except AMIGA_EXTROM ones for the Kickstart slot, only
+    // AMIGA_EXTROM ones for the Extension slot. Install one by passing its
+    // index to the matching installXRom().
+    Q_PROPERTY(QStringList availableKickRoms READ getAvailableKickRoms NOTIFY romConfigChanged)
+    Q_PROPERTY(QStringList availableExtRoms READ getAvailableExtRoms NOTIFY romConfigChanged)
+
+    Q_INVOKABLE void installKickRom(int index);
+    Q_INVOKABLE void installExtRom(int index);
+
     // Unlike vc64's RomFile, vAmiga's RomFile format is the same for the
     // Kickstart and Extended ROM slots -- there's nothing in the file itself
     // that says which one it's meant for, so there's no isKickRom/isExtRom
@@ -117,6 +129,25 @@ class SiAmConfigController : public Controller {
 
     QUrl getRomIcon(const vamiga::RomTraits &traits) const;
     QString getRomVendor(const vamiga::RomTraits &traits) const;
+
+    QStringList getAvailableKickRoms() const { return availableRomNames(false); }
+    QStringList getAvailableExtRoms() const { return availableRomNames(true); }
+
+    // The known Amiga Roms actually found in the Rom library -- every one
+    // except AMIGA_EXTROM when 'extOnly' is false, only AMIGA_EXTROM ones
+    // when it's true -- in the same order availableRomNames()/installXRom()
+    // index into.
+    std::vector<vamiga::RomTraits> availableRoms(bool extOnly) const;
+    QStringList availableRomNames(bool extOnly) const;
+
+    /* If 'path' matches a known Rom in the database (by content, not by
+     * where it happens to live -- see RomManager::resolve()), copies it into
+     * the Rom library, named after its checksum in hex (e.g. "1a2b3c4d.rom").
+     * A no-op for a file the database doesn't recognize, or one that's
+     * already sitting in the library under that name (e.g. reinstalling one
+     * via installKickRom()/installExtRom(), which load straight from there).
+     */
+    void copyToLibrary(const fs::path &path) const;
 
 
     //

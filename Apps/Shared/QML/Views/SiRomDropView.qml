@@ -86,6 +86,7 @@ Item {
                     phosphor: "bookmarks"
                     scale: 1.0
                     size: Size.regular
+                    enabled: root.libraryRoms.length > 0
                     onClicked: libraryMenu.open()
 
                     DebugRect {}

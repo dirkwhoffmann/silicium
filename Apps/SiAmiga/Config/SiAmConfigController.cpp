@@ -11,6 +11,7 @@
 #include "Assets.h"
 #include "SiAmController.h"
 #include "RomFile.h"
+#include "Roms/RomManager.h"
 #include <QFileInfo>
 
 using namespace vamiga;
@@ -43,8 +44,11 @@ SiAmConfigController::loadKickRom(const QUrl &url)
     try {
 
         if (url.isLocalFile()) {
+
+            auto path = fs::path(url.toLocalFile().toStdWString());
             SiAmController::core().mem.loadRom(url.toLocalFile().toStdWString());
             queryRoms();
+            copyToLibrary(path);
         }
 
     } catch (std::exception &e) {
@@ -59,8 +63,11 @@ SiAmConfigController::loadExtRom(const QUrl &url)
     try {
 
         if (url.isLocalFile()) {
+
+            auto path = fs::path(url.toLocalFile().toStdWString());
             SiAmController::core().mem.loadExt(url.toLocalFile().toStdWString());
             queryRoms();
+            copyToLibrary(path);
         }
 
     } catch (std::exception &e) {
@@ -130,6 +137,83 @@ QString
 SiAmConfigController::getRomVendor(const RomTraits &traits) const
 {
     return QString::fromUtf8(RomVendorEnum::key(traits.vendor));
+}
+
+std::vector<RomTraits>
+SiAmConfigController::availableRoms(bool extOnly) const
+{
+    auto &romManager = RomManager::shared();
+
+    // Restrict to entries the folder scan actually found a file for -- the
+    // database also knows about Roms the user doesn't have
+    auto matches = romManager.getRoms([extOnly](const RomTraits &t) {
+
+        if (t.platform != RomPlatform::Amiga) return false;
+        return extOnly ? (t.type == RomType::AMIGA_EXTROM) : (t.type != RomType::AMIGA_EXTROM);
+    });
+
+    std::vector<RomTraits> result;
+    for (auto &traits : matches) {
+        if (romManager.getRom(traits)) result.push_back(traits);
+    }
+
+    return result;
+}
+
+QStringList
+SiAmConfigController::availableRomNames(bool extOnly) const
+{
+    QStringList result;
+
+    for (auto &traits : availableRoms(extOnly)) {
+
+        auto name = QString::fromUtf8(traits.title);
+        if (traits.revision && *traits.revision) name += " (" + QString::fromUtf8(traits.revision) + ")";
+        result << name;
+    }
+
+    return result;
+}
+
+void
+SiAmConfigController::installKickRom(int index)
+{
+    auto roms = availableRoms(false);
+    if (index < 0 || index >= (int)roms.size()) return;
+
+    auto path = RomManager::shared().getRom(roms[(size_t)index]);
+    if (!path) return;
+
+    loadKickRom(QUrl::fromLocalFile(QString::fromStdString(path->string())));
+}
+
+void
+SiAmConfigController::installExtRom(int index)
+{
+    auto roms = availableRoms(true);
+    if (index < 0 || index >= (int)roms.size()) return;
+
+    auto path = RomManager::shared().getRom(roms[(size_t)index]);
+    if (!path) return;
+
+    loadExtRom(QUrl::fromLocalFile(QString::fromStdString(path->string())));
+}
+
+void
+SiAmConfigController::copyToLibrary(const fs::path &path) const
+{
+    auto traits = RomManager::shared().resolve(path);
+    if (!traits) return;
+
+    auto checksum = traits->crc ? QString::number(traits->crc, 16) : QString::number(traits->fnv, 16);
+    auto dest = fs::path(SiAmController::romLibraryDir().toStdString()) / (checksum.toStdString() + ".rom");
+
+    // Already there -- e.g. installKickRom()/installExtRom() reinstalling a
+    // library Rom, which loads straight from this same file
+    if (path == dest) return;
+
+    std::error_code ec;
+    fs::copy_file(path, dest, fs::copy_options::overwrite_existing, ec);
 }
 
 i64

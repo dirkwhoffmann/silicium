@@ -11,10 +11,14 @@
 #include "SiAmRenderer.h"
 #include "Logger.h"
 #include "DiagRom.h"
+#include "Roms/RomManager.h"
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QCursor>
+#include <QDir>
+#include <QFile>
 #include <QMetaObject>
+#include <QStandardPaths>
 
 using namespace vamiga;
 
@@ -83,6 +87,35 @@ SiAmController::initialize()
     // together on this core's API (unlike VirtualC64, which splits them into
     // launch() and a separate setListener()).
     core().launch(this, ::process);
+
+    // Point RomManager at the Rom library and scan it once. Nothing but this
+    // class and SiAmConfigController::copyToLibrary() ever write here, so
+    // there's nothing to watch for and nothing that would need a rescan later.
+    auto romDir = romLibraryDir();
+    QDir().mkpath(romDir);
+    installBundledRomFiles(romDir);
+
+    auto &romManager = retro::vault::RomManager::shared();
+    romManager.addFolder(fs::path(romDir.toStdString()));
+    romManager.scanFolders();
+}
+
+QString
+SiAmController::romLibraryDir()
+{
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/roms/amiga";
+}
+
+void
+SiAmController::installBundledRomFiles(const QString &dir)
+{
+    for (const auto &info : QDir(":/Roms").entryInfoList(QDir::Files)) {
+
+        auto dest = QDir(dir).filePath(info.fileName());
+
+        QFile::remove(dest);
+        QFile::copy(info.filePath(), dest);
+    }
 }
 
 void

@@ -91,6 +91,11 @@ Item {
         property string subtitle: ""
         property string details: ""
 
+        // Display names of the Roms available in the Rom library (see
+        // SiAmController::romLibraryDir()), shown in the dropdown opened by
+        // the bookmarks button; installRom(index) fires when one is picked.
+        property var libraryRoms: []
+
         // Extra content (the Extension Rom's Location combo) appended below
         // the title/subtitle/details column -- aliased to that column's
         // 'data' below rather than declared 'default property' (RomSlot's
@@ -100,6 +105,7 @@ Item {
 
         signal urlsDropped(var urls)
         signal deleteRom()
+        signal installRom(int index)
         signal clicked()
 
         Layout.fillWidth: true
@@ -146,7 +152,47 @@ Item {
             Layout.fillWidth: true
             spacing: Style.smallTextSpacing
 
-            SiText { text: slot.title; font.bold: true; color: Palette.primary; Layout.fillWidth: true; elide: Text.ElideRight }
+            RowLayout {
+
+                Layout.fillWidth: true
+                spacing: Style.smallSpacing
+
+                // Close to the big Rom image, which sits to this row's left
+                // for both slots in this panel (unlike SiC64RomConfig.qml's
+                // mirrored grid, there's no left/right variant here).
+                SiSymbolButton {
+
+                    id: libraryButton
+                    phosphor: "bookmarks"
+                    scale: 1.0
+                    size: Size.regular
+                    enabled: slot.libraryRoms.length > 0
+                    onClicked: libraryMenu.open()
+
+                    SiMenu {
+
+                        id: libraryMenu
+                        y: libraryButton.height
+
+                        // Dynamically generate one item per Rom the library
+                        // scan found for this slot (see availableKickRoms/
+                        // availableExtRoms in SiAmConfigController).
+                        Instantiator {
+
+                            model: slot.libraryRoms
+                            delegate: SiMenuItem {
+                                text: modelData
+                                onTriggered: slot.installRom(index)
+                            }
+                            onObjectAdded: (index, object) => libraryMenu.insertItem(index, object)
+                            onObjectRemoved: (index, object) => libraryMenu.removeItem(object)
+                        }
+                    }
+                }
+
+                SiText { text: slot.title; font.bold: true; color: Palette.primary; Layout.fillWidth: true; elide: Text.ElideRight }
+            }
+
             SiText { text: slot.subtitle; color: Palette.secondary; Layout.fillWidth: true; elide: Text.ElideRight; visible: text !== "" }
             SiText { text: slot.details; color: Palette.tertiary; Layout.fillWidth: true; elide: Text.ElideRight; visible: text !== "" }
 
@@ -246,9 +292,11 @@ Item {
                 title: root.kickTitle
                 subtitle: root.kickSubtitle
                 details: root.kickDetails
+                libraryRoms: cc.availableKickRoms
 
                 onUrlsDropped: (urls) => cc.loadKickRom(urls[0])
                 onDeleteRom: cc.deleteKickRom()
+                onInstallRom: (index) => cc.installKickRom(index)
                 onClicked: { romFileDialog.romType = "kick"; romFileDialog.open() }
             }
 
@@ -268,9 +316,11 @@ Item {
                 title: root.extTitle
                 subtitle: root.extSubtitle
                 details: root.extDetails
+                libraryRoms: cc.availableExtRoms
 
                 onUrlsDropped: (urls) => cc.loadExtRom(urls[0])
                 onDeleteRom: cc.deleteExtRom()
+                onInstallRom: (index) => cc.installExtRom(index)
                 onClicked: { romFileDialog.romType = "ext"; romFileDialog.open() }
 
                 extra: RowLayout {
