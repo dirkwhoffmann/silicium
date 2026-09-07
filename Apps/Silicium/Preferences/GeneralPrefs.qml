@@ -9,7 +9,6 @@
 
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Dialogs
 import QtQuick.Layouts
 import Silicium.Controllers
 import Silicium.Preferences
@@ -209,54 +208,6 @@ PrefPage {
                 visibleTarget: autoDeleteSnapshotsHelp.checked
                 text: "When the snapshot capacity above is exceeded, the oldest snapshot is deleted automatically. If unchecked, you are asked for confirmation before it is removed."
             }
-        }
-    }
-
-    PrefSection {
-
-        header: "ROM LIBRARY"
-
-        HelpWrapper {
-
-            SiTextBoxControl {
-
-                id: romLibrary
-                Layout.fillWidth: true
-                l: "Location:"
-                lwidth: root.labelWidth
-
-                text: Preferences.romLibrary
-                onEditingFinished: Preferences.romLibrary = text
-
-                SiSymbolButton {
-
-                    symbol: "folder"
-                    size: Size.regular
-                    onClicked: romLibraryDialog.open()
-                }
-
-                SiHelpButton {
-
-                    id: romLibraryHelp
-                    checkable: true
-                    alignment: Qt.AlignLeft
-                }
-
-                HSpacer { }
-            }
-
-            HelpBox {
-
-                visibleTarget: romLibraryHelp.checked
-                text: "The folder the emulator searches for real Rom images (Kickstart, Basic, Kernal, and similar files). Roms found here are recognized and offered automatically wherever a Rom is needed."
-            }
-        }
-
-        FolderDialog {
-
-            id: romLibraryDialog
-            title: qsTr("Select Rom Library Folder")
-            onAccepted: Preferences.setRomLibraryUrl(selectedFolder)
         }
     }
 

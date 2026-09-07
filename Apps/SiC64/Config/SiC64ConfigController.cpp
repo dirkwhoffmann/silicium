@@ -51,6 +51,7 @@ SiC64ConfigController::loadRom(const QUrl &url)
 
             C64Controller::core().c64.loadRom(url.toLocalFile().toStdWString());
             queryRoms();
+            copyToLibrary(path);
 
             if (type) rememberRomPath(url, *type);
         }
@@ -72,8 +73,11 @@ SiC64ConfigController::loadRom(const QUrl &url, RomType type)
     try {
 
         if (url.isLocalFile()) {
+
+            auto path = fs::path(url.toLocalFile().toStdWString());
             C64Controller::core().c64.loadRom(url.toLocalFile().toStdWString(), type);
             queryRoms();
+            copyToLibrary(path);
             rememberRomPath(url, type);
         }
 
@@ -225,6 +229,23 @@ SiC64ConfigController::installRom(RomType type, int index)
     if (!path) return;
 
     loadRom(QUrl::fromLocalFile(QString::fromStdString(path->string())), type);
+}
+
+void
+SiC64ConfigController::copyToLibrary(const fs::path &path) const
+{
+    auto traits = RomManager::shared().resolve(path);
+    if (!traits) return;
+
+    auto checksum = traits->crc ? QString::number(traits->crc, 16) : QString::number(traits->fnv, 16);
+    auto dest = fs::path(C64Controller::romLibraryDir().toStdString()) / (checksum.toStdString() + ".rom");
+
+    // Already there -- e.g. installRom() reinstalling a library Rom, which
+    // loads straight from this same file
+    if (path == dest) return;
+
+    std::error_code ec;
+    fs::copy_file(path, dest, fs::copy_options::overwrite_existing, ec);
 }
 
 i64

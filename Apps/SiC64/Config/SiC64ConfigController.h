@@ -192,6 +192,15 @@ class SiC64ConfigController : public Controller {
     QStringList availableRomNames(vc64::RomType type) const;
     void installRom(vc64::RomType type, int index);
 
+    /* If 'path' matches a known Rom in the database (by content, not by
+     * where it happens to live -- see RomManager::resolve()), copies it into
+     * the Rom library, named after its checksum in hex (e.g. "1a2b3c4d.rom").
+     * A no-op for a file the database doesn't recognize, or one that's
+     * already sitting in the library under that name (e.g. reinstalling one
+     * via installRom() above, which loads straight from there).
+     */
+    void copyToLibrary(const fs::path &path) const;
+
     void deleteRom(vc64::RomType type);
 
     // Remembers the URL of a successfully loaded ROM in the user defaults

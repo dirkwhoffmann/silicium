@@ -141,6 +141,15 @@ public:
     // errorMessage describes the failure.
     bool parseArguments(const QCoreApplication &app);
 
+    /* The Rom library: a fixed, app-private folder that only
+     * SiC64ConfigController::copyToLibrary() ever writes to. Since nothing
+     * else can change its contents, RomManager needs pointing here and
+     * scanning exactly once, at startup -- no watching, no rescanning.
+     */
+    static QString romLibraryDir();
+
+public:
+
     Q_PROPERTY(QString errorMessage READ getErrorMessage CONSTANT)
     const QString &getErrorMessage() const { return errorMessage; }
 

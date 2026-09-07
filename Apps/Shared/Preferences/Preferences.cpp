@@ -117,8 +117,6 @@ Preferences::loadGeneralSettings()
     maxSnapshots           = s.value("maxSnapshots", 8).toInt();
     autoDeleteSnapshots    = s.value("autoDeleteSnapshots", false).toBool();
 
-    romLibrary             = fs::path(s.value("romLibrary", "").toString().toStdString());
-
     hibernateSnapshot      = s.value("hibernateSnapshot", true).toBool();
     hibernateWorkspace     = s.value("hibernateWorkspace", true).toBool();
     showHibernationDialog  = s.value("showHibernationDialog", true).toBool();
@@ -396,8 +394,6 @@ Preferences::saveGeneralSettings()
 
     s.setValue("maxSnapshots", maxSnapshots);
     s.setValue("autoDeleteSnapshots", autoDeleteSnapshots);
-
-    s.setValue("romLibrary", QString::fromStdString(romLibrary.string()));
 
     s.setValue("hibernateSnapshot", hibernateSnapshot);
     s.setValue("hibernateWorkspace", hibernateWorkspace);

@@ -17,9 +17,11 @@
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QCursor>
+#include <QDir>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMetaObject>
+#include <QStandardPaths>
 
 using namespace vc64;
 using retro::vault::ImageError;
@@ -104,15 +106,21 @@ C64Controller::initialize()
 {
     core().launch();
 
-    // Make the Rom library configured in Preferences available to the Rom
-    // database, so real Roms found there can be resolved later on
-    auto romLibrary = Preferences::instance().getRomLibrary();
-    if (!romLibrary.isEmpty()) {
+    // Point RomManager at the Rom library and scan it once. Nothing but
+    // SiC64ConfigController::copyToLibrary() ever writes here, so there's
+    // nothing to watch for and nothing that would need a rescan later.
+    auto romDir = romLibraryDir();
+    QDir().mkpath(romDir);
 
-        auto &romManager = retro::vault::RomManager::shared();
-        romManager.addFolder(fs::path(romLibrary.toStdString()));
-        romManager.scanFolders();
-    }
+    auto &romManager = retro::vault::RomManager::shared();
+    romManager.addFolder(fs::path(romDir.toStdString()));
+    romManager.scanFolders();
+}
+
+QString
+C64Controller::romLibraryDir()
+{
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/roms/c64";
 }
 
 bool
