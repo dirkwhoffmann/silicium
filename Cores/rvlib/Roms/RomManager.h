@@ -34,7 +34,10 @@ namespace retro::vault {
  */
 class RomManager {
 
-    // The Rom database, indexed by both checksums
+    // The Rom database, in registration order
+    std::vector<RomTraits> database;
+
+    // The same database, indexed by both checksums
     std::unordered_map<u32, RomTraits> crc32Info;
     std::unordered_map<u64, RomTraits> fnv64Info;
 
@@ -44,6 +47,12 @@ class RomManager {
     // Result of the most recent folder scan
     std::unordered_map<u32, fs::path> crc32Path;
     std::unordered_map<u64, fs::path> fnv64Path;
+
+    // Appends the known Roms to 'database' -- implemented in RomsC64.cpp and
+    // RomsAmiga.cpp respectively, to keep this class out of the huge literal
+    // tables
+    void registerC64Roms();
+    void registerAmigaRoms();
 
 public:
 
