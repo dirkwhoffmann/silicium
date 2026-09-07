@@ -140,6 +140,9 @@ constexpr u32 CRC32_CPUBLTRO_FC_0_3_2        = 0x86CB5B1B;
 /* Rom types. Only MEGA65 is C64-specific and only the AMIGA_ entries are
  * Amiga-specific; a Rom of any type is described by the same RomTraits.
  *
+ * UNKNOWN is the zero value, so a RomTraits that leaves 'type' out (e.g. a
+ * fallback for an unrecognized Rom) gets it by default.
+ *
  * AMIGA_KICKSTART is the standard type for Amiga Roms; AMIGA_BOOT marks the
  * two A1000 boot Roms, which used to carry a dedicated 'boot' flag; AMIGA_EXTROM
  * marks a Kickstart extension Rom (loaded alongside a Kickstart, not in place
@@ -152,6 +155,7 @@ constexpr u32 CRC32_CPUBLTRO_FC_0_3_2        = 0x86CB5B1B;
  */
 enum class RomType : long
 {
+    UNKNOWN,
     C64_BASIC,
     C64_CHAR,
     C64_KERNAL,
@@ -172,6 +176,7 @@ struct RomTypeEnum : utl::Reflectable<RomTypeEnum, RomType> {
     {
         switch (value) {
 
+            case RomType::UNKNOWN:         return "UNKNOWN";
             case RomType::C64_BASIC:       return "C64_BASIC";
             case RomType::C64_CHAR:        return "C64_CHAR";
             case RomType::C64_KERNAL:      return "C64_KERNAL";
@@ -189,6 +194,7 @@ struct RomTypeEnum : utl::Reflectable<RomTypeEnum, RomType> {
     {
         switch (value) {
 
+            case RomType::UNKNOWN:         return "Unknown ROM";
             case RomType::C64_BASIC:       return "Basic ROM";
             case RomType::C64_CHAR:        return "Character ROM";
             case RomType::C64_KERNAL:      return "Kernal ROM";
