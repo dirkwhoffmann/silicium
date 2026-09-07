@@ -162,6 +162,7 @@ class SiAmConfigController : public Controller {
 
     Q_PROPERTY(int HOST_REFRESH_RATE READ hostRefreshRate WRITE setHostRefreshRate NOTIFY configChanged)
     Q_PROPERTY(int HOST_SAMPLE_RATE READ hostSampleRate WRITE setHostSampleRate NOTIFY configChanged)
+    Q_PROPERTY(int HOST_TEX_FORMAT READ hostTexFormat WRITE setHostTexFormat NOTIFY configChanged)
     Q_PROPERTY(int HOST_FRAMEBUF_WIDTH READ hostFramebufWidth WRITE setHostFramebufWidth NOTIFY configChanged)
     Q_PROPERTY(int HOST_FRAMEBUF_HEIGHT READ hostFramebufHeight WRITE setHostFramebufHeight NOTIFY configChanged)
 
@@ -169,6 +170,8 @@ class SiAmConfigController : public Controller {
     void setHostRefreshRate(int value) { set(vamiga::Opt::HOST_REFRESH_RATE, (i64)value); }
     int hostSampleRate() const { return (int)get(vamiga::Opt::HOST_SAMPLE_RATE); }
     void setHostSampleRate(int value) { set(vamiga::Opt::HOST_SAMPLE_RATE, (i64)value); }
+    int hostTexFormat() const { return (int)get(vamiga::Opt::HOST_TEX_FORMAT); }
+    void setHostTexFormat(int value) { set(vamiga::Opt::HOST_TEX_FORMAT, (i64)value); }
     int hostFramebufWidth() const { return (int)get(vamiga::Opt::HOST_FRAMEBUF_WIDTH); }
     void setHostFramebufWidth(int value) { set(vamiga::Opt::HOST_FRAMEBUF_WIDTH, (i64)value); }
     int hostFramebufHeight() const { return (int)get(vamiga::Opt::HOST_FRAMEBUF_HEIGHT); }

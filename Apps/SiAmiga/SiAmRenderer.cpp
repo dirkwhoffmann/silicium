@@ -53,6 +53,9 @@ SiAmRenderer::start()
         controller->core().set(vamiga::Opt::HOST_REFRESH_RATE, (i64)screen->refreshRate());
     }
 
+    // Set the texture format
+    controller->getConfigController()->setHostTexFormat((int)vamiga::TexFormat::ARGB);
+
     // Only proceed if no connection exists yet
     if (m_frameConnection) return;
 

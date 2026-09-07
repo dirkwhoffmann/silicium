@@ -1,2 +1,3 @@
+host set TEX_FORMAT ARGB
 mem set CHIP_RAM 1024
 df1 connect
