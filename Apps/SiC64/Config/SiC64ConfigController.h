@@ -12,6 +12,7 @@
 #include "VirtualC64.h"
 #include "Controller.h"
 #include <QColor>
+#include <QStringList>
 #include <QUrl>
 
 //
@@ -93,6 +94,19 @@ class SiC64ConfigController : public Controller {
     Q_PROPERTY(QString vc1541RomVendor READ getVC1541RomVendor NOTIFY romConfigChanged)
     Q_PROPERTY(bool hasPatchedVC1541Rom READ hasPatchedVC1541Rom NOTIFY romConfigChanged)
 
+    // Titles of the Roms found in the user's Rom library (see Preferences::romLibrary
+    // and RomManager::scanFolders()), one list per slot, filtered to the matching
+    // RomType. Install one by passing its index to the corresponding installXRom().
+    Q_PROPERTY(QStringList availableBasicRoms READ getAvailableBasicRoms NOTIFY romConfigChanged)
+    Q_PROPERTY(QStringList availableKernalRoms READ getAvailableKernalRoms NOTIFY romConfigChanged)
+    Q_PROPERTY(QStringList availableCharRoms READ getAvailableCharRoms NOTIFY romConfigChanged)
+    Q_PROPERTY(QStringList availableVC1541Roms READ getAvailableVC1541Roms NOTIFY romConfigChanged)
+
+    Q_INVOKABLE void installBasicRom(int index) { installRom(vc64::RomType::C64_BASIC, index); }
+    Q_INVOKABLE void installKernalRom(int index) { installRom(vc64::RomType::C64_KERNAL, index); }
+    Q_INVOKABLE void installCharRom(int index) { installRom(vc64::RomType::C64_CHAR, index); }
+    Q_INVOKABLE void installVC1541Rom(int index) { installRom(vc64::RomType::C64_VC1541, index); }
+
     Q_INVOKABLE bool isBasicRom(const QUrl &url) const { return isRom(url, vc64::RomType::C64_BASIC); }
     Q_INVOKABLE bool isKernalRom(const QUrl &url) const { return isRom(url, vc64::RomType::C64_KERNAL); }
     Q_INVOKABLE bool isCharRom(const QUrl &url) const { return isRom(url, vc64::RomType::C64_CHAR); }
@@ -166,6 +180,17 @@ class SiC64ConfigController : public Controller {
 
     QUrl getRomIcon(const vc64::RomTraits &traits) const;
     QString getRomVendor(const vc64::RomTraits &traits) const;
+
+    QStringList getAvailableBasicRoms() const { return availableRomNames(vc64::RomType::C64_BASIC); }
+    QStringList getAvailableKernalRoms() const { return availableRomNames(vc64::RomType::C64_KERNAL); }
+    QStringList getAvailableCharRoms() const { return availableRomNames(vc64::RomType::C64_CHAR); }
+    QStringList getAvailableVC1541Roms() const { return availableRomNames(vc64::RomType::C64_VC1541); }
+
+    // The known Roms of a given type actually found in the Rom library, in
+    // the same order availableRomNames()/installRom() index into
+    std::vector<vc64::RomTraits> availableRoms(vc64::RomType type) const;
+    QStringList availableRomNames(vc64::RomType type) const;
+    void installRom(vc64::RomType type, int index);
 
     void deleteRom(vc64::RomType type);
 

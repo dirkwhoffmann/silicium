@@ -26,6 +26,11 @@ SiControl {
      */
     property bool focusable: true
 
+    // Fires only for a genuine user selection, unlike currentIndexChanged,
+    // which also fires when currentIndex is set programmatically (e.g. when
+    // the model is populated) -- use this for "the user picked something".
+    signal activated(int index)
+
     control: [
 
         SiComboBox {
@@ -44,6 +49,7 @@ SiControl {
             Layout.maximumWidth: hasFlexControl ? 9999 : root.controlWidth
             Layout.alignment: Qt.AlignVCenter
             onCurrentIndexChanged: root.currentIndexChanged()
+            onActivated: (index) => root.activated(index)
         }
     ]
 }

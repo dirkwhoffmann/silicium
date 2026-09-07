@@ -12,6 +12,7 @@
 #include "C64Controller.h"
 #include "Preferences.h"
 #include "RomFile.h"
+#include "Roms/RomManager.h"
 #include <QFileInfo>
 
 using namespace vc64;
@@ -180,6 +181,50 @@ QString
 SiC64ConfigController::getRomVendor(const RomTraits &traits) const
 {
     return QString::fromUtf8(RomVendorEnum::key(traits.vendor));
+}
+
+std::vector<RomTraits>
+SiC64ConfigController::availableRoms(RomType type) const
+{
+    auto &romManager = RomManager::shared();
+
+    // Restrict to entries the folder scan actually found a file for -- the
+    // database also knows about Roms the user doesn't have
+    auto matches = romManager.getRoms([type](const RomTraits &t) { return t.type == type; });
+
+    std::vector<RomTraits> result;
+    for (auto &traits : matches) {
+        if (romManager.getRom(traits)) result.push_back(traits);
+    }
+
+    return result;
+}
+
+QStringList
+SiC64ConfigController::availableRomNames(RomType type) const
+{
+    QStringList result;
+
+    for (auto &traits : availableRoms(type)) {
+
+        auto name = QString::fromUtf8(traits.title);
+        if (traits.revision && *traits.revision) name += " (" + QString::fromUtf8(traits.revision) + ")";
+        result << name;
+    }
+
+    return result;
+}
+
+void
+SiC64ConfigController::installRom(RomType type, int index)
+{
+    auto roms = availableRoms(type);
+    if (index < 0 || index >= (int)roms.size()) return;
+
+    auto path = RomManager::shared().getRom(roms[(size_t)index]);
+    if (!path) return;
+
+    loadRom(QUrl::fromLocalFile(QString::fromStdString(path->string())), type);
 }
 
 i64
