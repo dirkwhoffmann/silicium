@@ -1,0 +1,2 @@
+mem set CHIP_RAM 1024
+df1 connect
