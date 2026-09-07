@@ -10,7 +10,6 @@
 #include "SiAmController.h"
 #include "SiAmRenderer.h"
 #include "Logger.h"
-#include "DiagRom.h"
 #include "Preferences.h"
 #include "SleepGuard.h"
 #include "Images/ImageError.h"
@@ -86,17 +85,6 @@ SiAmController::core()
 void
 SiAmController::initialize()
 {
-    // There is no free, redistributable Kickstart ROM, so the stub plugs in
-    // DiagRom (an open-source diagnostic ROM) instead -- the same one the
-    // core's own Headless self-tests use. A real Amiga backend eventually
-    // wants a way to install a user-supplied Kickstart here.
-    core().mem.loadRom(diagROM13, sizeofDiagRom13);
-
-    // Registering the listener and starting the emulator thread happen
-    // together on this core's API (unlike VirtualC64, which splits them into
-    // launch() and a separate setListener()).
-    core().launch(this, ::process);
-
     // Point RomManager at the Rom library and scan it once. Nothing but this
     // class and SiAmConfigController::copyToLibrary() ever write here, so
     // there's nothing to watch for and nothing that would need a rescan later.
@@ -107,6 +95,28 @@ SiAmController::initialize()
     auto &romManager = retro::vault::RomManager::shared();
     romManager.addFolder(fs::path(romDir.toStdString()));
     romManager.scanFolders();
+
+    // There is no free, redistributable Kickstart ROM, so the stub plugs in
+    // the AROS Kickstart replacement instead (open-source, bundled under
+    // Shared/Assets/Roms and installed into the Rom library above just like
+    // any other bundled Rom -- see installBundledRomFiles()). A real Amiga
+    // backend eventually wants a way to install a user-supplied Kickstart
+    // here.
+    if (auto path = romManager.getRomCRC32(retro::vault::CRC32_AROS_20260820)) {
+        core().mem.loadRom(*path);
+    } else {
+        qCWarning(siLog) << "Failed to locate the bundled AROS Kickstart replacement.";
+    }
+    if (auto path = romManager.getRomCRC32(retro::vault::CRC32_AROS_20260820_EXT)) {
+        core().mem.loadExt(*path);
+    } else {
+        qCWarning(siLog) << "Failed to locate the bundled AROS Kickstart extension.";
+    }
+
+    // Registering the listener and starting the emulator thread happen
+    // together on this core's API (unlike VirtualC64, which splits them into
+    // launch() and a separate setListener()).
+    core().launch(this, ::process);
 }
 
 QString
