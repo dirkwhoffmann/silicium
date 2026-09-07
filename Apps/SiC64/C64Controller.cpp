@@ -10,10 +10,12 @@
 #include "C64Controller.h"
 #include "SiC64Renderer.h"
 #include "Logger.h"
+#include "OpenRoms.h"
 #include "Preferences.h"
 #include "SleepGuard.h"
 #include "Images/ImageError.h"
 #include "Roms/RomManager.h"
+#include "utl/abilities/Hashable.h"
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QCursor>
@@ -22,6 +24,7 @@
 #include <QJsonObject>
 #include <QMetaObject>
 #include <QStandardPaths>
+#include <fstream>
 
 using namespace vc64;
 using retro::vault::ImageError;
@@ -106,11 +109,12 @@ C64Controller::initialize()
 {
     core().launch();
 
-    // Point RomManager at the Rom library and scan it once. Nothing but
-    // SiC64ConfigController::copyToLibrary() ever writes here, so there's
-    // nothing to watch for and nothing that would need a rescan later.
+    // Point RomManager at the Rom library and scan it once. Nothing but this
+    // class and SiC64ConfigController::copyToLibrary() ever write here, so
+    // there's nothing to watch for and nothing that would need a rescan later.
     auto romDir = romLibraryDir();
     QDir().mkpath(romDir);
+    installOpenRomFiles(romDir);
 
     auto &romManager = retro::vault::RomManager::shared();
     romManager.addFolder(fs::path(romDir.toStdString()));
@@ -121,6 +125,23 @@ QString
 C64Controller::romLibraryDir()
 {
     return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/roms/c64";
+}
+
+void
+C64Controller::installOpenRomFiles(const QString &dir)
+{
+    auto write = [&](const unsigned char *data, utl::isize size) {
+
+        auto fnv = utl::Hashable::fnv64((const utl::u8 *)data, size);
+        auto path = fs::path(dir.toStdString()) / (QString::number(fnv, 16).toStdString() + ".rom");
+
+        std::ofstream out(path, std::ios::binary | std::ios::trunc);
+        out.write((const char *)data, size);
+    };
+
+    write(basic_generic, sizeof(basic_generic));
+    write(chargen_openroms, sizeof(chargen_openroms));
+    write(kernel_generic, sizeof(kernel_generic));
 }
 
 bool

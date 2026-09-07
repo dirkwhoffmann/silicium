@@ -141,12 +141,24 @@ public:
     // errorMessage describes the failure.
     bool parseArguments(const QCoreApplication &app);
 
-    /* The Rom library: a fixed, app-private folder that only
-     * SiC64ConfigController::copyToLibrary() ever writes to. Since nothing
+    /* The Rom library: a fixed, app-private folder that only this class and
+     * SiC64ConfigController::copyToLibrary() ever write to. Since nothing
      * else can change its contents, RomManager needs pointing here and
      * scanning exactly once, at startup -- no watching, no rescanning.
      */
     static QString romLibraryDir();
+
+private:
+
+    /* Writes the three built-in MEGA65 OpenROMs (see OpenRoms.h, baked into
+     * the app and installable at any time via installOpenRoms()) into the
+     * Rom library, named by their FNV-1a checksum like any other library
+     * Rom. Run on every startup, unconditionally, so a copy the user deleted
+     * comes back -- the point is to let the OpenROMs be reinstalled later
+     * from the same library UI as everything else, not just from the
+     * "Install OpenROMs" menu item.
+     */
+    static void installOpenRomFiles(const QString &dir);
 
 public:
 
