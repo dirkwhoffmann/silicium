@@ -28,6 +28,13 @@ RomManager::registerC64Roms()
         .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
         .type       = RomType::C64_BASIC
+    },{
+        .fnv        = 0xDE31E3D41C2E8EBE,
+        .title      = "Basic Rom",
+        .revision   = "M.E.G.A C64 OpenROM",
+        .platform   = RomPlatform::C64,
+        .vendor     = RomVendor::MEGA65,
+        .type       = RomType::C64_BASIC
     },
 
     //
@@ -237,6 +244,13 @@ RomManager::registerC64Roms()
         .revision   = "V1",
         .platform   = RomPlatform::C64,
         .vendor     = RomVendor::COMMODORE,
+        .type       = RomType::C64_KERNAL
+    },{
+        .fnv        = 0xB518628691B2CCA8,
+        .title      = "Kernal Rom",
+        .revision   = "M.E.G.A C64 OpenROM",
+        .platform   = RomPlatform::C64,
+        .vendor     = RomVendor::MEGA65,
         .type       = RomType::C64_KERNAL
     },{
         .fnv        = 0xDE7F07008B787040,
