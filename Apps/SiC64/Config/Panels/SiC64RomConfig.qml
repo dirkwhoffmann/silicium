@@ -126,144 +126,88 @@ Item {
                 // BASIC ROM
                 //
 
-                ColumnLayout {
+                SiRomDropView {
 
                     Layout.fillWidth: true
-                    spacing: Style.smallSpacing
+                    enabled: !root.locked
+                    orientation: Qt.RightToLeft
+                    title: basicRomTitle
+                    subtitle: basicRomSubtitle
+                    details: basicRomRevision
+                    imageSource: basicRomIcon
+                    libraryRoms: cc ? cc.availableBasicRoms : []
 
-                    SiRomDropView {
-
-                        Layout.fillWidth: true
-                        enabled: !root.locked
-                        orientation: Qt.RightToLeft
-                        title: basicRomTitle
-                        subtitle: basicRomSubtitle
-                        details: basicRomRevision
-                        imageSource: basicRomIcon
-
-                        acceptUrls: function (urls) { return cc.isBasicRom(urls[0]) }
-                        onUrlsDropped: (urls) => { cc.loadBasicRom(urls[0]) }
-                        onDeleteRom: cc.deleteBasicRom()
-                        onClicked: { romFileDialog.romType = "basic"; romFileDialog.open() }
-                    }
-
-                    SiComboBoxControl {
-
-                        Layout.fillWidth: true
-                        enabled: !root.locked
-                        l: "Library:"
-                        model: cc ? cc.availableBasicRoms : []
-                        currentIndex: -1
-                        onActivated: (index) => { cc.installBasicRom(index); currentIndex = -1 }
-                    }
+                    acceptUrls: function (urls) { return cc.isBasicRom(urls[0]) }
+                    onUrlsDropped: (urls) => { cc.loadBasicRom(urls[0]) }
+                    onDeleteRom: cc.deleteBasicRom()
+                    onInstallRom: (index) => cc.installBasicRom(index)
+                    onClicked: { romFileDialog.romType = "basic"; romFileDialog.open() }
                 }
 
                 //
                 // KERNAL ROM
                 //
 
-                ColumnLayout {
+                SiRomDropView {
 
                     Layout.fillWidth: true
-                    spacing: Style.smallSpacing
+                    enabled: !root.locked
+                    orientation: Qt.LeftToRight
+                    title: kernalRomTitle
+                    subtitle: kernalRomSubtitle
+                    details: kernalRomRevision
+                    imageSource: kernalRomIcon
+                    libraryRoms: cc ? cc.availableKernalRoms : []
 
-                    SiRomDropView {
-
-                        Layout.fillWidth: true
-                        enabled: !root.locked
-                        orientation: Qt.LeftToRight
-                        title: kernalRomTitle
-                        subtitle: kernalRomSubtitle
-                        details: kernalRomRevision
-                        imageSource: kernalRomIcon
-
-                        acceptUrls: function (urls) { return cc.isKernalRom(urls[0]) }
-                        onUrlsDropped: (urls) => { cc.loadKernalRom(urls[0]) }
-                        onDeleteRom: cc.deleteKernalRom()
-                        onClicked: { romFileDialog.romType = "kernal"; romFileDialog.open() }
-                    }
-
-                    SiComboBoxControl {
-
-                        Layout.fillWidth: true
-                        enabled: !root.locked
-                        l: "Library:"
-                        model: cc ? cc.availableKernalRoms : []
-                        currentIndex: -1
-                        onActivated: (index) => { cc.installKernalRom(index); currentIndex = -1 }
-                    }
+                    acceptUrls: function (urls) { return cc.isKernalRom(urls[0]) }
+                    onUrlsDropped: (urls) => { cc.loadKernalRom(urls[0]) }
+                    onDeleteRom: cc.deleteKernalRom()
+                    onInstallRom: (index) => cc.installKernalRom(index)
+                    onClicked: { romFileDialog.romType = "kernal"; romFileDialog.open() }
                 }
 
                 //
                 // CHAR ROM
                 //
 
-                ColumnLayout {
+                SiRomDropView {
 
                     Layout.fillWidth: true
-                    spacing: Style.smallSpacing
+                    enabled: !root.locked
+                    orientation: Qt.RightToLeft
+                    title: charRomTitle
+                    subtitle: charRomSubtitle
+                    details: charRomRevision
+                    imageSource: charRomIcon
+                    libraryRoms: cc ? cc.availableCharRoms : []
 
-                    SiRomDropView {
-
-                        Layout.fillWidth: true
-                        enabled: !root.locked
-                        orientation: Qt.RightToLeft
-                        title: charRomTitle
-                        subtitle: charRomSubtitle
-                        details: charRomRevision
-                        imageSource: charRomIcon
-
-                        acceptUrls: function (urls) { return cc.isCharRom(urls[0]) }
-                        onUrlsDropped: (urls) => { cc.loadCharRom(urls[0]) }
-                        onDeleteRom: cc.deleteCharRom()
-                        onClicked: { romFileDialog.romType = "char"; romFileDialog.open() }
-                    }
-
-                    SiComboBoxControl {
-
-                        Layout.fillWidth: true
-                        enabled: !root.locked
-                        l: "Library:"
-                        model: cc ? cc.availableCharRoms : []
-                        currentIndex: -1
-                        onActivated: (index) => { cc.installCharRom(index); currentIndex = -1 }
-                    }
+                    acceptUrls: function (urls) { return cc.isCharRom(urls[0]) }
+                    onUrlsDropped: (urls) => { cc.loadCharRom(urls[0]) }
+                    onDeleteRom: cc.deleteCharRom()
+                    onInstallRom: (index) => cc.installCharRom(index)
+                    onClicked: { romFileDialog.romType = "char"; romFileDialog.open() }
                 }
 
                 //
                 // VC1541 ROM
                 //
 
-                ColumnLayout {
+                SiRomDropView {
 
                     Layout.fillWidth: true
-                    spacing: Style.smallSpacing
+                    enabled: !root.locked
+                    orientation: Qt.LeftToRight
+                    title: vc1541RomTitle
+                    subtitle: vc1541RomSubtitle
+                    details: vc1541RomRevision
+                    imageSource: vc1541RomIcon
+                    libraryRoms: cc ? cc.availableVC1541Roms : []
 
-                    SiRomDropView {
-
-                        Layout.fillWidth: true
-                        enabled: !root.locked
-                        orientation: Qt.LeftToRight
-                        title: vc1541RomTitle
-                        subtitle: vc1541RomSubtitle
-                        details: vc1541RomRevision
-                        imageSource: vc1541RomIcon
-
-                        acceptUrls: function (urls) { return cc.isVC1541Rom(urls[0]) }
-                        onUrlsDropped: (urls) => { cc.loadVC1541Rom(urls[0]) }
-                        onDeleteRom: cc.deleteVC1541Rom()
-                        onClicked: { romFileDialog.romType = "vc1541"; romFileDialog.open() }
-                    }
-
-                    SiComboBoxControl {
-
-                        Layout.fillWidth: true
-                        enabled: !root.locked
-                        l: "Library:"
-                        model: cc ? cc.availableVC1541Roms : []
-                        currentIndex: -1
-                        onActivated: (index) => { cc.installVC1541Rom(index); currentIndex = -1 }
-                    }
+                    acceptUrls: function (urls) { return cc.isVC1541Rom(urls[0]) }
+                    onUrlsDropped: (urls) => { cc.loadVC1541Rom(urls[0]) }
+                    onDeleteRom: cc.deleteVC1541Rom()
+                    onInstallRom: (index) => cc.installVC1541Rom(index)
+                    onClicked: { romFileDialog.romType = "vc1541"; romFileDialog.open() }
                 }
             }
 

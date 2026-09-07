@@ -15,8 +15,14 @@ Item {
     property string subtitle: ""
     property string details: ""
 
+    // Display names of the Roms available in the user's Rom library (see
+    // Preferences.romLibrary), shown in the dropdown opened by the bookmarks
+    // button; installRom(index) fires when one is picked.
+    property var libraryRoms: []
+
     signal urlsDropped(var urls)
     signal deleteRom()
+    signal installRom(int index)
     signal clicked()
 
     implicitWidth: 220
@@ -94,15 +100,51 @@ Item {
 
             VSpacer {}
 
-            SiSymbolButton {
+            RowLayout {
 
-                symbol: "delete"
-                scale: 1.0
-                size: Size.regular
                 Layout.alignment: parent.alignRight ? Qt.AlignRight : Qt.AlignLeft
-                onClicked: deleteRom()
+                spacing: Style.smallSpacing
 
-                DebugRect {}
+                SiSymbolButton {
+
+                    symbol: "delete"
+                    scale: 1.0
+                    size: Size.regular
+                    onClicked: deleteRom()
+
+                    DebugRect {}
+                }
+
+                SiSymbolButton {
+
+                    id: libraryButton
+                    phosphor: "bookmarks"
+                    scale: 1.0
+                    size: Size.regular
+                    onClicked: libraryMenu.open()
+
+                    DebugRect {}
+
+                    SiMenu {
+
+                        id: libraryMenu
+                        y: libraryButton.height
+
+                        // Dynamically generate one item per Rom the library
+                        // scan found for this slot (see availableRoms in
+                        // SiC64ConfigController).
+                        Instantiator {
+
+                            model: root.libraryRoms
+                            delegate: SiMenuItem {
+                                text: modelData
+                                onTriggered: root.installRom(index)
+                            }
+                            onObjectAdded: (index, object) => libraryMenu.insertItem(index, object)
+                            onObjectRemoved: (index, object) => libraryMenu.removeItem(object)
+                        }
+                    }
+                }
             }
         }
     }
