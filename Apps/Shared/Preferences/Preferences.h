@@ -13,6 +13,7 @@
 #include "EmulationKey.h"
 #include "utl/common.h"
 #include <QtQml>
+#include <QUrl>
 
 class Preferences : public QObject {
 
@@ -29,6 +30,9 @@ class Preferences : public QObject {
     // Snapshot Library
     int maxSnapshots;
     bool autoDeleteSnapshots;
+
+    // Rom Library
+    fs::path romLibrary;
 
     // Hibernation
     bool hibernateSnapshot;
@@ -214,6 +218,8 @@ class Preferences : public QObject {
     Q_PROPERTY(int autoDeleteSnapshots READ getAutoDeleteSnapshots WRITE setAutoDeleteSnapshots NOTIFY
                    generalPrefsChanged)
 
+    Q_PROPERTY(QString romLibrary READ getRomLibrary WRITE setRomLibrary NOTIFY generalPrefsChanged)
+
     Q_PROPERTY(bool hibernateSnapshot READ getHibernateSnapshot WRITE setHibernateSnapshot NOTIFY generalPrefsChanged)
     Q_PROPERTY(bool hibernateWorkspace READ getHibernateWorkspace WRITE setHibernateWorkspace NOTIFY generalPrefsChanged)
     Q_PROPERTY(bool showHibernationDialog READ getShowHibernationDialog WRITE setShowHibernationDialog NOTIFY generalPrefsChanged)
@@ -235,6 +241,12 @@ class Preferences : public QObject {
     void setMaxSnapshots(int value) { setGeneralProperty(maxSnapshots, value); }
     bool getAutoDeleteSnapshots() const { return autoDeleteSnapshots; }
     void setAutoDeleteSnapshots(bool value) { setGeneralProperty(autoDeleteSnapshots, value); }
+
+    QString getRomLibrary() const { return QString::fromStdString(romLibrary.string()); }
+    void setRomLibrary(const QString &value) { setGeneralProperty(romLibrary, fs::path(value.toStdString())); }
+
+    // Convenience setter for a folder picked via a QML FolderDialog
+    Q_INVOKABLE void setRomLibraryUrl(const QUrl &url) { setRomLibrary(url.toLocalFile()); }
 
     bool getHibernateSnapshot() const { return hibernateSnapshot; }
     void setHibernateSnapshot(bool value) { setGeneralProperty(hibernateSnapshot, value); }

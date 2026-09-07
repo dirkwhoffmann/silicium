@@ -10,8 +10,10 @@
 #include "C64Controller.h"
 #include "SiC64Renderer.h"
 #include "Logger.h"
+#include "Preferences.h"
 #include "SleepGuard.h"
 #include "Images/ImageError.h"
+#include "Roms/RomManager.h"
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QCursor>
@@ -101,6 +103,16 @@ void
 C64Controller::initialize()
 {
     core().launch();
+
+    // Make the Rom library configured in Preferences available to the Rom
+    // database, so real Roms found there can be resolved later on
+    auto romLibrary = Preferences::instance().getRomLibrary();
+    if (!romLibrary.isEmpty()) {
+
+        auto &romManager = retro::vault::RomManager::shared();
+        romManager.addFolder(fs::path(romLibrary.toStdString()));
+        romManager.scanFolders();
+    }
 }
 
 bool
