@@ -61,6 +61,8 @@ Item {
 
         ColumnLayout {
 
+            id: descColumn
+
             Layout.topMargin: Style.mediumSpacing
             Layout.bottomMargin: Style.mediumSpacing
             Layout.fillWidth: true
@@ -70,51 +72,14 @@ Item {
 
             readonly property bool alignRight: root.orientation === Qt.RightToLeft
 
-            SiText {
-
-                text: root.title
-                font.pixelSize: Style.regular
-                font.bold: true
-                color: Palette.primary
-                Layout.fillWidth: true
-                horizontalAlignment: parent.alignRight ? Text.AlignRight : Text.AlignLeft
-            }
-
-            SiText {
-
-                text: root.subtitle
-                font.pixelSize: Style.small
-                color: Palette.secondary
-                Layout.fillWidth: true
-                horizontalAlignment: parent.alignRight ? Text.AlignRight : Text.AlignLeft
-            }
-
-            SiText {
-
-                text: root.details
-                font.pixelSize: Style.small
-                color: Palette.tertiary
-                Layout.fillWidth: true
-                horizontalAlignment: parent.alignRight ? Text.AlignRight : Text.AlignLeft
-            }
-
-            VSpacer {}
-
             RowLayout {
 
-                Layout.alignment: parent.alignRight ? Qt.AlignRight : Qt.AlignLeft
+                Layout.fillWidth: true
+                layoutDirection: descColumn.alignRight ? Qt.RightToLeft : Qt.LeftToRight
                 spacing: Style.smallSpacing
 
-                SiSymbolButton {
-
-                    symbol: "delete"
-                    scale: 1.0
-                    size: Size.regular
-                    onClicked: deleteRom()
-
-                    DebugRect {}
-                }
-
+                // Close to the big Rom image -- to its right for a tile whose
+                // image sits on the right (alignRight), to its left otherwise.
                 SiSymbolButton {
 
                     id: libraryButton
@@ -145,6 +110,47 @@ Item {
                         }
                     }
                 }
+
+                SiText {
+
+                    text: root.title
+                    font.pixelSize: Style.regular
+                    font.bold: true
+                    color: Palette.primary
+                    Layout.fillWidth: true
+                    horizontalAlignment: descColumn.alignRight ? Text.AlignRight : Text.AlignLeft
+                }
+            }
+
+            SiText {
+
+                text: root.subtitle
+                font.pixelSize: Style.small
+                color: Palette.secondary
+                Layout.fillWidth: true
+                horizontalAlignment: parent.alignRight ? Text.AlignRight : Text.AlignLeft
+            }
+
+            SiText {
+
+                text: root.details
+                font.pixelSize: Style.small
+                color: Palette.tertiary
+                Layout.fillWidth: true
+                horizontalAlignment: parent.alignRight ? Text.AlignRight : Text.AlignLeft
+            }
+
+            VSpacer {}
+
+            SiSymbolButton {
+
+                symbol: "delete"
+                scale: 1.0
+                size: Size.regular
+                Layout.alignment: parent.alignRight ? Qt.AlignRight : Qt.AlignLeft
+                onClicked: deleteRom()
+
+                DebugRect {}
             }
         }
     }
