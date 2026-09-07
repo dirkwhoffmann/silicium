@@ -165,3 +165,30 @@ SiAmRenderer::normalize(TexRect rect) const
              .w = rect.w / texWidth,
              .h = rect.h / texHeight };
 }
+
+QImage
+SiAmRenderer::grabScreenshot() const
+{
+    if (!controller) return QImage();
+
+    auto &core = controller->core();
+
+    // Lock, copy, and unlock right away -- unlike tick(), which only stores
+    // the pointer for updatePaintNode() to consume shortly after (safe there
+    // because it runs almost immediately on the same thread cadence), this
+    // can be called at an arbitrary time from the GUI thread, so the pixel
+    // data must be copied out while the emulator thread is held off.
+    core.videoPort.lockTexture();
+    const u32 *src = core.videoPort.getTexture();
+    QImage grabbed;
+    if (src) {
+        grabbed = QImage(reinterpret_cast<const uchar *>(src),
+                          (int)texWidth, (int)texHeight, QImage::Format_ARGB32).copy();
+    }
+    core.videoPort.unlockTexture();
+
+    if (grabbed.isNull()) return QImage();
+
+    auto rect = largestVisible();
+    return grabbed.copy(qRound(rect.x), qRound(rect.y), qRound(rect.w), qRound(rect.h));
+}

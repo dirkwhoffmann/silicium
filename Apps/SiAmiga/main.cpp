@@ -76,18 +76,21 @@ main(int argc, char *argv[])
     qmlRegisterSingletonInstance("Silicium.Preferences", 1, 0, "Preferences", &Preferences::instance());
     qmlRegisterSingletonInstance("Silicium.Theme", 1, 0, "Shortcuts", &Shortcuts::instance());
 
-    // Parse the command line, collecting any --exec (-e) commands
-    SiAmController::instance().parseArguments(app);
+    // Parse the command line and open the SVM file it names
+    bool ok = SiAmController::instance().parseArguments(app);
 
     // Launch the emulator core
     SiAmController::instance().initialize();
 
-    const QUrl url(QStringLiteral("qrc:/qt/qml/siamigaUI/SiAmiga/SiAmWindow.qml"));
+    // Load the main window, or an alert window if the SVM file couldn't be opened
+    const QUrl url(ok
+        ? QStringLiteral("qrc:/qt/qml/siamigaUI/SiAmiga/SiAmWindow.qml")
+        : QStringLiteral("qrc:/qt/qml/siamigaUI/SiAmiga/Dialogs/SiAmAbout.qml"));
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreated,
         &app,
-        [url](QObject *obj, const QUrl &objUrl) {
+        [url, ok](QObject *obj, const QUrl &objUrl) {
 
             if (!obj && url == objUrl) {
                 QCoreApplication::exit(-1);
@@ -95,6 +98,7 @@ main(int argc, char *argv[])
             }
 
             if (url != objUrl) return;
+            if (!ok) return;
 
             // Wire the main window's lifetime to the SiAmController
             if (auto *window = qobject_cast<QQuickWindow *>(obj)) {

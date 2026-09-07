@@ -11,16 +11,25 @@
 #include "SiAmRenderer.h"
 #include "Logger.h"
 #include "DiagRom.h"
+#include "Preferences.h"
+#include "SleepGuard.h"
+#include "Images/ImageError.h"
 #include "Roms/RomManager.h"
+#include "utl/abilities/Hashable.h"
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QCursor>
 #include <QDir>
 #include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QMetaObject>
 #include <QStandardPaths>
 
 using namespace vamiga;
+using retro::vault::ImageError;
+using retro::vault::SnapshotInfo;
+using retro::vault::Platform;
 
 // Receives messages from the emulator thread and marshals them onto the GUI thread
 static void
@@ -118,17 +127,9 @@ SiAmController::installBundledRomFiles(const QString &dir)
     }
 }
 
-void
+bool
 SiAmController::parseArguments(const QCoreApplication &app)
 {
-    /* SiAmiga [options]
-     *
-     * Options:
-     *   -e, --exec <cmd>   Execute a command after startup. This option may be
-     *                      specified multiple times and commands are executed
-     *                      in the order they appear on the command line.
-     */
-
     QCommandLineOption execOption(
             QStringList() << "e" << "exec",
             "Executes a command after startup. May be given multiple times.",
@@ -137,13 +138,35 @@ SiAmController::parseArguments(const QCoreApplication &app)
     QCommandLineParser parser;
     parser.setApplicationDescription("SiAmiga - Amiga emulator");
     parser.addHelpOption();
+    parser.addPositionalArgument("svm", "The SVM file to load.");
     parser.addOption(execOption);
 
     parser.process(app);
 
+    const QStringList positionalArgs = parser.positionalArguments();
+    const QString svmPath = positionalArgs.isEmpty() ? QString() : positionalArgs.first();
+
     execCommands.clear();
     for (const QString &command : parser.values(execOption)) {
+        printf("Argument: %s\n", command.toStdString().c_str());
         execCommands.push_back(command.toStdString());
+    }
+
+    printf("SVM: %s\n", svmPath.toStdString().c_str());
+
+    if (svmPath.isEmpty()) {
+        errorMessage = "No SVM file specified";
+        qCWarning(siLog).noquote() << errorMessage;
+        return false;
+    }
+
+    try {
+        svm = make_unique<SVMFile>(svmPath.toStdString());
+        return true;
+    } catch (std::exception &e) {
+        errorMessage = QString::fromUtf8(e.what());
+        qCWarning(siLog).noquote() << "Failed to open SVM file:" << errorMessage;
+        return false;
     }
 }
 
@@ -293,6 +316,12 @@ SiAmController::updateKeyboardCapture()
 void
 SiAmController::windowDidOpen()
 {
+    try {
+        core().amiga.loadWorkspace(svm->root() / SVMFile::workspaceDir);
+    } catch (const std::exception &e) {
+        showError("Failed to load workspace.", e.what());
+    }
+
     core().powerOn();
 
     for (const auto &command : execCommands) {
@@ -300,11 +329,6 @@ SiAmController::windowDidOpen()
         qCDebug(siLog).noquote() << "Executing command: '" << command << "'";
         core().retroShell.execScript(command);
     }
-
-    // Kick the machine into motion right away -- the stub has no play/pause
-    // overlay yet (see VMWindow.qml for how SiC64 wires that up), and the
-    // point of this milestone is to see frames appear.
-    core().run();
 
     startRenderer();
 
@@ -363,6 +387,244 @@ SiAmController::linkAudioSink(QAudioSink *sink, QAudioFormat &format)
         const int sampleCount = buffer.size() / 2;
         core().audioPort.copyInterleaved(buffer.data(), sampleCount);
     });
+}
+
+bool
+SiAmController::getReadOnly() const
+{
+    return svm ? svm->isReadOnly() : false;
+}
+
+QString
+SiAmController::getUUID() const
+{
+    return svm ? QString::fromStdString(svm->getManifest().uuid.toString()) : "";
+}
+
+QString
+SiAmController::getName() const
+{
+    return svm ? QString::fromStdString(svm->getManifest().name) : "";
+}
+
+void
+SiAmController::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
+{
+    try {
+        LogTask task("Hibernating...");
+        if (hibernateSnapshot) {
+            shrinkSnapshotStorage(preferences().getMaxSnapshots() - 1);
+            captureSnapshot();
+        }
+        if (hibernateWorkspace) {
+            saveWorkspace();
+        }
+    } catch (std::exception &e) {
+        qCWarning(siLog) << "Failed to hibernate the virtual machine:" << e.what();
+    }
+}
+
+void
+SiAmController::saveWorkspace()
+{
+    LogTask task("Saving workspace...");
+    try {
+        const auto folder = svm->root() / SVMFile::workspaceDir;
+        fs::remove_all(folder);
+        fs::create_directories(folder);
+        core().amiga.saveWorkspace(folder);
+
+        if (m_renderer) {
+            if (auto image = m_renderer->grabScreenshot(); !image.isNull()) {
+                fs::path screenshot = "screenshot.jpg";
+                if (image.save(QString::fromStdString((folder / screenshot).string()))) {
+                    svm->getManifest().screenshot = screenshot;
+                } else {
+                    qCWarning(siLog) << "Failed to save workspace screenshot.";
+                }
+            }
+        }
+
+        svm->persist();
+        emit workspaceSaved();
+        notifyPersist();
+        notifySvmChanged("workspace");
+    } catch (const std::exception &e) {
+        showError("Failed to save workspace.", e.what());
+    }
+}
+
+void
+SiAmController::saveSnapshot()
+{
+    auto &m = svm->getManifest();
+    if (m.numSnapshots() >= preferences().getMaxSnapshots() && !preferences().getAutoDeleteSnapshots()) {
+        emit snapshotLimitReached();
+    } else {
+        captureSnapshot();
+    }
+}
+
+void
+SiAmController::captureSnapshot()
+{
+    LogTask task("Saving snapshot...");
+    try {
+        auto &m = svm->getManifest();
+        if (svm->isReadOnly()) throw ImageError(ImageError::VM_READ_ONLY);
+
+        qCDebug(siLog) << "Taking snapshot...";
+        auto snap = core().amiga.takeSnapshot(Compressor::LZ4);
+
+        qCDebug(siLog) << "Taking screenshot...";
+        auto thumbnail = snap->getHeader()->screenshot;
+        QImage image((uchar *)thumbnail.screen, (int)thumbnail.width, (int)thumbnail.height, QImage::Format_ARGB32);
+
+        SnapshotInfo info {};
+        info.version    = VAmiga::snapshotVersion();
+        info.uuid       = utl::UUID::v4();
+        info.platform   = Platform::AMIGA;
+        info.created    = thumbnail.timestamp;
+        info.modified   = thumbnail.timestamp;
+        info.screenshot = fs::path(info.uuid.toString() + ".jpg");
+        info.binary     = fs::path(info.uuid.toString() + ".vasnap");
+
+        const auto snapshotFolder = svm->root() / SVMFile::snapshotDir;
+        std::error_code ec;
+        fs::create_directories(snapshotFolder, ec);
+        if (ec) throw utl::IOError(utl::IOError::DIR_CANT_CREATE, snapshotFolder);
+
+        auto screenshotPath = snapshotFolder / info.screenshot;
+        auto snapshotPath   = snapshotFolder / info.binary;
+
+        if (!image.save(QString::fromStdString(screenshotPath.string()))) {
+            qCWarning(siLog) << "Failed to save screenshot" << screenshotPath;
+            return;
+        }
+        snap->writeToFile(snapshotPath);
+
+        m.appendSnapshot(info);
+        svm->persist();
+        notifyPersist();
+        emit snapshotSaved(QString::fromStdString(info.uuid.toString()));
+        notifySvmChanged("snapshot", QString::fromStdString(info.uuid.toString()));
+    } catch (const std::exception &e) {
+        showError("Failed to save snapshot.", e.what());
+    }
+}
+
+void
+SiAmController::revertSnapshot()
+{
+    auto *info = svm->getManifest().lookupLatestSnapshot();
+    if (!info) {
+        showError("Failed to load snapshot.", "This virtual machine has no snapshots yet.");
+        return;
+    }
+    loadSnapshot(info->uuid);
+}
+
+void
+SiAmController::shrinkSnapshotStorage(int count)
+{
+    svm->getManifest().snapshots.shrink(count);
+}
+
+void
+SiAmController::rpcReceive(const char *payload)
+{
+    if (!payload) return;
+    qCDebug(siLog).noquote() << "RPC recv:" << payload;
+    const auto doc = QJsonDocument::fromJson(QByteArray::fromStdString(payload));
+    if (!doc.isObject()) return;
+    const QJsonObject rpc = doc.object();
+    const QString method = rpc["method"].toString();
+
+    if (method == "prefsChanged") {
+        preferences().reloadGroup(rpc["params"].toString());
+    } else if (method == "raise") {
+        if (m_window) { m_window->raise(); m_window->requestActivate(); }
+    } else if (method == "loadSnapshot") {
+        loadSnapshot(utl::UUID::fromString(rpc["params"].toString().toStdString()));
+    } else if (method == "svmChanged") {
+        try {
+            svm->readManifest();
+            qCDebug(siLog) << "Reloaded manifest:" << svm->getManifest().numSnapshots() << "snapshot(s)";
+        } catch (const std::exception &e) {
+            qCWarning(siLog).noquote() << "Failed to re-read the SVM manifest:" << e.what();
+        }
+    }
+}
+
+void
+SiAmController::rpcSend(const char *payload)
+{
+    if (!payload) return;
+    qCDebug(siLog).noquote() << "RPC: Sent" << payload;
+}
+
+void
+SiAmController::loadSnapshot(const utl::UUID &uuid)
+{
+    auto *info = svm->getManifest().lookupSnapshot(uuid);
+    if (!info) {
+        showError("Failed to load snapshot.", "The requested snapshot could not be found.");
+        return;
+    }
+    try {
+        auto path = svm->root() / SVMFile::snapshotDir / info->binary;
+        core().amiga.loadSnapshot(path);
+    } catch (const std::exception &e) {
+        showError("Failed to load snapshot.", e.what());
+    }
+}
+
+void
+SiAmController::reportState(VMState state)
+{
+    setState(state);
+    const QJsonObject rpc {
+        { "jsonrpc", "2.0" }, { "method", "vmState" }, { "params", VMStateEnum::key(state) }
+    };
+    const QByteArray packet = QJsonDocument(rpc).toJson(QJsonDocument::Compact) + '\n';
+    try {
+        core().remoteManager.send(ServerType::RPC, packet.toStdString());
+    } catch (std::exception &exc) {
+        qCWarning(siLog).noquote() << "Failed to report state:" << exc.what();
+    }
+}
+
+void
+SiAmController::notifySvmChanged(const QString &kind, const QString &uuid)
+{
+    QJsonObject params { { "kind", kind } };
+    if (!uuid.isEmpty()) params["uuid"] = uuid;
+    const QJsonObject rpc { { "jsonrpc", "2.0" }, { "method", "svmChanged" }, { "params", params } };
+    const QByteArray packet = QJsonDocument(rpc).toJson(QJsonDocument::Compact) + '\n';
+    core().remoteManager.send(ServerType::RPC, packet.toStdString());
+}
+
+void
+SiAmController::notifyPersist()
+{
+    const QJsonObject rpc { { "jsonrpc", "2.0" }, { "method", "persist" } };
+    const QByteArray packet = QJsonDocument(rpc).toJson(QJsonDocument::Compact) + '\n';
+    core().remoteManager.send(ServerType::RPC, packet.toStdString());
+}
+
+void
+SiAmController::notifyFatalError(const QString &title, const QString &text)
+{
+    const QJsonObject rpc {
+        { "jsonrpc", "2.0" }, { "method", "fatalError" },
+        { "params", QJsonObject { { "title", title }, { "text", text } } }
+    };
+    const QByteArray packet = QJsonDocument(rpc).toJson(QJsonDocument::Compact) + '\n';
+    try {
+        core().remoteManager.send(ServerType::RPC, packet.toStdString());
+    } catch (std::exception &exc) {
+        qCWarning(siLog).noquote() << "Failed to report fatal error:" << exc.what();
+    }
 }
 
 void
@@ -585,32 +847,46 @@ SiAmController::resetKeyboardMatrix()
 void
 SiAmController::didPowerOn()
 {
-    setState(VMState::PAUSED);
-    m_configController->queryRoms();
+    try {
+        reportState(VMState::PAUSED);
+        m_configController->queryRoms();
+    } catch (const std::exception &e) {
+        qCWarning(siLog).noquote() << "Power-on bookkeeping failed:" << e.what();
+    }
+    try {
+        core().run();
+    } catch (const std::exception &e) {
+        qCCritical(siLog).noquote() << "Failed to power on the virtual machine:" << e.what();
+        emit showFatalError("Failed to power on the virtual machine.", e.what());
+    }
 }
 
 void
 SiAmController::didPowerOff()
 {
-    setState(VMState::OFF);
+    SleepGuard::allowSleep();
+    reportState(VMState::OFF);
 }
 
 void
 SiAmController::didRun()
 {
-    setState(VMState::RUNNING);
+    if (preferences().getPreventSleepWhileRunning()) SleepGuard::preventSleep();
+    reportState(VMState::RUNNING);
 }
 
 void
 SiAmController::didPause()
 {
-    setState(VMState::PAUSED);
+    SleepGuard::allowSleep();
+    reportState(VMState::PAUSED);
 }
 
 void
 SiAmController::didShutdown()
 {
-    setState(VMState::HALTED);
+    SleepGuard::allowSleep();
+    reportState(VMState::HALTED);
 }
 
 void
@@ -711,6 +987,22 @@ SiAmController::process(const Message &msg, const string &attachment)
         case Msg::RSH_ERROR:
 
             m_retroShellIsDirty = true;
+            break;
+
+        case Msg::SRV_STATE:
+
+            m_infoIsDirty = true;
+            if (SrvState(msg.value) == SrvState::CONNECTED) reportState(getState());
+            break;
+
+        case Msg::SRV_RECEIVE:
+
+            rpcReceive(msg.str);
+            break;
+
+        case Msg::SRV_SEND:
+
+            rpcSend(msg.str);
             break;
 
         default:

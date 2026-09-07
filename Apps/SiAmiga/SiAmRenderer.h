@@ -85,6 +85,19 @@ class SiAmRenderer : public Renderer {
 
     TexRect normalize(TexRect rect) const;
 
+
+    //
+    // Screenshots
+    //
+
+  public:
+
+    // Grabs a screenshot of the currently displayed frame, cropped to
+    // largestVisible() (the same convention the core's own snapshot
+    // thumbnails use). Returns a null QImage if no frame has been rendered
+    // yet. Mirrors SiC64Renderer::grabScreenshot().
+    QImage grabScreenshot() const;
+
   signals:
 
     void controllerChanged();

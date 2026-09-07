@@ -1611,6 +1611,18 @@ public:
     const RemoteManagerInfo &getCachedInfo() const;
 
     /// @}
+    /// @name Sending packets
+    /// @{
+
+    /** @brief  Sends a raw payload through the specified remote server.
+     *  It is delivered through the server's currently configured transport and
+     *  silently dropped if no client is connected.
+     *  @param  server   The server to send through.
+     *  @param  payload  The raw payload to send.
+     */
+    void send(ServerType server, const string &payload);
+
+    /// @}
 };
 
 
@@ -1664,10 +1676,14 @@ public:
     /** @brief  Returns a version string for this release.
      */
     static string version();
-    
+
     /** @brief  Returns a build-number string for this release.
      */
     static string build();
+
+    /** @brief  Returns a version string for the snapshot file format.
+     */
+    static string snapshotVersion();
     
     
     //

@@ -1699,6 +1699,13 @@ RemoteManagerAPI::getCachedInfo() const
     return remoteManager->info.backed();
 }
 
+void
+RemoteManagerAPI::send(ServerType server, const string &payload)
+{
+    VAMIGA_PUBLIC
+    remoteManager->send(server, payload);
+}
+
 
 //
 // RetroShellAPI
@@ -1983,6 +1990,12 @@ string
 VAmiga::build()
 {
     return Amiga::build();
+}
+
+string
+VAmiga::snapshotVersion()
+{
+    return Amiga::snapshotVersion();
 }
 
 const EmulatorInfo &

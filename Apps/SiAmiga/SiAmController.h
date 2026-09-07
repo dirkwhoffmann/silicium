@@ -137,11 +137,11 @@ public:
 
     void initialize();
 
-    // Parses the command line and collects any --exec (-e) commands into
-    // execCommands, run once the window opens (see windowDidOpen()). Unlike
-    // C64Controller::parseArguments, there is no SVM/workspace file to
-    // require here, so this never fails.
-    void parseArguments(const QCoreApplication &app);
+    // Parses the command line, opens the SVM file it names into 'svm', and
+    // collects any --exec (-e) commands into execCommands. Returns false if
+    // no SVM file was given or it could not be opened, in which case
+    // errorMessage describes the failure.
+    bool parseArguments(const QCoreApplication &app);
 
     /* The Rom library: a fixed, app-private folder that only this class and
      * SiAmConfigController::copyToLibrary() ever write to (mirrors
@@ -204,10 +204,17 @@ public:
     Q_PROPERTY(bool isPoweredOn READ isPoweredOn NOTIFY stateChanged)
     Q_PROPERTY(bool isRunning READ isRunning NOTIFY stateChanged)
     Q_PROPERTY(bool isPaused READ isPaused NOTIFY stateChanged)
+    Q_PROPERTY(bool readOnly READ getReadOnly CONSTANT)
+
+    Q_PROPERTY(QString uuid READ getUUID CONSTANT)
+    Q_PROPERTY(QString name READ getName CONSTANT)
 
     bool isPoweredOn() const { return m_state == VMState::PAUSED || m_state == VMState::RUNNING; }
     bool isRunning() { return m_state == VMState::RUNNING; }
     bool isPaused() { return m_state == VMState::PAUSED; }
+    bool getReadOnly() const;
+    QString getUUID() const;
+    QString getName() const;
 
     // Sampled once per rendered frame (see update()) rather than read
     // straight off the core, so the status bar's warp icon gets a change
@@ -222,6 +229,7 @@ public:
     Q_INVOKABLE void run();
     Q_INVOKABLE void pause();
     Q_INVOKABLE void runOrPause() { isPaused() ? run() : pause(); }
+    Q_INVOKABLE void hibernate(bool hibernateSnapshot, bool hibernateWorkspace);
 
     Q_INVOKABLE void reset();
     Q_INVOKABLE void softReset();
@@ -250,6 +258,10 @@ public:
     void setDebugPanel(bool value);
 
     Q_INVOKABLE void toggleDebugPanel() { setDebugPanel(!m_debugPanel); }
+
+    Q_INVOKABLE void saveWorkspace();
+    Q_INVOKABLE void saveSnapshot();
+    Q_INVOKABLE void revertSnapshot();
 
     Q_PROPERTY(SiAmActivityController *activityController READ getActivityController CONSTANT)
     Q_PROPERTY(SiAmConfigController *configController READ getConfigController CONSTANT)
@@ -367,10 +379,27 @@ public:
 
 
     //
-    // Processing messages
+    // Snapshots and workspaces
     //
 
 public:
+
+    Q_INVOKABLE void shrinkSnapshotStorage(int count);
+
+private:
+
+    /* The unconditional half of saveSnapshot(): captures the machine and
+     * files the result. saveSnapshot() checks the capacity limit and asks the
+     * user first; hibernation evicts silently and comes straight here, because
+     * it runs on quit where a dialog would have nowhere to go.
+     */
+    void captureSnapshot();
+
+public:
+
+    //
+    // Processing messages
+    //
 
     // Receives messages from the emulator thread (see initialize()) and
     // marshals them onto the GUI thread.
@@ -379,12 +408,44 @@ public:
 
 private:
 
+    // Processes incoming RPC messages
+    void rpcReceive(const char *payload);
+    void rpcSend(const char *payload);
+
+    // Loads a specific snapshot from this VM's own SVM
+    void loadSnapshot(const utl::UUID &uuid);
+
     // Called within the message receiver
     void didPowerOn();
     void didPowerOff();
     void didRun();
     void didPause();
     void didShutdown();
+
+private:
+
+    // Updates the VM state and reports it through the RPC server
+    void reportState(VMState state);
+
+    // Reports that the SVM file was just written to disk through the RPC server
+    void notifySvmChanged(const QString &kind, const QString &uuid = {});
+
+    /* Tells the Hub to pack the archive after we persisted into the root
+     * folder it gave us. A no-op when nothing is listening, which is the
+     * standalone case -- see the definition.
+     */
+    void notifyPersist();
+
+public:
+
+    /* Hands a fatal error to the Hub by sending a "fatalError" JSON-RPC
+     * notification through the RPC server. Fatal errors are the ones this
+     * window cannot recover from, so the Hub -- which outlives us -- shows
+     * the dialog instead (see HubController::processRpcPacket()). Unlike the
+     * other notifications, the payload is an object: the Hub's error dialog
+     * takes a title and a body.
+     */
+    Q_INVOKABLE void notifyFatalError(const QString &title, const QString &text);
 
 signals:
 
@@ -397,4 +458,7 @@ signals:
     void debugPanelChanged();
     void retroShellChanged();
     void retroShellTextChanged();
+    void workspaceSaved();
+    void snapshotSaved(const QString &sUUID);
+    void snapshotLimitReached();
 };
