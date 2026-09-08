@@ -36,13 +36,18 @@ Item {
 
     readonly property bool locked: controller.isPoweredOn
 
-    readonly property string kickTitle: !cc.hasKickRom ? qsTr("No Rom loaded") : cc.kickRomTitle
-    readonly property string kickSubtitle: !cc.hasKickRom ? "" : cc.kickRomRevision
+    // Cap the title/subtitle/details/combo column at half the panel's width,
+    // so a tile's total width -- image + spacing + that column -- matches
+    // SiRomDropView's own internal RowLayout spacing exactly.
+    readonly property real romTileWidth: 120 + Style.mediumSpacing + mainColumn.width / 2
+
+    readonly property string kickTitle: !cc.hasKickRom ? qsTr("Kickstart Rom or Boot Rom") : cc.kickRomTitle
+    readonly property string kickSubtitle: !cc.hasKickRom ? qsTr("Required") : cc.kickRomRevision
     readonly property string kickDetails: !cc.hasKickRom ? "" : cc.kickRomReleased
     readonly property url kickIcon: romIcon(cc.hasKickRom, cc.kickRomVendor)
 
-    readonly property string extTitle: !cc.hasExtRom ? qsTr("No Rom loaded") : cc.extRomTitle
-    readonly property string extSubtitle: !cc.hasExtRom ? "" : cc.extRomRevision
+    readonly property string extTitle: !cc.hasExtRom ? qsTr("Kickstart Rom Extension") : cc.extRomTitle
+    readonly property string extSubtitle: !cc.hasExtRom ? qsTr("Optional") : cc.extRomRevision
     readonly property string extDetails: !cc.hasExtRom ? "" : cc.extRomReleased
     readonly property url extIcon: romIcon(cc.hasExtRom, cc.extRomVendor)
 
@@ -77,104 +82,6 @@ Item {
         }
     }
 
-    // One ROM slot: the fixed left-hand label (name + Required/Optional),
-    // the chip icon (drag-and-drop + click-to-browse) with its delete
-    // button below, and the loaded ROM's own title/subtitle/details.
-    component RomSlot: RowLayout {
-
-        id: slot
-
-        property string label: ""
-        property string requirement: ""
-        property url icon: ""
-        property string title: ""
-        property string subtitle: ""
-        property string details: ""
-
-        // Display names of the Roms available in the Rom library (see
-        // SiAmController::romLibraryDir()), listed in the combo box below
-        // "None"; installRom(index) fires when one is picked.
-        property var libraryRoms: []
-
-        // Extra content (the Extension Rom's Location combo) appended below
-        // the title/subtitle/details column -- aliased to that column's
-        // 'data' below rather than declared 'default property' (RomSlot's
-        // instantiation already uses its default 'data' for nothing since
-        // it's a RowLayout with fixed children, so this needs its own name).
-        property alias extra: extraColumn.data
-
-        signal urlsDropped(var urls)
-        signal deleteRom()
-        signal installRom(int index)
-        signal clicked()
-
-        Layout.fillWidth: true
-        spacing: Style.largeSpacing
-
-        ColumnLayout {
-
-            Layout.preferredWidth: 200
-            Layout.alignment: Qt.AlignTop
-            spacing: 2
-
-            SiText { text: slot.label; font.pixelSize: Style.large; horizontalAlignment: Text.AlignRight; Layout.fillWidth: true }
-            SiText { text: slot.requirement; color: Palette.tertiary; horizontalAlignment: Text.AlignRight; Layout.fillWidth: true }
-        }
-
-        ColumnLayout {
-
-            Layout.alignment: Qt.AlignTop
-            spacing: Style.smallSpacing
-
-            SiImageDropView {
-
-                Layout.preferredWidth: 120
-                Layout.preferredHeight: 120
-                source: slot.icon
-
-                acceptUrls: function (urls) { return cc.isRom(urls[0]) }
-                onUrlsDropped: (urls) => slot.urlsDropped(urls)
-                onClicked: slot.clicked()
-            }
-
-            SiSymbolButton {
-
-                Layout.alignment: Qt.AlignHCenter
-                symbol: "delete"
-                size: Size.regular
-                onClicked: slot.deleteRom()
-            }
-        }
-
-        ColumnLayout {
-
-            Layout.alignment: Qt.AlignTop
-            Layout.fillWidth: true
-            spacing: Style.smallTextSpacing
-
-            SiComboBoxControl {
-
-                Layout.fillWidth: true
-
-                // "None" removes the Rom (same as the delete button next to
-                // the chip icon); the rest are the Roms found in the library.
-                model: ["None"].concat(slot.libraryRoms)
-                currentIndex: -1
-                displayText: slot.title
-
-                onActivated: (index) => {
-                    if (index === 0) slot.deleteRom()
-                    else slot.installRom(index - 1)
-                }
-            }
-
-            SiText { text: slot.subtitle; color: Palette.secondary; Layout.fillWidth: true; elide: Text.ElideRight; visible: text !== "" }
-            SiText { text: slot.details; color: Palette.tertiary; Layout.fillWidth: true; elide: Text.ElideRight; visible: text !== "" }
-
-            ColumnLayout { id: extraColumn }
-        }
-    }
-
     Pane {
 
         anchors.fill: parent
@@ -187,6 +94,7 @@ Item {
 
         ColumnLayout {
 
+            id: mainColumn
             anchors.fill: parent
 
             ConfigToolbar {
@@ -255,20 +163,22 @@ Item {
             VSpacer { }
 
             //
-            // Kickstart / Boot Rom
+            // Kickstart Rom
             //
 
-            RomSlot {
+            SiRomDropView {
 
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: root.romTileWidth
                 enabled: !root.locked
-                label: qsTr("Kickstart Rom or Boot Rom")
-                requirement: qsTr("(Required)")
-                icon: root.kickIcon
+                orientation: Qt.LeftToRight
                 title: root.kickTitle
                 subtitle: root.kickSubtitle
                 details: root.kickDetails
+                imageSource: root.kickIcon
                 libraryRoms: cc.availableKickRoms
 
+                acceptUrls: function (urls) { return cc.isRom(urls[0]) }
                 onUrlsDropped: (urls) => cc.loadKickRom(urls[0])
                 onDeleteRom: cc.deleteKickRom()
                 onInstallRom: (index) => cc.installKickRom(index)
@@ -281,18 +191,19 @@ Item {
             // Extension Rom
             //
 
-            RomSlot {
+            SiRomDropView {
 
-                id: extSlot
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: root.romTileWidth
                 enabled: !root.locked
-                label: qsTr("Kickstart Rom Extension")
-                requirement: qsTr("(Optional)")
-                icon: root.extIcon
+                orientation: Qt.LeftToRight
                 title: root.extTitle
                 subtitle: root.extSubtitle
                 details: root.extDetails
+                imageSource: root.extIcon
                 libraryRoms: cc.availableExtRoms
 
+                acceptUrls: function (urls) { return cc.isRom(urls[0]) }
                 onUrlsDropped: (urls) => cc.loadExtRom(urls[0])
                 onDeleteRom: cc.deleteExtRom()
                 onInstallRom: (index) => cc.installExtRom(index)

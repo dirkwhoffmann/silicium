@@ -20,6 +20,10 @@ Item {
     // installRom(index) fires when one is picked.
     property var libraryRoms: []
 
+    // Extra content appended below the title/subtitle/details, e.g. SiAmiga's
+    // Extension Rom location combo (MEM_EXT_START). Empty by default.
+    property alias extra: extraColumn.data
+
     signal urlsDropped(var urls)
     signal deleteRom()
     signal installRom(int index)
@@ -107,6 +111,8 @@ Item {
                 Layout.fillWidth: true
                 horizontalAlignment: parent.alignRight ? Text.AlignRight : Text.AlignLeft
             }
+
+            ColumnLayout { id: extraColumn }
 
             VSpacer {}
 
