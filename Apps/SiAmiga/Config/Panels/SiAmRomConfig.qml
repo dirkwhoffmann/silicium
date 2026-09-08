@@ -190,8 +190,6 @@ Item {
                 onClicked: { romFileDialog.romType = "kick"; romFileDialog.open() }
             }
 
-            // VSpacer { size: Style.smallSpacing }
-
             //
             // Extension Rom
             //

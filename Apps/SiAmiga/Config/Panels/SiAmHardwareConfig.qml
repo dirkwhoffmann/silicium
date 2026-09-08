@@ -10,6 +10,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Silicium.Assets
 import Silicium.Controllers
 import Silicium.Theme
 
@@ -102,17 +103,27 @@ SettingsPage {
         }
     }
 
-    component InfoText: ColumnLayout {
+    component InfoText: RowLayout {
 
         property string title: ""
         property string subtitle: ""
 
         Layout.leftMargin: 24
-        spacing: 0
+        spacing: Style.smallSpacing
         visible: title !== ""
 
-        SiText { text: title; color: Palette.primary }
-        SiText { text: subtitle; color: Palette.secondary; visible: subtitle !== "" }
+        Image {
+            source: Assets.iconUrl(Assets.RomPlain)
+            Layout.preferredWidth: 36
+            Layout.preferredHeight: 36
+            fillMode: Image.PreserveAspectFit
+        }
+
+        ColumnLayout {
+            spacing: 0
+            SiText { text: title; color: Palette.primary }
+            SiText { text: subtitle; color: Palette.secondary; visible: subtitle !== "" }
+        }
     }
 
     RowLayout {
