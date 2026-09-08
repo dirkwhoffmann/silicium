@@ -11,6 +11,10 @@ Item {
     property alias imageSource: dropView.source
     property alias acceptUrls: dropView.acceptUrls
 
+    // Side length of the chip icon; the description column's height follows
+    // it (see descColumn.Layout.preferredHeight below).
+    property int imageSize: 120
+
     property string title: ""
     property string subtitle: ""
     property string details: ""
@@ -29,8 +33,8 @@ Item {
     signal installRom(int index)
     signal clicked()
 
-    implicitWidth: 220
-    implicitHeight: 120
+    implicitWidth: imageSize + 100
+    implicitHeight: imageSize
 
     // Dim the whole tile -- image, labels and delete button -- when disabled.
     // Applied here rather than inside SiImageDropView so the two do not
@@ -52,8 +56,8 @@ Item {
         SiImageDropView {
 
             id: dropView
-            Layout.preferredWidth: 120
-            Layout.preferredHeight: 120
+            Layout.preferredWidth: root.imageSize
+            Layout.preferredHeight: root.imageSize
 
             onUrlsDropped: (urls) => root.urlsDropped(urls)
             onClicked: root.clicked()
