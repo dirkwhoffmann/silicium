@@ -15,9 +15,8 @@ import Silicium.Controllers
 import Silicium.Theme
 
 // Port of vAmiga's own GUI/Settings/ViewControllers/HardwareSettings.swift.
-// A flat two-column form (Chipset on the left, Memory on the right),
-// matching SiAmDevicesConfig/SiAmPerformanceConfig's layout rather than
-// SiC64HardwareConfig's ConfigSection cards.
+// ConfigGrid/ConfigSection cards, one per hardware component, matching
+// SiC64HardwareConfig's layout.
 //
 // The chip-model preset combos (Amiga 500/1000/2000/500+/1200 --
 // HardwareSettingsViewController.preset(tag:)) aren't ported: they'd need a
@@ -31,6 +30,7 @@ SettingsPage {
     readonly property var config: controller.configController
 
     readonly property int labelWidth: 100
+    readonly property int sectionWidth: 320
 
     // Chip Ram address ceiling per Agnus revision (in KB) -- matches
     // HardwareSettingsViewController's 'badAgnus' warning, which compares
@@ -151,170 +151,155 @@ SettingsPage {
         InfoBox {
             title: box.title
             subtitle: box.subtitle
-            visible: box.showInfo
+            // opacity, not visible -- keeps the row's height reserved so
+            // hiding the info (e.g. Slow/Fast Ram at 0 KB) doesn't make the
+            // rows below jump up.
+            opacity: box.showInfo ? 1 : 0
         }
     }
 
-    RowLayout {
+    ConfigGrid {
 
-        Layout.fillWidth: true
-        spacing: Style.largeSpacing * 2
+        id: grid
 
         //
-        // Left column: Chipset
+        // Chipset
         //
 
-        ColumnLayout {
+        ConfigSection {
 
-            Layout.fillWidth: true
-            spacing: Style.mediumSpacing
+            header: "Chipset"
+            size: root.sectionWidth
 
-            SiText { text: "Chipset"; font.bold: true; font.pixelSize: Style.large }
+            ConfigBox {
+                title: root.cpuInfo(config.CPU_REVISION)[0]
+                subtitle: root.cpuInfo(config.CPU_REVISION)[1]
 
-            ColumnLayout {
-
-                spacing: Style.largeSpacing
-
-                ConfigBox {
-                    title: root.cpuInfo(config.CPU_REVISION)[0]
-                    subtitle: root.cpuInfo(config.CPU_REVISION)[1]
-
-                    SiLabel { text: "CPU:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
-                    SiComboBoxControl {
-                        model: ["68000", "68010", "68EC020"]
-                        currentIndex: config.CPU_REVISION
-                        onCurrentIndexChanged: config.CPU_REVISION = currentIndex
-                    }
-                    SiComboBoxControl {
-                        model: ["7 MHz", "14 MHz", "28 MHz", "56 MHz"]
-                        currentIndex: config.CPU_OVERCLOCKING
-                        onCurrentIndexChanged: config.CPU_OVERCLOCKING = currentIndex
-                    }
+                SiLabel { text: "CPU:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
+                SiComboBoxControl {
+                    model: ["68000", "68010", "68EC020"]
+                    currentIndex: config.CPU_REVISION
+                    onCurrentIndexChanged: config.CPU_REVISION = currentIndex
                 }
-
-                ConfigBox {
-                    title: root.agnusInfo(config.AGNUS_REVISION, config.AMIGA_VIDEO_FORMAT === 0)[0]
-                    subtitle: root.agnusInfo(config.AGNUS_REVISION, config.AMIGA_VIDEO_FORMAT === 0)[1]
-
-                    SiLabel { text: "Agnus:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
-                    SiComboBoxControl {
-                        model: ["Early OCS", "OCS", "ECS (1MB)", "ECS (2MB)", "AGA"]
-                        currentIndex: config.AGNUS_REVISION
-                        onCurrentIndexChanged: config.AGNUS_REVISION = currentIndex
-                    }
-                    SiComboBoxControl {
-                        model: ["PAL", "NTSC"]
-                        currentIndex: config.AMIGA_VIDEO_FORMAT
-                        onCurrentIndexChanged: config.AMIGA_VIDEO_FORMAT = currentIndex
-                    }
-                }
-
-                ConfigBox {
-                    title: root.deniseInfo(config.DENISE_REVISION)[0]
-                    subtitle: root.deniseInfo(config.DENISE_REVISION)[1]
-
-                    SiLabel { text: "Denise:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
-                    SiComboBoxControl {
-                        model: ["OCS", "ECS", "AGA"]
-                        currentIndex: config.DENISE_REVISION
-                        onCurrentIndexChanged: config.DENISE_REVISION = currentIndex
-                    }
-                }
-
-                ConfigBox {
-                    title: root.ciaInfo(config.CIA_A_REVISION)[0]
-                    subtitle: root.ciaInfo(config.CIA_A_REVISION)[1]
-
-                    SiLabel { text: "CIAs:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
-                    SiComboBoxControl {
-                        model: ["DIP", "PLCC"]
-                        currentIndex: config.CIA_A_REVISION
-                        onCurrentIndexChanged: { config.CIA_A_REVISION = currentIndex; config.CIA_B_REVISION = currentIndex }
-                    }
-                }
-
-                ConfigBox {
-                    title: root.rtcInfo(config.RTC_MODEL)[0]
-                    subtitle: root.rtcInfo(config.RTC_MODEL)[1]
-
-                    SiLabel { text: "RTC:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
-                    SiComboBoxControl {
-                        model: ["None", "OKI", "Ricoh"]
-                        currentIndex: config.RTC_MODEL
-                        onCurrentIndexChanged: config.RTC_MODEL = currentIndex
-                    }
+                SiComboBoxControl {
+                    model: ["7 MHz", "14 MHz", "28 MHz", "56 MHz"]
+                    currentIndex: config.CPU_OVERCLOCKING
+                    onCurrentIndexChanged: config.CPU_OVERCLOCKING = currentIndex
                 }
             }
 
-            VSpacer { }
+            ConfigBox {
+                title: root.agnusInfo(config.AGNUS_REVISION, config.AMIGA_VIDEO_FORMAT === 0)[0]
+                subtitle: root.agnusInfo(config.AGNUS_REVISION, config.AMIGA_VIDEO_FORMAT === 0)[1]
+
+                SiLabel { text: "Agnus:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
+                SiComboBoxControl {
+                    model: ["Early OCS", "OCS", "ECS (1MB)", "ECS (2MB)", "AGA"]
+                    currentIndex: config.AGNUS_REVISION
+                    onCurrentIndexChanged: config.AGNUS_REVISION = currentIndex
+                }
+                SiComboBoxControl {
+                    model: ["PAL", "NTSC"]
+                    currentIndex: config.AMIGA_VIDEO_FORMAT
+                    onCurrentIndexChanged: config.AMIGA_VIDEO_FORMAT = currentIndex
+                }
+            }
+
+            ConfigBox {
+                title: root.deniseInfo(config.DENISE_REVISION)[0]
+                subtitle: root.deniseInfo(config.DENISE_REVISION)[1]
+
+                SiLabel { text: "Denise:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
+                SiComboBoxControl {
+                    model: ["OCS", "ECS", "AGA"]
+                    currentIndex: config.DENISE_REVISION
+                    onCurrentIndexChanged: config.DENISE_REVISION = currentIndex
+                }
+            }
+
+            ConfigBox {
+                title: root.ciaInfo(config.CIA_A_REVISION)[0]
+                subtitle: root.ciaInfo(config.CIA_A_REVISION)[1]
+
+                SiLabel { text: "CIAs:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
+                SiComboBoxControl {
+                    model: ["DIP", "PLCC"]
+                    currentIndex: config.CIA_A_REVISION
+                    onCurrentIndexChanged: { config.CIA_A_REVISION = currentIndex; config.CIA_B_REVISION = currentIndex }
+                }
+            }
+
+            ConfigBox {
+                title: root.rtcInfo(config.RTC_MODEL)[0]
+                subtitle: root.rtcInfo(config.RTC_MODEL)[1]
+
+                SiLabel { text: "RTC:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
+                SiComboBoxControl {
+                    model: ["None", "OKI", "Ricoh"]
+                    currentIndex: config.RTC_MODEL
+                    onCurrentIndexChanged: config.RTC_MODEL = currentIndex
+                }
+            }
         }
 
         //
-        // Right column: Memory
+        // Memory
         //
 
-        ColumnLayout {
+        ConfigSection {
 
-            Layout.fillWidth: true
-            spacing: Style.mediumSpacing
+            header: "Memory"
+            size: root.sectionWidth
 
-            SiText { text: "Memory"; font.bold: true; font.pixelSize: Style.large }
+            ConfigBox {
+                title: "DRAM"
+                subtitle: "%1 - %2".arg(formatAddr(0)).arg(formatAddr(config.MEM_CHIP_RAM * 1024 - 1))
 
-            ColumnLayout {
-
-                spacing: Style.tinySpacing
-
-                ConfigBox {
-                    title: "DRAM"
-                    subtitle: "%1 - %2".arg(formatAddr(0)).arg(formatAddr(config.MEM_CHIP_RAM * 1024 - 1))
-
-                    SiSymbol {
-                        visible: root.badAgnus
-                        symbol: "warning"
-                        color: Palette.warning
-                        ToolTip.visible: badAgnusHover.hovered
-                        ToolTip.text: "Chip Ram is not fully usable. The selected Agnus revision is limited to address %1 KB.".arg(root.chipRamLimits[config.AGNUS_REVISION])
-                        HoverHandler { id: badAgnusHover }
-                    }
-                    SiLabel { text: "Chip Ram:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
-                    SiComboBoxControl {
-                        model: ["256 KB", "512 KB", "1024 KB", "2048 KB"]
-                        currentIndex: [256, 512, 1024, 2048].indexOf(config.MEM_CHIP_RAM)
-                        onCurrentIndexChanged: config.MEM_CHIP_RAM = [256, 512, 1024, 2048][currentIndex]
-                    }
+                SiSymbol {
+                    visible: root.badAgnus
+                    symbol: "warning"
+                    color: Palette.warning
+                    ToolTip.visible: badAgnusHover.hovered
+                    ToolTip.text: "Chip Ram is not fully usable. The selected Agnus revision is limited to address %1 KB.".arg(root.chipRamLimits[config.AGNUS_REVISION])
+                    HoverHandler { id: badAgnusHover }
                 }
-
-                ConfigBox {
-                    title: "DRAM"
-                    subtitle: "%1 - %2".arg(formatAddr(0xC00000)).arg(formatAddr(0xC00000 + config.MEM_SLOW_RAM * 1024 - 1))
-                    showInfo: config.MEM_SLOW_RAM > 0
-
-                    SiLabel { text: "Slow Ram:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
-                    SiComboBoxControl {
-                        model: ["None", "256 KB", "512 KB", "768 KB", "1024 KB", "1280 KB", "1536 KB"]
-                        currentIndex: config.MEM_SLOW_RAM / 256
-                        onCurrentIndexChanged: config.MEM_SLOW_RAM = currentIndex * 256
-                    }
-                }
-
-                ConfigBox {
-                    title: "DRAM"
-                    subtitle: "%1 - %2".arg(formatAddr(0x200000)).arg(formatAddr(0x200000 + config.MEM_FAST_RAM * 1024 - 1))
-                    showInfo: config.MEM_FAST_RAM > 0
-
-                    SiLabel { text: "Fast Ram:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
-                    SiComboBoxControl {
-                        model: ["None", "64 KB", "128 KB", "256 KB", "512 KB", "1024 KB", "2048 KB", "4096 KB", "8192 KB"]
-                        currentIndex: [0, 64, 128, 256, 512, 1024, 2048, 4096, 8192].indexOf(config.MEM_FAST_RAM)
-                        onCurrentIndexChanged: config.MEM_FAST_RAM = [0, 64, 128, 256, 512, 1024, 2048, 4096, 8192][currentIndex]
-                    }
+                SiLabel { text: "Chip Ram:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
+                SiComboBoxControl {
+                    model: ["256 KB", "512 KB", "1024 KB", "2048 KB"]
+                    currentIndex: [256, 512, 1024, 2048].indexOf(config.MEM_CHIP_RAM)
+                    onCurrentIndexChanged: config.MEM_CHIP_RAM = [256, 512, 1024, 2048][currentIndex]
                 }
             }
 
-            VSpacer { size: Style.mediumSpacing }
+            ConfigBox {
+                title: "DRAM"
+                subtitle: "%1 - %2".arg(formatAddr(0xC00000)).arg(formatAddr(0xC00000 + config.MEM_SLOW_RAM * 1024 - 1))
+                showInfo: config.MEM_SLOW_RAM > 0
+
+                SiLabel { text: "Slow Ram:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
+                SiComboBoxControl {
+                    model: ["None", "256 KB", "512 KB", "768 KB", "1024 KB", "1280 KB", "1536 KB"]
+                    currentIndex: config.MEM_SLOW_RAM / 256
+                    onCurrentIndexChanged: config.MEM_SLOW_RAM = currentIndex * 256
+                }
+            }
+
+            ConfigBox {
+                title: "DRAM"
+                subtitle: "%1 - %2".arg(formatAddr(0x200000)).arg(formatAddr(0x200000 + config.MEM_FAST_RAM * 1024 - 1))
+                showInfo: config.MEM_FAST_RAM > 0
+
+                SiLabel { text: "Fast Ram:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
+                SiComboBoxControl {
+                    model: ["None", "64 KB", "128 KB", "256 KB", "512 KB", "1024 KB", "2048 KB", "4096 KB", "8192 KB"]
+                    currentIndex: [0, 64, 128, 256, 512, 1024, 2048, 4096, 8192].indexOf(config.MEM_FAST_RAM)
+                    onCurrentIndexChanged: config.MEM_FAST_RAM = [0, 64, 128, 256, 512, 1024, 2048, 4096, 8192][currentIndex]
+                }
+            }
 
             GridLayout {
 
+                Layout.topMargin: Style.smallSpacing
                 columns: 2
                 columnSpacing: Style.smallSpacing
                 rowSpacing: Style.mediumSpacing
@@ -347,8 +332,6 @@ SettingsPage {
                     onCurrentIndexChanged: config.MEM_UNMAPPING_TYPE = currentIndex
                 }
             }
-
-            VSpacer { }
         }
     }
 
