@@ -103,12 +103,12 @@ SettingsPage {
         }
     }
 
-    component InfoText: RowLayout {
+    component InfoBox: RowLayout {
 
         property string title: ""
         property string subtitle: ""
 
-        Layout.leftMargin: 24
+        Layout.leftMargin: root.labelWidth + Style.smallSpacing
         spacing: Style.smallSpacing
         visible: title !== ""
 
@@ -123,6 +123,35 @@ SettingsPage {
             spacing: 0
             SiText { text: title; color: Palette.primary }
             SiText { text: subtitle; color: Palette.secondary; visible: subtitle !== "" }
+        }
+    }
+
+    // A label+combo(s) row (the row's own contents go in via the default
+    // property) paired with the InfoBox describing the current selection.
+    component ConfigBox: ColumnLayout {
+
+        id: box
+
+        property string title: ""
+        property string subtitle: ""
+
+        // Lets a caller hide the InfoBox on its own (e.g. Slow/Fast Ram,
+        // whose row stays visible at 0 KB but whose info line shouldn't).
+        property bool showInfo: title !== ""
+
+        default property alias content: row.data
+
+        spacing: Style.mediumSpacing
+
+        RowLayout {
+            id: row
+            spacing: Style.smallSpacing
+        }
+
+        InfoBox {
+            title: box.title
+            subtitle: box.subtitle
+            visible: box.showInfo
         }
     }
 
@@ -144,10 +173,12 @@ SettingsPage {
 
             ColumnLayout {
 
-                spacing: Style.tinySpacing
+                spacing: Style.largeSpacing
 
-                RowLayout {
-                    spacing: Style.smallSpacing
+                ConfigBox {
+                    title: root.cpuInfo(config.CPU_REVISION)[0]
+                    subtitle: root.cpuInfo(config.CPU_REVISION)[1]
+
                     SiLabel { text: "CPU:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
                     SiComboBoxControl {
                         model: ["68000", "68010", "68EC020"]
@@ -160,10 +191,11 @@ SettingsPage {
                         onCurrentIndexChanged: config.CPU_OVERCLOCKING = currentIndex
                     }
                 }
-                InfoText { title: root.cpuInfo(config.CPU_REVISION)[0]; subtitle: root.cpuInfo(config.CPU_REVISION)[1] }
 
-                RowLayout {
-                    spacing: Style.smallSpacing
+                ConfigBox {
+                    title: root.agnusInfo(config.AGNUS_REVISION, config.AMIGA_VIDEO_FORMAT === 0)[0]
+                    subtitle: root.agnusInfo(config.AGNUS_REVISION, config.AMIGA_VIDEO_FORMAT === 0)[1]
+
                     SiLabel { text: "Agnus:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
                     SiComboBoxControl {
                         model: ["Early OCS", "OCS", "ECS (1MB)", "ECS (2MB)", "AGA"]
@@ -176,13 +208,11 @@ SettingsPage {
                         onCurrentIndexChanged: config.AMIGA_VIDEO_FORMAT = currentIndex
                     }
                 }
-                InfoText {
-                    title: root.agnusInfo(config.AGNUS_REVISION, config.AMIGA_VIDEO_FORMAT === 0)[0]
-                    subtitle: root.agnusInfo(config.AGNUS_REVISION, config.AMIGA_VIDEO_FORMAT === 0)[1]
-                }
 
-                RowLayout {
-                    spacing: Style.smallSpacing
+                ConfigBox {
+                    title: root.deniseInfo(config.DENISE_REVISION)[0]
+                    subtitle: root.deniseInfo(config.DENISE_REVISION)[1]
+
                     SiLabel { text: "Denise:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
                     SiComboBoxControl {
                         model: ["OCS", "ECS", "AGA"]
@@ -190,10 +220,11 @@ SettingsPage {
                         onCurrentIndexChanged: config.DENISE_REVISION = currentIndex
                     }
                 }
-                InfoText { title: root.deniseInfo(config.DENISE_REVISION)[0]; subtitle: root.deniseInfo(config.DENISE_REVISION)[1] }
 
-                RowLayout {
-                    spacing: Style.smallSpacing
+                ConfigBox {
+                    title: root.ciaInfo(config.CIA_A_REVISION)[0]
+                    subtitle: root.ciaInfo(config.CIA_A_REVISION)[1]
+
                     SiLabel { text: "CIAs:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
                     SiComboBoxControl {
                         model: ["DIP", "PLCC"]
@@ -201,10 +232,11 @@ SettingsPage {
                         onCurrentIndexChanged: { config.CIA_A_REVISION = currentIndex; config.CIA_B_REVISION = currentIndex }
                     }
                 }
-                InfoText { title: root.ciaInfo(config.CIA_A_REVISION)[0]; subtitle: root.ciaInfo(config.CIA_A_REVISION)[1] }
 
-                RowLayout {
-                    spacing: Style.smallSpacing
+                ConfigBox {
+                    title: root.rtcInfo(config.RTC_MODEL)[0]
+                    subtitle: root.rtcInfo(config.RTC_MODEL)[1]
+
                     SiLabel { text: "RTC:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
                     SiComboBoxControl {
                         model: ["None", "OKI", "Ricoh"]
@@ -212,7 +244,6 @@ SettingsPage {
                         onCurrentIndexChanged: config.RTC_MODEL = currentIndex
                     }
                 }
-                InfoText { title: root.rtcInfo(config.RTC_MODEL)[0]; subtitle: root.rtcInfo(config.RTC_MODEL)[1] }
             }
 
             VSpacer { }
@@ -233,8 +264,10 @@ SettingsPage {
 
                 spacing: Style.tinySpacing
 
-                RowLayout {
-                    spacing: Style.smallSpacing
+                ConfigBox {
+                    title: "DRAM"
+                    subtitle: "%1 - %2".arg(formatAddr(0)).arg(formatAddr(config.MEM_CHIP_RAM * 1024 - 1))
+
                     SiSymbol {
                         visible: root.badAgnus
                         symbol: "warning"
@@ -250,13 +283,12 @@ SettingsPage {
                         onCurrentIndexChanged: config.MEM_CHIP_RAM = [256, 512, 1024, 2048][currentIndex]
                     }
                 }
-                InfoText {
-                    title: "DRAM"
-                    subtitle: "%1 - %2".arg(formatAddr(0)).arg(formatAddr(config.MEM_CHIP_RAM * 1024 - 1))
-                }
 
-                RowLayout {
-                    spacing: Style.smallSpacing
+                ConfigBox {
+                    title: "DRAM"
+                    subtitle: "%1 - %2".arg(formatAddr(0xC00000)).arg(formatAddr(0xC00000 + config.MEM_SLOW_RAM * 1024 - 1))
+                    showInfo: config.MEM_SLOW_RAM > 0
+
                     SiLabel { text: "Slow Ram:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
                     SiComboBoxControl {
                         model: ["None", "256 KB", "512 KB", "768 KB", "1024 KB", "1280 KB", "1536 KB"]
@@ -264,25 +296,18 @@ SettingsPage {
                         onCurrentIndexChanged: config.MEM_SLOW_RAM = currentIndex * 256
                     }
                 }
-                InfoText {
-                    visible: config.MEM_SLOW_RAM > 0
-                    title: "DRAM"
-                    subtitle: "%1 - %2".arg(formatAddr(0xC00000)).arg(formatAddr(0xC00000 + config.MEM_SLOW_RAM * 1024 - 1))
-                }
 
-                RowLayout {
-                    spacing: Style.smallSpacing
+                ConfigBox {
+                    title: "DRAM"
+                    subtitle: "%1 - %2".arg(formatAddr(0x200000)).arg(formatAddr(0x200000 + config.MEM_FAST_RAM * 1024 - 1))
+                    showInfo: config.MEM_FAST_RAM > 0
+
                     SiLabel { text: "Fast Ram:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
                     SiComboBoxControl {
                         model: ["None", "64 KB", "128 KB", "256 KB", "512 KB", "1024 KB", "2048 KB", "4096 KB", "8192 KB"]
                         currentIndex: [0, 64, 128, 256, 512, 1024, 2048, 4096, 8192].indexOf(config.MEM_FAST_RAM)
                         onCurrentIndexChanged: config.MEM_FAST_RAM = [0, 64, 128, 256, 512, 1024, 2048, 4096, 8192][currentIndex]
                     }
-                }
-                InfoText {
-                    visible: config.MEM_FAST_RAM > 0
-                    title: "DRAM"
-                    subtitle: "%1 - %2".arg(formatAddr(0x200000)).arg(formatAddr(0x200000 + config.MEM_FAST_RAM * 1024 - 1))
                 }
             }
 
