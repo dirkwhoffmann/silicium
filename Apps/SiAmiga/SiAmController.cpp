@@ -906,6 +906,7 @@ SiAmController::process(const Message &msg, const string &attachment)
 
         case Msg::CONFIG:
 
+            m_configIsDirty = true;
             m_infoIsDirty = true;
             break;
 
@@ -1024,8 +1025,8 @@ SiAmController::process(const Message &msg, const string &attachment)
 void
 SiAmController::update()
 {
-    // Placeholder for coalesced per-frame UI updates (config/info dirty
-    // flags and the like), following the same rhythm as C64Controller::update().
+    // Coalesced per-frame UI updates (config/info/retroShell dirty flags),
+    // following the same rhythm as C64Controller::update().
     // Warping is the one piece of state so far that changes on its own
     // (AUTO mode kicks in without any user action), so it's sampled here
     // rather than read straight off the core -- see the warping property.
@@ -1040,6 +1041,12 @@ SiAmController::update()
 
         emit retroShellTextChanged();
         m_retroShellIsDirty = false;
+    }
+
+    if (m_configIsDirty) {
+
+        emit m_configController->configChanged();
+        m_configIsDirty = false;
     }
 
     if (m_infoIsDirty) {
