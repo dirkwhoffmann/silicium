@@ -32,6 +32,14 @@ SettingsPage {
     readonly property int labelWidth: 100
     readonly property int sectionWidth: 320
 
+    // Agnus revision, Chip/Slow/Fast Ram and the RTC model can only be
+    // changed while the machine is off (see Agnus/Memory/RTC::checkOption's
+    // isPoweredOff() guards in VACore) -- the core silently refuses the
+    // change otherwise, which used to go unnoticed because nothing ever
+    // re-read the rejected value back into the combo box. Gate those rows
+    // on this so the panel can't misrepresent a change that never took.
+    readonly property bool locked: controller.isPoweredOn
+
     // Chip Ram address ceiling per Agnus revision (in KB) -- matches
     // HardwareSettingsViewController's 'badAgnus' warning, which compares
     // the selected Chip Ram against AgnusTraits.chipRamLimit for the
@@ -142,6 +150,7 @@ SettingsPage {
         default property alias content: row.data
 
         spacing: Style.mediumSpacing
+        opacity: enabled ? 1.0 : 0.4
 
         RowLayout {
             id: row
@@ -189,11 +198,16 @@ SettingsPage {
             }
 
             ConfigBox {
+                // Only the revision combo is power-locked; the video format
+                // isn't (see Amiga::checkOption), so it stays enabled -- the
+                // box as a whole can't be disabled without taking that down
+                // with it, so the combo gets its own 'enabled' below instead.
                 title: root.agnusInfo(config.AGNUS_REVISION, config.AMIGA_VIDEO_FORMAT === 0)[0]
                 subtitle: root.agnusInfo(config.AGNUS_REVISION, config.AMIGA_VIDEO_FORMAT === 0)[1]
 
                 SiLabel { text: "Agnus:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
                 SiComboBoxControl {
+                    enabled: !root.locked
                     model: ["Early OCS", "OCS", "ECS (1MB)", "ECS (2MB)", "AGA"]
                     currentIndex: config.AGNUS_REVISION
                     onCurrentIndexChanged: config.AGNUS_REVISION = currentIndex
@@ -230,6 +244,7 @@ SettingsPage {
             }
 
             ConfigBox {
+                enabled: !root.locked
                 title: root.rtcInfo(config.RTC_MODEL)[0]
                 subtitle: root.rtcInfo(config.RTC_MODEL)[1]
 
@@ -252,6 +267,7 @@ SettingsPage {
             size: root.sectionWidth
 
             ConfigBox {
+                enabled: !root.locked
                 title: "DRAM"
                 subtitle: "%1 - %2".arg(formatAddr(0)).arg(formatAddr(config.MEM_CHIP_RAM * 1024 - 1))
 
@@ -272,6 +288,7 @@ SettingsPage {
             }
 
             ConfigBox {
+                enabled: !root.locked
                 title: "DRAM"
                 subtitle: "%1 - %2".arg(formatAddr(0xC00000)).arg(formatAddr(0xC00000 + config.MEM_SLOW_RAM * 1024 - 1))
                 showInfo: config.MEM_SLOW_RAM > 0
@@ -285,6 +302,7 @@ SettingsPage {
             }
 
             ConfigBox {
+                enabled: !root.locked
                 title: "DRAM"
                 subtitle: "%1 - %2".arg(formatAddr(0x200000)).arg(formatAddr(0x200000 + config.MEM_FAST_RAM * 1024 - 1))
                 showInfo: config.MEM_FAST_RAM > 0
