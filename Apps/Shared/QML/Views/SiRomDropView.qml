@@ -16,8 +16,8 @@ Item {
     property string details: ""
 
     // Display names of the Roms available in the user's Rom library (see
-    // Preferences.romLibrary), shown in the dropdown opened by the bookmarks
-    // button; installRom(index) fires when one is picked.
+    // Preferences.romLibrary), listed in the combo box below "None";
+    // installRom(index) fires when one is picked.
     property var libraryRoms: []
 
     signal urlsDropped(var urls)
@@ -72,55 +72,22 @@ Item {
 
             readonly property bool alignRight: root.orientation === Qt.RightToLeft
 
-            RowLayout {
+            SiComboBoxControl {
 
                 Layout.fillWidth: true
-                layoutDirection: descColumn.alignRight ? Qt.RightToLeft : Qt.LeftToRight
-                spacing: Style.smallSpacing
 
-                // Close to the big Rom image -- to its right for a tile whose
-                // image sits on the right (alignRight), to its left otherwise.
-                SiSymbolButton {
+                // "None" removes the Rom (same as the delete button below);
+                // the rest are the Roms found in the user's Rom library.
+                model: ["None"].concat(root.libraryRoms)
+                currentIndex: -1
+                displayText: root.title
 
-                    id: libraryButton
-                    phosphor: "bookmarks"
-                    scale: 1.0
-                    size: Size.regular
-                    enabled: root.libraryRoms.length > 0
-                    onClicked: libraryMenu.open()
-
-                    DebugRect {}
-
-                    SiMenu {
-
-                        id: libraryMenu
-                        y: libraryButton.height
-
-                        // Dynamically generate one item per Rom the library
-                        // scan found for this slot (see availableRoms in
-                        // SiC64ConfigController).
-                        Instantiator {
-
-                            model: root.libraryRoms
-                            delegate: SiMenuItem {
-                                text: modelData
-                                onTriggered: root.installRom(index)
-                            }
-                            onObjectAdded: (index, object) => libraryMenu.insertItem(index, object)
-                            onObjectRemoved: (index, object) => libraryMenu.removeItem(object)
-                        }
-                    }
+                onActivated: (index) => {
+                    if (index === 0) root.deleteRom()
+                    else root.installRom(index - 1)
                 }
 
-                SiText {
-
-                    text: root.title
-                    font.pixelSize: Style.regular
-                    font.bold: true
-                    color: Palette.primary
-                    Layout.fillWidth: true
-                    horizontalAlignment: descColumn.alignRight ? Text.AlignRight : Text.AlignLeft
-                }
+                DebugRect {}
             }
 
             SiText {

@@ -10,9 +10,14 @@ SiControl {
     property alias model: control.model
     property alias currentIndex: control.currentIndex
     property alias currentText: control.currentText
+    property alias displayText: control.displayText
     property alias delegate: control.delegate
     property alias isItemEnabled: control.isItemEnabled
     property alias readOnly: control.readOnly
+
+    // Forwarded from the inner ComboBox: fires only on user interaction
+    // (unlike currentIndexChanged, which also fires on programmatic changes).
+    signal activated(int index)
 
     // Model roles: 'textRole' names the role to display, 'iconRole' optionally
     // names one holding a symbol to show beside it (see SiComboBox).
@@ -44,6 +49,7 @@ SiControl {
             Layout.maximumWidth: hasFlexControl ? 9999 : root.controlWidth
             Layout.alignment: Qt.AlignVCenter
             onCurrentIndexChanged: root.currentIndexChanged()
+            onActivated: (index) => root.activated(index)
         }
     ]
 }
