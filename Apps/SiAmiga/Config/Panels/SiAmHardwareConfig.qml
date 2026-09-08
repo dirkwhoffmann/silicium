@@ -129,8 +129,8 @@ SettingsPage {
 
         ColumnLayout {
             spacing: 0
-            SiText { text: title; color: Palette.primary }
-            SiText { text: subtitle; color: Palette.secondary; visible: subtitle !== "" }
+            SiLabel { text: title; color: Palette.primary; size: Size.regular; font.bold: false }
+            SiLabel { text: subtitle; color: Palette.secondary; size: Size.small; visible: subtitle !== "" }
         }
     }
 
@@ -160,10 +160,7 @@ SettingsPage {
         InfoBox {
             title: box.title
             subtitle: box.subtitle
-            // opacity, not visible -- keeps the row's height reserved so
-            // hiding the info (e.g. Slow/Fast Ram at 0 KB) doesn't make the
-            // rows below jump up.
-            opacity: box.showInfo ? 1 : 0
+            visible: box.showInfo
         }
     }
 
@@ -181,7 +178,10 @@ SettingsPage {
             size: root.sectionWidth
             rowSpacing: Style.largeSpacing
 
+            Layout.rowSpan: 2
+
             ConfigBox {
+
                 title: root.cpuInfo(config.CPU_REVISION)[0]
                 subtitle: root.cpuInfo(config.CPU_REVISION)[1]
 
@@ -196,6 +196,7 @@ SettingsPage {
 
                 SiComboBoxControl {
 
+                    controlWidth: 90
                     model: ["7 MHz", "14 MHz", "28 MHz", "56 MHz"]
                     currentIndex: config.CPU_OVERCLOCKING
                     onCurrentIndexChanged: config.CPU_OVERCLOCKING = currentIndex
@@ -219,6 +220,7 @@ SettingsPage {
 
                 SiComboBoxControl {
 
+                    controlWidth: 90
                     model: ["PAL", "NTSC"]
                     currentIndex: config.AMIGA_VIDEO_FORMAT
                     onCurrentIndexChanged: config.AMIGA_VIDEO_FORMAT = currentIndex
@@ -282,6 +284,15 @@ SettingsPage {
             size: root.sectionWidth
             rowSpacing: Style.largeSpacing
 
+            // Chipset spans both grid rows on the left, which is taller than
+            // this card's own content -- GridLayout then stretches this
+            // row to match, and without this the Pane's default fillHeight
+            // would stretch into that extra space (via its trailing
+            // VSpacer), showing up as a gap below the last row here that
+            // grows or shrinks with whatever collapses (e.g. Fast Ram's
+            // info line at 0 KB). Size to content instead.
+            Layout.fillHeight: false
+
             ConfigBox {
 
                 enabled: !root.locked
@@ -310,6 +321,7 @@ SettingsPage {
             }
 
             ConfigBox {
+
                 enabled: !root.locked
                 title: "DRAM"
                 subtitle: "%1 - %2".arg(formatAddr(0xC00000)).arg(formatAddr(0xC00000 + config.MEM_SLOW_RAM * 1024 - 1))
@@ -347,6 +359,7 @@ SettingsPage {
 
             header: "Memory Properties"
             size: root.sectionWidth
+            Layout.fillHeight: true
 
             SiComboBoxControl {
 
@@ -383,6 +396,8 @@ SettingsPage {
                 currentIndex: config.MEM_UNMAPPING_TYPE
                 onCurrentIndexChanged: config.MEM_UNMAPPING_TYPE = currentIndex
             }
+
+            VSpacer {}
         }
     }
 
