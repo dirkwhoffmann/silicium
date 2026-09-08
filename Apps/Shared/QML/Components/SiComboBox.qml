@@ -156,6 +156,8 @@ ComboBox {
 
         SiText {
 
+            id: label
+
             text: root.displayText
             font: root.font
             color: root.enabled ? root.primary : root.disabled
@@ -165,6 +167,14 @@ ComboBox {
             // Keep clear of the arrow segment, which overlays the right edge.
             Layout.rightMargin: root.indicator.width + Style.smallSpacing // root.spacing
         }
+    }
+
+    // Only shown once the label above is actually eliding text, so a
+    // short, fully visible selection doesn't grow a redundant tooltip.
+    SiToolTip {
+
+        text: root.displayText
+        visible: root.hovered && label.truncated
     }
 
     //
@@ -228,6 +238,8 @@ ComboBox {
 
             SiText {
 
+                id: itemLabel
+
                 text: root.itemText(modelData)
                 color: item.foreground
                 font: root.font
@@ -243,6 +255,13 @@ ComboBox {
             visible: highlighted
             color: root.accent
             anchors.margins: 2
+        }
+
+        // Only shown once itemLabel above is actually eliding text.
+        SiToolTip {
+
+            text: root.itemText(modelData)
+            visible: item.hovered && itemLabel.truncated
         }
     }
 }
