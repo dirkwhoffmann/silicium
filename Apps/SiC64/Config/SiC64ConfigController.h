@@ -139,44 +139,44 @@ class SiC64ConfigController : public Controller {
   private:
 
     bool hasBasicRom() const { return basicRom.fnv != 0; }
+    bool hasPatchedBasicRom() const { return hasBasicRom() && (basicRom.flags & vc64::RomFlags::Patched); }
     u64 getBasicRomFnv() const { return basicRom.fnv; }
     u32 getBasicRomCrc() const { return basicRom.crc; }
     QUrl getBasicRomIcon() const { return getRomIcon(basicRom); }
     QString getBasicRomTitle() const { return QString::fromUtf8(basicRom.title); }
-    QString getBasicRomSubtitle() const { return ((basicRom.flags & vc64::RomFlags::Patched) ? QStringLiteral("Patched") : QString()); }
+    QString getBasicRomSubtitle() const { return hasPatchedBasicRom() ? QStringLiteral("Patched Basic ROM") : QString("Basic ROM"); }
     QString getBasicRomRevision() const { return QString::fromUtf8(basicRom.revision); }
     QString getBasicRomVendor() const { return getRomVendor(basicRom); }
-    bool hasPatchedBasicRom() const { return (basicRom.flags & vc64::RomFlags::Patched) != 0; }
 
     bool hasKernalRom() const { return kernalRom.fnv != 0; }
+    bool hasPatchedKernalRom() const { return hasKernalRom() && (kernalRom.flags & vc64::RomFlags::Patched); }
     u64 getKernalRomFnv() const { return kernalRom.fnv; }
     u32 getKernalRomCrc() const { return kernalRom.crc; }
     QUrl getKernalRomIcon() const { return getRomIcon(kernalRom); }
     QString getKernalRomTitle() const { return QString::fromUtf8(kernalRom.title); }
-    QString getKernalRomSubtitle() const { return ((kernalRom.flags & vc64::RomFlags::Patched) ? QStringLiteral("Patched") : QString()); }
+    QString getKernalRomSubtitle() const { return hasPatchedKernalRom() ? QStringLiteral("Patched Kernal ROM") : QString("Kernal ROM"); }
     QString getKernalRomRevision() const { return QString::fromUtf8(kernalRom.revision); }
     QString getKernalRomVendor() const { return getRomVendor(kernalRom); }
-    bool hasPatchedKernalRom() const { return (kernalRom.flags & vc64::RomFlags::Patched) != 0; }
 
     bool hasCharRom() const { return charRom.fnv != 0; }
+    bool hasPatchedCharRom() const { return hasCharRom() && (charRom.flags & vc64::RomFlags::Patched); }
     u64 getCharRomFnv() const { return charRom.fnv; }
     u32 getCharRomCrc() const { return charRom.crc; }
     QUrl getCharRomIcon() const { return getRomIcon(charRom); }
     QString getCharRomTitle() const { return QString::fromUtf8(charRom.title); }
-    QString getCharRomSubtitle() const { return ((charRom.flags & vc64::RomFlags::Patched) ? QStringLiteral("Patched") : QString()); }
+    QString getCharRomSubtitle() const { return hasPatchedCharRom() ? QStringLiteral("Patched Character ROM") : QString("Character ROM"); }
     QString getCharRomRevision() const { return QString::fromUtf8(charRom.revision); }
     QString getCharRomVendor() const { return getRomVendor(charRom); }
-    bool hasPatchedCharRom() const { return (charRom.flags & vc64::RomFlags::Patched) != 0; }
 
     bool hasVC1541Rom() const { return vc1541Rom.fnv != 0; }
+    bool hasPatchedVC1541Rom() const { return hasVC1541Rom() && (vc1541Rom.flags & vc64::RomFlags::Patched); }
     u64 getVC1541RomFnv() const { return vc1541Rom.fnv; }
     u32 getVC1541RomCrc() const { return vc1541Rom.crc; }
     QUrl getVC1541RomIcon() const { return getRomIcon(vc1541Rom); }
     QString getVC1541RomTitle() const { return QString::fromUtf8(vc1541Rom.title); }
-    QString getVC1541RomSubtitle() const { return ((vc1541Rom.flags & vc64::RomFlags::Patched) ? QStringLiteral("Patched") : QString()); }
+    QString getVC1541RomSubtitle() const { return hasPatchedVC1541Rom() ? QStringLiteral("Patched VC1541 ROM") : QString("VC1541 ROM"); }
     QString getVC1541RomRevision() const { return QString::fromUtf8(vc1541Rom.revision); }
     QString getVC1541RomVendor() const { return getRomVendor(vc1541Rom); }
-    bool hasPatchedVC1541Rom() const { return (vc1541Rom.flags & vc64::RomFlags::Patched) != 0; }
 
     QUrl getRomIcon(const vc64::RomTraits &traits) const;
     QString getRomVendor(const vc64::RomTraits &traits) const;

@@ -22,24 +22,24 @@ Item {
     required property C64Controller controller
     readonly property var cc: controller.configController
 
-    readonly property string basicRomTitle: !cc ? "" : !cc.hasBasicRom ? "Basic ROM" : cc.basicRomTitle
-    readonly property string basicRomSubtitle: !cc ? "" : !cc.hasBasicRom ? "Required" : cc.basicRomSubtitle
-    readonly property string basicRomRevision: !cc ? "" : !cc.hasBasicRom ? "" : cc.basicRomRevision
+    readonly property string basicRomTitle: !cc ? "" : !cc.hasBasicRom ? "None" : cc.basicRomTitle
+    readonly property string basicRomSubtitle: !cc ? "" : !cc.hasBasicRom ? "Basic ROM" : cc.basicRomSubtitle
+    readonly property string basicRomRevision: !cc ? "" : !cc.hasBasicRom ? "Required" : cc.basicRomRevision
     readonly property string basicRomIcon: !cc ? "" : cc.basicRomIcon
 
-    readonly property string kernalRomTitle: !cc ? "" : !cc.hasKernalRom ? "Kernal ROM" : cc.kernalRomTitle
-    readonly property string kernalRomSubtitle: !cc ? "" : !cc.hasKernalRom ? "Required" : cc.kernalRomSubtitle
-    readonly property string kernalRomRevision: !cc ? "" : !cc.hasKernalRom ? "" : cc.kernalRomRevision
+    readonly property string kernalRomTitle: !cc ? "" : !cc.hasKernalRom ? "None" : cc.kernalRomTitle
+    readonly property string kernalRomSubtitle: !cc ? "" : !cc.hasKernalRom ? "Kernal ROM" : cc.kernalRomSubtitle
+    readonly property string kernalRomRevision: !cc ? "" : !cc.hasKernalRom ? "Required" : cc.kernalRomRevision
     readonly property string kernalRomIcon: !cc ? "" : cc.kernalRomIcon
 
-    readonly property string charRomTitle: !cc ? "" : !cc.hasCharRom ? "Character ROM" : cc.charRomTitle
-    readonly property string charRomSubtitle: !cc ? "" : !cc.hasCharRom ? "Required" : cc.charRomSubtitle
-    readonly property string charRomRevision: !cc ? "" : !cc.hasCharRom ? "" : cc.charRomRevision
+    readonly property string charRomTitle: !cc ? "" : !cc.hasCharRom ? "None" : cc.charRomTitle
+    readonly property string charRomSubtitle: !cc ? "" : !cc.hasCharRom ? "Character ROM" : cc.charRomSubtitle
+    readonly property string charRomRevision: !cc ? "" : !cc.hasCharRom ? "Required" : cc.charRomRevision
     readonly property string charRomIcon: !cc ? "" : cc.charRomIcon
 
-    readonly property string vc1541RomTitle: !cc ? "" : !cc.hasVC1541Rom ? "VC1541 ROM" : cc.vc1541RomTitle
-    readonly property string vc1541RomSubtitle: !cc ? "" : !cc.hasVC1541Rom ? "Optional" : cc.vc1541RomSubtitle
-    readonly property string vc1541RomRevision: !cc ? "" : !cc.hasVC1541Rom ? "" : cc.vc1541RomRevision
+    readonly property string vc1541RomTitle: !cc ? "" : !cc.hasVC1541Rom ? "None" : cc.vc1541RomTitle
+    readonly property string vc1541RomSubtitle: !cc ? "" : !cc.hasVC1541Rom ? "VC1541 ROM" : cc.vc1541RomSubtitle
+    readonly property string vc1541RomRevision: !cc ? "" : !cc.hasVC1541Rom ? "Optional" : cc.vc1541RomRevision
     readonly property string vc1541RomIcon: !cc ? "" : cc.vc1541RomIcon
 
     readonly property bool hasRecentRoms: Preferences.basicPath.toString() !== ""

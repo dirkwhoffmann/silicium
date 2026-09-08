@@ -86,9 +86,9 @@ Item {
                     if (index === 0) root.deleteRom()
                     else root.installRom(index - 1)
                 }
-
-                DebugRect {}
             }
+
+            VSpacer {}
 
             SiText {
 
