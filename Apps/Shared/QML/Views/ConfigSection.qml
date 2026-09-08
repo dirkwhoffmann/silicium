@@ -23,6 +23,7 @@ Pane {
     property bool checkable: false
     property alias checked: checkbox.checked
     property alias layout: mainLayout
+    property alias rowSpacing: accessoryContainer.spacing
     default property alias content: accessoryContainer.data
 
     implicitWidth: mainLayout.implicitWidth
