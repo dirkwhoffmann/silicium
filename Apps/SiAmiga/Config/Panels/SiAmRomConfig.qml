@@ -38,12 +38,12 @@ Item {
 
     // Larger chip icon than SiC64's default (see SiRomDropView.imageSize) --
     // there are only two slots here, so there's room to grow them.
-    readonly property int romImageSize: 160
+    readonly property int romImageSize: 140
 
     // Cap the title/subtitle/details/combo column at half the panel's width,
     // so a tile's total width -- image + spacing + that column -- matches
     // SiRomDropView's own internal RowLayout spacing exactly.
-    readonly property real romTileWidth: romImageSize + Style.mediumSpacing + mainColumn.width / 2
+    readonly property real romTileWidth: romImageSize + Style.mediumSpacing + mainColumn.width / 3
 
     readonly property string kickTitle: !cc.hasKickRom ? qsTr("Kickstart Rom or Boot Rom") : cc.kickRomTitle
     readonly property string kickSubtitle: !cc.hasKickRom ? qsTr("Required") : cc.kickRomRevision
@@ -190,7 +190,7 @@ Item {
                 onClicked: { romFileDialog.romType = "kick"; romFileDialog.open() }
             }
 
-            VSpacer { size: Style.largeSpacing }
+            // VSpacer { size: Style.smallSpacing }
 
             //
             // Extension Rom
@@ -232,7 +232,7 @@ Item {
                 }
             }
 
-            VSpacer { size: Style.largeSpacing }
+            VSpacer { } // size: Style.largeSpacing }
 
             RowLayout {
 
