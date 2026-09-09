@@ -373,7 +373,7 @@ SettingsPage {
 
                 SiSliderControl {
 
-                    Layout.fillWidth: true
+                    // Layout.fillWidth: true
                     l: "Slow"
                     r: "Fast"
                     from: 1
