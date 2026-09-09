@@ -188,7 +188,68 @@ SettingsPage {
 
                 header: "DRIVE VOLUMES"
                 size: root.sectionWidth
-                implicitHeight: 320
+                implicitHeight: 180
+
+                RowLayout {
+
+                    Layout.leftMargin: Style.largeSpacing
+                    Layout.rightMargin: Style.largeSpacing
+
+                    HSpacer {}
+
+                    AudioControl {
+
+                        label: "Step"
+                        Layout.fillWidth: true
+                        knob: false
+
+                        sliderValue: config.driveStepVolume(0)
+                        onSliderMoved: (value) => root.setAllDriveStepVolume(Math.round(value))
+                    }
+
+                    AudioControl {
+
+                        label: "Poll"
+                        Layout.fillWidth: true
+                        knob: false
+
+                        sliderValue: config.drivePollVolume(0)
+                        onSliderMoved: (value) => root.setAllDrivePollVolume(Math.round(value))
+                    }
+
+                    AudioControl {
+
+                        label: "Insert"
+                        Layout.fillWidth: true
+                        knob: false
+
+                        sliderValue: config.driveInsertVolume(0)
+                        onSliderMoved: (value) => root.setAllDriveInsertVolume(Math.round(value))
+                    }
+
+                    AudioControl {
+
+                        label: "Eject"
+                        Layout.fillWidth: true
+                        knob: false
+
+                        sliderValue: config.driveEjectVolume(0)
+                        onSliderMoved: (value) => root.setAllDriveEjectVolume(Math.round(value))
+                    }
+
+                    HSpacer {}
+                }
+            }
+
+            //
+            // Panning
+            //
+
+            ConfigSection {
+
+                header: "Panning"
+                size: root.sectionWidth
+                implicitHeight: 180
 
                 ColumnLayout {
 
@@ -202,44 +263,20 @@ SettingsPage {
 
                         HSpacer {}
 
-                        AudioControl {
+                        Repeater {
 
-                            label: "Step"
-                            Layout.fillWidth: true
-                            knob: false
+                            model: 4
 
-                            sliderValue: config.driveStepVolume(0)
-                            onSliderMoved: (value) => root.setAllDriveStepVolume(Math.round(value))
-                        }
+                            AudioControl {
 
-                        AudioControl {
+                                required property int index
+                                label: "Df%1".arg(index)
+                                slider: false
+                                Layout.fillWidth: true
 
-                            label: "Poll"
-                            Layout.fillWidth: true
-                            knob: false
-
-                            sliderValue: config.drivePollVolume(0)
-                            onSliderMoved: (value) => root.setAllDrivePollVolume(Math.round(value))
-                        }
-
-                        AudioControl {
-
-                            label: "Insert"
-                            Layout.fillWidth: true
-                            knob: false
-
-                            sliderValue: config.driveInsertVolume(0)
-                            onSliderMoved: (value) => root.setAllDriveInsertVolume(Math.round(value))
-                        }
-
-                        AudioControl {
-
-                            label: "Eject"
-                            Layout.fillWidth: true
-                            knob: false
-
-                            sliderValue: config.driveEjectVolume(0)
-                            onSliderMoved: (value) => root.setAllDriveEjectVolume(Math.round(value))
+                                knobValue: 100 - (config.drivePan(index) / 4)
+                                onKnobMoved: (value) => config.setDrivePan(index, Math.round(4 * (100 - value)))
+                            }
                         }
 
                         HSpacer {}
@@ -247,50 +284,28 @@ SettingsPage {
 
                     RowLayout {
 
-                        Layout.fillWidth: true
                         Layout.leftMargin: Style.largeSpacing
                         Layout.rightMargin: Style.largeSpacing
-                        spacing: Style.largeSpacing
 
-                        ColumnLayout {
+                        HSpacer {}
 
-                            Layout.fillWidth: true
+                        Repeater {
 
-                            Repeater {
+                            model: 4
 
-                                model: 4
+                            AudioControl {
 
-                                AudioControl {
+                                required property int index
+                                label: "Hd%1".arg(index)
+                                slider: false
+                                Layout.fillWidth: true
 
-                                    required property int index
-                                    label: "Df%1".arg(index)
-                                    slider: false
-
-                                    knobValue: 100 - (config.drivePan(index) / 4)
-                                    onKnobMoved: (value) => config.setDrivePan(index, Math.round(4 * (100 - value)))
-                                }
+                                knobValue: 100 - (config.hdPan(index) / 4)
+                                onKnobMoved: (value) => config.setHdPan(index, Math.round(4 * (100 - value)))
                             }
                         }
 
-                        ColumnLayout {
-
-                            Layout.fillWidth: true
-
-                            Repeater {
-
-                                model: 4
-
-                                AudioControl {
-
-                                    required property int index
-                                    label: "Hd%1".arg(index)
-                                    slider: false
-
-                                    knobValue: 100 - (config.hdPan(index) / 4)
-                                    onKnobMoved: (value) => config.setHdPan(index, Math.round(4 * (100 - value)))
-                                }
-                            }
-                        }
+                        HSpacer {}
                     }
                 }
             }
