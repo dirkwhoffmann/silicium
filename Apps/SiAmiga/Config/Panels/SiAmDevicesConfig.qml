@@ -141,104 +141,6 @@ SettingsPage {
             size: root.sectionWidth
             rowSpacing: Style.smallSpacing
 
-            SiCheckBoxControl {
-
-                lwidth: root.labelWidth
-                Layout.fillWidth: true
-                l: "Df0:"
-
-                SiComboBoxControl {
-
-                    model: root.driveTypeNames
-                    currentIndex: config.driveType(0)
-                    onCurrentIndexChanged: config.setDriveType(0, currentIndex)
-
-                    SiHelpButton {
-                        onClicked: root.help("")
-                    }
-                }
-                checked: config.SID_ENABLE1
-                onClicked: config.SID_ENABLE1 = checked;
-            }
-
-            SiCheckBoxControl {
-
-                lwidth: root.labelWidth
-                Layout.fillWidth: true
-                l: "Df1:"
-
-                SiComboBoxControl {
-
-                    model: root.driveTypeNames
-                    currentIndex: config.driveType(1)
-                    onCurrentIndexChanged: config.setDriveType(1, currentIndex)
-
-                    SiHelpButton {
-                        onClicked: root.help("")
-                    }
-                }
-
-                enabled: !root.locked
-                checked: config.driveConnected(1)
-                onClicked: {
-                    config.setDriveConnected(1, checked)
-                    if (!checked) { config.setDriveConnected(2, false); config.setDriveConnected(3, false) }
-                }
-            }
-
-            SiCheckBoxControl {
-
-                lwidth: root.labelWidth
-                Layout.fillWidth: true
-                l: "Df2:"
-
-                SiComboBoxControl {
-
-                    model: root.driveTypeNames
-                    currentIndex: config.driveType(2)
-                    onCurrentIndexChanged: config.setDriveType(2, currentIndex)
-                }
-
-                enabled: !root.locked
-                checked: config.driveConnected(2)
-                onClicked: {
-                    config.setDriveConnected(2, checked)
-                    if (!checked) { config.setDriveConnected(3, false) }
-                }
-            }
-
-            SiCheckBoxControl {
-
-                lwidth: root.labelWidth
-                Layout.fillWidth: true
-                l: "Df3:"
-
-                SiComboBoxControl {
-
-                    model: root.driveTypeNames
-                    currentIndex: config.driveType(3)
-                    onCurrentIndexChanged: config.setDriveType(3, currentIndex)
-                }
-
-                enabled: !root.locked
-                checked: config.driveConnected(3)
-                onClicked: {
-                    config.setDriveConnected(3, checked)
-                }
-            }
-
-            /*
-            SiComboBoxControl {
-
-                l: "DF0:"
-                lwidth: root.labelWidth
-                Layout.fillWidth: true
-                enabled: !root.locked
-                model: root.driveTypeNames
-                currentIndex: config.driveType(0)
-                onCurrentIndexChanged: config.setDriveType(0, currentIndex)
-            }
-
             ConfigBox {
 
                 // Placeholder matching the connect checkbox's width below,
@@ -253,8 +155,8 @@ SettingsPage {
                     Layout.fillWidth: true
                     enabled: !root.locked
                     model: root.driveTypeNames
-                    currentIndex: config.driveType(0)
-                    onCurrentIndexChanged: config.setDriveType(0, currentIndex)
+                    currentIndex: config.DF0_TYPE
+                    onCurrentIndexChanged: config.DF0_TYPE = currentIndex
                 }
             }
 
@@ -263,10 +165,10 @@ SettingsPage {
                 SiCheckBoxControl {
                     Layout.preferredWidth: 24
                     enabled: !root.locked
-                    checked: config.driveConnected(1)
+                    checked: config.DF1_CONNECTED
                     onClicked: {
-                        config.setDriveConnected(1, checked)
-                        if (!checked) { config.setDriveConnected(2, false); config.setDriveConnected(3, false) }
+                        config.DF1_CONNECTED = checked
+                        if (!checked) { config.DF2_CONNECTED = false; config.DF3_CONNECTED = false }
                     }
                 }
 
@@ -275,24 +177,22 @@ SettingsPage {
                     l: "DF1:"
                     lwidth: root.labelWidth
                     Layout.fillWidth: true
-                    enabled: !root.locked && config.driveConnected(1)
+                    enabled: !root.locked && config.DF1_CONNECTED
                     model: root.driveTypeNames
-                    currentIndex: config.driveType(1)
-                    onCurrentIndexChanged: config.setDriveType(1, currentIndex)
+                    currentIndex: config.DF1_TYPE
+                    onCurrentIndexChanged: config.DF1_TYPE = currentIndex
                 }
             }
-
-
 
             ConfigBox {
 
                 SiCheckBoxControl {
                     Layout.preferredWidth: 24
-                    enabled: !root.locked && config.driveConnected(1)
-                    checked: config.driveConnected(2)
+                    enabled: !root.locked && config.DF1_CONNECTED
+                    checked: config.DF2_CONNECTED
                     onClicked: {
-                        config.setDriveConnected(2, checked)
-                        if (!checked) config.setDriveConnected(3, false)
+                        config.DF2_CONNECTED = checked
+                        if (!checked) config.DF3_CONNECTED = false
                     }
                 }
 
@@ -301,10 +201,10 @@ SettingsPage {
                     l: "DF2:"
                     lwidth: root.labelWidth
                     Layout.fillWidth: true
-                    enabled: !root.locked && config.driveConnected(2)
+                    enabled: !root.locked && config.DF2_CONNECTED
                     model: root.driveTypeNames
-                    currentIndex: config.driveType(2)
-                    onCurrentIndexChanged: config.setDriveType(2, currentIndex)
+                    currentIndex: config.DF2_TYPE
+                    onCurrentIndexChanged: config.DF2_TYPE = currentIndex
                 }
             }
 
@@ -312,9 +212,9 @@ SettingsPage {
 
                 SiCheckBoxControl {
                     Layout.preferredWidth: 24
-                    enabled: !root.locked && config.driveConnected(2)
-                    checked: config.driveConnected(3)
-                    onClicked: config.setDriveConnected(3, checked)
+                    enabled: !root.locked && config.DF2_CONNECTED
+                    checked: config.DF3_CONNECTED
+                    onClicked: config.DF3_CONNECTED = checked
                 }
 
                 SiComboBoxControl {
@@ -322,14 +222,12 @@ SettingsPage {
                     l: "DF3:"
                     lwidth: root.labelWidth
                     Layout.fillWidth: true
-                    enabled: !root.locked && config.driveConnected(3)
+                    enabled: !root.locked && config.DF3_CONNECTED
                     model: root.driveTypeNames
-                    currentIndex: config.driveType(3)
-                    onCurrentIndexChanged: config.setDriveType(3, currentIndex)
+                    currentIndex: config.DF3_TYPE
+                    onCurrentIndexChanged: config.DF3_TYPE = currentIndex
                 }
             }
-
-             */
         }
 
         //
@@ -347,8 +245,8 @@ SettingsPage {
                 SiCheckBoxControl {
                     Layout.preferredWidth: 24
                     enabled: !root.locked
-                    checked: config.hdConnected(0)
-                    onClicked: config.setHdConnected(0, checked)
+                    checked: config.HD0_CONNECTED
+                    onClicked: config.HD0_CONNECTED = checked
                 }
 
                 SiComboBoxControl {
@@ -356,10 +254,10 @@ SettingsPage {
                     l: "HD0:"
                     lwidth: root.labelWidth
                     Layout.fillWidth: true
-                    enabled: !root.locked && config.hdConnected(0)
+                    enabled: !root.locked && config.HD0_CONNECTED
                     model: root.hdTypeNames
-                    currentIndex: config.hdType(0)
-                    onCurrentIndexChanged: config.setHdType(0, currentIndex)
+                    currentIndex: config.HD0_TYPE
+                    onCurrentIndexChanged: config.HD0_TYPE = currentIndex
                 }
             }
 
@@ -368,8 +266,8 @@ SettingsPage {
                 SiCheckBoxControl {
                     Layout.preferredWidth: 24
                     enabled: !root.locked
-                    checked: config.hdConnected(1)
-                    onClicked: config.setHdConnected(1, checked)
+                    checked: config.HD1_CONNECTED
+                    onClicked: config.HD1_CONNECTED = checked
                 }
 
                 SiComboBoxControl {
@@ -377,10 +275,10 @@ SettingsPage {
                     l: "HD1:"
                     lwidth: root.labelWidth
                     Layout.fillWidth: true
-                    enabled: !root.locked && config.hdConnected(1)
+                    enabled: !root.locked && config.HD1_CONNECTED
                     model: root.hdTypeNames
-                    currentIndex: config.hdType(1)
-                    onCurrentIndexChanged: config.setHdType(1, currentIndex)
+                    currentIndex: config.HD1_TYPE
+                    onCurrentIndexChanged: config.HD1_TYPE = currentIndex
                 }
             }
 
@@ -389,8 +287,8 @@ SettingsPage {
                 SiCheckBoxControl {
                     Layout.preferredWidth: 24
                     enabled: !root.locked
-                    checked: config.hdConnected(2)
-                    onClicked: config.setHdConnected(2, checked)
+                    checked: config.HD2_CONNECTED
+                    onClicked: config.HD2_CONNECTED = checked
                 }
 
                 SiComboBoxControl {
@@ -398,10 +296,10 @@ SettingsPage {
                     l: "HD2:"
                     lwidth: root.labelWidth
                     Layout.fillWidth: true
-                    enabled: !root.locked && config.hdConnected(2)
+                    enabled: !root.locked && config.HD2_CONNECTED
                     model: root.hdTypeNames
-                    currentIndex: config.hdType(2)
-                    onCurrentIndexChanged: config.setHdType(2, currentIndex)
+                    currentIndex: config.HD2_TYPE
+                    onCurrentIndexChanged: config.HD2_TYPE = currentIndex
                 }
             }
 
@@ -410,8 +308,8 @@ SettingsPage {
                 SiCheckBoxControl {
                     Layout.preferredWidth: 24
                     enabled: !root.locked
-                    checked: config.hdConnected(3)
-                    onClicked: config.setHdConnected(3, checked)
+                    checked: config.HD3_CONNECTED
+                    onClicked: config.HD3_CONNECTED = checked
                 }
 
                 SiComboBoxControl {
@@ -419,10 +317,10 @@ SettingsPage {
                     l: "HD3:"
                     lwidth: root.labelWidth
                     Layout.fillWidth: true
-                    enabled: !root.locked && config.hdConnected(3)
+                    enabled: !root.locked && config.HD3_CONNECTED
                     model: root.hdTypeNames
-                    currentIndex: config.hdType(3)
-                    onCurrentIndexChanged: config.setHdType(3, currentIndex)
+                    currentIndex: config.HD3_TYPE
+                    onCurrentIndexChanged: config.HD3_TYPE = currentIndex
                 }
             }
         }

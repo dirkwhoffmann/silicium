@@ -29,10 +29,19 @@
 // ports, the five remote servers) -- exactly SiC64ConfigController's own
 // pattern -- but ballooning that same pattern out to four drives times ten
 // options each would mean forty near-identical property declarations, so
-// floppy- and hard-drive options are exposed as Q_INVOKABLE(nr) pairs
-// instead. Both shapes bind fine from QML; only the drive panel's future
-// implementation cares about the difference (a Repeater over df[0..3]/
-// hd[0..3] rather than four hand-written rows).
+// most floppy- and hard-drive options are exposed as Q_INVOKABLE(nr) pairs
+// instead.
+//
+// That shape has a catch, though: a QML binding only resubscribes to
+// NOTIFY configChanged when it *reads a property* during evaluation --
+// calling a Q_INVOKABLE method doesn't register as a dependency, so a
+// binding like 'currentIndex: config.driveType(0)' evaluates once and then
+// goes stale no matter how often configChanged fires afterwards. Connected
+// and Type are the two the Devices panel actually binds to, so those eight
+// drives worth (df0..df3, hd0..hd3) get named Q_PROPERTYs below, same as
+// Drive8/Drive9 on the C64 side. driveMechanics/driveRpm/driveSwapDelay
+// stay Q_INVOKABLE(nr) since nothing binds to them yet -- give them the
+// same treatment if a future panel needs to.
 //
 
 class SiAmController;
@@ -330,13 +339,43 @@ class SiAmConfigController : public Controller {
     Q_PROPERTY(int JOY1_AUTOFIRE_DELAY READ joy1AutofireDelay WRITE setJoy1AutofireDelay NOTIFY configChanged)
     Q_PROPERTY(int JOY2_AUTOFIRE_DELAY READ joy2AutofireDelay WRITE setJoy2AutofireDelay NOTIFY configChanged)
 
-    // Floppy drives (df0..df3) and hard drives (hd0..hd3) are exposed as
-    // parameterized pairs rather than named properties -- see the header
-    // comment at the top of this file for why.
+    // Floppy drives (df0..df3) and hard drives (hd0..hd3) -- named
+    // properties rather than Q_INVOKABLE(nr) pairs so QML bindings actually
+    // stay in sync with configChanged; see the header comment at the top of
+    // this file for why.
+    Q_PROPERTY(bool DF0_CONNECTED READ df0Connected WRITE setDf0Connected NOTIFY configChanged)
+    Q_PROPERTY(int DF0_TYPE READ df0Type WRITE setDf0Type NOTIFY configChanged)
+    Q_PROPERTY(bool DF1_CONNECTED READ df1Connected WRITE setDf1Connected NOTIFY configChanged)
+    Q_PROPERTY(int DF1_TYPE READ df1Type WRITE setDf1Type NOTIFY configChanged)
+    Q_PROPERTY(bool DF2_CONNECTED READ df2Connected WRITE setDf2Connected NOTIFY configChanged)
+    Q_PROPERTY(int DF2_TYPE READ df2Type WRITE setDf2Type NOTIFY configChanged)
+    Q_PROPERTY(bool DF3_CONNECTED READ df3Connected WRITE setDf3Connected NOTIFY configChanged)
+    Q_PROPERTY(int DF3_TYPE READ df3Type WRITE setDf3Type NOTIFY configChanged)
+
+    Q_PROPERTY(bool HD0_CONNECTED READ hd0Connected WRITE setHd0Connected NOTIFY configChanged)
+    Q_PROPERTY(int HD0_TYPE READ hd0Type WRITE setHd0Type NOTIFY configChanged)
+    Q_PROPERTY(bool HD1_CONNECTED READ hd1Connected WRITE setHd1Connected NOTIFY configChanged)
+    Q_PROPERTY(int HD1_TYPE READ hd1Type WRITE setHd1Type NOTIFY configChanged)
+    Q_PROPERTY(bool HD2_CONNECTED READ hd2Connected WRITE setHd2Connected NOTIFY configChanged)
+    Q_PROPERTY(int HD2_TYPE READ hd2Type WRITE setHd2Type NOTIFY configChanged)
+    Q_PROPERTY(bool HD3_CONNECTED READ hd3Connected WRITE setHd3Connected NOTIFY configChanged)
+    Q_PROPERTY(int HD3_TYPE READ hd3Type WRITE setHd3Type NOTIFY configChanged)
+
+    // Kept alongside the named properties above -- SiAmDropOverlay.qml,
+    // SiAmMenu.qml and SiAmStatusbar.qml still call these by index and
+    // would need updating to the named properties to fix the same
+    // staleness there; out of scope for now (the Devices panel was the
+    // reported case), so the indexed pair stays available.
     Q_INVOKABLE bool driveConnected(int nr) const { return (bool)get(vamiga::Opt::DRIVE_CONNECT, nr); }
     Q_INVOKABLE void setDriveConnected(int nr, bool value) { set(vamiga::Opt::DRIVE_CONNECT, (i64)value, nr); }
     Q_INVOKABLE int driveType(int nr) const { return (int)get(vamiga::Opt::DRIVE_TYPE, nr); }
     Q_INVOKABLE void setDriveType(int nr, int value) { set(vamiga::Opt::DRIVE_TYPE, (i64)value, nr); }
+    Q_INVOKABLE bool hdConnected(int nr) const { return (bool)get(vamiga::Opt::HDC_CONNECT, nr); }
+    Q_INVOKABLE void setHdConnected(int nr, bool value) { set(vamiga::Opt::HDC_CONNECT, (i64)value, nr); }
+    Q_INVOKABLE int hdType(int nr) const { return (int)get(vamiga::Opt::HDR_TYPE, nr); }
+    Q_INVOKABLE void setHdType(int nr, int value) { set(vamiga::Opt::HDR_TYPE, (i64)value, nr); }
+
+    // Unbound so far -- stay Q_INVOKABLE(nr) until a panel needs them.
     Q_INVOKABLE int driveMechanics(int nr) const { return (int)get(vamiga::Opt::DRIVE_MECHANICS, nr); }
     Q_INVOKABLE void setDriveMechanics(int nr, int value) { set(vamiga::Opt::DRIVE_MECHANICS, (i64)value, nr); }
     Q_INVOKABLE int driveRpm(int nr) const { return (int)get(vamiga::Opt::DRIVE_RPM, nr); }
@@ -344,10 +383,39 @@ class SiAmConfigController : public Controller {
     Q_INVOKABLE int driveSwapDelay(int nr) const { return (int)get(vamiga::Opt::DRIVE_SWAP_DELAY, nr); }
     Q_INVOKABLE void setDriveSwapDelay(int nr, int value) { set(vamiga::Opt::DRIVE_SWAP_DELAY, (i64)value, nr); }
 
-    Q_INVOKABLE bool hdConnected(int nr) const { return (bool)get(vamiga::Opt::HDC_CONNECT, nr); }
-    Q_INVOKABLE void setHdConnected(int nr, bool value) { set(vamiga::Opt::HDC_CONNECT, (i64)value, nr); }
-    Q_INVOKABLE int hdType(int nr) const { return (int)get(vamiga::Opt::HDR_TYPE, nr); }
-    Q_INVOKABLE void setHdType(int nr, int value) { set(vamiga::Opt::HDR_TYPE, (i64)value, nr); }
+    bool df0Connected() const { return (bool)get(vamiga::Opt::DRIVE_CONNECT, 0); }
+    void setDf0Connected(bool value) { set(vamiga::Opt::DRIVE_CONNECT, (i64)value, 0); }
+    int df0Type() const { return (int)get(vamiga::Opt::DRIVE_TYPE, 0); }
+    void setDf0Type(int value) { set(vamiga::Opt::DRIVE_TYPE, (i64)value, 0); }
+    bool df1Connected() const { return (bool)get(vamiga::Opt::DRIVE_CONNECT, 1); }
+    void setDf1Connected(bool value) { set(vamiga::Opt::DRIVE_CONNECT, (i64)value, 1); }
+    int df1Type() const { return (int)get(vamiga::Opt::DRIVE_TYPE, 1); }
+    void setDf1Type(int value) { set(vamiga::Opt::DRIVE_TYPE, (i64)value, 1); }
+    bool df2Connected() const { return (bool)get(vamiga::Opt::DRIVE_CONNECT, 2); }
+    void setDf2Connected(bool value) { set(vamiga::Opt::DRIVE_CONNECT, (i64)value, 2); }
+    int df2Type() const { return (int)get(vamiga::Opt::DRIVE_TYPE, 2); }
+    void setDf2Type(int value) { set(vamiga::Opt::DRIVE_TYPE, (i64)value, 2); }
+    bool df3Connected() const { return (bool)get(vamiga::Opt::DRIVE_CONNECT, 3); }
+    void setDf3Connected(bool value) { set(vamiga::Opt::DRIVE_CONNECT, (i64)value, 3); }
+    int df3Type() const { return (int)get(vamiga::Opt::DRIVE_TYPE, 3); }
+    void setDf3Type(int value) { set(vamiga::Opt::DRIVE_TYPE, (i64)value, 3); }
+
+    bool hd0Connected() const { return (bool)get(vamiga::Opt::HDC_CONNECT, 0); }
+    void setHd0Connected(bool value) { set(vamiga::Opt::HDC_CONNECT, (i64)value, 0); }
+    int hd0Type() const { return (int)get(vamiga::Opt::HDR_TYPE, 0); }
+    void setHd0Type(int value) { set(vamiga::Opt::HDR_TYPE, (i64)value, 0); }
+    bool hd1Connected() const { return (bool)get(vamiga::Opt::HDC_CONNECT, 1); }
+    void setHd1Connected(bool value) { set(vamiga::Opt::HDC_CONNECT, (i64)value, 1); }
+    int hd1Type() const { return (int)get(vamiga::Opt::HDR_TYPE, 1); }
+    void setHd1Type(int value) { set(vamiga::Opt::HDR_TYPE, (i64)value, 1); }
+    bool hd2Connected() const { return (bool)get(vamiga::Opt::HDC_CONNECT, 2); }
+    void setHd2Connected(bool value) { set(vamiga::Opt::HDC_CONNECT, (i64)value, 2); }
+    int hd2Type() const { return (int)get(vamiga::Opt::HDR_TYPE, 2); }
+    void setHd2Type(int value) { set(vamiga::Opt::HDR_TYPE, (i64)value, 2); }
+    bool hd3Connected() const { return (bool)get(vamiga::Opt::HDC_CONNECT, 3); }
+    void setHd3Connected(bool value) { set(vamiga::Opt::HDC_CONNECT, (i64)value, 3); }
+    int hd3Type() const { return (int)get(vamiga::Opt::HDR_TYPE, 3); }
+    void setHd3Type(int value) { set(vamiga::Opt::HDR_TYPE, (i64)value, 3); }
 
     // Restores the factory settings for every option the Devices panel
     // exposes (SiAmDevicesConfig.qml).
