@@ -10,15 +10,16 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Silicium.Assets
 import Silicium.Controllers
 import Silicium.Theme
 
 // Port of vAmiga's own GUI/Settings/ViewControllers/PeripheralsSettings.swift.
-// A plain two-column form (Floppy Drives/Game Ports/Serial Port on the
-// left, Hard Drives/Joystick on the right) rather than SiC64DevicesConfig's
-// card-per-device ConfigSection layout -- the Amiga side scales to 4 floppy
-// + 4 hard drives plus game/serial/MIDI port pickers, which reads better as
-// compact label+control rows than as one card apiece.
+// ConfigGrid/ConfigSection cards, one per device group, matching
+// SiAmHardwareConfig's layout -- Floppy Drives, Hard Drives, Game Ports,
+// Joystick, Serial Port, in that order so the row-major 2-column grid
+// keeps Floppy/Game Ports/Serial Port on the left and Hard Drives/Joystick
+// on the right, the same grouping the old two-column form had.
 //
 // Game Ports and MIDI Out/In are shown but inert: Configuration.swift's
 // gameDevice1/gameDevice2 and MidiManagerProxy pick from host game
@@ -39,6 +40,9 @@ SettingsPage {
 
     required property SiAmController controller
     readonly property var config: controller.configController
+
+    readonly property int labelWidth: 90
+    readonly property int sectionWidth: 320
 
     readonly property bool locked: controller.isPoweredOn
 
@@ -73,37 +77,188 @@ SettingsPage {
         }
     }
 
-    RowLayout {
+    component InfoBox: RowLayout {
 
-        Layout.fillWidth: true
-        spacing: Style.largeSpacing * 2
+        property string title: ""
+        property string subtitle: ""
 
-        //
-        // Left column: Floppy Drives, Game Ports, Serial Port
-        //
+        Layout.leftMargin: root.labelWidth + Style.smallSpacing
+        spacing: Style.smallSpacing
+        visible: title !== ""
+
+        Image {
+            source: Assets.iconUrl(Assets.RomPlain)
+            Layout.preferredWidth: 36
+            Layout.preferredHeight: 36
+            fillMode: Image.PreserveAspectFit
+        }
 
         ColumnLayout {
+            spacing: 0
+            SiLabel { text: title; color: Palette.primary; size: Size.regular; font.bold: false }
+            SiLabel { text: subtitle; color: Palette.secondary; size: Size.small; visible: subtitle !== "" }
+        }
+    }
 
-            Layout.fillWidth: true
+    // A label+combo(s) row (the row's own contents go in via the default
+    // property) paired with the InfoBox describing the current selection.
+    component ConfigBox: ColumnLayout {
+
+        id: box
+
+        property string title: ""
+        property string subtitle: ""
+        property bool showInfo: title !== ""
+
+        default property alias content: row.data
+
+        spacing: Style.mediumSpacing
+        opacity: enabled ? 1.0 : 0.4
+
+        RowLayout {
+            id: row
             spacing: Style.smallSpacing
+        }
 
-            SiText { text: "Floppy Drives"; font.bold: true; font.pixelSize: Style.large }
+        InfoBox {
+            title: box.title
+            subtitle: box.subtitle
+            visible: box.showInfo
+        }
+    }
 
-            GridLayout {
+    ConfigGrid {
 
-                columns: 3
-                columnSpacing: Style.smallSpacing
-                rowSpacing: Style.smallSpacing
+        id: grid
 
-                Item { Layout.preferredWidth: 24 }
-                SiLabel { text: "DF0:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: 60 }
+        //
+        // Floppy Drives
+        //
+
+        ConfigSection {
+
+            header: "Floppy Drives"
+            size: root.sectionWidth
+            rowSpacing: Style.smallSpacing
+
+            SiCheckBoxControl {
+
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                l: "Df0:"
+
                 SiComboBoxControl {
+
+                    model: root.driveTypeNames
+                    currentIndex: config.driveType(0)
+                    onCurrentIndexChanged: config.setDriveType(0, currentIndex)
+
+                    SiHelpButton {
+                        onClicked: root.help("")
+                    }
+                }
+                checked: config.SID_ENABLE1
+                onClicked: config.SID_ENABLE1 = checked;
+            }
+
+            SiCheckBoxControl {
+
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                l: "Df1:"
+
+                SiComboBoxControl {
+
+                    model: root.driveTypeNames
+                    currentIndex: config.driveType(1)
+                    onCurrentIndexChanged: config.setDriveType(1, currentIndex)
+
+                    SiHelpButton {
+                        onClicked: root.help("")
+                    }
+                }
+
+                enabled: !root.locked
+                checked: config.driveConnected(1)
+                onClicked: {
+                    config.setDriveConnected(1, checked)
+                    if (!checked) { config.setDriveConnected(2, false); config.setDriveConnected(3, false) }
+                }
+            }
+
+            SiCheckBoxControl {
+
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                l: "Df2:"
+
+                SiComboBoxControl {
+
+                    model: root.driveTypeNames
+                    currentIndex: config.driveType(2)
+                    onCurrentIndexChanged: config.setDriveType(2, currentIndex)
+                }
+
+                enabled: !root.locked
+                checked: config.driveConnected(2)
+                onClicked: {
+                    config.setDriveConnected(2, checked)
+                    if (!checked) { config.setDriveConnected(3, false) }
+                }
+            }
+
+            SiCheckBoxControl {
+
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                l: "Df3:"
+
+                SiComboBoxControl {
+
+                    model: root.driveTypeNames
+                    currentIndex: config.driveType(3)
+                    onCurrentIndexChanged: config.setDriveType(3, currentIndex)
+                }
+
+                enabled: !root.locked
+                checked: config.driveConnected(3)
+                onClicked: {
+                    config.setDriveConnected(3, checked)
+                }
+            }
+
+            /*
+            SiComboBoxControl {
+
+                l: "DF0:"
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                enabled: !root.locked
+                model: root.driveTypeNames
+                currentIndex: config.driveType(0)
+                onCurrentIndexChanged: config.setDriveType(0, currentIndex)
+            }
+
+            ConfigBox {
+
+                // Placeholder matching the connect checkbox's width below,
+                // so "DF0:" lines up with "DF1:"/"DF2:"/"DF3:" -- DF0 is
+                // always connected and has no checkbox of its own.
+                Item { Layout.preferredWidth: 24 }
+
+                SiComboBoxControl {
+
+                    l: "DF0:"
+                    lwidth: root.labelWidth
                     Layout.fillWidth: true
                     enabled: !root.locked
                     model: root.driveTypeNames
                     currentIndex: config.driveType(0)
                     onCurrentIndexChanged: config.setDriveType(0, currentIndex)
                 }
+            }
+
+            ConfigBox {
 
                 SiCheckBoxControl {
                     Layout.preferredWidth: 24
@@ -114,14 +269,22 @@ SettingsPage {
                         if (!checked) { config.setDriveConnected(2, false); config.setDriveConnected(3, false) }
                     }
                 }
-                SiLabel { text: "DF1:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: 60 }
+
                 SiComboBoxControl {
+
+                    l: "DF1:"
+                    lwidth: root.labelWidth
                     Layout.fillWidth: true
                     enabled: !root.locked && config.driveConnected(1)
                     model: root.driveTypeNames
                     currentIndex: config.driveType(1)
                     onCurrentIndexChanged: config.setDriveType(1, currentIndex)
                 }
+            }
+
+
+
+            ConfigBox {
 
                 SiCheckBoxControl {
                     Layout.preferredWidth: 24
@@ -132,14 +295,20 @@ SettingsPage {
                         if (!checked) config.setDriveConnected(3, false)
                     }
                 }
-                SiLabel { text: "DF2:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: 60 }
+
                 SiComboBoxControl {
+
+                    l: "DF2:"
+                    lwidth: root.labelWidth
                     Layout.fillWidth: true
                     enabled: !root.locked && config.driveConnected(2)
                     model: root.driveTypeNames
                     currentIndex: config.driveType(2)
                     onCurrentIndexChanged: config.setDriveType(2, currentIndex)
                 }
+            }
+
+            ConfigBox {
 
                 SiCheckBoxControl {
                     Layout.preferredWidth: 24
@@ -147,8 +316,11 @@ SettingsPage {
                     checked: config.driveConnected(3)
                     onClicked: config.setDriveConnected(3, checked)
                 }
-                SiLabel { text: "DF3:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: 60 }
+
                 SiComboBoxControl {
+
+                    l: "DF3:"
+                    lwidth: root.labelWidth
                     Layout.fillWidth: true
                     enabled: !root.locked && config.driveConnected(3)
                     model: root.driveTypeNames
@@ -157,67 +329,20 @@ SettingsPage {
                 }
             }
 
-            VSpacer { size: Style.largeSpacing }
-
-            SiText { text: "Game Ports"; font.bold: true; font.pixelSize: Style.large }
-
-            GridLayout {
-
-                columns: 2
-                columnSpacing: Style.smallSpacing
-                rowSpacing: Style.smallSpacing
-
-                SiLabel { text: "Game 1:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: 84 }
-                SiComboBoxControl { Layout.fillWidth: true; model: ["No device"]; currentIndex: 0 }
-
-                SiLabel { text: "Game 2:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: 84 }
-                SiComboBoxControl { Layout.fillWidth: true; model: ["No device"]; currentIndex: 0 }
-            }
-
-            VSpacer { size: Style.largeSpacing }
-
-            SiText { text: "Serial Port"; font.bold: true; font.pixelSize: Style.large }
-
-            GridLayout {
-
-                columns: 2
-                columnSpacing: Style.smallSpacing
-                rowSpacing: Style.smallSpacing
-
-                SiLabel { text: "Serial:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: 84 }
-                SiComboBoxControl {
-                    Layout.fillWidth: true
-                    model: root.serialDeviceNames
-                    currentIndex: config.SER_DEVICE
-                    onCurrentIndexChanged: config.SER_DEVICE = currentIndex
-                }
-
-                SiLabel { text: "MIDI Out:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: 84; visible: config.SER_DEVICE === 5 }
-                SiComboBoxControl { Layout.fillWidth: true; visible: config.SER_DEVICE === 5; model: ["None"]; currentIndex: 0 }
-
-                SiLabel { text: "MIDI In:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: 84; visible: config.SER_DEVICE === 5 }
-                SiComboBoxControl { Layout.fillWidth: true; visible: config.SER_DEVICE === 5; model: ["None"]; currentIndex: 0 }
-            }
-
-            VSpacer { }
+             */
         }
 
         //
-        // Right column: Hard Drives, Joystick
+        // Hard Drives
         //
 
-        ColumnLayout {
+        ConfigSection {
 
-            Layout.fillWidth: true
-            spacing: Style.smallSpacing
+            header: "Hard Drives"
+            size: root.sectionWidth
+            rowSpacing: Style.smallSpacing
 
-            SiText { text: "Hard Drives"; font.bold: true; font.pixelSize: Style.large }
-
-            GridLayout {
-
-                columns: 3
-                columnSpacing: Style.smallSpacing
-                rowSpacing: Style.smallSpacing
+            ConfigBox {
 
                 SiCheckBoxControl {
                     Layout.preferredWidth: 24
@@ -225,14 +350,20 @@ SettingsPage {
                     checked: config.hdConnected(0)
                     onClicked: config.setHdConnected(0, checked)
                 }
-                SiLabel { text: "HD0:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: 60 }
+
                 SiComboBoxControl {
+
+                    l: "HD0:"
+                    lwidth: root.labelWidth
                     Layout.fillWidth: true
                     enabled: !root.locked && config.hdConnected(0)
                     model: root.hdTypeNames
                     currentIndex: config.hdType(0)
                     onCurrentIndexChanged: config.setHdType(0, currentIndex)
                 }
+            }
+
+            ConfigBox {
 
                 SiCheckBoxControl {
                     Layout.preferredWidth: 24
@@ -240,14 +371,20 @@ SettingsPage {
                     checked: config.hdConnected(1)
                     onClicked: config.setHdConnected(1, checked)
                 }
-                SiLabel { text: "HD1:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: 60 }
+
                 SiComboBoxControl {
+
+                    l: "HD1:"
+                    lwidth: root.labelWidth
                     Layout.fillWidth: true
                     enabled: !root.locked && config.hdConnected(1)
                     model: root.hdTypeNames
                     currentIndex: config.hdType(1)
                     onCurrentIndexChanged: config.setHdType(1, currentIndex)
                 }
+            }
+
+            ConfigBox {
 
                 SiCheckBoxControl {
                     Layout.preferredWidth: 24
@@ -255,14 +392,20 @@ SettingsPage {
                     checked: config.hdConnected(2)
                     onClicked: config.setHdConnected(2, checked)
                 }
-                SiLabel { text: "HD2:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: 60 }
+
                 SiComboBoxControl {
+
+                    l: "HD2:"
+                    lwidth: root.labelWidth
                     Layout.fillWidth: true
                     enabled: !root.locked && config.hdConnected(2)
                     model: root.hdTypeNames
                     currentIndex: config.hdType(2)
                     onCurrentIndexChanged: config.setHdType(2, currentIndex)
                 }
+            }
+
+            ConfigBox {
 
                 SiCheckBoxControl {
                     Layout.preferredWidth: 24
@@ -270,8 +413,11 @@ SettingsPage {
                     checked: config.hdConnected(3)
                     onClicked: config.setHdConnected(3, checked)
                 }
-                SiLabel { text: "HD3:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: 60 }
+
                 SiComboBoxControl {
+
+                    l: "HD3:"
+                    lwidth: root.labelWidth
                     Layout.fillWidth: true
                     enabled: !root.locked && config.hdConnected(3)
                     model: root.hdTypeNames
@@ -279,20 +425,48 @@ SettingsPage {
                     onCurrentIndexChanged: config.setHdType(3, currentIndex)
                 }
             }
+        }
 
-            VSpacer { size: Style.largeSpacing }
+        //
+        // Game Ports
+        //
 
-            SiText { text: "Joystick"; font.bold: true; font.pixelSize: Style.large }
+        ConfigSection {
 
-            GridLayout {
+            header: "Game Ports"
+            size: root.sectionWidth
 
-                columns: 2
-                columnSpacing: Style.smallSpacing
-                rowSpacing: Style.mediumSpacing
+            SiComboBoxControl {
+                l: "Game 1:"
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                model: ["No device"]
+                currentIndex: 0
+            }
+
+            SiComboBoxControl {
+                l: "Game 2:"
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                model: ["No device"]
+                currentIndex: 0
+            }
+        }
+
+        //
+        // Joystick
+        //
+
+        ConfigSection {
+
+            header: "Joystick"
+            size: root.sectionWidth
+
+            ConfigBox {
 
                 SiCheckBoxControl {
                     l: "Auto-fire:"
-                    lwidth: 84
+                    lwidth: root.labelWidth
                     checked: config.JOY1_AUTOFIRE
                     onClicked: root.setAutofire(checked)
                 }
@@ -307,10 +481,13 @@ SettingsPage {
                     value: config.JOY1_AUTOFIRE_DELAY
                     onMoved: (value) => root.setAutofireDelay(Math.round(value))
                 }
+            }
+
+            ConfigBox {
 
                 SiCheckBoxControl {
                     l: "Burst Mode:"
-                    lwidth: 84
+                    lwidth: root.labelWidth
                     checked: config.JOY1_AUTOFIRE_BURSTS
                     onClicked: root.setAutofireBursts(checked)
                 }
@@ -324,8 +501,43 @@ SettingsPage {
                     onValueEdited: (value) => root.setAutofireBullets(value)
                 }
             }
+        }
 
-            VSpacer { }
+        //
+        // Serial Port
+        //
+
+        ConfigSection {
+
+            header: "Serial Port"
+            size: root.sectionWidth
+
+            SiComboBoxControl {
+                l: "Serial:"
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                model: root.serialDeviceNames
+                currentIndex: config.SER_DEVICE
+                onCurrentIndexChanged: config.SER_DEVICE = currentIndex
+            }
+
+            SiComboBoxControl {
+                l: "MIDI Out:"
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                visible: config.SER_DEVICE === 5
+                model: ["None"]
+                currentIndex: 0
+            }
+
+            SiComboBoxControl {
+                l: "MIDI In:"
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                visible: config.SER_DEVICE === 5
+                model: ["None"]
+                currentIndex: 0
+            }
         }
     }
 }
