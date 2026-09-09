@@ -240,87 +240,85 @@ SettingsPage {
             size: root.sectionWidth
             rowSpacing: Style.smallSpacing
 
-            ConfigBox {
+            SiCheckBoxControl {
 
-                SiCheckBoxControl {
-                    Layout.preferredWidth: 24
-                    enabled: !root.locked
-                    checked: config.HD0_CONNECTED
-                    onClicked: config.HD0_CONNECTED = checked
-                }
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                l: "Hd0:"
+                enabled: !root.locked
+                checked: config.HD0_CONNECTED
+                onClicked: config.HD0_CONNECTED = checked
 
                 SiComboBoxControl {
 
-                    l: "HD0:"
-                    lwidth: root.labelWidth
-                    Layout.fillWidth: true
                     enabled: !root.locked && config.HD0_CONNECTED
                     model: root.hdTypeNames
                     currentIndex: config.HD0_TYPE
                     onCurrentIndexChanged: config.HD0_TYPE = currentIndex
+
+                    SiHelpButton {
+                        onClicked: root.help("")
+                    }
                 }
             }
 
-            ConfigBox {
+            SiCheckBoxControl {
 
-                SiCheckBoxControl {
-                    Layout.preferredWidth: 24
-                    enabled: !root.locked
-                    checked: config.HD1_CONNECTED
-                    onClicked: config.HD1_CONNECTED = checked
-                }
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                l: "Hd1:"
+                enabled: !root.locked
+                checked: config.HD1_CONNECTED
+                onClicked: config.HD1_CONNECTED = checked
 
                 SiComboBoxControl {
 
-                    l: "HD1:"
-                    lwidth: root.labelWidth
-                    Layout.fillWidth: true
                     enabled: !root.locked && config.HD1_CONNECTED
                     model: root.hdTypeNames
                     currentIndex: config.HD1_TYPE
                     onCurrentIndexChanged: config.HD1_TYPE = currentIndex
+
+                    SiHelpButton { opacity: 0 }
                 }
             }
 
-            ConfigBox {
+            SiCheckBoxControl {
 
-                SiCheckBoxControl {
-                    Layout.preferredWidth: 24
-                    enabled: !root.locked
-                    checked: config.HD2_CONNECTED
-                    onClicked: config.HD2_CONNECTED = checked
-                }
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                l: "Hd2:"
+                enabled: !root.locked
+                checked: config.HD2_CONNECTED
+                onClicked: config.HD2_CONNECTED = checked
 
                 SiComboBoxControl {
 
-                    l: "HD2:"
-                    lwidth: root.labelWidth
-                    Layout.fillWidth: true
                     enabled: !root.locked && config.HD2_CONNECTED
                     model: root.hdTypeNames
                     currentIndex: config.HD2_TYPE
                     onCurrentIndexChanged: config.HD2_TYPE = currentIndex
+
+                    SiHelpButton { opacity: 0 }
                 }
             }
 
-            ConfigBox {
+            SiCheckBoxControl {
 
-                SiCheckBoxControl {
-                    Layout.preferredWidth: 24
-                    enabled: !root.locked
-                    checked: config.HD3_CONNECTED
-                    onClicked: config.HD3_CONNECTED = checked
-                }
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                l: "Hd3:"
+                enabled: !root.locked
+                checked: config.HD3_CONNECTED
+                onClicked: config.HD3_CONNECTED = checked
 
                 SiComboBoxControl {
 
-                    l: "HD3:"
-                    lwidth: root.labelWidth
-                    Layout.fillWidth: true
                     enabled: !root.locked && config.HD3_CONNECTED
                     model: root.hdTypeNames
                     currentIndex: config.HD3_TYPE
                     onCurrentIndexChanged: config.HD3_TYPE = currentIndex
+
+                    SiHelpButton { opacity: 0 }
                 }
             }
         }
@@ -335,19 +333,25 @@ SettingsPage {
             size: root.sectionWidth
 
             SiComboBoxControl {
+
                 l: "Game 1:"
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 model: ["No device"]
                 currentIndex: 0
+
+                SiHelpButton { opacity: 0 }
             }
 
             SiComboBoxControl {
+
                 l: "Game 2:"
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 model: ["No device"]
                 currentIndex: 0
+
+                SiHelpButton { opacity: 0 }
             }
         }
 
@@ -360,16 +364,15 @@ SettingsPage {
             header: "Joystick"
             size: root.sectionWidth
 
-            ConfigBox {
+            SiCheckBoxControl {
 
-                SiCheckBoxControl {
-                    l: "Auto-fire:"
-                    lwidth: root.labelWidth
-                    checked: config.JOY1_AUTOFIRE
-                    onClicked: root.setAutofire(checked)
-                }
+                l: "Auto-fire:"
+                lwidth: root.labelWidth
+                checked: config.JOY1_AUTOFIRE
+                onClicked: root.setAutofire(checked)
 
                 SiSliderControl {
+
                     Layout.fillWidth: true
                     l: "Slow"
                     r: "Fast"
@@ -381,16 +384,15 @@ SettingsPage {
                 }
             }
 
-            ConfigBox {
+            SiCheckBoxControl {
 
-                SiCheckBoxControl {
-                    l: "Burst Mode:"
-                    lwidth: root.labelWidth
-                    checked: config.JOY1_AUTOFIRE_BURSTS
-                    onClicked: root.setAutofireBursts(checked)
-                }
+                l: "Burst Mode:"
+                lwidth: root.labelWidth
+                checked: config.JOY1_AUTOFIRE_BURSTS
+                onClicked: root.setAutofireBursts(checked)
 
                 SiNumberInputControl {
+
                     Layout.fillWidth: true
                     enabled: config.JOY1_AUTOFIRE_BURSTS
                     r: "bullets per burst"
@@ -411,30 +413,39 @@ SettingsPage {
             size: root.sectionWidth
 
             SiComboBoxControl {
+
                 l: "Serial:"
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 model: root.serialDeviceNames
                 currentIndex: config.SER_DEVICE
                 onCurrentIndexChanged: config.SER_DEVICE = currentIndex
+
+                SiHelpButton { opacity: 0 }
             }
 
             SiComboBoxControl {
+
                 l: "MIDI Out:"
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 visible: config.SER_DEVICE === 5
                 model: ["None"]
                 currentIndex: 0
+
+                SiHelpButton { opacity: 0 }
             }
 
             SiComboBoxControl {
+
                 l: "MIDI In:"
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 visible: config.SER_DEVICE === 5
                 model: ["None"]
                 currentIndex: 0
+
+                SiHelpButton { opacity: 0 }
             }
         }
     }
