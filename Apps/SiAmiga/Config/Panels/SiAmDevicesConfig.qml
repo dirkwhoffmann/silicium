@@ -233,7 +233,7 @@ SettingsPage {
 
         ConfigSection {
 
-            header: "Hard Drives"
+            header: "HARD DRIVES"
             size: root.sectionWidth
             rowSpacing: Style.smallSpacing
 
@@ -320,7 +320,7 @@ SettingsPage {
 
         ConfigSection {
 
-            header: "Game Ports"
+            header: "GAME PORTS"
             size: root.sectionWidth
 
             SiComboBoxControl {
@@ -350,7 +350,7 @@ SettingsPage {
 
         ConfigSection {
 
-            header: "Joystick"
+            header: "JOYSTICK"
             size: root.sectionWidth
 
             SiCheckBoxControl {
@@ -413,7 +413,7 @@ SettingsPage {
 
         ConfigSection {
 
-            header: "Serial Port"
+            header: "SERIAL PORT"
             size: root.sectionWidth
 
             SiComboBoxControl {

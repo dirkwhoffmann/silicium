@@ -247,7 +247,7 @@ SettingsPage {
 
             ConfigSection {
 
-                header: "Panning"
+                header: "PANNING"
                 size: root.sectionWidth
                 implicitHeight: 180
 

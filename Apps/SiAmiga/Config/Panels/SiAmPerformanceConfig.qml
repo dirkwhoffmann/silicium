@@ -55,7 +55,7 @@ SettingsPage {
 
         ConfigSection {
 
-            header: "Warp Mode"
+            header: "WARP MODE"
             size: root.sectionWidth
 
             SiComboBoxControl {
@@ -84,7 +84,7 @@ SettingsPage {
 
         ConfigSection {
 
-            header: "Speed Boosters"
+            header: "SPEED BOOSTERS"
             size: root.sectionWidth
 
             SiCheckBoxControl {
@@ -112,7 +112,7 @@ SettingsPage {
 
         ConfigSection {
 
-            header: "Threading"
+            header: "THREADING"
             size: root.sectionWidth
 
             SiCheckBoxControl {
@@ -155,7 +155,7 @@ SettingsPage {
 
         ConfigSection {
 
-            header: "Compression"
+            header: "COMPRESSION"
             size: root.sectionWidth
 
             SiComboBoxControl {

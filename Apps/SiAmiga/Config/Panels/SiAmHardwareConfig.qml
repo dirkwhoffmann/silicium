@@ -174,7 +174,7 @@ SettingsPage {
 
         ConfigSection {
 
-            header: "Chipset"
+            header: "CHIPSET"
             size: root.sectionWidth
             rowSpacing: Style.largeSpacing
 
@@ -280,7 +280,7 @@ SettingsPage {
 
         ConfigSection {
 
-            header: "Memory"
+            header: "MEMORY"
             size: root.sectionWidth
             rowSpacing: Style.largeSpacing
 
@@ -357,7 +357,7 @@ SettingsPage {
 
         ConfigSection {
 
-            header: "Memory Properties"
+            header: "MEMORY PROPERTIES"
             size: root.sectionWidth
             Layout.fillHeight: true
 

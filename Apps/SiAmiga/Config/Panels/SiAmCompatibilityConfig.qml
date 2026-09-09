@@ -62,7 +62,7 @@ SettingsPage {
 
         ConfigSection {
 
-            header: "Floppy Drives"
+            header: "FLOPPY DRIVES"
             size: root.sectionWidth
 
             SiComboBoxControl {
@@ -107,7 +107,7 @@ SettingsPage {
 
         ConfigSection {
 
-            header: "Chipset Features"
+            header: "CHIPSET FEATURES"
             size: root.sectionWidth
 
             SiCheckBoxControl {
@@ -138,7 +138,7 @@ SettingsPage {
 
         ConfigSection {
 
-            header: "Keyboard"
+            header: "KEYBOARD"
             size: root.sectionWidth
 
             SiCheckBoxControl {
@@ -157,7 +157,7 @@ SettingsPage {
 
         ConfigSection {
 
-            header: "Timing"
+            header: "TIMING"
             size: root.sectionWidth
 
             SiCheckBoxControl {
@@ -181,7 +181,7 @@ SettingsPage {
 
         ConfigSection {
 
-            header: "Blitter Accuracy"
+            header: "BLITTER ACCURACY"
             size: root.sectionWidth
 
             // The tick numbers and the two descriptive labels need
@@ -247,7 +247,7 @@ SettingsPage {
 
         ConfigSection {
 
-            header: "Sprites"
+            header: "SPRITES"
             size: root.sectionWidth
 
             SiCheckBoxControl {
