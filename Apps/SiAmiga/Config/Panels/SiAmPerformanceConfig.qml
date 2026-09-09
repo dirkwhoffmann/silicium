@@ -13,20 +13,6 @@ import QtQuick.Layouts
 import Silicium.Controllers
 import Silicium.Theme
 
-// Port of vAmiga's own GUI/Settings/ViewControllers/PerformanceSettings.swift.
-// ConfigGrid/ConfigSection cards, one per group, matching
-// SiAmDevicesConfig's/SiAmHardwareConfig's layout -- Warp Mode, Speed
-// Boosters, Threading, Compression, in that order so the row-major
-// 2-column grid keeps Warp Mode/Threading on the left and Speed
-// Boosters/Compression on the right, the same grouping the old
-// two-column form had.
-//
-// "Put idle CIAs to sleep" broadcasts CIA_A_IDLE_SLEEP/CIA_B_IDLE_SLEEP
-// together, mirroring Configuration.swift's own ciaIdleSleep wrapper (get
-// with no id, set with no id -- i.e. both chips at once). vAmiga's
-// PerformanceSettingsViewController has no counterpart for
-// SiAmConfigController's CIA_A/B_ECLOCK_SYNCING or DC_SPEED/DC_LOCK_DSKSYNC/
-// DC_AUTO_DSKSYNC options, so those stay off this panel too.
 SettingsPage {
 
     id: root
@@ -34,7 +20,7 @@ SettingsPage {
     required property SiAmController controller
     readonly property var config: controller.configController
 
-    readonly property int labelWidth: 160
+    readonly property int labelWidth: 100
     readonly property int sectionWidth: 320
 
     // Configuration.swift's ciaIdleSleep wrapper reads/writes both chips at
@@ -82,10 +68,10 @@ SettingsPage {
             }
 
             SiNumberInputControl {
-                l: "Boot in warp mode for"
+                l: "Boot for"
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
-                r: "seconds"
+                r: "seconds in warp mode."
                 controlWidth: 48
                 intValue: config.AMIGA_WARP_BOOT
                 onValueEdited: (value) => config.AMIGA_WARP_BOOT = value
@@ -176,7 +162,7 @@ SettingsPage {
                 l: "Workspaces:"
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
-                model: ["Off", "On"]
+                model: ["Off", "ADZ / HDZ"]
                 currentIndex: config.AMIGA_WS_COMPRESSION ? 1 : 0
                 onCurrentIndexChanged: config.AMIGA_WS_COMPRESSION = currentIndex === 1
             }

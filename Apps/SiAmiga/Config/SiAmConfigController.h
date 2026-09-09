@@ -361,6 +361,11 @@ class SiAmConfigController : public Controller {
     Q_PROPERTY(bool HD3_CONNECTED READ hd3Connected WRITE setHd3Connected NOTIFY configChanged)
     Q_PROPERTY(int HD3_TYPE READ hd3Type WRITE setHd3Type NOTIFY configChanged)
 
+    // The Compatibility panel's "Emulate mechanical delays" checkbox
+    // broadcasts across every floppy drive -- reads df0, writes df0..df3 --
+    // mirroring Configuration.swift's own driveMechanics wrapper.
+    Q_PROPERTY(bool DRIVE_MECHANICS READ driveMechanicsAll WRITE setDriveMechanicsAll NOTIFY configChanged)
+
     // Kept alongside the named properties above -- SiAmDropOverlay.qml,
     // SiAmMenu.qml and SiAmStatusbar.qml still call these by index and
     // would need updating to the named properties to fix the same
@@ -416,6 +421,11 @@ class SiAmConfigController : public Controller {
     void setHd3Connected(bool value) { set(vamiga::Opt::HDC_CONNECT, (i64)value, 3); }
     int hd3Type() const { return (int)get(vamiga::Opt::HDR_TYPE, 3); }
     void setHd3Type(int value) { set(vamiga::Opt::HDR_TYPE, (i64)value, 3); }
+
+    bool driveMechanicsAll() const { return (bool)get(vamiga::Opt::DRIVE_MECHANICS, 0); }
+    void setDriveMechanicsAll(bool value) {
+        for (int nr = 0; nr < 4; nr++) set(vamiga::Opt::DRIVE_MECHANICS, (i64)value, nr);
+    }
 
     // Restores the factory settings for every option the Devices panel
     // exposes (SiAmDevicesConfig.qml).
@@ -484,6 +494,16 @@ class SiAmConfigController : public Controller {
     // Restores the factory settings for every option the Performance panel
     // exposes (SiAmPerformanceConfig.qml).
     Q_INVOKABLE void restorePerformanceDefaults();
+
+    // Restores the factory settings for every option the Compatibility
+    // panel exposes (SiAmCompatibilityConfig.qml). Those options don't get
+    // their own Q_PROPERTY group -- they're declared alongside whichever
+    // other panel's properties they happened to land next to (Hardware:
+    // BLITTER_ACCURACY/AGNUS_PTR_DROPS/MEM_SLOW_RAM_*/DENISE_CLX_*;
+    // Peripherals: CIA_A/B_TODBUG/KBD_ACCURACY/DF*_TYPE's DRIVE_MECHANICS
+    // sibling; here: CIA_A/B_ECLOCK_SYNCING/DC_*) -- so this restore call
+    // is the one place that gathers them back up.
+    Q_INVOKABLE void restoreCompatibilityDefaults();
 
     int warpMode() const { return (int)get(vamiga::Opt::AMIGA_WARP_MODE); }
     void setWarpMode(int value) { set(vamiga::Opt::AMIGA_WARP_MODE, (i64)value); }

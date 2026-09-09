@@ -18,12 +18,17 @@ Window {
     id: root
 
     // Page indices. Must match the order of the sidebar model and the
-    // StackLayout children below. Same seven pages as SiC64ConfigWindow.
+    // StackLayout children below. SiC64ConfigWindow has no Compatibility
+    // page (the C64 core has no counterpart), so this has one more than
+    // that -- otherwise the same, and in the same order as vAmiga's own
+    // SidebarViewController.swift (Roms/Hardware/Peripherals/Performance/
+    // Compatibility/Audio/Video/Server).
     enum Page {
         Roms,
         Hardware,
         Devices,
         Performance,
+        Compatibility,
         Audio,
         Video,
         Server
@@ -105,6 +110,7 @@ Window {
                     {name: "Hardware", symbol: "developer_board"},
                     {name: "Devices", symbol: "flowchart"},
                     {name: "Peformance", symbol: "sprint"},
+                    {name: "Compatibility", symbol: "tune"},
                     {name: "Audio", symbol: "music_note_2"},
                     {name: "Video", symbol: "monitor"},
                     {name: "Server", symbol: "nest_remote_comfort_sensor"},
@@ -179,6 +185,10 @@ Window {
             }
 
             SiAmPerformanceConfig {
+                controller: root.controller
+            }
+
+            SiAmCompatibilityConfig {
                 controller: root.controller
             }
 

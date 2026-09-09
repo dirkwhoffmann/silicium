@@ -275,7 +275,6 @@ SiAmConfigController::restoreHardwareDefaults()
 {
     restoreDefaults(Opt::AMIGA_VIDEO_FORMAT);
     restoreDefaults(Opt::AGNUS_REVISION);
-    restoreDefaults(Opt::AGNUS_PTR_DROPS);
     restoreDefaults(Opt::DENISE_REVISION);
     restoreDefaults(Opt::DENISE_SHRES_BLEND);
     restoreDefaults(Opt::DENISE_VIEWPORT_TRACKING);
@@ -289,13 +288,10 @@ SiAmConfigController::restoreHardwareDefaults()
     restoreDefaults(Opt::MEM_SLOW_RAM);
     restoreDefaults(Opt::MEM_FAST_RAM);
     restoreDefaults(Opt::MEM_EXT_START);
-    restoreDefaults(Opt::MEM_SLOW_RAM_DELAY);
-    restoreDefaults(Opt::MEM_SLOW_RAM_MIRROR);
     restoreDefaults(Opt::MEM_BANKMAP);
     restoreDefaults(Opt::MEM_UNMAPPING_TYPE);
     restoreDefaults(Opt::MEM_RAM_INIT_PATTERN);
     restoreDefaults(Opt::MEM_SAVE_ROMS);
-    restoreDefaults(Opt::BLITTER_ACCURACY);
     restoreDefaults(Opt::CIA_REVISION, { CiaA, CiaB });
     restoreDefaults(Opt::DIAG_BOARD);
 
@@ -307,20 +303,16 @@ SiAmConfigController::restoreDevicesDefaults()
 {
     static const std::vector<isize> drives = { 0, 1, 2, 3 };
     static const std::vector<isize> hds    = { 0, 1, 2, 3 };
-    static const std::vector<isize> cias   = { CiaA, CiaB };
     static const std::vector<isize> ports  = { Port1, Port2 };
 
     restoreDefaults(Opt::DRIVE_CONNECT, drives);
     restoreDefaults(Opt::DRIVE_TYPE, drives);
-    restoreDefaults(Opt::DRIVE_MECHANICS, drives);
     restoreDefaults(Opt::HDC_CONNECT, hds);
     restoreDefaults(Opt::HDR_TYPE, hds);
-    restoreDefaults(Opt::CIA_TODBUG, cias);
     restoreDefaults(Opt::SER_DEVICE);
     restoreDefaults(Opt::SER_VERBOSE);
     restoreDefaults(Opt::MIDI_DEVICE_OUT);
     restoreDefaults(Opt::MIDI_DEVICE_IN);
-    restoreDefaults(Opt::KBD_ACCURACY);
     restoreDefaults(Opt::MOUSE_PULLUP_RESISTORS, ports);
     restoreDefaults(Opt::MOUSE_SHAKE_DETECTION, ports);
     restoreDefaults(Opt::MOUSE_VELOCITY, ports);
@@ -343,10 +335,30 @@ SiAmConfigController::restorePerformanceDefaults()
     restoreDefaults(Opt::AMIGA_SPEED_BOOST);
     restoreDefaults(Opt::AMIGA_RUN_AHEAD);
     restoreDefaults(Opt::CIA_IDLE_SLEEP, cias);
+
+    emit configChanged();
+}
+
+void
+SiAmConfigController::restoreCompatibilityDefaults()
+{
+    static const std::vector<isize> cias   = { CiaA, CiaB };
+    static const std::vector<isize> drives = { 0, 1, 2, 3 };
+
+    restoreDefaults(Opt::BLITTER_ACCURACY);
+    restoreDefaults(Opt::MEM_SLOW_RAM_MIRROR);
+    restoreDefaults(Opt::MEM_SLOW_RAM_DELAY);
+    restoreDefaults(Opt::CIA_TODBUG, cias);
+    restoreDefaults(Opt::AGNUS_PTR_DROPS);
     restoreDefaults(Opt::CIA_ECLOCK_SYNCING, cias);
     restoreDefaults(Opt::DC_SPEED);
+    restoreDefaults(Opt::DRIVE_MECHANICS, drives);
     restoreDefaults(Opt::DC_LOCK_DSKSYNC);
     restoreDefaults(Opt::DC_AUTO_DSKSYNC);
+    restoreDefaults(Opt::KBD_ACCURACY);
+    restoreDefaults(Opt::DENISE_CLX_SPR_SPR);
+    restoreDefaults(Opt::DENISE_CLX_SPR_PLF);
+    restoreDefaults(Opt::DENISE_CLX_PLF_PLF);
 
     emit configChanged();
 }
