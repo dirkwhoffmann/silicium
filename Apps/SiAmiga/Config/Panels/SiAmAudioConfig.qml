@@ -364,15 +364,13 @@ SettingsPage {
 
                     l: "Capacity:"
                     lwidth: root.labelWidth
-                    Layout.preferredWidth: root.comboWidth
-                    from: 512
+                    r: "%1 samples".arg(config.AUD_BUFFER_SIZE)
+                    rwidth: 100
+                    Layout.fillWidth: true // preferredWidth: root.comboWidth
+                    from: 4096
                     to: 65536
                     value: config.AUD_BUFFER_SIZE
                     onMoved: (value) => config.AUD_BUFFER_SIZE = Math.round(value)
-                }
-
-                SiText {
-                    text: "%1 samples".arg(config.AUD_BUFFER_SIZE); color: Palette.secondary
                 }
             }
 
