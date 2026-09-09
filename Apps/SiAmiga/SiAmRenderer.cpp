@@ -207,10 +207,50 @@ SiAmRenderer::visible() const
     auto width = hscale * max.w;
     auto height = vscale * max.h;
 
-    auto bw = max.x + hCenter * (max.w - width);
-    auto bh = max.y + vCenter * (max.h - height);
+    double bw, bh;
+
+    if (config->center() == 1) {
+
+        // Automatic: center on the live beam window (x1/y1/x2/y2) fed by
+        // updateTextureRect(), clamped to the largest visible area.
+        bw = x1 - 0.5 * (width - (x2 - x1));
+        if (bw < max.x) bw = max.x;
+        if (bw > max.x + max.w - width) bw = max.x + max.w - width;
+
+        bh = y1 - 0.5 * (height - (y2 - y1));
+        if (bh < max.y) bh = max.y;
+        if (bh > max.y + max.h - height) bh = max.y + max.h - height;
+
+    } else {
+
+        bw = max.x + hCenter * (max.w - width);
+        bh = max.y + vCenter * (max.h - height);
+    }
 
     return TexRect { .x = bw, .y = bh, .w = width, .h = height };
+}
+
+void
+SiAmRenderer::updateTextureRect(int hstrt, int vstrt, int hstop, int vstop)
+{
+    // hstrt/hstop already arrive in super-hires pixel coordinates
+    x1 = double(hstrt);
+    x2 = double(hstop);
+    y1 = double(vstrt);
+    y2 = double(vstop);
+
+    // Compensate the texture shift
+    x1 -= double(vamiga::HBLANK_MIN) * 8;
+    x2 -= double(vamiga::HBLANK_MIN) * 8;
+
+    // Crop to the largest visible area
+    auto max = largestVisible();
+    if (x1 < max.x) x1 = max.x;
+    if (y1 < max.y) y1 = max.y;
+    if (x2 > max.x + max.w) x2 = max.x + max.w;
+    if (y2 > max.y + max.h) y2 = max.y + max.h;
+
+    updateTextureCutout();
 }
 
 void

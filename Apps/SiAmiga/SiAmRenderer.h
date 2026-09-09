@@ -36,6 +36,13 @@ class SiAmRenderer : public Renderer {
     QMetaObject::Connection m_frameConnection;
     QMetaObject::Connection m_configConnection;
 
+    // Live beam/display-window rect, fed by Msg::VIEWPORT via
+    // updateTextureRect(hstrt,vstrt,hstop,vstop) below. Only meaningful
+    // once at least one such message has arrived; used by visible()'s
+    // MON_CENTER == 1 (Automatic/AutoShift) branch. Mirrors Canvas's
+    // x1/y1/x2/y2 in GUI/Metal/TextureRect.swift.
+    double x1 = 0.0, y1 = 0.0, x2 = 0.0, y2 = 0.0;
+
     Q_PROPERTY(
         SiAmController *controller READ getController WRITE setController NOTIFY controllerChanged)
 
@@ -80,14 +87,20 @@ class SiAmRenderer : public Renderer {
     // Returns the visible texture area based on the zoom and center
     // parameters (MON_ZOOM/MON_HZOOM/MON_VZOOM/MON_CENTER/MON_HCENTER/
     // MON_VCENTER). Ported from vAmiga's own GUI/Metal/TextureRect.swift,
-    // including its MON_ZOOM preset switch (Narrow/Wide/Extreme), but
-    // *not* MON_CENTER's "Automatic" (AutoShift) mode: that needs a live
-    // DMA-debug/beam window (x1/y1/x2/y2, kept in sync via
-    // updateTextureRect(hstrt:...) on the Swift side) that nothing here
-    // tracks yet, so MON_CENTER == 1 currently falls back to the same
-    // hCenter/vCenter formula as Custom (0) rather than truly auto-shifting.
+    // including its MON_ZOOM preset switch (Narrow/Wide/Extreme) and its
+    // MON_CENTER == 1 "Automatic" (AutoShift) mode, which centers on the
+    // live beam window (x1/y1/x2/y2) instead of hCenter/vCenter -- see
+    // updateTextureRect() below for how that window gets populated.
     TexRect visible() const override;
     TexRect visibleNormalized() const override { return normalize(visible()); }
+
+    // Feeds a fresh beam/display-window rect (super-hires pixel
+    // coordinates) into visible()'s AutoShift branch and recomputes the
+    // cutout. Called from SiAmController::process() on every Msg::VIEWPORT
+    // (Denise's viewport tracker; see DeniseDebugger::vsyncHandler() in
+    // VACore). Mirrors Canvas.updateTextureRect(hstrt:vstrt:hstop:vstop:)
+    // in GUI/Metal/TextureRect.swift.
+    void updateTextureRect(int hstrt, int vstrt, int hstop, int vstop);
 
   private:
 

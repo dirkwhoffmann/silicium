@@ -967,6 +967,18 @@ SiAmController::process(const Message &msg, const string &attachment)
             m_infoIsDirty = true;
             break;
 
+        case Msg::VIEWPORT:
+
+            // Denise's viewport tracker (DeniseDebugger::vsyncHandler())
+            // reports the live beam/display window -- feed it to the
+            // renderer's MON_CENTER == 1 (Automatic) cutout. Mirrors
+            // MyController.swift's own .VIEWPORT case.
+            if (m_renderer) {
+                m_renderer->updateTextureRect(msg.viewport.hstrt, msg.viewport.vstrt,
+                                               msg.viewport.hstop, msg.viewport.vstop);
+            }
+            break;
+
         case Msg::KB_PRESS:
 
             m_keyboardController->kbChanged((int)msg.value, true);
