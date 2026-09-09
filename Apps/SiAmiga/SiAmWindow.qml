@@ -98,15 +98,24 @@ ApplicationWindow {
     }
 
     //
-    // Console overlay (RetroShell / Logger). Port of SiC64Window's own --
-    // no explicit z, so it paints below SiAmToolbar's z: 10 and the toolbar
-    // stays reachable (to close the console again) while this is up.
+    // Console overlay (RetroShell / Logger). Starts below the toolbar
+    // (anchors.top: toolbar.bottom) rather than filling the whole window --
+    // SiAmToolbar floats over the canvas at z: 10 rather than reserving its
+    // own layout slot (see its own header comment), so a plain
+    // anchors.fill: parent here would extend underneath that opaque
+    // toolbar strip and get visibly covered by it. Starting below it
+    // instead avoids the overlap entirely, and keeps the toolbar reachable
+    // (to close the console again) as a side effect, without needing to
+    // out-z it.
     //
 
     Item {
 
         id: overlayPanel
-        anchors.fill: parent
+        anchors.top: toolbar.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
         opacity: (root.amiga.retroShell || root.loggerOpen) ? 0.85 : 0.0
         visible: opacity > 0.0
 
