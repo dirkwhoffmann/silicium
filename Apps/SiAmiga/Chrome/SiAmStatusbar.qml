@@ -497,7 +497,21 @@ Rectangle {
 
                 required property int index
 
-                visible: config.driveConnected(index)
+                // driveConnected(nr) is a Q_INVOKABLE, not a Q_PROPERTY, so
+                // reading it here wouldn't register as a binding dependency
+                // and 'visible' would go stale -- see the DF0_CONNECTED..
+                // _CONNECTED comment in SiAmConfigController.h. index is
+                // fixed per delegate, so the matching named property keeps
+                // this reactive.
+                visible: {
+                    switch (index) {
+                        case 0: return config.DF0_CONNECTED
+                        case 1: return config.DF1_CONNECTED
+                        case 2: return config.DF2_CONNECTED
+                        case 3: return config.DF3_CONNECTED
+                    }
+                    return false
+                }
 
                 FloppyObserver {
 

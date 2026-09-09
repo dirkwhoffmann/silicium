@@ -163,7 +163,21 @@ SiMenuBar {
 
         required property int driveNr   // 0..3
 
-        readonly property bool connected: config.driveConnected(driveNr)
+        // driveConnected(nr) is a Q_INVOKABLE, not a Q_PROPERTY -- reading
+        // it here wouldn't register as a binding dependency, so it would
+        // never notice a later change and 'connected' would go stale (see
+        // SiAmConfigController.h's DF0_CONNECTED.._CONNECTED comment).
+        // driveNr is fixed for this component's lifetime, so picking the
+        // matching named property keeps this reactive.
+        readonly property bool connected: {
+            switch (driveNr) {
+                case 0: return config.DF0_CONNECTED
+                case 1: return config.DF1_CONNECTED
+                case 2: return config.DF2_CONNECTED
+                case 3: return config.DF3_CONNECTED
+            }
+            return false
+        }
         readonly property bool hasDisk: amiga.media.driveHasDisk(driveNr)
         readonly property bool writeProtected: amiga.media.driveWriteProtected(driveNr)
 
@@ -236,7 +250,16 @@ SiMenuBar {
 
         required property int driveNr   // 0..3
 
-        readonly property bool connected: config.hdConnected(driveNr)
+        // Same staleness reason as DriveMenu.connected above.
+        readonly property bool connected: {
+            switch (driveNr) {
+                case 0: return config.HD0_CONNECTED
+                case 1: return config.HD1_CONNECTED
+                case 2: return config.HD2_CONNECTED
+                case 3: return config.HD3_CONNECTED
+            }
+            return false
+        }
         readonly property bool hasDisk: amiga.media.hdHasDisk(driveNr)
 
         SiMenuItem {
