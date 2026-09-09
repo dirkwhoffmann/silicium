@@ -36,6 +36,7 @@ RowLayout {
     property int rwidth: 0
     property int controlWidth: -1
     property int aspacing: Style.smallSpacing
+    property bool hide: false
     // Kept for subclasses/callers that want to tint their own background;
     // SiControl itself no longer draws one (see note below).
     property bool debug: Preferences.qtDebug
@@ -99,6 +100,7 @@ RowLayout {
         Layout.fillWidth: true
         Layout.alignment: Qt.AlignVCenter
         spacing: 0
+        opacity: root.hide ? 0 : 1
     }
 
     //

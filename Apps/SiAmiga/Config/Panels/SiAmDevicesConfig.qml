@@ -141,91 +141,91 @@ SettingsPage {
             size: root.sectionWidth
             rowSpacing: Style.smallSpacing
 
-            ConfigBox {
+            SiCheckBoxControl {
 
-                // Placeholder matching the connect checkbox's width below,
-                // so "DF0:" lines up with "DF1:"/"DF2:"/"DF3:" -- DF0 is
-                // always connected and has no checkbox of its own.
-                Item { Layout.preferredWidth: 24 }
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                l: "Df0:"
+                enabled: !root.locked
+                checked: true
+                hide: true
 
                 SiComboBoxControl {
 
-                    l: "DF0:"
-                    lwidth: root.labelWidth
-                    Layout.fillWidth: true
-                    enabled: !root.locked
                     model: root.driveTypeNames
                     currentIndex: config.DF0_TYPE
                     onCurrentIndexChanged: config.DF0_TYPE = currentIndex
+
+                    SiHelpButton {
+                        onClicked: root.help("")
+                    }
                 }
             }
 
-            ConfigBox {
+            SiCheckBoxControl {
 
-                SiCheckBoxControl {
-                    Layout.preferredWidth: 24
-                    enabled: !root.locked
-                    checked: config.DF1_CONNECTED
-                    onClicked: {
-                        config.DF1_CONNECTED = checked
-                        if (!checked) { config.DF2_CONNECTED = false; config.DF3_CONNECTED = false }
-                    }
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                l: "Df1:"
+                enabled: !root.locked
+                checked: config.DF1_CONNECTED
+                onClicked: {
+                    config.DF1_CONNECTED = checked
+                    if (!checked) { config.DF2_CONNECTED = false; config.DF3_CONNECTED = false }
                 }
 
                 SiComboBoxControl {
 
-                    l: "DF1:"
-                    lwidth: root.labelWidth
-                    Layout.fillWidth: true
-                    enabled: !root.locked && config.DF1_CONNECTED
                     model: root.driveTypeNames
                     currentIndex: config.DF1_TYPE
                     onCurrentIndexChanged: config.DF1_TYPE = currentIndex
+
+                    SiHelpButton { opacity: 0 }
                 }
             }
 
-            ConfigBox {
+            SiCheckBoxControl {
 
-                SiCheckBoxControl {
-                    Layout.preferredWidth: 24
-                    enabled: !root.locked && config.DF1_CONNECTED
-                    checked: config.DF2_CONNECTED
-                    onClicked: {
-                        config.DF2_CONNECTED = checked
-                        if (!checked) config.DF3_CONNECTED = false
-                    }
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                l: "Df2:"
+                enabled: !root.locked
+                checked: config.DF2_CONNECTED
+                onClicked: {
+                    config.DF2_CONNECTED = checked
+                    if (!checked) { config.DF3_CONNECTED = false }
                 }
 
                 SiComboBoxControl {
 
-                    l: "DF2:"
-                    lwidth: root.labelWidth
-                    Layout.fillWidth: true
                     enabled: !root.locked && config.DF2_CONNECTED
                     model: root.driveTypeNames
                     currentIndex: config.DF2_TYPE
                     onCurrentIndexChanged: config.DF2_TYPE = currentIndex
+
+                    SiHelpButton { opacity: 0 }
                 }
             }
 
-            ConfigBox {
+            SiCheckBoxControl {
 
-                SiCheckBoxControl {
-                    Layout.preferredWidth: 24
-                    enabled: !root.locked && config.DF2_CONNECTED
-                    checked: config.DF3_CONNECTED
-                    onClicked: config.DF3_CONNECTED = checked
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                l: "Df3:"
+                enabled: !root.locked
+                checked: config.DF3_CONNECTED
+                onClicked: {
+                    config.DF3_CONNECTED = checked
                 }
 
                 SiComboBoxControl {
 
-                    l: "DF3:"
-                    lwidth: root.labelWidth
-                    Layout.fillWidth: true
                     enabled: !root.locked && config.DF3_CONNECTED
                     model: root.driveTypeNames
                     currentIndex: config.DF3_TYPE
                     onCurrentIndexChanged: config.DF3_TYPE = currentIndex
+
+                    SiHelpButton { opacity: 0 }
                 }
             }
         }
