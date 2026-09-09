@@ -192,6 +192,16 @@ SiAmRenderer::visible() const
     auto hCenter = double(config->hCenter()) / 1000.0;
     auto vCenter = double(config->vCenter()) / 1000.0;
 
+    // MON_ZOOM overrides the H/V Zoom knobs with a fixed preset -- SiAmVideoConfig.qml
+    // disables those knobs whenever this isn't 0 (Custom), same as
+    // VideoSettings.swift's zoomAction/refresh.
+    switch (config->zoom()) {
+        case 1: hZoom = 1.0;   vZoom = 0.27;  break; // Narrow
+        case 2: hZoom = 0.747; vZoom = 0.032; break; // Wide
+        case 3: hZoom = 0.0;   vZoom = 0.0;   break; // Extreme
+        default: break;
+    }
+
     auto hscale = 1.0 - 0.2 * hZoom;
     auto vscale = 1.0 - 0.2 * vZoom;
     auto width = hscale * max.w;

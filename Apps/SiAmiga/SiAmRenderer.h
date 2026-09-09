@@ -78,14 +78,14 @@ class SiAmRenderer : public Renderer {
     TexRect largestVisibleNormalized() const override { return normalize(largestVisible()); }
 
     // Returns the visible texture area based on the zoom and center
-    // parameters (MON_HZOOM/MON_VZOOM/MON_HCENTER/MON_VCENTER). Ported from
-    // vAmiga's own GUI/Metal/TextureRect.swift, minus its MON_ZOOM preset
-    // switch (Narrow/Wide/Extreme) and MON_CENTER "AutoShift" mode: neither
-    // is exposed by SiAmVideoConfig.qml (matching the scope
-    // SiC64VideoConfig.qml already settled on -- see its own header
-    // comment), and AutoShift additionally needs a live DMA-debug/beam
-    // window (x1/y1/x2/y2, kept in sync via updateTextureRect(hstrt:...)
-    // on the Swift side) that nothing here tracks yet.
+    // parameters (MON_ZOOM/MON_HZOOM/MON_VZOOM/MON_CENTER/MON_HCENTER/
+    // MON_VCENTER). Ported from vAmiga's own GUI/Metal/TextureRect.swift,
+    // including its MON_ZOOM preset switch (Narrow/Wide/Extreme), but
+    // *not* MON_CENTER's "Automatic" (AutoShift) mode: that needs a live
+    // DMA-debug/beam window (x1/y1/x2/y2, kept in sync via
+    // updateTextureRect(hstrt:...) on the Swift side) that nothing here
+    // tracks yet, so MON_CENTER == 1 currently falls back to the same
+    // hCenter/vCenter formula as Custom (0) rather than truly auto-shifting.
     TexRect visible() const override;
     TexRect visibleNormalized() const override { return normalize(visible()); }
 

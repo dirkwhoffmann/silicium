@@ -159,14 +159,18 @@ SettingsPage {
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
 
-                model: [
-                    "Custom"
-                ]
+                // Tags match MON_ZOOM's raw values 1:1 (0 = Custom, i.e.
+                // the H/V Zoom knobs below apply; 1..3 = a fixed preset,
+                // same as VideoSettings.swift's zoomAction/refresh).
+                model: ["Custom", "Narrow", "Wide", "Extreme"]
+                currentIndex: config.MON_ZOOM
+                onCurrentIndexChanged: config.MON_ZOOM = currentIndex
             }
 
             VideoKnob {
 
                 text: "H ZOOM"
+                enabled: config.MON_ZOOM === 0
                 from: 0
                 to: 200
                 value: config.MON_HZOOM
@@ -176,6 +180,7 @@ SettingsPage {
             VideoKnob {
 
                 text: "V ZOOM"
+                enabled: config.MON_ZOOM === 0
                 from: 0
                 to: 200
                 value: config.MON_VZOOM
@@ -196,14 +201,18 @@ SettingsPage {
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
 
-                model: [
-                    "Custom"
-                ]
+                // Tags match MON_CENTER's raw values 1:1 (0 = Custom, i.e.
+                // the H/V Center knobs below apply; 1 = Automatic/AutoShift,
+                // same as VideoSettings.swift's centerAction/refresh).
+                model: ["Custom", "Automatic"]
+                currentIndex: config.MON_CENTER
+                onCurrentIndexChanged: config.MON_CENTER = currentIndex
             }
 
             VideoKnob {
 
                 text: "H CENTER"
+                enabled: config.MON_CENTER === 0
                 from: 0
                 to: 1000
                 value: config.MON_HCENTER
@@ -213,6 +222,7 @@ SettingsPage {
             VideoKnob {
 
                 text: "V CENTER"
+                enabled: config.MON_CENTER === 0
                 from: 0
                 to: 1000
                 value: config.MON_VCENTER
