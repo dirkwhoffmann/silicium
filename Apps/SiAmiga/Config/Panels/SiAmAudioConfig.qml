@@ -311,32 +311,12 @@ SettingsPage {
             }
 
             //
-            // Audio Filter
-            //
-
-            ConfigSection {
-
-                header: "AUDIO FILTER"
-                size: root.sectionWidth
-
-                SiComboBoxControl {
-
-                    l: "Filter:"
-                    lwidth: root.labelWidth
-                    controlWidth: root.comboWidth
-                    model: ["None", "A500", "A1000", "A1200", "Low", "LED", "High"]
-                    currentIndex: config.AUD_FILTER_TYPE
-                    onCurrentIndexChanged: config.AUD_FILTER_TYPE = currentIndex
-                }
-            }
-
-            //
             // Sampler
             //
 
             ConfigSection {
 
-                header: "SAMPLER"
+                header: "SAMPLING"
                 size: root.sectionWidth
 
                 SiComboBoxControl {
@@ -349,14 +329,16 @@ SettingsPage {
                     currentIndex: config.AUD_SAMPLING_METHOD
                     onCurrentIndexChanged: config.AUD_SAMPLING_METHOD = currentIndex
 
-                    HoverHandler { id: samplingHover }
+                    HoverHandler {
+                        id: samplingHover
+                    }
                     ToolTip.visible: samplingHover.hovered
                     ToolTip.delay: 500
                     ToolTip.text: samplingCombo.currentIndex === 0
                         ? "Selects the most recent sample from the ring buffer. Minimizes latency but may introduce jitter when the sample rate fluctuates."
                         : samplingCombo.currentIndex === 1
-                        ? "Picks the sample closest to the target timestamp. Improves timing accuracy over the latest-sample method but may still have minor mismatches."
-                        : "Computes a value between two neighboring samples for smoother output. Increases computation slightly but reduces artifacts and improves fidelity."
+                            ? "Picks the sample closest to the target timestamp. Improves timing accuracy over the latest-sample method but may still have minor mismatches."
+                            : "Computes a value between two neighboring samples for smoother output. Increases computation slightly but reduces artifacts and improves fidelity."
                 }
 
                 SiComboBoxControl {
@@ -368,7 +350,9 @@ SettingsPage {
                     currentIndex: config.AUD_ASR ? 1 : 0
                     onCurrentIndexChanged: config.AUD_ASR = currentIndex === 1
 
-                    HoverHandler { id: asrHover }
+                    HoverHandler {
+                        id: asrHover
+                    }
                     ToolTip.visible: asrHover.hovered
                     ToolTip.delay: 500
                     ToolTip.text: config.AUD_ASR
@@ -376,23 +360,39 @@ SettingsPage {
                         : "Synthesizes audio at a constant sampling rate, ignoring drift between emulated and real-time playback rates. This may cause buffer underflows and overflows over time, leading to audio stutter or glitches."
                 }
 
-                RowLayout {
+                SiSliderControl {
 
-                    Layout.fillWidth: true
-                    spacing: Style.smallSpacing
+                    l: "Capacity:"
+                    lwidth: root.labelWidth
+                    Layout.preferredWidth: root.comboWidth
+                    from: 512
+                    to: 65536
+                    value: config.AUD_BUFFER_SIZE
+                    onMoved: (value) => config.AUD_BUFFER_SIZE = Math.round(value)
+                }
 
-                    SiLabel { text: "Capacity:"; Layout.preferredWidth: root.labelWidth }
+                SiText {
+                    text: "%1 samples".arg(config.AUD_BUFFER_SIZE); color: Palette.secondary
+                }
+            }
 
-                    SiSliderControl {
+            //
+            // Audio Filter
+            //
 
-                        Layout.preferredWidth: root.comboWidth
-                        from: 512
-                        to: 65536
-                        value: config.AUD_BUFFER_SIZE
-                        onMoved: (value) => config.AUD_BUFFER_SIZE = Math.round(value)
-                    }
+            ConfigSection {
 
-                    SiText { text: "%1 samples".arg(config.AUD_BUFFER_SIZE); color: Palette.secondary }
+                header: "AUDIO FILTER"
+                size: root.sectionWidth
+
+                SiComboBoxControl {
+
+                    l: "Type:"
+                    lwidth: root.labelWidth
+                    controlWidth: root.comboWidth
+                    model: ["None", "A500", "A1000", "A1200", "Low", "LED", "High"]
+                    currentIndex: config.AUD_FILTER_TYPE
+                    onCurrentIndexChanged: config.AUD_FILTER_TYPE = currentIndex
                 }
             }
         }
