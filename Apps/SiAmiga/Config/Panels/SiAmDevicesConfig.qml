@@ -381,15 +381,15 @@ SettingsPage {
 
                 SiSliderControl {
 
-                    l: "Slow"
-                    r: "Fast"
+                    // l: "-"
+                    // r: "+"
                     from: 1
                     to: 25
                     enabled: config.JOY1_AUTOFIRE
                     value: config.JOY1_AUTOFIRE_DELAY
                     onMoved: (value) => root.setAutofireDelay(Math.round(value))
 
-                    SiHelpButton { onClicked: root.help("") }
+                    SiHelpButton { enabled: true; onClicked: root.help("") }
                 }
             }
 
