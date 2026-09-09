@@ -256,9 +256,7 @@ SettingsPage {
                     currentIndex: config.HD0_TYPE
                     onCurrentIndexChanged: config.HD0_TYPE = currentIndex
 
-                    SiHelpButton {
-                        onClicked: root.help("")
-                    }
+                    SiHelpButton { onClicked: root.help("") }
                 }
             }
 
@@ -368,12 +366,21 @@ SettingsPage {
 
                 l: "Auto-fire:"
                 lwidth: root.labelWidth
+                // SiCheckBoxControl overrides hasFlexControl to false, which
+                // is what makes accessoryContainer (holding the slider
+                // below) flex in the first place -- see SiControl.qml's
+                // 'Layout.fillWidth: !hasFlexControl' on it. But that same
+                // override also makes *this* row's own default
+                // Layout.fillWidth ('hasFlexControl') false, so without this
+                // override the whole row -- and the slider along with it --
+                // never grows past its natural size in the first place.
+                // Matches the SID2/SID3 rows in SiC64HardwareConfig.qml.
+                Layout.fillWidth: true
                 checked: config.JOY1_AUTOFIRE
                 onClicked: root.setAutofire(checked)
 
                 SiSliderControl {
 
-                    // Layout.fillWidth: true
                     l: "Slow"
                     r: "Fast"
                     from: 1
@@ -381,6 +388,8 @@ SettingsPage {
                     enabled: config.JOY1_AUTOFIRE
                     value: config.JOY1_AUTOFIRE_DELAY
                     onMoved: (value) => root.setAutofireDelay(Math.round(value))
+
+                    SiHelpButton { onClicked: root.help("") }
                 }
             }
 
