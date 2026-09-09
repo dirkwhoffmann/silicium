@@ -34,6 +34,7 @@ class SiAmRenderer : public Renderer {
     isize height = 0;
 
     QMetaObject::Connection m_frameConnection;
+    QMetaObject::Connection m_configConnection;
 
     Q_PROPERTY(
         SiAmController *controller READ getController WRITE setController NOTIFY controllerChanged)
@@ -72,18 +73,29 @@ class SiAmRenderer : public Renderer {
     TexRect entire() const override;
     TexRect entireNormalized() const override { return normalize(entire()); }
 
-    // The stub has no zoom/pan configuration yet (see C64Controller's
-    // SiC64ConfigController for what that eventually looks like), so both of
-    // these are the same as entire() for now.
-    TexRect largestVisible() const override { return entire(); }
-    TexRect largestVisibleNormalized() const override { return entireNormalized(); }
+    // Returns the largest visible texture area (excluding HBLANK and VBLANK)
+    TexRect largestVisible() const override;
+    TexRect largestVisibleNormalized() const override { return normalize(largestVisible()); }
 
-    TexRect visible() const override { return entire(); }
-    TexRect visibleNormalized() const override { return entireNormalized(); }
+    // Returns the visible texture area based on the zoom and center
+    // parameters (MON_HZOOM/MON_VZOOM/MON_HCENTER/MON_VCENTER). Ported from
+    // vAmiga's own GUI/Metal/TextureRect.swift, minus its MON_ZOOM preset
+    // switch (Narrow/Wide/Extreme) and MON_CENTER "AutoShift" mode: neither
+    // is exposed by SiAmVideoConfig.qml (matching the scope
+    // SiC64VideoConfig.qml already settled on -- see its own header
+    // comment), and AutoShift additionally needs a live DMA-debug/beam
+    // window (x1/y1/x2/y2, kept in sync via updateTextureRect(hstrt:...)
+    // on the Swift side) that nothing here tracks yet.
+    TexRect visible() const override;
+    TexRect visibleNormalized() const override { return normalize(visible()); }
 
   private:
 
     TexRect normalize(TexRect rect) const;
+
+    // Recomputes the cutout from visible(). Called on every config change,
+    // and once from start(). Mirrors SiC64Renderer::updateTextureCutout().
+    void updateTextureCutout();
 
 
     //

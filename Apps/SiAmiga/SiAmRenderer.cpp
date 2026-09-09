@@ -28,6 +28,16 @@ SiAmRenderer::setController(SiAmController *ptr)
     if (controller != ptr) {
 
         controller = ptr;
+
+        // Track the monitor's zoom and center options
+        if (m_configConnection) disconnect(m_configConnection);
+        if (controller) {
+            m_configConnection = connect(controller->getConfigController(),
+                                         &SiAmConfigController::configChanged,
+                                         this,
+                                         &SiAmRenderer::updateTextureCutout);
+        }
+
         emit controllerChanged();
     }
 }
@@ -40,13 +50,7 @@ SiAmRenderer::start()
     width = texWidth;
     height = texHeight;
 
-    // No zoom/pan configuration yet (see the header) -- the cutout is just
-    // the entire texture.
-    auto rect = entire();
-    x = rect.x;
-    y = rect.y;
-    w = rect.w;
-    h = rect.h;
+    updateTextureCutout();
 
     // Get the refresh rate and pass it to the core
     if (auto screen = window() ? window()->screen() : nullptr) {
@@ -158,6 +162,60 @@ TexRect
 SiAmRenderer::entire() const
 {
     return { 0, 0, double(texWidth), double(texHeight) };
+}
+
+TexRect
+SiAmRenderer::largestVisible() const
+{
+    if (!controller) return entire();
+
+    bool pal = controller->core().agnus.getTraits().isPAL;
+
+    auto x1 = 8.0 * vamiga::HBLANK_CNT;
+    auto x2 = 8.0 * vamiga::PAL::HPOS_CNT;
+    auto y1 = double(pal ? vamiga::PAL::VBLANK_CNT : vamiga::NTSC::VBLANK_CNT);
+    auto y2 = double(pal ? vamiga::PAL::VPOS_CNT : vamiga::NTSC::VPOS_CNT);
+
+    return TexRect { .x = x1, .y = y1, .w = x2 - x1, .h = y2 - y1 - 1 };
+}
+
+TexRect
+SiAmRenderer::visible() const
+{
+    if (!controller) return entire();
+
+    auto *config = controller->getConfigController();
+    auto max = largestVisible();
+
+    auto hZoom = double(config->hZoom()) / 1000.0;
+    auto vZoom = double(config->vZoom()) / 1000.0;
+    auto hCenter = double(config->hCenter()) / 1000.0;
+    auto vCenter = double(config->vCenter()) / 1000.0;
+
+    auto hscale = 1.0 - 0.2 * hZoom;
+    auto vscale = 1.0 - 0.2 * vZoom;
+    auto width = hscale * max.w;
+    auto height = vscale * max.h;
+
+    auto bw = max.x + hCenter * (max.w - width);
+    auto bh = max.y + vCenter * (max.h - height);
+
+    return TexRect { .x = bw, .y = bh, .w = width, .h = height };
+}
+
+void
+SiAmRenderer::updateTextureCutout()
+{
+    if (!controller) return;
+
+    auto rect = visible();
+    x = rect.x;
+    y = rect.y;
+    w = rect.w;
+    h = rect.h;
+
+    // Repaint even if the render loop isn't running
+    update();
 }
 
 TexRect
