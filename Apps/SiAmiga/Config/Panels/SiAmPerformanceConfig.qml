@@ -14,9 +14,12 @@ import Silicium.Controllers
 import Silicium.Theme
 
 // Port of vAmiga's own GUI/Settings/ViewControllers/PerformanceSettings.swift.
-// A plain two-column form (Warp mode/Threading on the left, Speed Boosters/
-// Compression on the right), matching SiAmDevicesConfig.qml's flat layout
-// rather than SiC64PerformanceConfig's ConfigSection cards.
+// ConfigGrid/ConfigSection cards, one per group, matching
+// SiAmDevicesConfig's/SiAmHardwareConfig's layout -- Warp Mode, Speed
+// Boosters, Threading, Compression, in that order so the row-major
+// 2-column grid keeps Warp Mode/Threading on the left and Speed
+// Boosters/Compression on the right, the same grouping the old
+// two-column form had.
 //
 // "Put idle CIAs to sleep" broadcasts CIA_A_IDLE_SLEEP/CIA_B_IDLE_SLEEP
 // together, mirroring Configuration.swift's own ciaIdleSleep wrapper (get
@@ -32,6 +35,7 @@ SettingsPage {
     readonly property var config: controller.configController
 
     readonly property int labelWidth: 160
+    readonly property int sectionWidth: 320
 
     // Configuration.swift's ciaIdleSleep wrapper reads/writes both chips at
     // once -- see the class comment.
@@ -55,152 +59,127 @@ SettingsPage {
         }
     }
 
-    RowLayout {
+    ConfigGrid {
 
-        Layout.fillWidth: true
-        spacing: Style.largeSpacing * 2
+        id: grid
 
         //
-        // Left column: Warp mode, Threading
+        // Warp Mode
         //
 
-        ColumnLayout {
+        ConfigSection {
 
-            Layout.fillWidth: true
-            spacing: Style.smallSpacing
+            header: "Warp Mode"
+            size: root.sectionWidth
 
-            SiText { text: "Warp mode"; font.bold: true; font.pixelSize: Style.large }
-
-            GridLayout {
-
-                columns: 2
-                columnSpacing: Style.smallSpacing
-                rowSpacing: Style.mediumSpacing
-
-                SiLabel { text: "Activation:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
-                SiComboBoxControl {
-                    Layout.fillWidth: true
-                    model: ["During disk activity", "Never", "Always"]
-                    currentIndex: config.AMIGA_WARP_MODE
-                    onCurrentIndexChanged: config.AMIGA_WARP_MODE = currentIndex
-                }
-
-                SiLabel { text: "Boot in warp mode for"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
-                SiNumberInputControl {
-                    Layout.fillWidth: true
-                    r: "seconds"
-                    controlWidth: 48
-                    intValue: config.AMIGA_WARP_BOOT
-                    onValueEdited: (value) => config.AMIGA_WARP_BOOT = value
-                }
+            SiComboBoxControl {
+                l: "Activation:"
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                model: ["During disk activity", "Never", "Always"]
+                currentIndex: config.AMIGA_WARP_MODE
+                onCurrentIndexChanged: config.AMIGA_WARP_MODE = currentIndex
             }
 
-            VSpacer { size: Style.largeSpacing * 2 }
-
-            SiText { text: "Threading"; font.bold: true; font.pixelSize: Style.large }
-
-            GridLayout {
-
-                columns: 2
-                columnSpacing: Style.smallSpacing
-                rowSpacing: Style.mediumSpacing
-
-                SiLabel { text: "Sync mode:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
-                SiCheckBoxControl {
-                    r: "VSYNC"
-                    checked: config.AMIGA_VSYNC
-                    onClicked: config.AMIGA_VSYNC = checked
-                }
-
-                SiLabel { text: "Speed:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: Style.smallSpacing
-                    SiSliderControl {
-                        Layout.fillWidth: true
-                        enabled: !config.AMIGA_VSYNC
-                        from: 50
-                        to: 200
-                        stepSize: 5
-                        snapMode: Slider.SnapAlways
-                        value: config.AMIGA_SPEED_BOOST
-                        onMoved: (value) => config.AMIGA_SPEED_BOOST = value
-                    }
-                    SiText { text: "%1 %".arg(config.AMIGA_SPEED_BOOST); color: config.AMIGA_VSYNC ? Palette.tertiary : Palette.primary }
-                }
-
-                SiLabel { text: config.AMIGA_RUN_AHEAD < 0 ? "Run behind:" : "Run ahead:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: Style.smallSpacing
-                    SiSliderControl {
-                        Layout.fillWidth: true
-                        from: -7
-                        to: 7
-                        value: config.AMIGA_RUN_AHEAD
-                        onMoved: (value) => config.AMIGA_RUN_AHEAD = value
-                    }
-                    SiText { text: "%1 frames".arg(Math.abs(config.AMIGA_RUN_AHEAD)) }
-                }
+            SiNumberInputControl {
+                l: "Boot in warp mode for"
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                r: "seconds"
+                controlWidth: 48
+                intValue: config.AMIGA_WARP_BOOT
+                onValueEdited: (value) => config.AMIGA_WARP_BOOT = value
             }
-
-            VSpacer { }
         }
 
         //
-        // Right column: Speed Boosters, Compression
+        // Speed Boosters
         //
 
-        ColumnLayout {
+        ConfigSection {
 
-            Layout.fillWidth: true
-            spacing: Style.smallSpacing
+            header: "Speed Boosters"
+            size: root.sectionWidth
 
-            SiText { text: "Speed Boosters"; font.bold: true; font.pixelSize: Style.large }
-
-            ColumnLayout {
-
-                spacing: Style.mediumSpacing
-
-                SiCheckBoxControl {
-                    r: "Put idle CIAs to sleep"
-                    checked: config.CIA_A_IDLE_SLEEP
-                    onClicked: root.setCiaIdleSleep(checked)
-                }
-
-                SiCheckBoxControl {
-                    r: "Put idle audio backend to sleep"
-                    checked: config.AUD_FASTPATH
-                    onClicked: config.AUD_FASTPATH = checked
-                }
-
-                SiCheckBoxControl {
-                    r: "Reduce frame rate in warp mode"
-                    checked: config.DENISE_FRAME_SKIPPING > 0
-                    onClicked: config.DENISE_FRAME_SKIPPING = checked ? 16 : 0
-                }
+            SiCheckBoxControl {
+                r: "Put idle CIAs to sleep"
+                checked: config.CIA_A_IDLE_SLEEP
+                onClicked: root.setCiaIdleSleep(checked)
             }
 
-            VSpacer { size: Style.largeSpacing * 2 }
-
-            SiText { text: "Compression"; font.bold: true; font.pixelSize: Style.large }
-
-            GridLayout {
-
-                columns: 2
-                columnSpacing: Style.smallSpacing
-                rowSpacing: Style.mediumSpacing
-
-                SiLabel { text: "Workspaces:"; horizontalAlignment: Text.AlignRight; Layout.preferredWidth: root.labelWidth }
-                SiComboBoxControl {
-                    Layout.fillWidth: true
-                    model: ["Off", "On"]
-                    currentIndex: config.AMIGA_WS_COMPRESSION ? 1 : 0
-                    onCurrentIndexChanged: config.AMIGA_WS_COMPRESSION = currentIndex === 1
-                }
+            SiCheckBoxControl {
+                r: "Put idle audio backend to sleep"
+                checked: config.AUD_FASTPATH
+                onClicked: config.AUD_FASTPATH = checked
             }
 
-            VSpacer { }
+            SiCheckBoxControl {
+                r: "Reduce frame rate in warp mode"
+                checked: config.DENISE_FRAME_SKIPPING > 0
+                onClicked: config.DENISE_FRAME_SKIPPING = checked ? 16 : 0
+            }
+        }
+
+        //
+        // Threading
+        //
+
+        ConfigSection {
+
+            header: "Threading"
+            size: root.sectionWidth
+
+            SiCheckBoxControl {
+                l: "Sync mode:"
+                lwidth: root.labelWidth
+                r: "VSYNC"
+                checked: config.AMIGA_VSYNC
+                onClicked: config.AMIGA_VSYNC = checked
+            }
+
+            SiSliderControl {
+                l: "Speed:"
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                r: "%1 %".arg(config.AMIGA_SPEED_BOOST)
+                enabled: !config.AMIGA_VSYNC
+                from: 50
+                to: 200
+                stepSize: 5
+                snapMode: Slider.SnapAlways
+                value: config.AMIGA_SPEED_BOOST
+                onMoved: (value) => config.AMIGA_SPEED_BOOST = value
+            }
+
+            SiSliderControl {
+                l: config.AMIGA_RUN_AHEAD < 0 ? "Run behind:" : "Run ahead:"
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                r: "%1 frames".arg(Math.abs(config.AMIGA_RUN_AHEAD))
+                from: -7
+                to: 7
+                value: config.AMIGA_RUN_AHEAD
+                onMoved: (value) => config.AMIGA_RUN_AHEAD = value
+            }
+        }
+
+        //
+        // Compression
+        //
+
+        ConfigSection {
+
+            header: "Compression"
+            size: root.sectionWidth
+
+            SiComboBoxControl {
+                l: "Workspaces:"
+                lwidth: root.labelWidth
+                Layout.fillWidth: true
+                model: ["Off", "On"]
+                currentIndex: config.AMIGA_WS_COMPRESSION ? 1 : 0
+                onCurrentIndexChanged: config.AMIGA_WS_COMPRESSION = currentIndex === 1
+            }
         }
     }
 }
