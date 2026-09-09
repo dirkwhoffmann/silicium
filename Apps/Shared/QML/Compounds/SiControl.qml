@@ -48,6 +48,16 @@ RowLayout {
     property bool hasFlexControl: controlWidth === -1
     readonly property bool hasAccessories: accessoryContainer.children.length > 0 // accessoryContainer.visible
 
+    // Gates the label(s) and the primary control, but not the accessories
+    // (e.g. a help button nested via the default 'accessories' property).
+    // Plain Item.enabled cascades to every descendant with no way for a
+    // child to opt back in -- Qt Quick computes the effective enabled state
+    // as the AND of the whole ancestor chain -- so a caller that disabled
+    // this whole control via 'enabled' would take an embedded help button
+    // down with it. Use 'controlEnabled' instead of 'enabled' wherever an
+    // accessory needs to stay live while the control itself is locked.
+    property bool controlEnabled: true
+
     // signal helpClicked()
 
     spacing: 0
@@ -79,7 +89,7 @@ RowLayout {
         id: leftText
         size: root.size
         visible: text !== "" || lwidth > 0
-        enabled: root.enabled
+        enabled: root.controlEnabled
         text: ""
         horizontalAlignment: Text.AlignRight
         Layout.preferredWidth: root.lwidth === 0 ? leftText.implicitWidth : root.lwidth
@@ -101,6 +111,7 @@ RowLayout {
         Layout.alignment: Qt.AlignVCenter
         spacing: 0
         opacity: root.hide ? 0 : 1
+        enabled: root.controlEnabled
     }
 
     //
@@ -112,7 +123,7 @@ RowLayout {
         id: rightText
         size: root.size
         visible: text !== ""
-        enabled: root.enabled
+        enabled: root.controlEnabled
         text: ""
         Layout.preferredWidth: root.rwidth === 0 ? rightText.implicitWidth : root.rwidth
         Layout.alignment: Qt.AlignVCenter

@@ -146,19 +146,17 @@ SettingsPage {
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 l: "Df0:"
-                enabled: !root.locked
+                controlEnabled: !root.locked
                 checked: true
                 hide: true
 
                 SiComboBoxControl {
 
+                    controlEnabled: !root.locked
                     model: root.driveTypeNames
                     currentIndex: config.DF0_TYPE
                     onCurrentIndexChanged: config.DF0_TYPE = currentIndex
-
-                    SiHelpButton {
-                        onClicked: root.help("")
-                    }
+                    SiHelpButton { onClicked: root.help("") }
                 }
             }
 
@@ -167,7 +165,7 @@ SettingsPage {
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 l: "Df1:"
-                enabled: !root.locked
+                controlEnabled: !root.locked
                 checked: config.DF1_CONNECTED
                 onClicked: {
                     config.DF1_CONNECTED = checked
@@ -176,10 +174,10 @@ SettingsPage {
 
                 SiComboBoxControl {
 
+                    controlEnabled: !root.locked
                     model: root.driveTypeNames
                     currentIndex: config.DF1_TYPE
                     onCurrentIndexChanged: config.DF1_TYPE = currentIndex
-
                     SiHelpButton { opacity: 0 }
                 }
             }
@@ -189,7 +187,7 @@ SettingsPage {
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 l: "Df2:"
-                enabled: !root.locked
+                controlEnabled: !root.locked
                 checked: config.DF2_CONNECTED
                 onClicked: {
                     config.DF2_CONNECTED = checked
@@ -198,7 +196,7 @@ SettingsPage {
 
                 SiComboBoxControl {
 
-                    enabled: !root.locked && config.DF2_CONNECTED
+                    controlEnabled: !root.locked && config.DF2_CONNECTED
                     model: root.driveTypeNames
                     currentIndex: config.DF2_TYPE
                     onCurrentIndexChanged: config.DF2_TYPE = currentIndex
@@ -212,7 +210,7 @@ SettingsPage {
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 l: "Df3:"
-                enabled: !root.locked
+                controlEnabled: !root.locked
                 checked: config.DF3_CONNECTED
                 onClicked: {
                     config.DF3_CONNECTED = checked
@@ -220,11 +218,10 @@ SettingsPage {
 
                 SiComboBoxControl {
 
-                    enabled: !root.locked && config.DF3_CONNECTED
+                    controlEnabled: !root.locked && config.DF3_CONNECTED
                     model: root.driveTypeNames
                     currentIndex: config.DF3_TYPE
                     onCurrentIndexChanged: config.DF3_TYPE = currentIndex
-
                     SiHelpButton { opacity: 0 }
                 }
             }
@@ -245,17 +242,16 @@ SettingsPage {
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 l: "Hd0:"
-                enabled: !root.locked
+                controlEnabled: !root.locked
                 checked: config.HD0_CONNECTED
                 onClicked: config.HD0_CONNECTED = checked
 
                 SiComboBoxControl {
 
-                    enabled: !root.locked && config.HD0_CONNECTED
+                    controlEnabled: !root.locked && config.HD0_CONNECTED
                     model: root.hdTypeNames
                     currentIndex: config.HD0_TYPE
                     onCurrentIndexChanged: config.HD0_TYPE = currentIndex
-
                     SiHelpButton { onClicked: root.help("") }
                 }
             }
@@ -265,17 +261,16 @@ SettingsPage {
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 l: "Hd1:"
-                enabled: !root.locked
+                controlEnabled: !root.locked
                 checked: config.HD1_CONNECTED
                 onClicked: config.HD1_CONNECTED = checked
 
                 SiComboBoxControl {
 
-                    enabled: !root.locked && config.HD1_CONNECTED
+                    controlEnabled: !root.locked && config.HD1_CONNECTED
                     model: root.hdTypeNames
                     currentIndex: config.HD1_TYPE
                     onCurrentIndexChanged: config.HD1_TYPE = currentIndex
-
                     SiHelpButton { opacity: 0 }
                 }
             }
@@ -285,7 +280,7 @@ SettingsPage {
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 l: "Hd2:"
-                enabled: !root.locked
+                controlEnabled: !root.locked
                 checked: config.HD2_CONNECTED
                 onClicked: config.HD2_CONNECTED = checked
 
@@ -295,7 +290,6 @@ SettingsPage {
                     model: root.hdTypeNames
                     currentIndex: config.HD2_TYPE
                     onCurrentIndexChanged: config.HD2_TYPE = currentIndex
-
                     SiHelpButton { opacity: 0 }
                 }
             }
@@ -305,7 +299,7 @@ SettingsPage {
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 l: "Hd3:"
-                enabled: !root.locked
+                controlEnabled: !root.locked
                 checked: config.HD3_CONNECTED
                 onClicked: config.HD3_CONNECTED = checked
 
@@ -315,7 +309,6 @@ SettingsPage {
                     model: root.hdTypeNames
                     currentIndex: config.HD3_TYPE
                     onCurrentIndexChanged: config.HD3_TYPE = currentIndex
-
                     SiHelpButton { opacity: 0 }
                 }
             }
@@ -337,8 +330,7 @@ SettingsPage {
                 Layout.fillWidth: true
                 model: ["No device"]
                 currentIndex: 0
-
-                SiHelpButton { opacity: 0 }
+                SiHelpButton { onClicked: root.help("") }
             }
 
             SiComboBoxControl {
@@ -348,7 +340,6 @@ SettingsPage {
                 Layout.fillWidth: true
                 model: ["No device"]
                 currentIndex: 0
-
                 SiHelpButton { opacity: 0 }
             }
         }
@@ -385,11 +376,10 @@ SettingsPage {
                     // r: "+"
                     from: 1
                     to: 25
-                    enabled: config.JOY1_AUTOFIRE
+                    controlEnabled: config.JOY1_AUTOFIRE
                     value: config.JOY1_AUTOFIRE_DELAY
                     onMoved: (value) => root.setAutofireDelay(Math.round(value))
-
-                    SiHelpButton { enabled: true; onClicked: root.help("") }
+                    SiHelpButton { onClicked: root.help("") }
                 }
             }
 
@@ -400,15 +390,20 @@ SettingsPage {
                 checked: config.JOY1_AUTOFIRE_BURSTS
                 onClicked: root.setAutofireBursts(checked)
 
+                Layout.fillWidth: true
+
                 SiNumberInputControl {
 
                     Layout.fillWidth: true
-                    enabled: config.JOY1_AUTOFIRE_BURSTS
+                    controlEnabled: config.JOY1_AUTOFIRE_BURSTS
                     r: "bullets per burst"
                     controlWidth: 48
                     intValue: config.JOY1_AUTOFIRE_BULLETS
                     onValueEdited: (value) => root.setAutofireBullets(value)
                 }
+
+                HSpacer {}
+                SiHelpButton { onClicked: root.help("") }
             }
         }
 
@@ -429,32 +424,7 @@ SettingsPage {
                 model: root.serialDeviceNames
                 currentIndex: config.SER_DEVICE
                 onCurrentIndexChanged: config.SER_DEVICE = currentIndex
-
-                SiHelpButton { opacity: 0 }
-            }
-
-            SiComboBoxControl {
-
-                l: "MIDI Out:"
-                lwidth: root.labelWidth
-                Layout.fillWidth: true
-                visible: config.SER_DEVICE === 5
-                model: ["None"]
-                currentIndex: 0
-
-                SiHelpButton { opacity: 0 }
-            }
-
-            SiComboBoxControl {
-
-                l: "MIDI In:"
-                lwidth: root.labelWidth
-                Layout.fillWidth: true
-                visible: config.SER_DEVICE === 5
-                model: ["None"]
-                currentIndex: 0
-
-                SiHelpButton { opacity: 0 }
+                SiHelpButton { onClicked: root.help("") }
             }
         }
     }
