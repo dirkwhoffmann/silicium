@@ -13,23 +13,6 @@ import QtQuick.Layouts
 import Silicium.Controllers
 import Silicium.Theme
 
-// Port of vAmiga's own GUI/Settings/ViewControllers/CompatibilitySettings.swift.
-// ConfigGrid/ConfigSection cards, matching SiAmHardwareConfig's/
-// SiAmDevicesConfig's layout -- Floppy Drives, Chipset Features, Keyboard,
-// Timing, Blitter Accuracy, Sprites, in that order so the row-major
-// 2-column grid keeps Floppy Drives/Keyboard/Blitter Accuracy on the left
-// and Chipset Features/Timing/Sprites on the right, the same grouping the
-// Swift panel's own layout has.
-//
-// None of these options are gated behind ConfigLock/isPoweredOff -- unlike
-// Agnus/Ram/RTC on the Hardware panel, none of DiskController/Blitter/
-// CIA/Denise/Agnus's checkOption() implementations guard these particular
-// options on isPoweredOff(), so nothing here needs 'locked'/'controlEnabled'.
-//
-// "Emulate TOD bug" and "Sync CIA accesses with E-clock" broadcast across
-// both CIA chips at once, mirroring Configuration.swift's own todBug/
-// eClockSyncing wrappers (get CiaA, set both) -- same pattern as
-// SiAmPerformanceConfig's setCiaIdleSleep.
 SettingsPage {
 
     id: root
@@ -83,6 +66,7 @@ SettingsPage {
             size: root.sectionWidth
 
             SiComboBoxControl {
+
                 l: "Speed:"
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -92,6 +76,7 @@ SettingsPage {
             }
 
             SiCheckBoxControl {
+
                 lwidth: root.labelWidth
                 r: "Emulate mechanical delays"
                 checked: config.DRIVE_MECHANICS
@@ -99,6 +84,7 @@ SettingsPage {
             }
 
             SiCheckBoxControl {
+
                 l: "Piracy:"
                 lwidth: root.labelWidth
                 r: "Ignore writes to DSKSYNC"
@@ -107,6 +93,7 @@ SettingsPage {
             }
 
             SiCheckBoxControl {
+
                 lwidth: root.labelWidth
                 r: "Always find a SYNC mark"
                 checked: config.DC_AUTO_DSKSYNC
@@ -124,18 +111,21 @@ SettingsPage {
             size: root.sectionWidth
 
             SiCheckBoxControl {
+
                 r: "Emulate Slow Ram mirror"
                 checked: config.MEM_SLOW_RAM_MIRROR
                 onClicked: config.MEM_SLOW_RAM_MIRROR = checked
             }
 
             SiCheckBoxControl {
+
                 r: "Emulate TOD bug"
                 checked: config.CIA_A_TODBUG !== 0
                 onClicked: root.setCiaTodBug(checked)
             }
 
             SiCheckBoxControl {
+
                 r: "Emulate dropped register writes"
                 checked: config.AGNUS_PTR_DROPS
                 onClicked: config.AGNUS_PTR_DROPS = checked
@@ -152,6 +142,9 @@ SettingsPage {
             size: root.sectionWidth
 
             SiCheckBoxControl {
+
+                l: "Protocol:"
+                lwidth: root.labelWidth
                 r: "Transmit keycodes bit by bit"
                 checked: config.KBD_ACCURACY
                 onClicked: config.KBD_ACCURACY = checked
@@ -168,12 +161,14 @@ SettingsPage {
             size: root.sectionWidth
 
             SiCheckBoxControl {
+
                 r: "Sync CIA accesses with E-clock"
                 checked: config.CIA_A_ECLOCK_SYNCING
                 onClicked: root.setCiaEClockSyncing(checked)
             }
 
             SiCheckBoxControl {
+                
                 r: "Emulate Slow Ram bus delays"
                 checked: config.MEM_SLOW_RAM_DELAY
                 onClicked: config.MEM_SLOW_RAM_DELAY = checked
@@ -189,24 +184,34 @@ SettingsPage {
             header: "Blitter Accuracy"
             size: root.sectionWidth
 
-            GridLayout {
+            // The tick numbers and the two descriptive labels need
+            // independent vertical offsets (numbers at 0%/50%/100% of the
+            // slider's travel, descriptions at 25%/75%, in between) -- a
+            // GridLayout only has whole rows shared by every column, so it
+            // can't shift one side against the other. Positioning both
+            // sides directly off bltSlider.height instead can.
+            RowLayout {
 
                 Layout.fillWidth: true
-                columns: 3
-                columnSpacing: Style.smallSpacing
-                rowSpacing: Style.mediumSpacing
+                spacing: Style.smallSpacing
 
-                SiLabel { text: "2"; Layout.row: 0; Layout.column: 0; Layout.alignment: Qt.AlignHCenter }
+                Item {
+
+                    Layout.preferredWidth: tick2.implicitWidth
+                    Layout.preferredHeight: bltSlider.height
+                    Layout.alignment: Qt.AlignVCenter
+
+                    SiLabel { id: tick2; text: "2"; anchors.horizontalCenter: parent.horizontalCenter; y: 0 }
+                    SiLabel { text: "1"; anchors.horizontalCenter: parent.horizontalCenter; y: (parent.height - height) / 2 }
+                    SiLabel { text: "0"; anchors.horizontalCenter: parent.horizontalCenter; y: parent.height - height }
+                }
 
                 SiSlider {
 
                     id: bltSlider
                     orientation: Qt.Vertical
-                    Layout.row: 0
-                    Layout.column: 1
-                    Layout.rowSpan: 3
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredHeight: 90
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredHeight: 60
                     from: 0
                     to: 2
                     stepSize: 1
@@ -215,20 +220,23 @@ SettingsPage {
                     onMoved: config.BLITTER_ACCURACY = value
                 }
 
-                SiLabel { text: "1"; Layout.row: 1; Layout.column: 0; Layout.alignment: Qt.AlignHCenter }
-                SiLabel {
-                    text: "Move data word by word"
-                    Layout.row: 1
-                    Layout.column: 2
-                    color: config.BLITTER_ACCURACY >= 1 ? Palette.primary : Palette.tertiary
-                }
+                Item {
 
-                SiLabel { text: "0"; Layout.row: 2; Layout.column: 0; Layout.alignment: Qt.AlignHCenter }
-                SiLabel {
-                    text: "Use up bus cycles"
-                    Layout.row: 2
-                    Layout.column: 2
-                    color: config.BLITTER_ACCURACY >= 2 ? Palette.primary : Palette.tertiary
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: bltSlider.height
+                    Layout.alignment: Qt.AlignVCenter
+
+                    SiLabel {
+                        text: "Move data word by word"
+                        y: bltSlider.height * 0.25 - height / 2
+                        color: config.BLITTER_ACCURACY >= 2 ? Palette.primary : Palette.tertiary
+                    }
+
+                    SiLabel {
+                        text: "Use up bus cycles"
+                        y: bltSlider.height * 0.75 - height / 2
+                        color: config.BLITTER_ACCURACY >= 1 ? Palette.primary : Palette.tertiary
+                    }
                 }
             }
         }
