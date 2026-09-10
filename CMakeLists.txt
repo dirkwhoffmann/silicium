@@ -19,6 +19,7 @@ find_package(Qt6 COMPONENTS
         QuickControls2
         QuickDialogs2
         QuickEffects
+        ShaderTools
         REQUIRED)
 
 qt_standard_project_setup()

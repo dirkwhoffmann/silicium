@@ -10,10 +10,11 @@
 #include "SiAmRenderer.h"
 #include "Logger.h"
 #include "Constants.h"
+#include "SiAmMergeNode.h"
 #include "VAmiga.h"
 
 #include <QQuickWindow>
-#include <QSGSimpleTextureNode>
+#include <QSGTexture>
 
 static constexpr isize texWidth  = 2 * vamiga::HPIXELS;
 static constexpr isize texHeight = vamiga::VPIXELS;
@@ -42,9 +43,6 @@ void
 SiAmRenderer::start()
 {
     LogTask task("Starting renderer...");
-
-    width = texWidth;
-    height = texHeight;
 
     updateTextureCutout();
 
@@ -105,37 +103,141 @@ SiAmRenderer::tick()
     controller->getDeniseController()->tick();
     controller->getPortController()->tick();
 
-    // Update texture
-    core.videoPort.lockTexture();
-    tex = const_cast<u32 *>(core.videoPort.getTexture());
-    core.videoPort.unlockTexture();
+    // Grab the current frame
+    updateTexture();
 
     // Let the emulator compute the next frame
     core.wakeUp();
 }
 
+void
+SiAmRenderer::updateTexture()
+{
+    auto &core = controller->core();
+
+    isize nr = 0;
+    bool lof = true;
+    bool prevlof = true;
+
+    // Prevent the stable texture from changing
+    core.videoPort.lockTexture();
+
+    if (auto *buffer = core.videoPort.getTexture(&nr, &lof, &prevlof)) {
+
+        currLOF = lof;
+        prevLOF = prevlof;
+
+        // Check for duplicated or dropped frames
+        if (nr != prevNr + 1) {
+            // qCDebug(siLog) << "Frame sync mismatch (" << prevNr << "->" << nr << ")";
+        }
+        prevNr = nr;
+
+        /* Copy the frame out rather than holding on to the emulator's own
+         * buffer: the upload happens later, on the render thread, long after
+         * the lock is gone. The copy is deep and handed over whole, so the
+         * texture built from it keeps its own reference and this never has
+         * to be written in place behind the GPU's back.
+         */
+        QImage frame(reinterpret_cast<const uchar *>(buffer),
+                     (int)texWidth, (int)texHeight, QImage::Format_ARGB32);
+
+        if (currLOF) {
+            lfImage = frame.copy();
+            lfDirty = true;
+        } else {
+            sfImage = frame.copy();
+            sfDirty = true;
+        }
+    }
+
+    // Release the texture lock
+    core.videoPort.unlockTexture();
+
+    /* Work out how bright each field is drawn. Only interlaced frames can
+     * flicker -- a non-interlaced picture is carried by a single field, so
+     * dimming every other one would just make the whole screen pulse.
+     * Mirrors the merge-uniform half of Canvas.makeCommandBuffer().
+     */
+    auto *config = controller->getConfigController();
+
+    if (currLOF != prevLOF && config->flicker()) {
+
+        auto weight = 1.0f - float(config->flickerWeight()) / 1000.0f;
+        longFrameScale = (flickerCnt % 4 >= 2) ? 1.0f : weight;
+        shortFrameScale = (flickerCnt % 4 >= 2) ? weight : 1.0f;
+        flickerCnt++;
+
+    } else {
+
+        longFrameScale = 1.0f;
+        shortFrameScale = 1.0f;
+    }
+}
+
 QSGNode *
 SiAmRenderer::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
 {
-    if (!tex || width <= 0 || height <= 0) {
+    if (lfImage.isNull() && sfImage.isNull()) {
         delete node;
         return nullptr;
     }
 
-    auto *textureNode = static_cast<QSGSimpleTextureNode *>(node);
-    if (!textureNode) {
-        textureNode = new QSGSimpleTextureNode();
-        textureNode->setOwnsTexture(true);
+    auto *mergeNode = static_cast<SiAmMergeNode *>(node);
+    if (!mergeNode) mergeNode = new SiAmMergeNode();
+
+    // Upload whichever fields have been refilled since the last paint. Only
+    // one of them changes per frame, so the other one's texture survives --
+    // which is the whole point, since interlace needs the previous frame's
+    // opposite field to still be around.
+    if (lfDirty) {
+        lfDirty = false;
+        mergeNode->setLongFrameTexture(window()->createTextureFromImage(lfImage));
+    }
+    if (sfDirty) {
+        sfDirty = false;
+        mergeNode->setShortFrameTexture(window()->createTextureFromImage(sfImage));
     }
 
-    QImage img(reinterpret_cast<uchar *>(tex), (int)width, (int)height, QImage::Format_ARGB32);
-    QSGTexture *qsgTex = window()->createTextureFromImage(img);
+    auto *lf = mergeNode->longFrameTexture();
+    auto *sf = mergeNode->shortFrameTexture();
 
-    textureNode->setTexture(qsgTex);
-    textureNode->setRect(boundingRect());
-    textureNode->setSourceRect(x.current, y.current, w.current, h.current);
+    // Until both fields have been seen once, the one that has stands in for
+    // the other. Same substitution non-interlace mode makes below, so the
+    // startup frames simply take the plain-copy path.
+    if (!lf) lf = sf;
+    if (!sf) sf = lf;
+    if (!lf) return mergeNode;
 
-    return textureNode;
+    auto *material = mergeNode->mergeMaterial();
+    material->texHeight = float(texHeight);
+
+    if (currLOF == prevLOF) {
+
+        // Non-interlace mode: a single field carries the whole picture.
+        // Feeding it to both slots collapses the merge to scale1X4Y's copy.
+        auto *field = currLOF ? lf : sf;
+        material->longFrame = field;
+        material->shortFrame = field;
+        material->longFrameScale = 1.0f;
+        material->shortFrameScale = 1.0f;
+
+    } else {
+
+        // Interlace mode: long frame followed by a short frame, or the
+        // other way round -- the shader weaves them line by line.
+        material->longFrame = lf;
+        material->shortFrame = sf;
+        material->longFrameScale = longFrameScale;
+        material->shortFrameScale = shortFrameScale;
+    }
+
+    mergeNode->updateGeometry(boundingRect(),
+                              QRectF(x.current / texWidth, y.current / texHeight,
+                                     w.current / texWidth, h.current / texHeight));
+    mergeNode->markDirty(QSGNode::DirtyMaterial);
+
+    return mergeNode;
 }
 
 void

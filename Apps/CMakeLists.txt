@@ -304,6 +304,23 @@ target_link_libraries(SiAmiga PRIVATE
         Qt6::QuickControls2
         SDL3::SDL3)
 
+# The interlace merge shader (see SiAmMergeNode). qsb compiles the GLSL once
+# and packs a SPIR-V/MSL/HLSL/GLSL variant for every RHI backend into the
+# .qsb, which is what makes one shader source work across platforms.
+#
+# BATCHABLE is required for anything drawn through a QSGMaterialShader: the
+# scene graph batches geometry and draws it with a rewritten vertex shader
+# carrying an extra attribute. Without that variant in the bundle the
+# renderer looks for the attribute, doesn't find it, and hands the backend
+# an attribute index of -1.
+qt_add_shaders(SiAmiga "siamiga_shaders"
+        BATCHABLE
+        PREFIX "/shaders"
+        BASE "${CMAKE_CURRENT_SOURCE_DIR}/SiAmiga/Shaders"
+        FILES
+        "SiAmiga/Shaders/merge.vert"
+        "SiAmiga/Shaders/merge.frag")
+
 # SiAmiga embeds the same Shared/Assets tree as the other two apps.
 qt_add_resources(SiAmiga "assets_files"
         PREFIX "/"
