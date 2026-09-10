@@ -15,10 +15,6 @@
 #include <QQuickWindow>
 #include <QSGSimpleTextureNode>
 
-// The core packs two GPU texels (one hires pixel's worth of super-hires
-// color data) into every emulator-side Texel -- see FrameBufferTypes.h. So
-// the pixel buffer VideoPortAPI::getTexture() hands back is twice as wide,
-// in u32 terms, as the HPIXELS the core itself counts in.
 static constexpr isize texWidth  = 2 * vamiga::HPIXELS;
 static constexpr isize texHeight = vamiga::VPIXELS;
 
