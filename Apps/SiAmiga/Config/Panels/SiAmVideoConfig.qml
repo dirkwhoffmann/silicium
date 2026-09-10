@@ -232,4 +232,68 @@ SettingsPage {
             Item { }
         }
     }
+
+    ConfigSection {
+
+        header: "EFFECTS"
+        size: 2 * root.sectionWidth
+
+        GridLayout {
+
+            columns: 4
+            columnSpacing: Style.largeSpacing
+            rowSpacing: Style.largeSpacing
+
+            //
+            // Row 1: Flicker fixer
+            //
+
+            SiComboBoxControl {
+
+                Layout.alignment: Qt.AlignVCenter
+
+                l: "Flicker fixer:"
+                lwidth: root.labelWidth
+                controlWidth: root.comboWidth
+
+                model: ["Disabled", "Enabled"]
+                currentIndex: config.MON_FLICKER ? 1 : 0
+                onCurrentIndexChanged: config.MON_FLICKER = currentIndex === 1
+            }
+
+            VideoKnob {
+
+                text: "WEIGHT"
+                enabled: config.MON_FLICKER
+                from: 0
+                to: 1000
+                value: config.MON_FLICKER_WEIGHT
+                onMoved: (value) => config.MON_FLICKER_WEIGHT = value
+            }
+
+            Item { }
+            Item { }
+
+            //
+            // Row 2: Off state
+            //
+
+            SiComboBoxControl {
+
+                Layout.alignment: Qt.AlignVCenter
+
+                l: "Off state:"
+                lwidth: root.labelWidth
+                controlWidth: root.comboWidth
+
+                model: ["Black", "White noise"]
+                currentIndex: config.VID_WHITE_NOISE ? 1 : 0
+                onCurrentIndexChanged: config.VID_WHITE_NOISE = currentIndex === 1
+            }
+
+            Item { }
+            Item { }
+            Item { }
+        }
+    }
 }
