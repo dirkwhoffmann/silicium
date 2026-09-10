@@ -161,9 +161,9 @@ SiAmRenderer::updateTexture()
      */
     auto *config = controller->getConfigController();
 
-    if (currLOF != prevLOF && config->flicker()) {
+    if (currLOF != prevLOF && !config->flickerFixer()) {
 
-        auto weight = 1.0f - float(config->flickerWeight()) / 1000.0f;
+        auto weight = 1.0f - float(config->flickerJitter()) / 1000.0f;
         longFrameScale = (flickerCnt % 4 >= 2) ? 1.0f : weight;
         shortFrameScale = (flickerCnt % 4 >= 2) ? weight : 1.0f;
         flickerCnt++;

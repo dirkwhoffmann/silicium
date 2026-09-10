@@ -257,18 +257,18 @@ SettingsPage {
                 controlWidth: root.comboWidth
 
                 model: ["Disabled", "Enabled"]
-                currentIndex: config.MON_FLICKER ? 1 : 0
-                onCurrentIndexChanged: config.MON_FLICKER = currentIndex === 1
+                currentIndex: config.MON_FLICKER_FIXER ? 1 : 0
+                onCurrentIndexChanged: config.MON_FLICKER_FIXER = currentIndex === 1
             }
 
             VideoKnob {
 
-                text: "WEIGHT"
-                enabled: config.MON_FLICKER
+                text: "JITTER"
+                enabled: !config.MON_FLICKER_FIXER
                 from: 0
                 to: 1000
-                value: config.MON_FLICKER_WEIGHT
-                onMoved: (value) => config.MON_FLICKER_WEIGHT = value
+                value: config.MON_FLICKER_JITTER
+                onMoved: (value) => config.MON_FLICKER_JITTER = value
             }
 
             Item { }

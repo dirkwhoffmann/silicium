@@ -632,8 +632,8 @@ class SiAmConfigController : public Controller {
     Q_PROPERTY(bool MON_DISALIGNMENT READ disalignment WRITE setDisalignment NOTIFY configChanged)
     Q_PROPERTY(int MON_DISALIGNMENT_H READ disalignmentH WRITE setDisalignmentH NOTIFY configChanged)
     Q_PROPERTY(int MON_DISALIGNMENT_V READ disalignmentV WRITE setDisalignmentV NOTIFY configChanged)
-    Q_PROPERTY(bool MON_FLICKER READ flicker WRITE setFlicker NOTIFY configChanged)
-    Q_PROPERTY(int MON_FLICKER_WEIGHT READ flickerWeight WRITE setFlickerWeight NOTIFY configChanged)
+    Q_PROPERTY(bool MON_FLICKER_FIXER READ flickerFixer WRITE setFlickerFixer NOTIFY configChanged)
+    Q_PROPERTY(int MON_FLICKER_JITTER READ flickerJitter WRITE setFlickerJitter NOTIFY configChanged)
     Q_PROPERTY(bool VID_WHITE_NOISE READ whiteNoise WRITE setWhiteNoise NOTIFY configChanged)
 
     // Restores the factory settings for every option the Video panel exposes
@@ -695,10 +695,10 @@ class SiAmConfigController : public Controller {
     void setDisalignmentH(int value) { set(vamiga::Opt::MON_DISALIGNMENT_H, (i64)value); }
     int disalignmentV() const { return (int)get(vamiga::Opt::MON_DISALIGNMENT_V); }
     void setDisalignmentV(int value) { set(vamiga::Opt::MON_DISALIGNMENT_V, (i64)value); }
-    bool flicker() const { return (bool)get(vamiga::Opt::MON_FLICKER); }
-    void setFlicker(bool value) { set(vamiga::Opt::MON_FLICKER, (i64)value); }
-    int flickerWeight() const { return (int)get(vamiga::Opt::MON_FLICKER_WEIGHT); }
-    void setFlickerWeight(int value) { set(vamiga::Opt::MON_FLICKER_WEIGHT, (i64)value); }
+    bool flickerFixer() const { return (bool)get(vamiga::Opt::MON_FLICKER_FIXER); }
+    void setFlickerFixer(bool value) { set(vamiga::Opt::MON_FLICKER_FIXER, (i64)value); }
+    int flickerJitter() const { return (int)get(vamiga::Opt::MON_FLICKER_JITTER); }
+    void setFlickerJitter(int value) { set(vamiga::Opt::MON_FLICKER_JITTER, (i64)value); }
     bool whiteNoise() const { return (bool)get(vamiga::Opt::VID_WHITE_NOISE); }
     void setWhiteNoise(bool value) { set(vamiga::Opt::VID_WHITE_NOISE, (i64)value); }
 
