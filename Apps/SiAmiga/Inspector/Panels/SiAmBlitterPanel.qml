@@ -279,19 +279,19 @@ SiAmInspectorWindow {
 
                     model: 8
 
-                    RowLayout {
+                    SiBin16 {
 
                         required property int index
-                        spacing: Style.tinySpacing
+                        lwidth: 40
+                        l: blitter.lfLabel(index)
+                        value: blitter.lfValue(index)
 
                         SiCheckBoxControl {
+
+                            size: Size.small
                             readOnly: true
                             checked: blitter.lfEnabled(index)
-                            l: blitter.lfLabel(index)
-                            lwidth: 40
                         }
-
-                        SiBin16 { value: blitter.lfValue(index) }
                     }
                 }
 

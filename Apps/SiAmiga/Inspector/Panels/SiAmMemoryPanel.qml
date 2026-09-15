@@ -284,7 +284,7 @@ SiAmInspectorWindow {
                     spacing: Style.smallSpacing
                     // Layout.alignment: Qt.AlignHCenter
                     Layout.fillWidth: true
-                    HSpacer { }
+                    HSpacer {}
                     TypeInfo { memType: root.typeSlow; r: qsTr("Slow Ram"); sizeText: qsTr("%1 KB").arg(mem.slowKB) }
                     HSpacer {}
                     TypeInfo { memType: root.typeRom; r: qsTr("Rom"); sizeText: qsTr("%1 KB").arg(mem.romKB) }
@@ -294,7 +294,7 @@ SiAmInspectorWindow {
                     TypeInfo { memType: root.typeRtc; r: qsTr("RTC") }
                     HSpacer {}
                     TypeInfo { memType: root.typeAutoconf; r: qsTr("Zorro") }
-                    HSpacer { }
+                    HSpacer {}
                 }
             }
         }
