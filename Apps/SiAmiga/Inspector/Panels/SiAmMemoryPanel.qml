@@ -118,6 +118,7 @@ SiAmInspectorWindow {
 
         size: Size.small
         rwidth: 90
+        r: typeInfo.sizeText
         hasFlexControl: false
 
         control: [
@@ -136,18 +137,6 @@ SiAmInspectorWindow {
                 }
             }
         ]
-
-        // Default-property child -- lands in SiControl's accessory slot,
-        // after the 'r' label, so each legend entry reads
-        // swatch -> type name -> KB size (blank for the four fixed
-        // hardware regions with no MemConfig size field -- see the class
-        // comment).
-        SiText {
-
-            visible: typeInfo.sizeText !== ""
-            text: typeInfo.sizeText
-            color: Palette.tertiary
-        }
     }
 
     component MemLayoutStrip: Rectangle {
@@ -275,25 +264,37 @@ SiAmInspectorWindow {
                 RowLayout {
 
                     spacing: Style.smallSpacing
-                    Layout.alignment: Qt.AlignHCenter
-
+                    // Layout.alignment: Qt.AlignHCenter
+                    Layout.fillWidth: true
+                    HSpacer {}
                     TypeInfo { memType: root.typeChip; r: qsTr("Chip Ram"); sizeText: qsTr("%1 KB").arg(mem.chipKB) }
+                    HSpacer {}
                     TypeInfo { memType: root.typeFast; r: qsTr("Fast Ram"); sizeText: qsTr("%1 KB").arg(mem.fastKB) }
+                    HSpacer {}
                     TypeInfo { memType: root.typeWom; r: qsTr("Wom"); sizeText: qsTr("%1 KB").arg(mem.womKB) }
+                    HSpacer {}
                     TypeInfo { memType: root.typeCia; r: qsTr("CIA") }
+                    HSpacer {}
                     TypeInfo { memType: root.typeCustom; r: qsTr("Chipset") }
+                    HSpacer {}
                 }
 
                 RowLayout {
 
                     spacing: Style.smallSpacing
-                    Layout.alignment: Qt.AlignHCenter
-
+                    // Layout.alignment: Qt.AlignHCenter
+                    Layout.fillWidth: true
+                    HSpacer { }
                     TypeInfo { memType: root.typeSlow; r: qsTr("Slow Ram"); sizeText: qsTr("%1 KB").arg(mem.slowKB) }
+                    HSpacer {}
                     TypeInfo { memType: root.typeRom; r: qsTr("Rom"); sizeText: qsTr("%1 KB").arg(mem.romKB) }
+                    HSpacer {}
                     TypeInfo { memType: root.typeExt; r: qsTr("Rom Extension"); sizeText: qsTr("%1 KB").arg(mem.extKB) }
+                    HSpacer {}
                     TypeInfo { memType: root.typeRtc; r: qsTr("RTC") }
+                    HSpacer {}
                     TypeInfo { memType: root.typeAutoconf; r: qsTr("Zorro") }
+                    HSpacer { }
                 }
             }
         }
