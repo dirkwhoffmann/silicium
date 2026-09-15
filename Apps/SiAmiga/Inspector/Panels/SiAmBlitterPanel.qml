@@ -42,6 +42,9 @@ SiAmInspectorWindow {
     readonly property real columnWidth: Math.max(260,
         (scrollView.availableWidth - Style.largeSpacing * 2) / 3)
 
+    // Shared label width for every field in this panel
+    readonly property int labelWidth: 64
+
     // BLTCON0/1's ash/bsh + sub-field bytes, and the barrel shifters' shift
     // amounts -- fmt4/fmt8 in the Swift reference (fixed hex, not tied to
     // the shared format setting -- see the class comment).
@@ -134,7 +137,7 @@ SiAmInspectorWindow {
 
                         SiHex4 {
 
-                            lwidth: 65
+                            lwidth: root.labelWidth
                             l: qsTr("BLTCON0:")
                             value: blitter.bltcon0A
 
@@ -144,7 +147,7 @@ SiAmInspectorWindow {
 
                         SiHex4 {
 
-                            lwidth: 65
+                            lwidth: root.labelWidth
                             l: qsTr("BLTCON1:")
                             value: blitter.bltcon1A
 
@@ -152,16 +155,16 @@ SiAmInspectorWindow {
                             SiHex8 { value: blitter.bltcon1C }
                         }
 
-                        SiCheckBoxControl { size: Size.small; lwidth: 65; readOnly: true; checked: blitter.exclusiveFill; r: qsTr("Exclusive Fill") }
-                        SiCheckBoxControl { size: Size.small; lwidth: 65; readOnly: true; checked: blitter.inclusiveFill; r: qsTr("Inclusive Fill") }
-                        SiCheckBoxControl { size: Size.small; lwidth: 65; readOnly: true; checked: blitter.fillCarry; r: qsTr("Fill Carry") }
-                        SiCheckBoxControl { size: Size.small; lwidth: 65; readOnly: true; checked: blitter.descending; r: qsTr("Descending") }
-                        SiCheckBoxControl { size: Size.small; lwidth: 65; readOnly: true; checked: blitter.lineMode; r: qsTr("Line Mode") }
+                        SiCheckBoxControl { size: Size.small; lwidth: root.labelWidth; readOnly: true; checked: blitter.exclusiveFill; r: qsTr("Exclusive Fill") }
+                        SiCheckBoxControl { size: Size.small; lwidth: root.labelWidth; readOnly: true; checked: blitter.inclusiveFill; r: qsTr("Inclusive Fill") }
+                        SiCheckBoxControl { size: Size.small; lwidth: root.labelWidth; readOnly: true; checked: blitter.fillCarry; r: qsTr("Fill Carry") }
+                        SiCheckBoxControl { size: Size.small; lwidth: root.labelWidth; readOnly: true; checked: blitter.descending; r: qsTr("Descending") }
+                        SiCheckBoxControl { size: Size.small; lwidth: root.labelWidth; readOnly: true; checked: blitter.lineMode; r: qsTr("Line Mode") }
 
                         SiCheckBoxControl {
 
                             size: Size.small
-                            lwidth: 65
+                            lwidth: root.labelWidth
                             l: qsTr("BBUSY:")
                             readOnly: true
                             checked: blitter.bbusy
@@ -234,27 +237,27 @@ SiAmInspectorWindow {
                         Layout.alignment: Qt.AlignHCenter
                         spacing: Style.tinySpacing
 
-                        SiBin16 { l: qsTr("Unmasked"); lwidth: 90; value: blitter.unmasked }
+                        SiBin16 { l: qsTr("Unmasked:"); lwidth: root.labelWidth; value: blitter.unmasked }
 
                         SiBin16 {
 
-                            l: qsTr("First word"); lwidth: 90; value: blitter.afwm
+                            l: qsTr("First word:"); lwidth: root.labelWidth; value: blitter.afwm
                             SiCheckBoxControl { size: Size.small; readOnly: true; checked: blitter.firstWord }
                         }
 
                         SiBin16 {
 
-                            l: qsTr("Last word"); lwidth: 90; value: blitter.alwm
+                            l: qsTr("Last word:"); lwidth: root.labelWidth; value: blitter.alwm
                             SiCheckBoxControl { size: Size.small; readOnly: true; checked: blitter.lastWord }
                         }
 
-                        SiBin16 { l: qsTr("Masked"); lwidth: 90; value: blitter.masked }
+                        SiBin16 { l: qsTr("Masked:"); lwidth: root.labelWidth; value: blitter.masked }
                     }
                 }
 
                 SiBox {
 
-                    title: qsTr("Shift")
+                    title: qsTr("Shift:")
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     spacing: Style.smallSpacing
@@ -264,34 +267,36 @@ SiAmInspectorWindow {
                         Layout.alignment: Qt.AlignHCenter
                         spacing: Style.tinySpacing
 
-                        SiBin16 { l: qsTr("Barrel A In"); lwidth: 90; value: blitter.barrelAIn
+                        SiBin16 {
+                            l: qsTr("Barrel A In:"); lwidth: root.labelWidth; value: blitter.barrelAIn
+                            SiCheckBoxControl { size: Size.small; hide: true }
                         }
 
                         SiHex4 {
 
-                            lwidth: 90
+                            lwidth: root.labelWidth
                             l: qsTr("<<")
                             value: blitter.barrelAShift }
 
                         SiBin16 {
 
-                            lwidth: 90
+                            lwidth: root.labelWidth
                             l: "="
                             value: blitter.barrelAOut
                         }
 
-                        SiBin16 { l: qsTr("Barrel B In"); lwidth: 90; value: blitter.barrelBIn
+                        SiBin16 { l: qsTr("Barrel B In:"); lwidth: root.labelWidth; value: blitter.barrelBIn
                         }
 
                         SiHex4 {
 
-                            lwidth: 90
+                            lwidth: root.labelWidth
                             l: qsTr("<<")
                             value: blitter.barrelBShift }
 
                         SiBin16 {
 
-                            lwidth: 90
+                            lwidth: root.labelWidth
                             l: "="
                             value: blitter.barrelBOut
                         }
@@ -310,8 +315,13 @@ SiAmInspectorWindow {
                         Layout.alignment: Qt.AlignHCenter
                         spacing: Style.tinySpacing
 
-                        SiBin16 { l: qsTr("Fill in"); lwidth: 90; value: blitter.fillIn }
-                        SiBin16 { l: qsTr("Fill out"); lwidth: 90; value: blitter.fillOut }
+                        SiBin16 {
+                            l: qsTr("Fill in:"); lwidth: root.labelWidth; value: blitter.fillIn
+                            SiCheckBoxControl { size: Size.small; hide: true }
+                        }
+                        SiBin16 {
+                            l: qsTr("Fill out:"); lwidth: root.labelWidth; value: blitter.fillOut
+                        }
                     }
                 }
             }
@@ -333,9 +343,9 @@ SiAmInspectorWindow {
                     Layout.alignment: Qt.AlignHCenter
                     spacing: Style.tinySpacing
 
-                    SiBin16 { l: qsTr("A"); lwidth: 40; value: blitter.mintermA }
-                    SiBin16 { l: qsTr("B"); lwidth: 40; value: blitter.mintermB }
-                    SiBin16 { l: qsTr("C"); lwidth: 40; value: blitter.mintermC }
+                    SiBin16 { l: qsTr("A:"); lwidth: 40; value: blitter.mintermA }
+                    SiBin16 { l: qsTr("B:"); lwidth: 40; value: blitter.mintermB }
+                    SiBin16 { l: qsTr("C:"); lwidth: 40; value: blitter.mintermC }
 
                     Repeater {
 
@@ -345,7 +355,7 @@ SiAmInspectorWindow {
 
                             required property int index
                             lwidth: 40
-                            l: blitter.lfLabel(index)
+                            l: blitter.lfLabel(index) + ":"
                             value: blitter.lfValue(index)
 
                             SiCheckBoxControl {
@@ -357,7 +367,7 @@ SiAmInspectorWindow {
                         }
                     }
 
-                    SiBin16 { l: qsTr("Out"); lwidth: 40; value: blitter.lfOut }
+                    SiBin16 { l: qsTr("Out:"); lwidth: 40; value: blitter.lfOut }
                 }
 
                 VSpacer {}
