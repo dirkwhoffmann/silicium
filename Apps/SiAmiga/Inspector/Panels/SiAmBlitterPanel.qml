@@ -107,46 +107,38 @@ SiAmInspectorWindow {
                     Layout.alignment: Qt.AlignHCenter
                     spacing: Style.smallSpacing
 
-                    RowLayout {
-                        spacing: Style.tinySpacing
-                        SiLabel { text: qsTr("BLTCON0"); Layout.preferredWidth: 65; horizontalAlignment: Text.AlignRight }
-                        SiHex4 { value: blitter.bltcon0A }
+                    SiHex4 {
+
+                        lwidth: 65
+                        l: qsTr("BLTCON0:")
+                        value: blitter.bltcon0A
+
                         SiHex4 { value: blitter.bltcon0B }
                         SiHex8 { value: blitter.bltcon0C }
                     }
 
-                    RowLayout {
-                        spacing: Style.tinySpacing
-                        SiLabel { text: qsTr("BLTCON1"); Layout.preferredWidth: 65; horizontalAlignment: Text.AlignRight }
-                        SiHex4 { value: blitter.bltcon1A }
+                    SiHex4 {
+
+                        lwidth: 65
+                        l: qsTr("BLTCON1:")
+                        value: blitter.bltcon1A
+
                         SiHex4 { value: blitter.bltcon1B }
                         SiHex8 { value: blitter.bltcon1C }
                     }
 
-                    RowLayout {
+                    SiCheckBoxControl { lwidth: 65; readOnly: true; checked: blitter.exclusiveFill; r: qsTr("Exclusive Fill") }
+                    SiCheckBoxControl { lwidth: 65; readOnly: true; checked: blitter.inclusiveFill; r: qsTr("Inclusive Fill") }
+                    SiCheckBoxControl { lwidth: 65; readOnly: true; checked: blitter.fillCarry; r: qsTr("Fill Carry") }
+                    SiCheckBoxControl { lwidth: 65; readOnly: true; checked: blitter.descending; r: qsTr("Descending") }
+                    SiCheckBoxControl { lwidth: 65; readOnly: true; checked: blitter.lineMode; r: qsTr("Line Mode") }
 
-                        Layout.topMargin: Style.smallSpacing
-                        spacing: Style.mediumSpacing
+                    SiCheckBoxControl {
 
-                        SiCheckBoxControl {
-                            Layout.alignment: Qt.AlignBottom
-                            readOnly: true
-                            checked: blitter.bbusy
-                            r: qsTr("BBUSY")
-                        }
-
-                        HSpacer { }
-
-                        ColumnLayout {
-
-                            spacing: Style.tinySpacing
-
-                            SiCheckBoxControl { readOnly: true; checked: blitter.exclusiveFill; r: qsTr("Exclusive Fill") }
-                            SiCheckBoxControl { readOnly: true; checked: blitter.inclusiveFill; r: qsTr("Inclusive Fill") }
-                            SiCheckBoxControl { readOnly: true; checked: blitter.fillCarry; r: qsTr("Fill Carry") }
-                            SiCheckBoxControl { readOnly: true; checked: blitter.descending; r: qsTr("Descending") }
-                            SiCheckBoxControl { readOnly: true; checked: blitter.lineMode; r: qsTr("Line Mode") }
-                        }
+                        lwidth: 65
+                        l: qsTr("BBUSY:")
+                        readOnly: true
+                        checked: blitter.bbusy
                     }
                 }
             }
