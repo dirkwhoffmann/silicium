@@ -97,6 +97,8 @@ HdController::getOption(Opt option) const
     switch (option) {
             
         case Opt::HDC_CONNECT:       return (i64)config.connected;
+        case Opt::HDC_MB_LIMIT:      return (i64)config.mbLimit;
+        case Opt::HDC_MEM_LIMIT:     return (i64)config.memLimit;
 
         default:
             fatalError;
@@ -109,6 +111,14 @@ HdController::checkOption(Opt opt, i64 value)
     switch (opt) {
 
         case Opt::HDC_CONNECT:
+            return;
+
+        case Opt::HDC_MB_LIMIT:
+        case Opt::HDC_MEM_LIMIT:
+
+            if (value < 0) {
+                throw CoreError(CoreError::OPT_INV_ARG, "0 (no limit) or a positive value");
+            }
             return;
 
         default:
@@ -140,6 +150,16 @@ HdController::setOption(Opt option, i64 value)
             }
             return;
 
+        case Opt::HDC_MB_LIMIT:
+
+            config.mbLimit = isize(value);
+            return;
+
+        case Opt::HDC_MEM_LIMIT:
+
+            config.memLimit = isize(value);
+            return;
+
         default:
             fatalError;
     }
@@ -148,7 +168,7 @@ HdController::setOption(Opt option, i64 value)
 bool
 HdController::pluggedIn() const
 {
-    return drive.isConnected() && !drive.data.empty();
+    return drive.isConnected() && drive.hasDisk();
 }
 
 void
@@ -234,10 +254,84 @@ HdController::peek16(u32 addr)
     return result;
 }
 
+namespace {
+
+/* The commands this device understands, as NSCMD_DEVICEQUERY reports them.
+ *
+ * Zero terminated, and to be kept in step with processCmd: a command listed
+ * here must not answer IOERR_NOCMD. The 64-bit commands appear in their NSD
+ * form only, which is what a caller that got here through the query expects;
+ * the TD64 numbers work just as well, but are not advertised.
+ */
+const u16 nsdCommandList[] = {
+
+    u16(IoCommand::NSD_DEVICEQUERY),
+    u16(IoCommand::RESET),
+    u16(IoCommand::READ),
+    u16(IoCommand::WRITE),
+    u16(IoCommand::UPDATE),
+    u16(IoCommand::CLEAR),
+    u16(IoCommand::STOP),
+    u16(IoCommand::START),
+    u16(IoCommand::FLUSH),
+    u16(IoCommand::TD_MOTOR),
+    u16(IoCommand::TD_SEEK),
+    u16(IoCommand::TD_FORMAT),
+    u16(IoCommand::TD_REMOVE),
+    u16(IoCommand::TD_CHANGENUM),
+    u16(IoCommand::TD_CHANGESTATE),
+    u16(IoCommand::TD_PROTSTATUS),
+    u16(IoCommand::TD_GETDRIVETYPE),
+    u16(IoCommand::TD_GETGEOMETRY),
+    u16(IoCommand::TD_ADDCHANGEINT),
+    u16(IoCommand::TD_REMCHANGEINT),
+    u16(IoCommand::NSD_TD_READ64),
+    u16(IoCommand::NSD_TD_WRITE64),
+    u16(IoCommand::NSD_TD_SEEK64),
+    u16(IoCommand::NSD_TD_FORMAT64),
+    0
+};
+
+}
+
+const u16 *
+HdController::nsdCommands()
+{
+    return nsdCommandList;
+}
+
+isize
+HdController::nsdCommandCount()
+{
+    return isize(sizeof(nsdCommandList) / sizeof(u16));
+}
+
+isize
+HdController::nsdCommandOffset()
+{
+    // Behind the Rom and the four magic registers (see spypeek16)
+    return EXPROM_SIZE + 8;
+}
+
+u32
+HdController::nsdCommandAddr() const
+{
+    return baseAddr + initDiagVec() + u32(nsdCommandOffset());
+}
+
 u8
 HdController::spypeek8(u32 addr) const
 {
     isize offset = (isize)(addr & 0xFFFF) - (isize)initDiagVec();
+    isize index = offset - nsdCommandOffset();
+
+    // Serve the NSD command list (see nsdCommands)
+    if (index >= 0 && index < 2 * nsdCommandCount()) {
+
+        auto entry = nsdCommands()[index / 2];
+        return u8(index & 1 ? entry : entry >> 8);
+    }
+
     return offset < rom.size ? rom[offset] : 0;
 }
 
@@ -251,13 +345,13 @@ HdController::spypeek16(u32 addr) const
         case EXPROM_SIZE:
             
             // Return the number of partitions
-            logmsg(LOG_HDR, "Partitions: %ld\n", drive.numPartitions());
+            logmsg(LOG_HDR, "Partitions: %td\n", drive.numPartitions());
             return u16(drive.numPartitions());
             
         case EXPROM_SIZE + 2:
             
             // Number of filesystem drivers to add
-            logmsg(LOG_HDR, "Filesystem drivers: %ld\n", drive.numDrivers());
+            logmsg(LOG_HDR, "Filesystem drivers: %td\n", drive.numDrivers());
             return u16(drive.numDrivers());
             
         case EXPROM_SIZE + 4:
@@ -278,7 +372,14 @@ HdController::spypeek16(u32 addr) const
             return 0;
             
         default:
-            
+
+            // Serve the NSD command list (see nsdCommands)
+            if (auto index = offset - nsdCommandOffset();
+                index >= 0 && index < 2 * nsdCommandCount()) {
+
+                return nsdCommands()[index / 2];
+            }
+
             // Return Rom code
             return offset < rom.size ? HI_LO(rom[offset], rom[offset + 1]) : 0;
     }
@@ -344,16 +445,39 @@ HdController::processCmd(u32 ptr)
     
     // Extract information
     auto cmd = IoCommand(stdReq.io_Command);
-    auto offset = isize(stdReq.io_Offset);
-    auto length = isize(stdReq.io_Length);
+    auto offset = i64(stdReq.io_Offset);
+    auto length = i64(stdReq.io_Length);
     auto addr = u32(stdReq.io_Data);
+
+    /* The 64-bit commands carry the high half of the offset in io_Actual,
+     * which is an output field for every other command. This is the only way
+     * a drive beyond 4 GB can be addressed, and TD64 and NSD both do it this
+     * way (see IoCommand).
+     */
+    switch (cmd) {
+
+        case IoCommand::TD_READ64:
+        case IoCommand::TD_WRITE64:
+        case IoCommand::TD_SEEK64:
+        case IoCommand::TD_FORMAT64:
+        case IoCommand::NSD_TD_READ64:
+        case IoCommand::NSD_TD_WRITE64:
+        case IoCommand::NSD_TD_SEEK64:
+        case IoCommand::NSD_TD_FORMAT64:
+
+            offset |= i64(stdReq.io_Actual) << 32;
+            break;
+
+        default:
+            break;
+    }
     
     if CONSTEXPR (LOG_HDR != LOG_OFF) {
 
         [[maybe_unused]] auto unit = mem.spypeek32 <Accessor::CPU> (stdReq.io_Unit + 0x2A);
         [[maybe_unused]] auto blck = offset / 512;
         
-        logmsg(LOG_HDR, "%d.%ld: %s\n", unit, blck, IoCommandEnum::key(cmd));
+        logmsg(LOG_HDR, "%d.%lld: %s\n", unit, (long long)blck, IoCommandEnum::key(cmd));
     }
     
     // Update the usage profile
@@ -362,6 +486,8 @@ HdController::processCmd(u32 ptr)
     switch (cmd) {
             
         case IoCommand::READ:
+        case IoCommand::TD_READ64:
+        case IoCommand::NSD_TD_READ64:
 
             if (offset) changeHdcState(HdcState::READY);
             
@@ -371,9 +497,78 @@ HdController::processCmd(u32 ptr)
 
         case IoCommand::WRITE:
         case IoCommand::TD_FORMAT:
+        case IoCommand::TD_WRITE64:
+        case IoCommand::TD_FORMAT64:
+        case IoCommand::NSD_TD_WRITE64:
+        case IoCommand::NSD_TD_FORMAT64:
 
             error = drive.write(offset, length, addr);
             actual = u32(length);
+            break;
+
+        case IoCommand::TD_PROTSTATUS:
+
+            // -1 means protected, 0 means writable
+            actual = drive.hasProtectedDisk() ? u32(-1) : 0;
+            break;
+
+        case IoCommand::TD_GETDRIVETYPE:
+
+            /* Announce that this device understands the NSD commands. A
+             * caller asks this before it trusts the query below.
+             */
+            actual = DRIVE_NEWSTYLE;
+            break;
+
+        case IoCommand::TD_GETGEOMETRY:
+
+            // Describe the drive the way trackdisk.device does
+            if (!mem.inRam(addr) || !mem.inRam(u32(addr + DG_SIZE - 1))) {
+
+                logmsg(LOG_HDR, "Invalid RAM location\n");
+                error = u8(IOERR_BADADDRESS);
+
+            } else {
+
+                auto &geo = drive.getGeometry();
+
+                /* dg_TotalSectors is a 32-bit field. It cannot describe a
+                 * drive of more than 2 TB, which is far beyond what a
+                 * geometry can express anyway (see checkCompatibility).
+                 */
+                auto sectors = std::min(i64(geo.numBlocks()), i64(0xFFFFFFFF));
+
+                mem.patch(addr +  0, u32(geo.bsize));               // dg_SectorSize
+                mem.patch(addr +  4, u32(sectors));                 // dg_TotalSectors
+                mem.patch(addr +  8, u32(geo.cylinders));           // dg_Cylinders
+                mem.patch(addr + 12, u32(geo.heads * geo.sectors)); // dg_CylSectors
+                mem.patch(addr + 16, u32(geo.heads));               // dg_Heads
+                mem.patch(addr + 20, u32(geo.sectors));             // dg_TrackSectors
+                mem.patch(addr + 24, u32(0));                       // dg_BufMemType
+                mem.patch(addr + 28, u8(DG_DIRECT_ACCESS));         // dg_DeviceType
+                mem.patch(addr + 29, u8(0));                        // dg_Flags
+                mem.patch(addr + 30, u16(0));                       // dg_Reserved
+                actual = DG_SIZE;
+            }
+            break;
+
+        case IoCommand::NSD_DEVICEQUERY:
+
+            // Describe the device and point the caller at the command list
+            if (!mem.inRam(addr) || !mem.inRam(u32(addr + NSD_QUERY_SIZE - 1))) {
+
+                logmsg(LOG_HDR, "Invalid RAM location\n");
+                error = u8(IOERR_BADADDRESS);
+
+            } else {
+
+                mem.patch(addr + 0, u32(0));                        // DevQueryFormat
+                mem.patch(addr + 4, NSD_QUERY_SIZE);                // SizeAvailable
+                mem.patch(addr + 8, u16(NSDEVTYPE_TRACKDISK));      // DeviceType
+                mem.patch(addr + 10, u16(0));                       // DeviceSubType
+                mem.patch(addr + 12, nsdCommandAddr());             // SupportedCommands
+                actual = NSD_QUERY_SIZE;
+            }
             break;
 
         case IoCommand::RESET:
@@ -384,10 +579,11 @@ HdController::processCmd(u32 ptr)
         case IoCommand::FLUSH:
         case IoCommand::TD_MOTOR:
         case IoCommand::TD_SEEK:
+        case IoCommand::TD_SEEK64:
+        case IoCommand::NSD_TD_SEEK64:
         case IoCommand::TD_REMOVE:
         case IoCommand::TD_CHANGENUM:
         case IoCommand::TD_CHANGESTATE:
-        case IoCommand::TD_PROTSTATUS:
         case IoCommand::TD_ADDCHANGEINT:
         case IoCommand::TD_REMCHANGEINT:
             
@@ -675,7 +871,7 @@ HdController::processInitSeg(u32 ptr)
                     if (s.target >= numHunks) {
                         throw CoreError(CoreError::HDC_INIT, "Invalid relocation target");
                     }
-                    logmsg(LOG_HDR, "Relocation target: %ld\n", s.target);
+                    logmsg(LOG_HDR, "Relocation target: %td\n", s.target);
                     
                     for (auto &offset : s.relocations) {
                         

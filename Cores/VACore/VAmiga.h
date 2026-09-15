@@ -336,7 +336,7 @@ public:
     /** @brief  Returns information about a guard.
      *  @param  nr      Number of the guard in the guard list
      */
-    std::optional<GuardInfo> guardNr(long nr) const;
+    std::optional<GuardInfo> guardNr(isize nr) const;
 
     /** @brief  Returns information about a guard.
      *  @param  target  The target of the guard to query
@@ -750,6 +750,29 @@ public:
      */
     void writeToFile(const std::filesystem::path& path);
 
+    /** @brief  Returns where the disk lives
+     *  @note   Floppy disks always live in memory (MEMORY_BACKED).
+     */
+    StorageMode getStorageMode() const;
+
+    /** @brief  Returns the file the disk lives in
+     *  @note   Always empty, since floppy disks always live in memory.
+     */
+    std::filesystem::path path() const;
+
+    /** @brief  Indicates whether the disk holds changes its file does not
+     *          have yet
+     *  @note   Always false for a floppy disk, which has no file. Whether the
+     *          disk has been modified since it was inserted is reported by
+     *          FloppyDriveInfo::hasModifiedDisk.
+     */
+    bool needsPersisting() const;
+
+    /** @brief  Writes all changes back to the file the disk lives in
+     *  @note   Does nothing for a floppy disk, which has no file.
+     */
+    void persist();
+
     /** @brief  Creates a textual bit representation of a track's data
      */
     string readTrackBits(isize track);
@@ -839,8 +862,12 @@ public:
 
     /** @brief  Attaches a hard drive provided by an URL to a media file.
      *  @param  path    Path to the media file.
+     *  @param  mode    Where the disk lives. FILE_BACKED keeps it on top of
+     *                  the file, MEMORY_BACKED loads it into memory and lets
+     *                  go of the file (see loadIntoMemory()).
      */
-    void attach(const std::filesystem::path &path);
+    void attach(const std::filesystem::path &path,
+                StorageMode mode = StorageMode::FILE_BACKED);
 
     /** @brief  Attaches a hard drive with a particular geometry.
      *  @param  c       Number of cylinders
@@ -854,6 +881,42 @@ public:
      *  @note   All existing files are deleted prior to importing the folder.
      */
     void importFiles(const std::filesystem::path &path);
+
+    /** @brief  Returns where the disk lives
+     *  @note   A drive without a disk counts as memory-backed.
+     */
+    StorageMode getStorageMode() const;
+
+    /** @brief  Returns the file the disk lives in
+     *  @note   The path is empty for a drive that was built in memory.
+     */
+    std::filesystem::path path() const;
+
+    /** @brief  Indicates whether the disk holds changes the file does not have
+     *          yet, i.e. whether persist() has anything to do.
+     */
+    bool needsPersisting() const;
+
+    /** @brief  Loads the disk into memory and lets go of its image file
+     *  @note   A disk in memory becomes part of every snapshot, so the call
+     *          throws for a drive larger than Opt::HDC_MEM_LIMIT allows. A
+     *          drive that is in memory already is left alone.
+     */
+    void loadIntoMemory();
+
+    /** @brief  Writes the disk to a file and continues on top of it
+     *  @param  path    Path of the file to create
+     *  @note   Unlike writeToFile(), which exports a copy and leaves the
+     *          drive where it is.
+     */
+    void saveAs(const std::filesystem::path &path);
+
+    /** @brief  Writes all changes back to the file the disk lives in
+     *  @note   Only what has changed is written. For a drive that was built
+     *          in memory, the call has no effect. Opt::HDR_WRITE_THROUGH
+     *          performs this call on its own (see WriteThroughMode).
+     */
+    void persist();
 
     /** @brief  Exports the hard drive to an HDF file on disk
      */

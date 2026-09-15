@@ -41,7 +41,7 @@ Codec::makeEADF(const FloppyDisk &disk)
 {
     auto numTracks = disk.numTracks();
 
-    auto length = 0;
+    isize length = 0;
 
     length += 12;               // File header
     length += 12 * numTracks;   // Track headers
@@ -83,7 +83,7 @@ Codec::makeIMG(const FloppyDrive &drive)
 std::unique_ptr<HDFFile>
 Codec::makeHDF(const HardDrive &drive)
 {
-    auto hdf = std::make_unique<HDFFile>(drive.data.ptr, drive.data.size);
+    auto hdf = std::make_unique<HDFFile>(drive);
 
     // Overwrite the predicted geometry with the precise one
     hdf->geometry = drive.getGeometry();
@@ -94,14 +94,14 @@ Codec::makeHDF(const HardDrive &drive)
 void
 Codec::encodeEADF(const EADFFile &eadf, FloppyDisk &disk)
 {
-    assert(!eadf.data.empty());
+    assert(!eadf.empty());
 
     isize tracks   = eadf.storedTracks();
     // auto  diameter = eadf.getDiameter();
     // auto  density  = eadf.getDensity();
 
     if CONSTEXPR (LOG_MFM != LOG_OFF)
-        fprintf(stderr, "Encoding Amiga disk with %ld tracks\n", tracks);
+        fprintf(stderr, "Encoding Amiga disk with %td tracks\n", tracks);
 
     // Create an empty ADF
     // auto adf = make_unique<ADFFile>(ADFFile::fileSize(diameter, density, tracks));
@@ -165,7 +165,7 @@ Codec::encodeStandardTrack(const EADFFile &eadf, ADFFile &adf, TrackNr t)
     if (eadf.typeOfTrack(t) == 0) {
 
         if CONSTEXPR (LOG_MFM != LOG_OFF)
-            fprintf(stderr, "Encoding standard track %ld\n", t);
+            fprintf(stderr, "Encoding standard track %td\n", t);
 
         auto numBits = eadf.usedBitsForTrack(t);
         assert(numBits % 8 == 0);
@@ -181,7 +181,7 @@ Codec::encodeExtendedTrack(const EADFFile &eadf, FloppyDisk &disk, TrackNr t)
     if (eadf.typeOfTrack(t) == 1) {
 
         if CONSTEXPR (LOG_MFM != LOG_OFF)
-            fprintf(stderr, "Encoding extended track %ld\n", t);
+            fprintf(stderr, "Encoding extended track %td\n", t);
 
         auto numBits = eadf.usedBitsForTrack(t);
         assert(numBits % 8 == 0);
@@ -195,9 +195,10 @@ Codec::encodeExtendedTrack(const EADFFile &eadf, FloppyDisk &disk, TrackNr t)
 void
 Codec::decodeEADF(EADFFile &eadf, const FloppyDisk &disk)
 {
-    assert(!eadf.data.empty());
+    assert(!eadf.empty());
 
-    u8 *p = eadf.data.ptr;
+    auto view = eadf.mutableByteView(0, eadf.getSize());
+    u8 *p = view.data();
     auto numTracks = disk.numTracks();
 
     // Magic bytes
@@ -253,37 +254,7 @@ Codec::decodeEADF(EADFFile &eadf, const FloppyDisk &disk)
     }
 
     if CONSTEXPR (LOG_MFM != LOG_OFF)
-        fprintf(stderr, "Wrote %td bytes\n", p - eadf.data.ptr);
-}
-
-void
-Codec::encodeIMG(const class IMGFile &source, FloppyDisk &disk)
-{
-    IMGFile img(source.data.ptr, source.data.size);
-    disk.encode(img);
-}
-
-void
-Codec::decodeIMG(class IMGFile &target, const FloppyDisk &disk)
-{
-    IMGFile img(target.data.ptr, target.data.size);
-    disk.decode(img);
-    target.data = img.data;
-}
-
-void
-Codec::encodeST(const class STFile &source, FloppyDisk &disk)
-{
-    IMGFile img(source.data.ptr, source.data.size);
-    disk.encode(img);
-}
-
-void
-Codec::decodeST(class STFile &target, const FloppyDisk &disk)
-{
-    IMGFile img(target.data.ptr, target.data.size);
-    disk.decode(img);
-    target.data = img.data;
+        fprintf(stderr, "Wrote %td bytes\n", p - view.data());
 }
 
 void

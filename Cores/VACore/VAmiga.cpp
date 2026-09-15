@@ -299,7 +299,7 @@ GuardsAPI::elements() const
 }
 
 std::optional<GuardInfo>
-GuardsAPI::guardNr(long nr) const
+GuardsAPI::guardNr(isize nr) const
 {
     VAMIGA_PUBLIC
     return guards->guardNr(nr);
@@ -1236,6 +1236,34 @@ FloppyDriveAPI::writeToFile(const std::filesystem::path& path)
     drive->writeToFile(path);
 }
 
+StorageMode
+FloppyDriveAPI::getStorageMode() const
+{
+    VAMIGA_PUBLIC
+    return drive->getStorageMode();
+}
+
+fs::path
+FloppyDriveAPI::path() const
+{
+    VAMIGA_PUBLIC
+    return drive->getPath();
+}
+
+bool
+FloppyDriveAPI::needsPersisting() const
+{
+    VAMIGA_PUBLIC
+    return drive->needsPersisting();
+}
+
+void
+FloppyDriveAPI::persist()
+{
+    VAMIGA_PUBLIC_SUSPEND
+    drive->persist();
+}
+
 string
 FloppyDriveAPI::readTrackBits(isize track)
 {
@@ -1319,10 +1347,10 @@ HardDriveAPI::changeGeometry(isize c, isize h, isize s, isize b)
 }
 
 void
-HardDriveAPI::attach(const fs::path &path)
+HardDriveAPI::attach(const fs::path &path, StorageMode mode)
 {
     VAMIGA_PUBLIC_SUSPEND
-    drive->init(path.string());
+    drive->init(path, mode);
 }
 
 void
@@ -1345,6 +1373,48 @@ HardDriveAPI::importFiles(const fs::path &path)
 {
     VAMIGA_PUBLIC_SUSPEND
     drive->importFolder(path);
+}
+
+StorageMode
+HardDriveAPI::getStorageMode() const
+{
+    VAMIGA_PUBLIC
+    return drive->getStorageMode();
+}
+
+fs::path
+HardDriveAPI::path() const
+{
+    VAMIGA_PUBLIC
+    return drive->getPath();
+}
+
+bool
+HardDriveAPI::needsPersisting() const
+{
+    VAMIGA_PUBLIC
+    return drive->needsPersisting();
+}
+
+void
+HardDriveAPI::loadIntoMemory()
+{
+    VAMIGA_PUBLIC_SUSPEND
+    drive->loadIntoMemory();
+}
+
+void
+HardDriveAPI::saveAs(const fs::path &path)
+{
+    VAMIGA_PUBLIC_SUSPEND
+    drive->saveAs(path);
+}
+
+void
+HardDriveAPI::persist()
+{
+    VAMIGA_PUBLIC_SUSPEND
+    drive->persist();
 }
 
 void

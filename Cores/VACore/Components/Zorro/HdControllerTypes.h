@@ -25,6 +25,23 @@ constexpr i8    IOERR_BADLENGTH     = -4;
 constexpr i8    IOERR_BADADDRESS    = -5;
 constexpr i8    IOERR_UNITBUSY      = -6;
 constexpr i8    IOERR_SELFTEST      = -7;
+constexpr i8    TDERR_WRITEPROT     = 28;   // The disk is write protected (trackdisk.device)
+constexpr i8    TDERR_DISKCHANGED   = 29;   // No disk in the drive (trackdisk.device)
+
+// Answer to TD_GETDRIVETYPE from a device that understands the NSD commands
+constexpr u32   DRIVE_NEWSTYLE      = 0x4E535459;   // 'NSTY'
+
+// Device type reported by NSCMD_DEVICEQUERY
+constexpr u16   NSDEVTYPE_TRACKDISK = 5;
+
+// Size of the NSDeviceQueryResult structure this device fills in
+constexpr u32   NSD_QUERY_SIZE      = 16;
+
+// Size of the DriveGeometry structure this device fills in
+constexpr u32   DG_SIZE             = 32;
+
+// Device type reported by TD_GETGEOMETRY
+constexpr u8    DG_DIRECT_ACCESS    = 0;
 
 // Offsets into the IOStdReq struct
 constexpr u32   IO_COMMAND          = 0x1C;
@@ -68,13 +85,39 @@ enum class IoCommand
     TD_REMCHANGEINT,    // 21
     TD_GETGEOMETRY,     // 22
     TD_EJECT,           // 23
-    TD_LASTCOMM         // 24
+
+    /* 64-bit commands (TD64)
+     *
+     * They begin where the trackdisk commands end, at what trackdisk.h calls
+     * TD_LASTCOMM, and carry the high 32 bits of the offset in io_Actual.
+     * That is how a drive beyond 4 GB is addressed at all: io_Offset is a
+     * 32-bit field and always will be.
+     */
+    TD_READ64,          // 24
+    TD_WRITE64,         // 25
+    TD_SEEK64,          // 26
+    TD_FORMAT64,        // 27
+    HD_SCSICMD,         // 28 (not supported)
+
+    /* New Style Device commands
+     *
+     * The same four 64-bit commands under different numbers, plus the query
+     * that tells a caller which commands a device understands. They live
+     * outside the trackdisk command space, which is why they lie beyond the
+     * range this enum calls valid.
+     */
+    NSD_DEVICEQUERY     = 0x4000,
+    NSD_TD_READ64       = 0xC000,
+    NSD_TD_WRITE64      = 0xC001,
+    NSD_TD_SEEK64       = 0xC002,
+    NSD_TD_FORMAT64     = 0xC003
 };
 
 struct IoCommandEnum : Reflectable<IoCommandEnum, IoCommand>
 {
     static constexpr long minVal = 0;
-    static constexpr long maxVal = long(IoCommand::TD_LASTCOMM);
+    // The NSD commands are deliberately outside this range (see IoCommand)
+    static constexpr long maxVal = long(IoCommand::HD_SCSICMD);
     
     static const char *_key(IoCommand value)
     {
@@ -105,7 +148,17 @@ struct IoCommandEnum : Reflectable<IoCommandEnum, IoCommand>
             case IoCommand::TD_REMCHANGEINT:   return "TD_REMCHANGEINT";
             case IoCommand::TD_GETGEOMETRY:    return "TD_GETGEOMETRY";
             case IoCommand::TD_EJECT:          return "TD_EJECT";
-            case IoCommand::TD_LASTCOMM:       return "TD_LASTCOMM";
+            case IoCommand::TD_READ64:         return "TD_READ64";
+            case IoCommand::TD_WRITE64:        return "TD_WRITE64";
+            case IoCommand::TD_SEEK64:         return "TD_SEEK64";
+            case IoCommand::TD_FORMAT64:       return "TD_FORMAT64";
+            case IoCommand::HD_SCSICMD:        return "HD_SCSICMD";
+
+            case IoCommand::NSD_DEVICEQUERY:   return "NSD_DEVICEQUERY";
+            case IoCommand::NSD_TD_READ64:     return "NSD_TD_READ64";
+            case IoCommand::NSD_TD_WRITE64:    return "NSD_TD_WRITE64";
+            case IoCommand::NSD_TD_SEEK64:     return "NSD_TD_SEEK64";
+            case IoCommand::NSD_TD_FORMAT64:   return "NSD_TD_FORMAT64";
         }
         return "???";
     }
@@ -151,6 +204,23 @@ struct HdcStateEnum : Reflectable<HdcStateEnum, HdcState>
 typedef struct
 {
     bool connected;
+
+    /* Largest drive this controller accepts, in MB (0 = no limit)
+     *
+     * Controllers of the era could only address so much, and an image beyond
+     * their reach would not have worked on the hardware being emulated. 504
+     * reproduces the classic IDE ceiling; 0 lets a drive be as large as its
+     * geometry allows.
+     */
+    isize mbLimit;
+
+    /* Largest disk this controller keeps in memory, in MB (0 = no limit)
+     *
+     * A disk that does not live in a file is part of every snapshot, in full.
+     * Beyond this size that is no longer practical, so such a disk has to
+     * stay in its file (see HardDrive::loadIntoMemory).
+     */
+    isize memLimit;
 }
 HdcConfig;
 
@@ -165,7 +235,7 @@ HdcInfo;
 typedef struct
 {
     // Tracks the number of executed commands
-    isize cmdCount[25];
+    isize cmdCount[29];
 }
 HdcStats;
 

@@ -792,7 +792,7 @@ Memory::patchExpansionLib()
                     R16BE(rom + i + 20) == 0x202f &&
                     R16BE(rom + i + 22) == 0x0002) {
                     
-                    xfiles("Patching Kickstart 1.2 at %lx\n", i);
+                    xfiles("Patching Kickstart 1.2 at %tx\n", i);
 
                     W32BE(rom + i, 0x426f0004);
                     W16BE(rom + i + 22, 0x0000);
@@ -3189,7 +3189,7 @@ Memory::patch(u32 addr, u32 value)
 }
 
 void
-Memory::patch(u32 addr, u8 *buf, isize len)
+Memory::patch(u32 addr, const u8 *buf, isize len)
 {
     assert(buf);
     

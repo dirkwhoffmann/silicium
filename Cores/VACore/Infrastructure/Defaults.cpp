@@ -158,10 +158,13 @@ Defaults::fallbacks()
     registerDefaults(Opt::DRIVE_EJECT_VOLUME,         50,                     { 0, 1, 2, 3 });
     registerDefaults(Opt::HDC_CONNECT,                true,                   { 0 });
     registerDefaults(Opt::HDC_CONNECT,                false,                  { 1, 2, 3 });
+    registerDefaults(Opt::HDC_MB_LIMIT,               0,                      { 0, 1, 2, 3 });
+    registerDefaults(Opt::HDC_MEM_LIMIT,              256,                    { 0, 1, 2, 3 });
     registerDefaults(Opt::HDR_TYPE,                   (i64)HardDriveType::GENERIC, { 0, 1, 2, 3 });
     registerDefaults(Opt::HDR_PAN,                    300,                    { 0, 2 });
     registerDefaults(Opt::HDR_PAN,                    100,                    { 1, 3 });
     registerDefaults(Opt::HDR_STEP_VOLUME,            50,                     { 0, 1, 2, 3 });
+    registerDefaults(Opt::HDR_WRITE_THROUGH,          (i64)WriteThroughMode::NEVER, { 0, 1, 2, 3 });
 
     registerDefault(Opt::SER_DEVICE,                 (i64)SerialPortDevice::NONE);
     registerDefault(Opt::SER_VERBOSE,                0);
@@ -356,7 +359,7 @@ Defaults::load(std::stringstream &stream)
         }
 
         if (accepted || skipped) {
-            logmsg(LOG_DEF, "%ld keys accepted, %ld ignored\n", accepted, skipped);
+            logmsg(LOG_DEF, "%td keys accepted, %td ignored\n", accepted, skipped);
         }
     }
 }
