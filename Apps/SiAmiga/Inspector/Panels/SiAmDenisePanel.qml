@@ -154,6 +154,31 @@ SiAmInspectorWindow {
                         SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.pf1p0;  l: qsTr("PF1P0");  lwidth: 60 }
                     }
 
+                    ColumnLayout {
+
+                        spacing: Style.tinySpacing
+
+                        RowLayout {
+                            spacing: Style.tinySpacing
+                            SiHex16 { l: qsTr("BPLCON3"); lwidth: 65; value: denise.bplcon3 }
+                        }
+                        RowLayout {
+                            spacing: Style.smallSpacing
+                            Item { Layout.preferredWidth: 4 }
+                            SiHex8 { controlWidth: 32; value: denise.colorBank }
+                            SiLabel { text: qsTr("Color bank") }
+                        }
+                        RowLayout {
+                            spacing: Style.smallSpacing
+                            Item { Layout.preferredWidth: 4 }
+                            SiHex8 { controlWidth: 32; value: denise.pf2of }
+                            SiLabel { text: qsTr("PF2 offset") }
+                        }
+                        SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.loct;      l: qsTr("LOCT");      lwidth: 60 }
+                        SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.brdrblnk;  l: qsTr("BRDRBLNK");  lwidth: 60 }
+                        SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.brdsprt;   l: qsTr("BRDSPRT");   lwidth: 60 }
+                    }
+
                     HSpacer { }
                 }
 

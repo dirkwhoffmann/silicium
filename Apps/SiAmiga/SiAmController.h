@@ -24,6 +24,7 @@
 #include "Inspector/SiAmMemoryController.h"
 #include "Inspector/SiAmCopperController.h"
 #include "Inspector/SiAmBlitterController.h"
+#include "Inspector/SiAmAgnusController.h"
 #include "Inspector/SiAmPaulaController.h"
 #include "Inspector/SiAmBusController.h"
 #include "Inspector/SiAmCPUController.h"
@@ -69,6 +70,7 @@ class SiAmController : public Controller {
     unique_ptr<SiAmMemoryController> m_memoryController;
     unique_ptr<SiAmCopperController> m_copperController;
     unique_ptr<SiAmBlitterController> m_blitterController;
+    unique_ptr<SiAmAgnusController> m_agnusController;
     unique_ptr<SiAmPaulaController> m_paulaController;
     unique_ptr<SiAmBusController> m_busController;
     unique_ptr<SiAmCPUController> m_cpuController;
@@ -273,6 +275,7 @@ public:
     Q_PROPERTY(SiAmMemoryController *memoryController READ getMemoryController CONSTANT)
     Q_PROPERTY(SiAmCopperController *copperController READ getCopperController CONSTANT)
     Q_PROPERTY(SiAmBlitterController *blitterController READ getBlitterController CONSTANT)
+    Q_PROPERTY(SiAmAgnusController *agnusController READ getAgnusController CONSTANT)
     Q_PROPERTY(SiAmPaulaController *paulaController READ getPaulaController CONSTANT)
     Q_PROPERTY(SiAmBusController *busController READ getBusController CONSTANT)
     Q_PROPERTY(SiAmCPUController *cpuController READ getCPUController CONSTANT)
@@ -291,6 +294,7 @@ public:
     SiAmMemoryController *getMemoryController() const { return m_memoryController.get(); }
     SiAmCopperController *getCopperController() const { return m_copperController.get(); }
     SiAmBlitterController *getBlitterController() const { return m_blitterController.get(); }
+    SiAmAgnusController *getAgnusController() const { return m_agnusController.get(); }
     SiAmPaulaController *getPaulaController() const { return m_paulaController.get(); }
     SiAmBusController *getBusController() const { return m_busController.get(); }
     SiAmCPUController *getCPUController() const { return m_cpuController.get(); }

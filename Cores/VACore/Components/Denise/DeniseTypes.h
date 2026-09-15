@@ -135,6 +135,7 @@ typedef struct
     u16 bplcon0;
     u16 bplcon1;
     u16 bplcon2;
+    u16 bplcon3;
     i16 bpu;
     u16 bpldat[8];
     

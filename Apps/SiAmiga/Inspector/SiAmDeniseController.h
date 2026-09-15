@@ -26,6 +26,11 @@
 // than querying the core directly -- this controller only decodes it into
 // the individual bit/field properties DenisePanel.swift's outlets expose.
 //
+// BPLCON3 (AGA) is decoded the same way BPLCON0/1/2 already are -- straight
+// bitmasks matching the bit positions Denise's own colorBank()/pf2of()/
+// loct()/brdrblnk()/brdsprt() accessors use (see Denise.h's "BPLCON3"
+// block), which are the only BPLCON3 fields the core actually acts on.
+//
 // Color registers are exposed via colorAt(n) rather than 32 named
 // properties, the same Q_INVOKABLE(n) shape SiAmInfoController's own
 // dReg(n)/aReg(n) and SiAmBlitterController's lfEnabled(n)/lfValue(n) use.
@@ -41,13 +46,19 @@ class SiAmDeniseController : public SiAmInspectorController {
 
     Q_OBJECT
 
-    int m_bplcon0 = 0, m_bplcon1 = 0, m_bplcon2 = 0;
+    int m_bplcon0 = 0, m_bplcon1 = 0, m_bplcon2 = 0, m_bplcon3 = 0;
     int m_bpu = 0;
     bool m_hires = false, m_homod = false, m_dbplf = false, m_lace = false, m_shres = false;
     bool m_shresEnabled = false;
     int m_p1h = 0, m_p2h = 0;
     bool m_pf2pri = false, m_pf2p2 = false, m_pf2p1 = false, m_pf2p0 = false;
     bool m_pf1p2 = false, m_pf1p1 = false, m_pf1p0 = false;
+
+    // BPLCON3 (AGA), decoded via Denise's own colorBank()/pf2of()/loct()/
+    // brdrblnk()/brdsprt() -- the only BPLCON3 fields the core actually acts
+    // on (see Denise.h's "BPLCON3" accessor block).
+    int m_colorBank = 0, m_pf2of = 0;
+    bool m_loct = false, m_brdrblnk = false, m_brdsprt = false;
 
     int m_diwstrt = 0, m_diwstop = 0;
     int m_hstrt = 0, m_vstrt = 0, m_hstop = 0, m_vstop = 0;
@@ -68,6 +79,12 @@ class SiAmDeniseController : public SiAmInspectorController {
     Q_PROPERTY(int bplcon0 READ bplcon0 NOTIFY deniseChanged)
     Q_PROPERTY(int bplcon1 READ bplcon1 NOTIFY deniseChanged)
     Q_PROPERTY(int bplcon2 READ bplcon2 NOTIFY deniseChanged)
+    Q_PROPERTY(int bplcon3 READ bplcon3 NOTIFY deniseChanged)
+    Q_PROPERTY(int colorBank READ colorBank NOTIFY deniseChanged)
+    Q_PROPERTY(int pf2of READ pf2of NOTIFY deniseChanged)
+    Q_PROPERTY(bool loct READ loct NOTIFY deniseChanged)
+    Q_PROPERTY(bool brdrblnk READ brdrblnk NOTIFY deniseChanged)
+    Q_PROPERTY(bool brdsprt READ brdsprt NOTIFY deniseChanged)
     Q_PROPERTY(int bpu READ bpu NOTIFY deniseChanged)
     Q_PROPERTY(bool hires READ hires NOTIFY deniseChanged)
     Q_PROPERTY(bool homod READ homod NOTIFY deniseChanged)
@@ -114,6 +131,12 @@ class SiAmDeniseController : public SiAmInspectorController {
     int bplcon0() const { return m_bplcon0; }
     int bplcon1() const { return m_bplcon1; }
     int bplcon2() const { return m_bplcon2; }
+    int bplcon3() const { return m_bplcon3; }
+    int colorBank() const { return m_colorBank; }
+    int pf2of() const { return m_pf2of; }
+    bool loct() const { return m_loct; }
+    bool brdrblnk() const { return m_brdrblnk; }
+    bool brdsprt() const { return m_brdsprt; }
     int bpu() const { return m_bpu; }
     bool hires() const { return m_hires; }
     bool homod() const { return m_homod; }

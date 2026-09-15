@@ -54,10 +54,12 @@ SiAmDeniseController::refreshData()
     int bplcon0 = info.bplcon0;
     int bplcon1 = info.bplcon1;
     int bplcon2 = info.bplcon2;
+    int bplcon3 = info.bplcon3;
 
     m_bplcon0 = bplcon0;
     m_bplcon1 = bplcon1;
     m_bplcon2 = bplcon2;
+    m_bplcon3 = bplcon3;
     m_bpu = info.bpu;
 
     m_hires = bplcon0 & 0b1000000000000000;
@@ -79,6 +81,15 @@ SiAmDeniseController::refreshData()
     m_pf1p2  = bplcon2 & 0b0000100;
     m_pf1p1  = bplcon2 & 0b0000010;
     m_pf1p0  = bplcon2 & 0b0000001;
+
+    // BPLCON3 (AGA), same bit positions as Denise::colorBank()/pf2of()/
+    // loct()/brdrblnk()/brdsprt() -- see SiAmDeniseController's class
+    // comment.
+    m_colorBank = (bplcon3 >> 13) & 0b111;
+    m_pf2of     = (bplcon3 >> 10) & 0b111;
+    m_loct      = bplcon3 & 0b0000001000000000;
+    m_brdrblnk  = bplcon3 & 0b0000000000100000;
+    m_brdsprt   = bplcon3 & 0b0000000000000010;
 
     m_diwstrt = info.diwstrt;
     m_diwstop = info.diwstop;
