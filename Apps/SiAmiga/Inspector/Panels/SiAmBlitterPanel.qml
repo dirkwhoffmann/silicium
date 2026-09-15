@@ -79,7 +79,7 @@ SiAmInspectorWindow {
     component SiBin16: SiNumberViewControl {
         size: Size.small
         font.weight: 500
-        controlWidth: 180
+        controlWidth: 140
         bits: 16
         base: 2
         padded: true
@@ -183,23 +183,23 @@ SiAmInspectorWindow {
                         SiLabel { text: qsTr("Old"); horizontalAlignment: Text.AlignHCenter; Layout.preferredWidth: 64 }
                         SiLabel { text: qsTr("New"); horizontalAlignment: Text.AlignHCenter; Layout.preferredWidth: 64 }
 
-                        Item { }
+                        SiCheckBoxControl { readOnly: true; checked: blitter.useA; l: qsTr("Channel A") }
                         SiHex16 { value: blitter.aHold }
                         SiHex16 { value: blitter.aOld }
-                        SiHex16 { value: blitter.aNew; SiCheckBoxControl { readOnly: true; checked: blitter.useA; r: qsTr("Channel A") } }
+                        SiHex16 { value: blitter.aNew }
 
-                        Item { }
+                        SiCheckBoxControl { readOnly: true; checked: blitter.useB; l: qsTr("Channel B") }
                         SiHex16 { value: blitter.bHold }
                         SiHex16 { value: blitter.bOld }
-                        SiHex16 { value: blitter.bNew; SiCheckBoxControl { readOnly: true; checked: blitter.useB; r: qsTr("Channel B") } }
+                        SiHex16 { value: blitter.bNew }
 
-                        Item { }
-                        SiHex16 { value: blitter.cHold; SiCheckBoxControl { readOnly: true; checked: blitter.useC; r: qsTr("Channel C") } }
+                        SiCheckBoxControl { readOnly: true; checked: blitter.useC; l: qsTr("Channel C") }
+                        SiHex16 { value: blitter.cHold }
                         Item { }
                         Item { }
 
-                        Item { }
-                        SiHex16 { value: blitter.dHold; SiCheckBoxControl { readOnly: true; checked: blitter.useD; r: qsTr("Channel D") } }
+                        SiCheckBoxControl { readOnly: true; checked: blitter.useD; l: qsTr("Channel D") }
+                        SiHex16 { value: blitter.dHold }
                         Item { }
                         SiCheckBoxControl { readOnly: true; checked: blitter.bzero; r: qsTr("BZERO") }
                     }
@@ -243,24 +243,30 @@ SiAmInspectorWindow {
 
                     Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; Layout.topMargin: Style.smallSpacing; Layout.bottomMargin: Style.smallSpacing; color: Palette.surfaceBorder }
 
-                    SiBin16 { l: qsTr("Barrel A In"); lwidth: 90; value: blitter.barrelAIn }
+                    SiBin16 { l: qsTr("Barrel A In"); lwidth: 90; value: blitter.barrelAIn
 
-                    RowLayout {
-                        spacing: Style.tinySpacing
-                        SiLabel { text: qsTr("<<"); Layout.preferredWidth: 90; horizontalAlignment: Text.AlignRight }
+                        SiLabel { text: qsTr("<<") }
                         SiHex4 { value: blitter.barrelAShift }
-                        SiLabel { text: "=" }
-                        SiBin16 { value: blitter.barrelAOut }
                     }
 
-                    SiBin16 { l: qsTr("Barrel B In"); lwidth: 90; value: blitter.barrelBIn }
+                    SiBin16 {
 
-                    RowLayout {
-                        spacing: Style.tinySpacing
-                        SiLabel { text: qsTr("<<"); Layout.preferredWidth: 90; horizontalAlignment: Text.AlignRight }
+                        lwidth: 90
+                        l: "="
+                        value: blitter.barrelAOut
+                    }
+
+                    SiBin16 { l: qsTr("Barrel B In"); lwidth: 90; value: blitter.barrelBIn
+
+                        SiLabel { text: qsTr("<<") }
                         SiHex4 { value: blitter.barrelBShift }
-                        SiLabel { text: "=" }
-                        SiBin16 { value: blitter.barrelBOut }
+                    }
+
+                    SiBin16 {
+
+                        lwidth: 90
+                        l: "="
+                        value: blitter.barrelBOut
                     }
 
                     Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; Layout.topMargin: Style.smallSpacing; Layout.bottomMargin: Style.smallSpacing; color: Palette.surfaceBorder }
@@ -313,6 +319,8 @@ SiAmInspectorWindow {
 
                     SiBin16 { l: qsTr("Out"); lwidth: 40; value: blitter.lfOut }
                 }
+
+                VSpacer {}
             }
         }
     }
