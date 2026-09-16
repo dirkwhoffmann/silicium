@@ -14,14 +14,14 @@ import Silicium.Components
 import Silicium.Controllers
 import Silicium.Theme
 
-// The DMA Debugger box that used to live in SiAmBusPanel.qml, paired with a
-// live preview -- same split as SiC64BusPanel.qml's "DMA Channels" +
-// "Preview" boxes, including the same "Show as overlay" toggle: DmaDebugger
+// The X-Ray box that used to live in SiAmBusPanel.qml, paired with a live
+// preview -- same split as SiC64BusPanel.qml's "DMA Channels" + "Preview"
+// boxes, including the same "Show as overlay" toggle: the X-Ray debugger
 // always paints its raw visualization into its own texture (PixelEngine::
-// xrayTexture, mirrored here by SiAmDmaView) whenever XRAY_MODE is XRAY_DMA,
-// and only additionally blends it into the real picture when
-// XRAY_OVERLAY is also on -- so the preview works independently of
-// whether the live display is affected.
+// xrayTexture, mirrored here by SiAmDmaView) whenever XRAY_MODE is not
+// XRAY_NONE, and only additionally blends it into the real picture when
+// XRAY_OVERLAY is also on -- so the preview works independently of whether
+// the live display is affected.
 SiAmInspectorWindow {
 
     id: root
@@ -36,6 +36,7 @@ SiAmInspectorWindow {
     // Mirrors vamiga::XRayMode (see DmaDebuggerTypes.h)
     readonly property int xrayNone: 0
     readonly property int xrayDma: 1
+    readonly property int xrayLayers: 2
 
     component ChannelRow: RowLayout {
 
@@ -55,7 +56,6 @@ SiAmInspectorWindow {
 
             Layout.fillWidth: true
             indent: tab
-            enabled: root.cc.XRAY_MODE !== root.xrayNone
             checked: chRow.on
             onClicked: chRow.toggled(checked)
             r: chRow.label
@@ -70,6 +70,25 @@ SiAmInspectorWindow {
         }
     }
 
+    // A single bit of Opt.DENISE_HIDDEN_LAYERS (see PixelEngine::hide for
+    // the bit layout: sprites 0-7 in bits 0x01-0x80, playfield 1 in 0x100,
+    // playfield 2 in 0x200).
+    component LayerRow: SiCheckBoxControl {
+
+        id: layerRow
+
+        required property string label
+        required property int bit
+
+        Layout.fillWidth: true
+        indent: tab
+        checked: (cc.DENISE_HIDDEN_LAYERS & bit) !== 0
+        onClicked: cc.DENISE_HIDDEN_LAYERS = checked ?
+                       (cc.DENISE_HIDDEN_LAYERS | bit) :
+                       (cc.DENISE_HIDDEN_LAYERS & ~bit)
+        r: layerRow.label
+    }
+
     RowLayout {
 
         anchors.fill: parent
@@ -77,25 +96,33 @@ SiAmInspectorWindow {
         spacing: Style.mediumSpacing
 
         //
-        // DMA Debugger
+        // X-Ray
         //
 
         SiBox {
 
-            title: qsTr("DMA Channels")
+            title: qsTr("X-Ray")
             Layout.preferredWidth: 280
             Layout.fillHeight: true
             spacing: Style.tinySpacing
 
-            SiCheckBoxControl {
+            SiComboBoxControl {
 
-                checked: cc.XRAY_MODE === xrayDma
-                onClicked: cc.XRAY_MODE = checked ? xrayDma : xrayNone
-                r: qsTr("DMA Debugger")
+                Layout.fillWidth: true
+                model: [qsTr("Off"), qsTr("DMA Debugger"), qsTr("Layers")]
+                currentIndex: cc.XRAY_MODE
+                onCurrentIndexChanged: cc.XRAY_MODE = currentIndex
             }
+
+            VSpacer { size: Style.mediumSpacing }
+
+            //
+            // DMA channels (only shown in DMA Debugger mode)
+            //
 
             ChannelRow {
 
+                visible: cc.XRAY_MODE === xrayDma
                 label: qsTr("Copper DMA")
                 on: cc.XRAY_DMA_CHANNEL0; swatch: cc.XRAY_DMA_COLOR0
                 onToggled: (value) => cc.XRAY_DMA_CHANNEL0 = value
@@ -104,6 +131,7 @@ SiAmInspectorWindow {
 
             ChannelRow {
 
+                visible: cc.XRAY_MODE === xrayDma
                 label: qsTr("Blitter DMA")
                 on: cc.XRAY_DMA_CHANNEL1; swatch: cc.XRAY_DMA_COLOR1
                 onToggled: (value) => cc.XRAY_DMA_CHANNEL1 = value
@@ -112,6 +140,7 @@ SiAmInspectorWindow {
 
             ChannelRow {
 
+                visible: cc.XRAY_MODE === xrayDma
                 label: qsTr("Disk DMA")
                 on: cc.XRAY_DMA_CHANNEL2; swatch: cc.XRAY_DMA_COLOR2
                 onToggled: (value) => cc.XRAY_DMA_CHANNEL2 = value
@@ -120,6 +149,7 @@ SiAmInspectorWindow {
 
             ChannelRow {
 
+                visible: cc.XRAY_MODE === xrayDma
                 label: qsTr("Audio DMA")
                 on: cc.XRAY_DMA_CHANNEL3; swatch: cc.XRAY_DMA_COLOR3
                 onToggled: (value) => cc.XRAY_DMA_CHANNEL3 = value
@@ -128,6 +158,7 @@ SiAmInspectorWindow {
 
             ChannelRow {
 
+                visible: cc.XRAY_MODE === xrayDma
                 label: qsTr("Sprite DMA")
                 on: cc.XRAY_DMA_CHANNEL4; swatch: cc.XRAY_DMA_COLOR4
                 onToggled: (value) => cc.XRAY_DMA_CHANNEL4 = value
@@ -136,6 +167,7 @@ SiAmInspectorWindow {
 
             ChannelRow {
 
+                visible: cc.XRAY_MODE === xrayDma
                 label: qsTr("Bitplane DMA")
                 on: cc.XRAY_DMA_CHANNEL5; swatch: cc.XRAY_DMA_COLOR5
                 onToggled: (value) => cc.XRAY_DMA_CHANNEL5 = value
@@ -144,6 +176,7 @@ SiAmInspectorWindow {
 
             ChannelRow {
 
+                visible: cc.XRAY_MODE === xrayDma
                 label: qsTr("CPU DMA")
                 on: cc.XRAY_DMA_CHANNEL6; swatch: cc.XRAY_DMA_COLOR6
                 onToggled: (value) => cc.XRAY_DMA_CHANNEL6 = value
@@ -152,18 +185,34 @@ SiAmInspectorWindow {
 
             ChannelRow {
 
+                visible: cc.XRAY_MODE === xrayDma
                 label: qsTr("Memory Refresh DMA")
                 on: cc.XRAY_DMA_CHANNEL7; swatch: cc.XRAY_DMA_COLOR7
                 onToggled: (value) => cc.XRAY_DMA_CHANNEL7 = value
                 onColorPicked: (value) => cc.XRAY_DMA_COLOR7 = value
             }
 
+            //
+            // Hidden layers (only shown in Layers mode)
+            //
+
+            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Sprite 0"); bit: 0x01 }
+            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Sprite 1"); bit: 0x02 }
+            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Sprite 2"); bit: 0x04 }
+            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Sprite 3"); bit: 0x08 }
+            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Sprite 4"); bit: 0x10 }
+            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Sprite 5"); bit: 0x20 }
+            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Sprite 6"); bit: 0x40 }
+            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Sprite 7"); bit: 0x80 }
+            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Playfield 1"); bit: 0x100 }
+            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Playfield 2"); bit: 0x200 }
+
             VSpacer { size: Style.mediumSpacing }
 
             SiCheckBoxControl {
 
                 indent: tab
-                enabled: cc.XRAY_MODE !== xrayNone
+                visible: cc.XRAY_MODE !== xrayNone
                 checked: cc.XRAY_OVERLAY
                 onClicked: cc.XRAY_OVERLAY = checked
                 r: qsTr("Show as overlay")
@@ -173,7 +222,8 @@ SiAmInspectorWindow {
 
                 indent: tabtab
                 Layout.fillWidth: true
-                enabled: cc.XRAY_MODE !== xrayNone && cc.XRAY_OVERLAY
+                visible: cc.XRAY_MODE === xrayDma
+                enabled: cc.XRAY_OVERLAY
                 model: [qsTr("Foreground layer"), qsTr("Background layer"), qsTr("Mixed layers")]
                 currentIndex: cc.XRAY_OVERLAY_STYLE
                 onCurrentIndexChanged: cc.XRAY_OVERLAY_STYLE = currentIndex
@@ -181,7 +231,8 @@ SiAmInspectorWindow {
 
             SiSliderControl {
 
-                enabled: cc.XRAY_MODE !== xrayNone && cc.XRAY_OVERLAY
+                visible: cc.XRAY_MODE !== xrayNone
+                indent: tabtab
                 Layout.fillWidth: true
                 l: qsTr("Opacity")
                 from: 0
@@ -226,7 +277,7 @@ SiAmInspectorWindow {
                 }
             }
 
-            // Placeholder shown while the DMA debugger is off
+            // Placeholder shown while X-Ray is off
             Item {
 
                 Layout.fillWidth: true
