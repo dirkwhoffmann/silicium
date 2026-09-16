@@ -35,7 +35,7 @@ DmaDebugger::setDmaDebugColor(MemAccess type, RgbColor color)
     auto channel = (long)type;
     config.dmaColor[channel] = GpuColor<TexelFormat::ABGR>(color).rawValue;
 
-    switch (host.getConfig().texFormat) {
+    switch (static_cast<TexelFormat>(host.getConfig().texFormat)) {
 
         case TexelFormat::ABGR: updateDebugColor<TexelFormat::ABGR>(channel, color); break;
         case TexelFormat::ARGB: updateDebugColor<TexelFormat::ARGB>(channel, color); break;
@@ -92,7 +92,7 @@ DmaDebugger::computeOverlay(u32 *emuTexture, u32 *dmaTexture)
     // DmaDebugger.h. Each branch below calls a separate instantiation of
     // the templated overload, so the format is a compile-time constant for
     // the whole per-pixel loop inside it.
-    switch (host.getConfig().texFormat) {
+    switch (static_cast<TexelFormat>(host.getConfig().texFormat)) {
 
         case TexelFormat::ABGR: computeOverlay<TexelFormat::ABGR>(emuTexture, dmaTexture); return;
         case TexelFormat::ARGB: computeOverlay<TexelFormat::ARGB>(emuTexture, dmaTexture); return;
@@ -178,7 +178,7 @@ void
 DmaDebugger::cutLayers()
 {
     // Dispatched once per call (not per pixel) -- see computeOverlay above.
-    switch (host.getConfig().texFormat) {
+    switch (static_cast<TexelFormat>(host.getConfig().texFormat)) {
 
         case TexelFormat::ABGR: cutLayers<TexelFormat::ABGR>(); return;
         case TexelFormat::ARGB: cutLayers<TexelFormat::ARGB>(); return;

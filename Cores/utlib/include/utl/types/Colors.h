@@ -1,5 +1,5 @@
-/// -----------------------------------------------------------------------------
-// This file is part of vAmiga
+// -----------------------------------------------------------------------------
+// This file is part of utlib - A lightweight utility library
 //
 // Copyright (C) Dirk W. Hoffmann. www.dirkwhoffmann.de
 // Licensed under the Mozilla Public License v2
@@ -9,12 +9,11 @@
 
 #pragma once
 
-#include "ColorTypes.h"
+#include "utl/common.h"
 #include "utl/abilities/Streamable.h"
+#include "ColorTypes.h"
 
-namespace vamiga {
-
-using namespace utl;
+namespace utl {
 
 struct RgbColor;
 struct YuvColor;
@@ -49,6 +48,7 @@ struct RgbColor : Streamable {
     }
 
     RgbColor mix(RgbColor additive, double weight) const;
+    RgbColor mix(RgbColor additive, double weight1, double weight2) const;
     RgbColor tint(double weight) const { return mix(white, weight); }
     RgbColor shade(double weight) const { return mix(black, weight); }
 };
@@ -93,12 +93,6 @@ struct AmigaColor : Streamable
     AmigaColor(const RgbColor &c);
     AmigaColor(const YuvColor &c) : AmigaColor(RgbColor(c)) { }
     template <TexelFormat F> AmigaColor(const GpuColor<F> &c);
-
-    //
-    // Methods from Serializable
-    //
-
-public:
 
     template <class W>
     W& operator<<(W& worker)
@@ -165,15 +159,13 @@ public:
 
 /* A 32-bit pixel color, laid out exactly as a texel of format F.
  *
- * Making the layout a template parameter rather than a fixed internal
- * convention (translated to/from the host's actual HOST_TEX_FORMAT at the
- * edges by a separate pair of functions) means a GpuColor<F> is never
- * ambiguous about which bytes mean what: r()/g()/b()/a() and every
- * constructor below decode/encode according to F itself, so there is no
- * separate conversion step left where the format and the data could get out
- * of sync -- which is exactly how the DMA debugger's opacity blending used
- * to silently mix the wrong channel whenever the host wasn't running in
- * ABGR (the format GpuColor's old fixed layout happened to match).
+ * A GpuColor<F>'s rawValue is always already packed as format F, so
+ * constructing one from raw channel values or reading r()/g()/b()/a() back
+ * out is correct by construction, for whichever F it was made with. There is
+ * no separate "convert to/from the host's texel format" step left where the
+ * format and the data could get out of sync -- which is exactly the bug this
+ * design replaced (a fixed-layout GpuColor silently mixing the wrong channel
+ * whenever the actual host format didn't match the layout it assumed).
  *
  * Only three instantiations exist (one per TexelFormat), explicitly
  * instantiated in Colors.cpp.
@@ -236,6 +228,7 @@ struct GpuColor {
     }
 
     GpuColor mix(const RgbColor &color, double weight) const;
+    GpuColor mix(const RgbColor &color, double weight1, double weight2) const;
     GpuColor tint(double weight) const { return mix(RgbColor::white, weight); }
     GpuColor shade(double weight) const { return mix(RgbColor::black, weight); }
 };

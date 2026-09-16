@@ -382,7 +382,7 @@ DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize las
     // DmaDebugger.h. Each branch below calls a separate instantiation of
     // the templated overload, so the format is a compile-time constant for
     // the whole per-pixel loop inside it.
-    switch (host.getConfig().texFormat) {
+    switch (static_cast<TexelFormat>(host.getConfig().texFormat)) {
 
         case TexelFormat::ABGR: computeOverlay<TexelFormat::ABGR>(emuPtr, dmaPtr, first, last, own, val); return;
         case TexelFormat::ARGB: computeOverlay<TexelFormat::ARGB>(emuPtr, dmaPtr, first, last, own, val); return;

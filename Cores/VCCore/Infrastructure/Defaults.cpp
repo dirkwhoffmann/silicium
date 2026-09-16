@@ -20,7 +20,7 @@ Defaults::Defaults()
 {
     setFallback(Opt::HOST_REFRESH_RATE,          60);
     setFallback(Opt::HOST_SAMPLE_RATE,           44100);
-    setFallback(Opt::HOST_TEX_FORMAT,            (i64)TexelFormat::RGBA);
+    setFallback(Opt::HOST_TEX_FORMAT,            (i64)TexFormat::RGBA);
     setFallback(Opt::HOST_FRAMEBUF_WIDTH,        0);
     setFallback(Opt::HOST_FRAMEBUF_HEIGHT,       0);
 

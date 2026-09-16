@@ -46,7 +46,7 @@ SiC64Renderer::start()
     setupRefreshRate();
 
     // Set the texture format
-    controller->getConfigController()->setHostTexFormat((int)vc64::TexelFormat::ARGB);
+    controller->getConfigController()->setHostTexFormat((int)vc64::TexFormat::ARGB);
 
     // Only proceed if no connection exists yet
     if (m_frameConnection) return;

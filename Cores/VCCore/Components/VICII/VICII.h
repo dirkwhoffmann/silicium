@@ -14,7 +14,7 @@
 
 #include "VICIITypes.h"
 #include "SubComponent.h"
-#include "Colors.h"
+#include "utl/types/Colors.h"
 #include "Constants.h"
 #include "DmaDebugger.h"
 #include "MemoryTypes.h"

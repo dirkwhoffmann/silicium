@@ -10,7 +10,7 @@
 #include "vaconfig.h"
 #include "PixelEngine.h"
 #include "Amiga.h"
-#include "Colors.h"
+#include "utl/types/Colors.h"
 #include "Denise.h"
 #include "DmaDebugger.h"
 #include "Emulator.h"
@@ -263,8 +263,8 @@ PixelEngine::toTexel(const AmigaColor c) const
 
     switch (host.getConfig().texFormat) {
 
-        case TexelFormat::ABGR: return TEXEL(HI_HI_LO_LO(0xFF, b, g, r));
-        case TexelFormat::ARGB: return TEXEL(HI_HI_LO_LO(0xFF, r, g, b));
+        case TexFormat::ABGR: return TEXEL(HI_HI_LO_LO(0xFF, b, g, r));
+        case TexFormat::ARGB: return TEXEL(HI_HI_LO_LO(0xFF, r, g, b));
 
         default:
             return TEXEL(HI_HI_LO_LO(r, g, b, 0xFF));
@@ -277,8 +277,11 @@ PixelEngine::toTexel(u8 r, u8 g, u8 b, u8 a) const
     // One-off conversion: re-reads the host format and dispatches to the
     // matching compile-time-specialized instantiation. A hot loop should
     // do this switch itself, once, and call the template directly per pixel
-    // (see DmaDebugger::computeOverlay).
-    switch (host.getConfig().texFormat) {
+    // (see DmaDebugger::computeOverlay). HOST_TEX_FORMAT's own enum
+    // (TexFormat) and utlib's GpuColor<F> template parameter (TexelFormat)
+    // share the same three values in the same order, so a plain cast moves
+    // between them.
+    switch (static_cast<TexelFormat>(host.getConfig().texFormat)) {
 
         case TexelFormat::ABGR: return toTexel(GpuColor<TexelFormat::ABGR>(r, g, b, a));
         case TexelFormat::ARGB: return toTexel(GpuColor<TexelFormat::ARGB>(r, g, b, a));
