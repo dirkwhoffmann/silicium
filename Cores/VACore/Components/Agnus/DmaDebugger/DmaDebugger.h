@@ -13,7 +13,7 @@
 #include "FrameBufferTypes.h"
 #include "SubComponent.h"
 #include "Beamtraps.h"
-#include "utl/types/Colors.h"
+#include "utl/color/Colors.h"
 #include "Constants.h"
 #include "utl/wrappers.h"
 

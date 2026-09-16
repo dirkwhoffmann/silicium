@@ -7,7 +7,7 @@
 // See https://mozilla.org/MPL/2.0 for license information
 // -----------------------------------------------------------------------------
 
-#include "utl/types/Colors.h"
+#include "utl/color/Colors.h"
 #include <cassert>
 
 namespace utl {
