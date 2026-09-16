@@ -22,12 +22,6 @@ SiAmInspectorWindow {
 
     readonly property var agnus: controller.agnusController
 
-    // Shared width for every SiBox (see SiAmCIAPanel)
-    readonly property real columnWidth: Math.max(280,
-        (scrollView.availableWidth - Style.largeSpacing * 2) * 2 / 5)
-    readonly property real smallColumnWidth: Math.max(140,
-        (scrollView.availableWidth - Style.largeSpacing * 2) / 5)
-
     // Shared label width for a register name
     readonly property int labelWidth: 62
 
@@ -78,27 +72,29 @@ SiAmInspectorWindow {
         anchors.margins: Style.mediumSpacing
 
         clip: true
-        contentWidth: content.implicitWidth
+        contentWidth: content.width
         contentHeight: content.height
 
-        // A single 3-column grid holds all the boxes (see SiAmCIAPanel).
-        // GridLayout has no per-column stretch factor, so pin every cell's
-        // width to root.columnWidth instead, so all four columns stay
-        // equal and track window resizes together.
+        // A single 3-column grid holds all the boxes. Columns are sized by
+        // GridLayout itself, from each cell's natural content size (the
+        // widest cell in that column wins) -- no explicit Layout.preferredWidth
+        // anywhere below, unlike SiAmCIAPanel's equal-width columns.
         //
-        // Height works differently: a Flickable's content item always sizes
-        // to its own implicitHeight, so a GridLayout inside a ScrollView
-        // never grows past what its children need, even when the window is
-        // taller than that -- the extra space just sits blank below it. To
-        // have the grid (and every Layout.fillHeight cell in it) actually
-        // stretch to fill a taller window, and only fall back to scrolling
-        // once the window gets shorter than the natural content height, the
-        // GridLayout's height has to be driven explicitly: the larger of its
-        // own implicitHeight and the ScrollView's available height.
+        // A Flickable's content item always sizes to its own implicitWidth/
+        // implicitHeight, so a GridLayout inside a ScrollView never grows
+        // past what its children need, even when the window is bigger than
+        // that -- the extra space just sits blank to the right of / below
+        // it. To have the grid (and every Layout.fillWidth/fillHeight cell
+        // in it) actually stretch to fill a bigger window, and only fall
+        // back to scrolling once the window gets smaller than the natural
+        // content size, both dimensions have to be driven explicitly: the
+        // larger of the GridLayout's own implicit size and the ScrollView's
+        // available size.
         GridLayout {
 
             id: content
 
+            width: Math.max(implicitWidth, scrollView.availableWidth)
             height: Math.max(implicitHeight, scrollView.availableHeight)
 
             columns: 3
@@ -113,7 +109,6 @@ SiAmInspectorWindow {
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.preferredWidth: root.columnWidth
                 spacing: Style.mediumSpacing
 
                 SiBox {
@@ -134,7 +129,7 @@ SiAmInspectorWindow {
                         SiHex16 { l: qsTr("HPOS:"); lwidth: root.labelWidth; value: agnus.hpos }
                     }
 
-                    VSpacer {}
+                    // VSpacer {}
                 }
 
                 SiBox {
@@ -168,7 +163,7 @@ SiAmInspectorWindow {
                     }
                 }
 
-                VSpacer { }
+                // VSpacer { }
             }
 
             //
@@ -180,7 +175,6 @@ SiAmInspectorWindow {
                 title: qsTr("Bitplane DMA")
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.preferredWidth: root.columnWidth
                 spacing: Style.smallSpacing
 
                 // 2-column grid: left = the 8 bitplane channels, right = the
@@ -219,7 +213,6 @@ SiAmInspectorWindow {
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.preferredWidth: root.smallColumnWidth
                 spacing: Style.mediumSpacing
 
                 SiBox {
@@ -242,7 +235,7 @@ SiAmInspectorWindow {
                         SiCheckBoxControl { size: Size.small; readOnly: true; lwidth: root.labelWidth; l: qsTr("BLTPRI:"); checked: agnus.bltPri }
                         SiCheckBoxControl { size: Size.small; readOnly: true; lwidth: root.labelWidth; l: qsTr("BLS:"); checked: agnus.bls }
 
-                        VSpacer { }
+                        // VSpacer { }
                     }
                 }
             }
@@ -287,7 +280,6 @@ SiAmInspectorWindow {
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.preferredWidth: root.columnWidth
                 spacing: Style.mediumSpacing
 
                 SiBox {
@@ -334,7 +326,6 @@ SiAmInspectorWindow {
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.preferredWidth: root.smallColumnWidth
                 spacing: Style.mediumSpacing
 
                 SiBox {
@@ -357,6 +348,7 @@ SiAmInspectorWindow {
 
                     title: qsTr("Disk DMA")
                     Layout.fillWidth: true
+                    Layout.fillHeight: true
                     spacing: Style.smallSpacing
 
                     ColumnLayout {
