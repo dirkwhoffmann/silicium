@@ -62,7 +62,7 @@ SiC64DmaView::grab()
     isize nr = 0, w = 0, h = 0;
 
     videoPort.lockTexture();
-    const u32 *tex = videoPort.getDmaTexture(&nr, &w, &h);
+    const u32 *tex = videoPort.getXrayTexture(&nr, &w, &h);
 
     if (tex && w > 0 && h > 0) {
 

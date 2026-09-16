@@ -216,7 +216,6 @@ class SiAmConfigController : public Controller {
     Q_PROPERTY(int DENISE_HIDDEN_BITPLANES READ deniseHiddenBitplanes WRITE setDeniseHiddenBitplanes NOTIFY configChanged)
     Q_PROPERTY(int DENISE_HIDDEN_SPRITES READ deniseHiddenSprites WRITE setDeniseHiddenSprites NOTIFY configChanged)
     Q_PROPERTY(int DENISE_HIDDEN_LAYERS READ deniseHiddenLayers WRITE setDeniseHiddenLayers NOTIFY configChanged)
-    Q_PROPERTY(int DENISE_HIDDEN_LAYER_ALPHA READ deniseHiddenLayerAlpha WRITE setDeniseHiddenLayerAlpha NOTIFY configChanged)
     Q_PROPERTY(bool DENISE_CLX_SPR_SPR READ deniseClxSprSpr WRITE setDeniseClxSprSpr NOTIFY configChanged)
     Q_PROPERTY(bool DENISE_CLX_SPR_PLF READ deniseClxSprPlf WRITE setDeniseClxSprPlf NOTIFY configChanged)
     Q_PROPERTY(bool DENISE_CLX_PLF_PLF READ deniseClxPlfPlf WRITE setDeniseClxPlfPlf NOTIFY configChanged)
@@ -266,8 +265,6 @@ class SiAmConfigController : public Controller {
     void setDeniseHiddenSprites(int value) { set(vamiga::Opt::DENISE_HIDDEN_SPRITES, (i64)value); }
     int deniseHiddenLayers() const { return (int)get(vamiga::Opt::DENISE_HIDDEN_LAYERS); }
     void setDeniseHiddenLayers(int value) { set(vamiga::Opt::DENISE_HIDDEN_LAYERS, (i64)value); }
-    int deniseHiddenLayerAlpha() const { return (int)get(vamiga::Opt::DENISE_HIDDEN_LAYER_ALPHA); }
-    void setDeniseHiddenLayerAlpha(int value) { set(vamiga::Opt::DENISE_HIDDEN_LAYER_ALPHA, (i64)value); }
     bool deniseClxSprSpr() const { return (bool)get(vamiga::Opt::DENISE_CLX_SPR_SPR); }
     void setDeniseClxSprSpr(bool value) { set(vamiga::Opt::DENISE_CLX_SPR_SPR, (i64)value); }
     bool deniseClxSprPlf() const { return (bool)get(vamiga::Opt::DENISE_CLX_SPR_PLF); }

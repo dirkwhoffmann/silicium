@@ -68,7 +68,7 @@ DmaDebugger::updateDebugColor(long channel, const RgbColor &color)
 void
 DmaDebugger::visualizeDma(isize offset, u8 data, MemAccess type)
 {
-    visualizeDma((u32 *)vic.dmaTexturePtr + offset, data, type);
+    visualizeDma((u32 *)vic.xrayTexturePtr + offset, data, type);
 }
 
 void
@@ -86,7 +86,7 @@ DmaDebugger::visualizeDma(u32 *p, u8 data, MemAccess type)
 }
 
 void
-DmaDebugger::computeOverlay(u32 *emuTexture, u32 *dmaTexture)
+DmaDebugger::computeOverlay(u32 *emuTexture, u32 *xrayTexture)
 {
     // Dispatched once per call (not per pixel) -- see the class comment in
     // DmaDebugger.h. Each branch below calls a separate instantiation of
@@ -94,17 +94,17 @@ DmaDebugger::computeOverlay(u32 *emuTexture, u32 *dmaTexture)
     // the whole per-pixel loop inside it.
     switch (static_cast<TexelFormat>(host.getConfig().texFormat)) {
 
-        case TexelFormat::ABGR: computeOverlay<TexelFormat::ABGR>(emuTexture, dmaTexture); return;
-        case TexelFormat::ARGB: computeOverlay<TexelFormat::ARGB>(emuTexture, dmaTexture); return;
+        case TexelFormat::ABGR: computeOverlay<TexelFormat::ABGR>(emuTexture, xrayTexture); return;
+        case TexelFormat::ARGB: computeOverlay<TexelFormat::ARGB>(emuTexture, xrayTexture); return;
 
         default: // RGBA
-            computeOverlay<TexelFormat::RGBA>(emuTexture, dmaTexture); return;
+            computeOverlay<TexelFormat::RGBA>(emuTexture, xrayTexture); return;
     }
 }
 
 template <TexelFormat F>
 void
-DmaDebugger::computeOverlay(u32 *emuTexture, u32 *dmaTexture)
+DmaDebugger::computeOverlay(u32 *emuTexture, u32 *xrayTexture)
 {
     double weight = config.dmaOpacity / 255.0;
 
@@ -117,7 +117,7 @@ DmaDebugger::computeOverlay(u32 *emuTexture, u32 *dmaTexture)
                 for (isize y = 0; y < Texture::height; y++) {
 
                     u32 *emu = emuTexture + (y * Texture::width);
-                    u32 *dma = dmaTexture + (y * Texture::width);
+                    u32 *dma = xrayTexture + (y * Texture::width);
 
                     for (isize x = 0; x < Texture::width; x++) {
 
@@ -136,7 +136,7 @@ DmaDebugger::computeOverlay(u32 *emuTexture, u32 *dmaTexture)
                 for (isize y = 0; y < Texture::height; y++) {
 
                     u32 *emu = emuTexture + (y * Texture::width);
-                    u32 *dma = dmaTexture + (y * Texture::width);
+                    u32 *dma = xrayTexture + (y * Texture::width);
 
                     for (isize x = 0; x < Texture::width; x++) {
 
@@ -156,7 +156,7 @@ DmaDebugger::computeOverlay(u32 *emuTexture, u32 *dmaTexture)
                 for (isize y = 0; y < Texture::height; y++) {
 
                     u32 *emu = emuTexture + (y * Texture::width);
-                    u32 *dma = dmaTexture + (y * Texture::width);
+                    u32 *dma = xrayTexture + (y * Texture::width);
 
                     for (isize x = 0; x < Texture::width; x++) {
 

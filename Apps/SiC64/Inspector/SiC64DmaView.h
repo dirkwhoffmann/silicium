@@ -18,7 +18,7 @@
 // preview of the VICII DMA debugger's texture shown in the Bus inspector.
 //
 // A self-contained QQuickItem that mirrors SiC64Renderer's texture plumbing
-// but for the DMA texture (VideoPort::getDmaTexture). It self-drives off its
+// but for the DMA texture (VideoPort::getXrayTexture). It self-drives off its
 // window's frameSwapped signal while visible -- so it only renders while the
 // Bus inspector window is actually on screen -- and needs no controller
 // wiring beyond the static core() accessor.

@@ -1030,10 +1030,10 @@ VideoPortAPI::getTexture(isize *nr, bool *lof, bool *prevlof) const
 }
 
 const u32 *
-VideoPortAPI::getDmaTexture() const
+VideoPortAPI::getXrayTexture() const
 {
     VAMIGA_PUBLIC
-    return (u32 *)emu->getDmaTexture().pixels.ptr;
+    return (u32 *)emu->getXrayTexture().pixels.ptr;
 }
 
 void

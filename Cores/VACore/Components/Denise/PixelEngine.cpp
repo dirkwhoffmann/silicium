@@ -39,7 +39,7 @@ PixelEngine::clearAll()
     // Wipe out all textures
     for (isize i = 0; i < NUM_TEXTURES; i++) {
         emuTexture[i].clear();
-        dmaTexture[i].clear();
+        xrayTexture[i].clear();
     }
 }
 
@@ -443,25 +443,25 @@ PixelEngine::stablePtr(isize row, isize col)
 }
 
 Texture &
-PixelEngine::getWorkingDmaBuffer()
+PixelEngine::getWorkingXrayBuffer()
 {
-    return dmaTexture[activeBuffer];
+    return xrayTexture[activeBuffer];
 }
 
 const Texture &
-PixelEngine::getStableDmaBuffer(isize offset) const
+PixelEngine::getStableXrayBuffer(isize offset) const
 {
     auto nr = activeBuffer + offset - 1;
-    return dmaTexture[(nr + NUM_TEXTURES) % NUM_TEXTURES];
+    return xrayTexture[(nr + NUM_TEXTURES) % NUM_TEXTURES];
 }
 
 Texel *
-PixelEngine::dmaWorkingPtr(isize row, isize col)
+PixelEngine::xrayWorkingPtr(isize row, isize col)
 {
     assert(row >= 0 && row <= VPOS_MAX);
     assert(col >= 0 && col <= HPOS_MAX);
 
-    return getWorkingDmaBuffer().pixels.ptr + row * HPIXELS + col;
+    return getWorkingXrayBuffer().pixels.ptr + row * HPIXELS + col;
 }
 
 void
@@ -855,47 +855,80 @@ PixelEngine::removeBorderOverSprites(Pixel from, Pixel to)
 }
 
 void
-PixelEngine::hide(isize line, u16 layers, u8 alpha)
+PixelEngine::hide(isize line, u16 layers)
+{
+    // Dispatched once per call (not per pixel) -- see the declaration's
+    // comment in PixelEngine.h.
+    switch (static_cast<TexelFormat>(host.getConfig().texFormat)) {
+
+        case TexelFormat::ABGR: hide<TexelFormat::ABGR>(line, layers); return;
+        case TexelFormat::ARGB: hide<TexelFormat::ARGB>(line, layers); return;
+
+        default: // RGBA
+            hide<TexelFormat::RGBA>(line, layers); return;
+    }
+}
+
+template <TexelFormat F>
+void
+PixelEngine::hide(isize line, u16 layers)
 {
     // Pixel coordinates address super-hires pixels (see colorize)
-    auto *p = (u32 *)workingPtr(line);
+    auto *emu = workingPtr(line);
+    auto *xray = xrayWorkingPtr(line);
+
+    auto &dmaConfig = dmaDebugger.getConfig();
+    bool overlay = dmaConfig.overlay;
+    double scale = dmaConfig.opacity / 255.0;
 
     for (Pixel i = 0; i < Denise::PIXEL_CNT; i++) {
 
         u16 z = denise.zBuffer[i];
+        bool hidden;
 
         // Check for case 1: A sprite is visible
         if (Denise::isSpritePixel(z)) {
 
-            if (Denise::isSpritePixel<0>(z) && !(layers & 0x01)) continue;
-            if (Denise::isSpritePixel<1>(z) && !(layers & 0x02)) continue;
-            if (Denise::isSpritePixel<2>(z) && !(layers & 0x04)) continue;
-            if (Denise::isSpritePixel<3>(z) && !(layers & 0x08)) continue;
-            if (Denise::isSpritePixel<4>(z) && !(layers & 0x10)) continue;
-            if (Denise::isSpritePixel<5>(z) && !(layers & 0x20)) continue;
-            if (Denise::isSpritePixel<6>(z) && !(layers & 0x40)) continue;
-            if (Denise::isSpritePixel<7>(z) && !(layers & 0x80)) continue;
+            hidden =
+            (Denise::isSpritePixel<0>(z) && (layers & 0x01)) ||
+            (Denise::isSpritePixel<1>(z) && (layers & 0x02)) ||
+            (Denise::isSpritePixel<2>(z) && (layers & 0x04)) ||
+            (Denise::isSpritePixel<3>(z) && (layers & 0x08)) ||
+            (Denise::isSpritePixel<4>(z) && (layers & 0x10)) ||
+            (Denise::isSpritePixel<5>(z) && (layers & 0x20)) ||
+            (Denise::isSpritePixel<6>(z) && (layers & 0x40)) ||
+            (Denise::isSpritePixel<7>(z) && (layers & 0x80));
 
         } else {
 
-            // Check for case 2: Playfield 1 is visible
-            if ((Denise::upperPlayfield(z) == 1) && !(layers & 0x100)) continue;
-
-            // Check for case 3: layfield 2 is visible
-            if ((Denise::upperPlayfield(z) == 2) && !(layers & 0x200)) continue;
+            // Playfield 1 or playfield 2 is visible
+            hidden =
+            ((Denise::upperPlayfield(z) == 1) && (layers & 0x100)) ||
+            ((Denise::upperPlayfield(z) == 2) && (layers & 0x200));
         }
-        
-        u8 r = p[i] & 0xFF;
-        u8 g = (p[i] >> 8) & 0xFF;
-        u8 b = (p[i] >> 16) & 0xFF;
 
-        double scale = alpha / 255.0;
+        if (!hidden) {
+
+            // Nothing to show at this pixel in the xray texture
+            xray[i] = Texture::black;
+            continue;
+        }
+
+        GpuColor<F> color = fromTexel<F>(emu[i]);
+
         u8 bg = (line / 4) % 2 == (i / 16) % 2 ? 0x22 : 0x44;
-        u8 newr = (u8)(r * (1 - scale) + bg * scale);
-        u8 newg = (u8)(g * (1 - scale) + bg * scale);
-        u8 newb = (u8)(b * (1 - scale) + bg * scale);
-        
-        p[i] = 0xFF000000 | newb << 16 | newg << 8 | newr;
+        u8 newr = (u8)(color.r() * (1 - scale) + bg * scale);
+        u8 newg = (u8)(color.g() * (1 - scale) + bg * scale);
+        u8 newb = (u8)(color.b() * (1 - scale) + bg * scale);
+
+        Texel cutout = toTexel<F>(GpuColor<F>(newr, newg, newb));
+
+        // Always paint the raw cutout into the xray texture, regardless of
+        // whether it also gets blended into the real picture below -- this
+        // is what the Layers inspector's preview shows.
+        xray[i] = cutout;
+
+        if (overlay) emu[i] = cutout;
     }
 }
 

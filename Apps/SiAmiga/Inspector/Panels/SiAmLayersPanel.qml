@@ -18,7 +18,7 @@ import Silicium.Theme
 // live preview -- same split as SiC64BusPanel.qml's "DMA Channels" +
 // "Preview" boxes, including the same "Show as overlay" toggle: DmaDebugger
 // always paints its raw visualization into its own texture (PixelEngine::
-// dmaTexture, mirrored here by SiAmDmaView) whenever XRAY_MODE is XRAY_DMA,
+// xrayTexture, mirrored here by SiAmDmaView) whenever XRAY_MODE is XRAY_DMA,
 // and only additionally blends it into the real picture when
 // XRAY_OVERLAY is also on -- so the preview works independently of
 // whether the live display is affected.

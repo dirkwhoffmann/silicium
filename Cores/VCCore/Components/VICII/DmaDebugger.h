@@ -163,9 +163,9 @@ public:
     // matching the host's current HOST_TEX_FORMAT -- mirrors vAmiga's own
     // DmaDebugger::computeOverlay (Components/Agnus/DmaDebugger/
     // DmaDebugger.h), see its class comment for why.
-    void computeOverlay(u32 *emuTexture, u32 *dmaTexture);
+    void computeOverlay(u32 *emuTexture, u32 *xrayTexture);
 
-    template <TexelFormat F> void computeOverlay(u32 *emuTexture, u32 *dmaTexture);
+    template <TexelFormat F> void computeOverlay(u32 *emuTexture, u32 *xrayTexture);
 
 
     //

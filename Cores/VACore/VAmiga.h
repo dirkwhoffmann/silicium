@@ -1258,15 +1258,16 @@ public:
     const u32 *getTexture() const;
     const u32 *getTexture(isize *nr, bool *lof, bool *prevlof) const;
 
-    /** @brief  Returns a pointer to the most recent stable DMA debugger
-     *          texture
+    /** @brief  Returns a pointer to the most recent stable X-Ray texture
      *
-     * Holds the DMA debugger's raw, unblended per-channel visualization,
-     * independent of whether Opt::XRAY_OVERLAY is also blending it into
-     * getTexture()'s picture. Same dimensions as getTexture(). Only
-     * meaningful while Opt::XRAY_MODE is XRayMode::XRAY_DMA; otherwise black.
+     * Holds the X-Ray debugger's raw, unblended visualization -- either the
+     * per-channel DMA colors (Opt::XRAY_MODE == XRayMode::XRAY_DMA) or the
+     * cut-out graphics layers (XRayMode::XRAY_LAYERS) -- independent of
+     * whether Opt::XRAY_OVERLAY is also blending it into getTexture()'s
+     * picture. Same dimensions as getTexture(). Black while
+     * Opt::XRAY_MODE is XRayMode::XRAY_NONE.
      */
-    const u32 *getDmaTexture() const;
+    const u32 *getXrayTexture() const;
 
     /** @brief Experimental
      */

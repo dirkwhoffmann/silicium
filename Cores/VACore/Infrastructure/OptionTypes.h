@@ -49,7 +49,6 @@ enum class Opt : long
     DENISE_HIDDEN_BITPLANES,
     DENISE_HIDDEN_SPRITES,
     DENISE_HIDDEN_LAYERS,
-    DENISE_HIDDEN_LAYER_ALPHA,
     DENISE_CLX_SPR_SPR,
     DENISE_CLX_SPR_PLF,
     DENISE_CLX_PLF_PLF,
@@ -262,7 +261,6 @@ struct OptEnum : Reflectable<OptEnum, Opt>
             case Opt::DENISE_HIDDEN_SPRITES:     return "HIDDEN_SPRITES";
             case Opt::DENISE_HIDDEN_LAYERS:      return "HIDDEN_LAYERS";
             case Opt::DENISE_SHRES_BLEND:        return "SHRES_BLEND";
-            case Opt::DENISE_HIDDEN_LAYER_ALPHA: return "HIDDEN_LAYER_ALPHA";
             case Opt::DENISE_CLX_SPR_SPR:        return "CLX_SPR_SPR";
             case Opt::DENISE_CLX_SPR_PLF:        return "CLX_SPR_PLF";
             case Opt::DENISE_CLX_PLF_PLF:        return "CLX_PLF_PLF";
@@ -451,7 +449,6 @@ struct OptEnum : Reflectable<OptEnum, Opt>
             case Opt::DENISE_HIDDEN_SPRITES:     return "Hide sprites";
             case Opt::DENISE_HIDDEN_LAYERS:      return "Hide playfields";
             case Opt::DENISE_SHRES_BLEND:        return "Blend super hires pixel pairs";
-            case Opt::DENISE_HIDDEN_LAYER_ALPHA: return "Hidden playfield opacity";
             case Opt::DENISE_CLX_SPR_SPR:        return "Detect sprite-sprite collisions";
             case Opt::DENISE_CLX_SPR_PLF:        return "Detect sprite-playfield collisions";
             case Opt::DENISE_CLX_PLF_PLF:        return "Detect playfield-playfield collisions";

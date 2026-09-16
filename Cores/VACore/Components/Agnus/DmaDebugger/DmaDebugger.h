@@ -179,7 +179,7 @@ private:
     
     /* Visualizes DMA usage for a certain range of DMA cycles. Always paints
      * the raw, unblended per-channel colors into 'dmaPtr' (the DMA debug
-     * texture, see PixelEngine::dmaTexture), so the Layers inspector's
+     * texture, see PixelEngine::xrayTexture), so the Layers inspector's
      * preview has something to show independent of the overlay setting.
      * Only additionally blends the result into 'emuPtr' (the real picture)
      * when config.overlay is enabled.

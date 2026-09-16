@@ -365,7 +365,7 @@ DmaDebugger::hsyncHandler(isize vpos)
 
         // Draw first chunk (data from previous DMA line)
         auto *ptr1 = pixelEngine.workingPtr(vpos);
-        auto *dma1 = pixelEngine.dmaWorkingPtr(vpos);
+        auto *dma1 = pixelEngine.xrayWorkingPtr(vpos);
         computeOverlay(ptr1, dma1, HBLANK_MIN, HPOS_MAX, busOwner, busData);
 
         // Draw second chunk (data from current DMA line)
@@ -493,7 +493,7 @@ DmaDebugger::vSyncHandler()
     for (isize row = 0; row < cnt; row++) {
 
         auto *ptr = denise.pixelEngine.workingPtr(row);
-        auto *dma = denise.pixelEngine.dmaWorkingPtr(row);
+        auto *dma = denise.pixelEngine.xrayWorkingPtr(row);
 
         for (isize col = 0; col < HPIXELS; col++) {
 

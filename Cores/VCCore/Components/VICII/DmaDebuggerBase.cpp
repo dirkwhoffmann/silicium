@@ -114,7 +114,7 @@ DmaDebugger::setOption(Opt opt, i64 value)
         case Opt::XRAY_MODE:
 
             config.mode = (XRayMode)value;
-            vic.resetDmaTextures();
+            vic.resetXrayTextures();
             vic.resetEmuTextures();
             return;
 

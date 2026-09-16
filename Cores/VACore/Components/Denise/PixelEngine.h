@@ -52,15 +52,16 @@ private:
      */
     Texture emuTexture[NUM_TEXTURES];
 
-    /* Parallel ring buffer holding the DMA debugger's raw, unblended
-     * per-channel visualization (see DmaDebugger::computeOverlay). Kept
-     * separate from emuTexture so the Layers inspector's preview can show
-     * DMA usage on its own, independent of whether it is also blended into
-     * the real picture (XRAY_OVERLAY) -- mirrors VICII's own
-     * emuTexture/dmaTexture split in the C64 core. Indexed by the same
-     * activeBuffer as emuTexture, so both stay in lockstep.
+    /* Parallel ring buffer holding the X-Ray debugger's raw, unblended
+     * visualization -- either DmaDebugger::computeOverlay's per-channel DMA
+     * colors (XRayMode::XRAY_DMA) or hide()'s cut-out layers
+     * (XRayMode::XRAY_LAYERS). Kept separate from emuTexture so the Layers
+     * inspector's preview can show it on its own, independent of whether it
+     * is also blended into the real picture (XRAY_OVERLAY) -- mirrors
+     * VICII's own emuTexture/xrayTexture split in the C64 core. Indexed by
+     * the same activeBuffer as emuTexture, so both stay in lockstep.
      */
-    Texture dmaTexture[NUM_TEXTURES];
+    Texture xrayTexture[NUM_TEXTURES];
 
     // The currently active buffer
     isize activeBuffer = 0;
@@ -378,10 +379,10 @@ public:
     Texel *workingPtr(isize row = 0, isize col = 0);
     Texel *stablePtr(isize row = 0, isize col = 0);
 
-    // Same as above, but for the DMA debugger's own texture (see dmaTexture)
-    Texture &getWorkingDmaBuffer();
-    const Texture &getStableDmaBuffer(isize offset = 0) const;
-    Texel *dmaWorkingPtr(isize row = 0, isize col = 0);
+    // Same as above, but for the DMA debugger's own texture (see xrayTexture)
+    Texture &getWorkingXrayBuffer();
+    const Texture &getStableXrayBuffer(isize offset = 0) const;
+    Texel *xrayWorkingPtr(isize row = 0, isize col = 0);
 
     // Swaps the working buffer and the stable buffer
     void swapBuffers();
@@ -430,10 +431,26 @@ private:
     //
     // Hiding graphics layers
     //
-    
+
 public:
-    
-    void hide(isize line, u16 layer, u8 alpha);
+
+    /* Cuts out certain graphics layers (see DENISE_HIDDEN_LAYERS), only
+     * active in XRayMode::XRAY_LAYERS. Mirrors DmaDebugger::computeOverlay:
+     * always paints the raw cutout into the xray texture (see xrayTexture),
+     * so the Layers inspector's preview has something to show, and
+     * additionally blends it into the real picture when config.overlay
+     * is enabled. Shares its opacity with the DMA overlay
+     * (Opt::XRAY_OVERLAY_OPACITY) rather than keeping its own.
+     *
+     * Dispatches once (per call, not per pixel) to the templated overload
+     * below, matching the host's current HOST_TEX_FORMAT -- see
+     * DmaDebugger::computeOverlay's class comment for why.
+     */
+    void hide(isize line, u16 layers);
+
+private:
+
+    template <TexelFormat F> void hide(isize line, u16 layers);
 };
 
 }
