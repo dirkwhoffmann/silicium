@@ -787,7 +787,7 @@ class SiAmConfigController : public Controller {
 
   public:
 
-    Q_PROPERTY(bool XRAY_ENABLE READ dmaDebugEnable WRITE setDmaDebugEnable NOTIFY configChanged)
+    Q_PROPERTY(int XRAY_MODE READ xrayMode WRITE setXrayMode NOTIFY configChanged)
     Q_PROPERTY(bool XRAY_OVERLAY READ dmaDebugOverlay WRITE setDmaDebugOverlay NOTIFY configChanged)
     Q_PROPERTY(int XRAY_OVERLAY_STYLE READ dmaDebugMode WRITE setDmaDebugMode NOTIFY configChanged)
     Q_PROPERTY(int XRAY_OVERLAY_OPACITY READ dmaDebugOpacity WRITE setDmaDebugOpacity NOTIFY configChanged)
@@ -808,8 +808,8 @@ class SiAmConfigController : public Controller {
     Q_PROPERTY(QColor XRAY_DMA_COLOR6 READ dmaDebugColor6 WRITE setDmaDebugColor6 NOTIFY configChanged)
     Q_PROPERTY(QColor XRAY_DMA_COLOR7 READ dmaDebugColor7 WRITE setDmaDebugColor7 NOTIFY configChanged)
 
-    bool dmaDebugEnable() const { return (bool)get(vamiga::Opt::XRAY_ENABLE); }
-    void setDmaDebugEnable(bool value) { set(vamiga::Opt::XRAY_ENABLE, (i64)value); }
+    int xrayMode() const { return (int)get(vamiga::Opt::XRAY_MODE); }
+    void setXrayMode(int value) { set(vamiga::Opt::XRAY_MODE, (i64)value); }
     bool dmaDebugOverlay() const { return (bool)get(vamiga::Opt::XRAY_OVERLAY); }
     void setDmaDebugOverlay(bool value) { set(vamiga::Opt::XRAY_OVERLAY, (i64)value); }
     int dmaDebugMode() const { return (int)get(vamiga::Opt::XRAY_OVERLAY_STYLE); }

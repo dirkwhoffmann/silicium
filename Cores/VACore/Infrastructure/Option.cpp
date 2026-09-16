@@ -83,7 +83,7 @@ OptionParser::create(Opt opt, i64 arg)
         case Opt::MON_FLICKER_FIXER:         return boolParser();
         case Opt::MON_FLICKER_JITTER:        return numParser();
 
-        case Opt::XRAY_ENABLE:          return boolParser();
+        case Opt::XRAY_MODE:            return enumParser.template operator()<XRayModeEnum,XRayMode>();
         case Opt::XRAY_OVERLAY:         return boolParser();
         case Opt::XRAY_OVERLAY_STYLE: return enumParser.template operator()<DmaDisplayModeEnum,DmaDisplayMode>();
         case Opt::XRAY_OVERLAY_OPACITY: return numParser("%");

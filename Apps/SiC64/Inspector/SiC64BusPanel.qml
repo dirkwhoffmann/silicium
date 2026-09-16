@@ -25,6 +25,10 @@ SiC64InspectorWindow {
     readonly property int tab: 21
     readonly property int tabtab: 42
 
+    // Mirrors vc64::XRayMode (see DmaDebuggerTypes.h)
+    readonly property int xrayNone: 0
+    readonly property int xrayDma: 1
+
     component ChannelRow: RowLayout {
 
         id: chRow
@@ -43,7 +47,7 @@ SiC64InspectorWindow {
 
             Layout.fillWidth: true
             indent: tab
-            enabled: root.cc.XRAY_ENABLE
+            enabled: root.cc.XRAY_MODE !== root.xrayNone
             checked: chRow.on
             onClicked: chRow.toggled(checked)
             r: chRow.label
@@ -85,8 +89,8 @@ SiC64InspectorWindow {
 
                 SiCheckBoxControl {
 
-                    checked: cc.XRAY_ENABLE
-                    onClicked: cc.XRAY_ENABLE = checked
+                    checked: cc.XRAY_MODE === xrayDma
+                    onClicked: cc.XRAY_MODE = checked ? xrayDma : xrayNone
                     r: qsTr("DMA Debugger")
                 }
 
@@ -143,7 +147,7 @@ SiC64InspectorWindow {
                 SiCheckBoxControl {
 
                     indent: tab
-                    enabled: cc.XRAY_ENABLE
+                    enabled: cc.XRAY_MODE !== xrayNone
                     checked: cc.XRAY_OVERLAY
                     onClicked: cc.XRAY_OVERLAY = checked
                     r: qsTr("Show as overlay")
@@ -153,7 +157,7 @@ SiC64InspectorWindow {
 
                     indent: tabtab
                     Layout.fillWidth: true
-                    enabled: cc.XRAY_ENABLE && cc.XRAY_OVERLAY
+                    enabled: cc.XRAY_MODE !== xrayNone && cc.XRAY_OVERLAY
                     model: [qsTr("Foreground layer"), qsTr("Background layer"), qsTr("Mixed layers")]
                     currentIndex: cc.XRAY_OVERLAY_STYLE
                     onCurrentIndexChanged: cc.XRAY_OVERLAY_STYLE = currentIndex
@@ -161,7 +165,7 @@ SiC64InspectorWindow {
 
                 SiSliderControl {
 
-                    enabled: cc.XRAY_ENABLE && cc.XRAY_OVERLAY
+                    enabled: cc.XRAY_MODE !== xrayNone && cc.XRAY_OVERLAY
                     indent: tabtab
                     Layout.fillWidth: true
                     l: qsTr("Opacity")
@@ -192,7 +196,7 @@ SiC64InspectorWindow {
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    visible: cc.XRAY_ENABLE
+                    visible: cc.XRAY_MODE !== xrayNone
                     color: "black"
                     border.width: 1
                     border.color: Palette.surfaceBorder
@@ -215,7 +219,7 @@ SiC64InspectorWindow {
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    visible: !cc.XRAY_ENABLE
+                    visible: cc.XRAY_MODE === xrayNone
 
                     SiSymbol {
 

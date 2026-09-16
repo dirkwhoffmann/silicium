@@ -51,8 +51,8 @@ enum class Opt : long
     VICII_SS_COLLISIONS,    ///< Check for sprite-sprite collisions
     VICII_SB_COLLISIONS,    ///< Check for sprite-background collisions
 
-    // DMA Debugger
-    XRAY_ENABLE,       ///< Global on/off switch for the DMA debugger
+    // X-Ray
+    XRAY_MODE,         ///< X-Ray mode (off, DMA debugger, layer inspector)
     XRAY_OVERLAY,      ///< Overlay DMA texture onto emulator texture
     XRAY_OVERLAY_STYLE,         ///< DMA texture overlay mode
     XRAY_OVERLAY_OPACITY,      ///< DMA texture opacity
@@ -227,22 +227,22 @@ struct OptEnum : Reflectable<OptEnum, Opt> {
             case Opt::VICII_SS_COLLISIONS:   return "VICII.SS_COLLISIONS";
             case Opt::VICII_SB_COLLISIONS:   return "VICII.SB_COLLISIONS";
 
-            case Opt::XRAY_ENABLE:      return "DMA_DEBUG.ENABLE";
-            case Opt::XRAY_OVERLAY:     return "DMA_DEBUG.OVERLAY";
-            case Opt::XRAY_OVERLAY_STYLE: return "DMA_DEBUG.MODE";
-            case Opt::XRAY_OVERLAY_OPACITY: return "DMA_DEBUG.OPACITY";
-            case Opt::XRAY_DMA_CHANNEL0:    return "DMA_DEBUG.CHANNEL0";
-            case Opt::XRAY_DMA_CHANNEL1:    return "DMA_DEBUG.CHANNEL1";
-            case Opt::XRAY_DMA_CHANNEL2:    return "DMA_DEBUG.CHANNEL2";
-            case Opt::XRAY_DMA_CHANNEL3:    return "DMA_DEBUG.CHANNEL3";
-            case Opt::XRAY_DMA_CHANNEL4:    return "DMA_DEBUG.CHANNEL4";
-            case Opt::XRAY_DMA_CHANNEL5:    return "DMA_DEBUG.CHANNEL5";
-            case Opt::XRAY_DMA_COLOR0:      return "DMA_DEBUG.COLOR0";
-            case Opt::XRAY_DMA_COLOR1:      return "DMA_DEBUG.COLOR1";
-            case Opt::XRAY_DMA_COLOR2:      return "DMA_DEBUG.COLOR2";
-            case Opt::XRAY_DMA_COLOR3:      return "DMA_DEBUG.COLOR3";
-            case Opt::XRAY_DMA_COLOR4:      return "DMA_DEBUG.COLOR4";
-            case Opt::XRAY_DMA_COLOR5:      return "DMA_DEBUG.COLOR5";
+            case Opt::XRAY_MODE:            return "XRAY.MODE";
+            case Opt::XRAY_OVERLAY:         return "XRAY.OVERLAY";
+            case Opt::XRAY_OVERLAY_STYLE:   return "XRAY.OVERLAY_STYLE";
+            case Opt::XRAY_OVERLAY_OPACITY: return "XRAY.OVERLAY_OPACITY";
+            case Opt::XRAY_DMA_CHANNEL0:    return "XRAY.DMA_CHANNEL0";
+            case Opt::XRAY_DMA_CHANNEL1:    return "XRAY.DMA_CHANNEL1";
+            case Opt::XRAY_DMA_CHANNEL2:    return "XRAY.DMA_CHANNEL2";
+            case Opt::XRAY_DMA_CHANNEL3:    return "XRAY.DMA_CHANNEL3";
+            case Opt::XRAY_DMA_CHANNEL4:    return "XRAY.DMA_CHANNEL4";
+            case Opt::XRAY_DMA_CHANNEL5:    return "XRAY.DMA_CHANNEL5";
+            case Opt::XRAY_DMA_COLOR0:      return "XRAY.DMA_COLOR0";
+            case Opt::XRAY_DMA_COLOR1:      return "XRAY.DMA_COLOR1";
+            case Opt::XRAY_DMA_COLOR2:      return "XRAY.DMA_COLOR2";
+            case Opt::XRAY_DMA_COLOR3:      return "XRAY.DMA_COLOR3";
+            case Opt::XRAY_DMA_COLOR4:      return "XRAY.DMA_COLOR4";
+            case Opt::XRAY_DMA_COLOR5:      return "XRAY.DMA_COLOR5";
 
             case Opt::EXP_REU_SPEED:         return "EXP.REU_SPEED";
 
@@ -380,7 +380,7 @@ struct OptEnum : Reflectable<OptEnum, Opt> {
             case Opt::VICII_SS_COLLISIONS:   return "Sprite-sprite collisions";
             case Opt::VICII_SB_COLLISIONS:   return "Sprite-background collisions";
 
-            case Opt::XRAY_ENABLE:      return "DMA Debugger";
+            case Opt::XRAY_MODE:        return "X-Ray mode";
             case Opt::XRAY_OVERLAY:     return "Enable DMA Overlay";
             case Opt::XRAY_OVERLAY_STYLE: return "Overlay style";
             case Opt::XRAY_OVERLAY_OPACITY: return "Overlay opacity";

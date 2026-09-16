@@ -49,10 +49,10 @@ Defaults::Defaults()
     setFallback(Opt::VICII_CUT_LAYERS,           0xFF);
     setFallback(Opt::VICII_CUT_OPACITY,          0xFF);
 
-    setFallback(Opt::XRAY_ENABLE,           false);
+    setFallback(Opt::XRAY_MODE,             (i64)XRayMode::XRAY_NONE);
     setFallback(Opt::XRAY_OVERLAY,          false);
-    setFallback(Opt::XRAY_OVERLAY_STYLE,             (i64)DmaDisplayMode::FG_LAYER);
-    setFallback(Opt::XRAY_OVERLAY_OPACITY,          0x80);
+    setFallback(Opt::XRAY_OVERLAY_STYLE,    (i64)DmaDisplayMode::FG_LAYER);
+    setFallback(Opt::XRAY_OVERLAY_OPACITY,  0x80);
     setFallback(Opt::XRAY_DMA_CHANNEL0,         true);
     setFallback(Opt::XRAY_DMA_CHANNEL1,         true);
     setFallback(Opt::XRAY_DMA_CHANNEL2,         true);

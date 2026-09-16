@@ -702,7 +702,7 @@ VICII::beginFrame()
 void
 VICII::endFrame()
 {
-    bool debug = dmaDebugger.config.dmaDebug;
+    bool debug = dmaDebugger.config.mode == XRayMode::XRAY_DMA;
 
     // Update the VICII revision if requested
     updateRevision();

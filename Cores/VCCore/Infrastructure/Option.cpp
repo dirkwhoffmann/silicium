@@ -51,7 +51,7 @@ OptionParser::create(Opt opt, i64 arg)
         case Opt::GLUE_LOGIC:                return enumParser.template operator()<GlueLogicEnum,GlueLogic>();
         case Opt::VICII_CUT_LAYERS:          return numParser();
         case Opt::VICII_CUT_OPACITY:         return numParser("%");
-        case Opt::XRAY_ENABLE:          return boolParser();
+        case Opt::XRAY_MODE:            return enumParser.template operator()<XRayModeEnum,XRayMode>();
         case Opt::XRAY_OVERLAY:         return boolParser();
         case Opt::XRAY_OVERLAY_STYLE: return enumParser.template operator()<DmaDisplayModeEnum,DmaDisplayMode>();
         case Opt::XRAY_OVERLAY_OPACITY: return numParser("%");

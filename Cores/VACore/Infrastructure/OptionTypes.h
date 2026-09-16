@@ -84,8 +84,8 @@ enum class Opt : long
     MON_FLICKER_FIXER,      ///< Interlace flicker fixer (true = no flicker)
     MON_FLICKER_JITTER,     ///< Interlace flicker intensity
 
-    // DMA Debugger
-    XRAY_ENABLE,
+    // X-Ray
+    XRAY_MODE,
     XRAY_OVERLAY,
     XRAY_OVERLAY_STYLE,
     XRAY_OVERLAY_OPACITY,
@@ -296,7 +296,7 @@ struct OptEnum : Reflectable<OptEnum, Opt>
             case Opt::MON_FLICKER_FIXER:         return "MON.FLICKER_FIXER";
             case Opt::MON_FLICKER_JITTER:        return "MON.FLICKER_JITTER";
 
-            case Opt::XRAY_ENABLE:          return "XRAY.ENABLE";
+            case Opt::XRAY_MODE:            return "XRAY.MODE";
             case Opt::XRAY_OVERLAY:         return "XRAY.OVERLAY";
             case Opt::XRAY_OVERLAY_STYLE: return "XRAY.OVERLAY_STYLE";
             case Opt::XRAY_OVERLAY_OPACITY: return "XRAY.OVERLAY_OPACITY";
@@ -485,7 +485,7 @@ struct OptEnum : Reflectable<OptEnum, Opt>
             case Opt::MON_FLICKER_FIXER:         return "Interlace flicker fixer";
             case Opt::MON_FLICKER_JITTER:        return "Interlace flicker jitter";
 
-            case Opt::XRAY_ENABLE:          return "DMA Debugger";
+            case Opt::XRAY_MODE:            return "X-Ray mode";
             case Opt::XRAY_OVERLAY:         return "Show as overlay";
             case Opt::XRAY_OVERLAY_STYLE: return "DMA Debugger style";
             case Opt::XRAY_OVERLAY_OPACITY: return "Opacity";

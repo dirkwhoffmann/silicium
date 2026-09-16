@@ -18,7 +18,7 @@
 // inspector (SiAmLayersPanel.qml). Grabs VideoPortAPI::getDmaTexture() --
 // PixelEngine's dmaTexture ring buffer, painted by DmaDebugger::
 // computeOverlay() independently of the real picture -- so it shows DMA
-// usage whenever XRAY_ENABLE is on, whether or not XRAY_OVERLAY is
+// usage whenever XRAY_MODE is XRAY_DMA, whether or not XRAY_OVERLAY is
 // also blending it into the display. Mirrors SiC64DmaView, which does the
 // same for VICII's own separate DMA texture.
 //

@@ -18,7 +18,7 @@ import Silicium.Theme
 // live preview -- same split as SiC64BusPanel.qml's "DMA Channels" +
 // "Preview" boxes, including the same "Show as overlay" toggle: DmaDebugger
 // always paints its raw visualization into its own texture (PixelEngine::
-// dmaTexture, mirrored here by SiAmDmaView) whenever XRAY_ENABLE is on,
+// dmaTexture, mirrored here by SiAmDmaView) whenever XRAY_MODE is XRAY_DMA,
 // and only additionally blends it into the real picture when
 // XRAY_OVERLAY is also on -- so the preview works independently of
 // whether the live display is affected.
@@ -32,6 +32,10 @@ SiAmInspectorWindow {
     readonly property var cc: controller.configController
     readonly property int tab: 21
     readonly property int tabtab: 42
+
+    // Mirrors vamiga::XRayMode (see DmaDebuggerTypes.h)
+    readonly property int xrayNone: 0
+    readonly property int xrayDma: 1
 
     component ChannelRow: RowLayout {
 
@@ -51,7 +55,7 @@ SiAmInspectorWindow {
 
             Layout.fillWidth: true
             indent: tab
-            enabled: root.cc.XRAY_ENABLE
+            enabled: root.cc.XRAY_MODE !== root.xrayNone
             checked: chRow.on
             onClicked: chRow.toggled(checked)
             r: chRow.label
@@ -85,8 +89,8 @@ SiAmInspectorWindow {
 
             SiCheckBoxControl {
 
-                checked: cc.XRAY_ENABLE
-                onClicked: cc.XRAY_ENABLE = checked
+                checked: cc.XRAY_MODE === xrayDma
+                onClicked: cc.XRAY_MODE = checked ? xrayDma : xrayNone
                 r: qsTr("DMA Debugger")
             }
 
@@ -159,7 +163,7 @@ SiAmInspectorWindow {
             SiCheckBoxControl {
 
                 indent: tab
-                enabled: cc.XRAY_ENABLE
+                enabled: cc.XRAY_MODE !== xrayNone
                 checked: cc.XRAY_OVERLAY
                 onClicked: cc.XRAY_OVERLAY = checked
                 r: qsTr("Show as overlay")
@@ -169,7 +173,7 @@ SiAmInspectorWindow {
 
                 indent: tabtab
                 Layout.fillWidth: true
-                enabled: cc.XRAY_ENABLE && cc.XRAY_OVERLAY
+                enabled: cc.XRAY_MODE !== xrayNone && cc.XRAY_OVERLAY
                 model: [qsTr("Foreground layer"), qsTr("Background layer"), qsTr("Mixed layers")]
                 currentIndex: cc.XRAY_OVERLAY_STYLE
                 onCurrentIndexChanged: cc.XRAY_OVERLAY_STYLE = currentIndex
@@ -177,7 +181,7 @@ SiAmInspectorWindow {
 
             SiSliderControl {
 
-                enabled: cc.XRAY_ENABLE && cc.XRAY_OVERLAY
+                enabled: cc.XRAY_MODE !== xrayNone && cc.XRAY_OVERLAY
                 Layout.fillWidth: true
                 l: qsTr("Opacity")
                 from: 0
@@ -204,7 +208,7 @@ SiAmInspectorWindow {
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                visible: cc.XRAY_ENABLE
+                visible: cc.XRAY_MODE !== xrayNone
                 color: "black"
                 border.width: 1
                 border.color: Palette.surfaceBorder
@@ -227,7 +231,7 @@ SiAmInspectorWindow {
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                visible: !cc.XRAY_ENABLE
+                visible: cc.XRAY_MODE === xrayNone
 
                 SiSymbol {
 

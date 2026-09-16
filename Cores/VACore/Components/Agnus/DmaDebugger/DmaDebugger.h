@@ -31,7 +31,7 @@ class DmaDebugger final : public SubComponent {
     
     Options options = {
         
-        Opt::XRAY_ENABLE,
+        Opt::XRAY_MODE,
         Opt::XRAY_OVERLAY,
         Opt::XRAY_OVERLAY_STYLE,
         Opt::XRAY_OVERLAY_OPACITY,

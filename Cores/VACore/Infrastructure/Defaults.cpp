@@ -88,9 +88,9 @@ Defaults::fallbacks()
     registerDefault(Opt::MON_FLICKER_FIXER,          false);
     registerDefault(Opt::MON_FLICKER_JITTER,         250);
 
-    registerDefault(Opt::XRAY_ENABLE,           false);
+    registerDefault(Opt::XRAY_MODE,             (i64)XRayMode::XRAY_NONE);
     registerDefault(Opt::XRAY_OVERLAY,          false);
-    registerDefault(Opt::XRAY_OVERLAY_STYLE,             (i64)DmaDisplayMode::FG_LAYER);
+    registerDefault(Opt::XRAY_OVERLAY_STYLE,    (i64)DmaDisplayMode::FG_LAYER);
     registerDefault(Opt::XRAY_OVERLAY_OPACITY,          50);
     registerDefault(Opt::XRAY_DMA_CHANNEL0,         true);
     registerDefault(Opt::XRAY_DMA_CHANNEL1,         true);

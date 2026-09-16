@@ -60,7 +60,7 @@ DmaDebugger::getOption(Opt option) const
 {
     switch (option) {
             
-        case Opt::XRAY_ENABLE:      return config.enabled;
+        case Opt::XRAY_MODE:        return (i64)config.mode;
         case Opt::XRAY_OVERLAY:     return config.overlay;
         case Opt::XRAY_OVERLAY_STYLE: return (i64)config.displayMode;
         case Opt::XRAY_OVERLAY_OPACITY: return config.opacity;
@@ -93,12 +93,17 @@ DmaDebugger::checkOption(Opt opt, i64 value)
 {
     switch (opt) {
 
-        case Opt::XRAY_ENABLE:
+        case Opt::XRAY_MODE:
+            if (!XRayModeEnum::isValid(value)) {
+                throw CoreError(CoreError::OPT_INV_ARG, XRayModeEnum::keyList());
+            }
+            return;
+
         case Opt::XRAY_OVERLAY:
 
             return;
 
-        case Opt::XRAY_OVERLAY_STYLE: 
+        case Opt::XRAY_OVERLAY_STYLE:
             if (!DmaDisplayModeEnum::isValid(value)) {
                 throw CoreError(CoreError::OPT_INV_ARG, DmaDisplayModeEnum::keyList());
             }
@@ -133,9 +138,9 @@ DmaDebugger::setOption(Opt option, i64 value)
 {
     switch (option) {
 
-        case Opt::XRAY_ENABLE:
+        case Opt::XRAY_MODE:
 
-            config.enabled = value;
+            config.mode = (XRayMode)value;
             msgQueue.put(Msg::DMA_DEBUG, value);
             return;
 
@@ -339,7 +344,7 @@ DmaDebugger::eolHandler()
     // Check if execution should be interrupted
     if (eolTrap) { eolTrap = false; amiga.setFlag(RL::EOL_REACHED); }
     
-    if (config.enabled) {
+    if (config.mode == XRayMode::XRAY_DMA) {
         
         // Copy Agnus arrays before they get deleted
         std::memcpy(busOwner, agnus.busOwner, sizeof(agnus.busOwner));
@@ -356,7 +361,7 @@ DmaDebugger::hsyncHandler(isize vpos)
 {
     assert(agnus.pos.h == 0x12);
 
-    if (config.enabled) {
+    if (config.mode == XRayMode::XRAY_DMA) {
 
         // Draw first chunk (data from previous DMA line)
         auto *ptr1 = pixelEngine.workingPtr(vpos);
@@ -481,7 +486,7 @@ void
 DmaDebugger::vSyncHandler()
 {
     // Only proceed if the debugger is enabled
-    if (!config.enabled) return;
+    if (config.mode != XRayMode::XRAY_DMA) return;
 
     // Clear old data in the VBLANK area of the next frame
     auto cnt = agnus.isPAL() ? PAL::VBLANK_CNT : NTSC::VBLANK_CNT;

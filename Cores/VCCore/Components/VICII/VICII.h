@@ -1030,7 +1030,7 @@ public:
     void checkOption(Opt opt, i64 value) override;
     void setOption(Opt opt, i64 value) override;
 
-    bool dmaDebug() const { return dmaDebugger.config.dmaDebug; }
+    bool dmaDebug() const { return dmaDebugger.config.mode == XRayMode::XRAY_DMA; }
 
 private:
     

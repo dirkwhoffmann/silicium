@@ -33,7 +33,7 @@ DmaDebugger::getOption(Opt option) const
 {
     switch (option) {
 
-        case Opt::XRAY_ENABLE:      return (i64)config.dmaDebug;
+        case Opt::XRAY_MODE:        return (i64)config.mode;
         case Opt::XRAY_OVERLAY:     return (i64)config.dmaOverlay;
         case Opt::XRAY_OVERLAY_STYLE: return (i64)config.dmaDisplayMode;
         case Opt::XRAY_OVERLAY_OPACITY: return (i64)config.dmaOpacity;
@@ -64,9 +64,14 @@ DmaDebugger::checkOption(Opt opt, i64 value)
 {
     switch (opt) {
 
-        case Opt::XRAY_ENABLE:
+        case Opt::XRAY_MODE:
+            if (!XRayModeEnum::isValid(value)) {
+                throw CoreError(CoreError::OPT_INV_ARG, XRayModeEnum::keyList());
+            }
+            return;
+
         case Opt::XRAY_OVERLAY:
-            
+
             return;
 
         case Opt::XRAY_OVERLAY_STYLE: 
@@ -106,9 +111,9 @@ DmaDebugger::setOption(Opt opt, i64 value)
 
     switch (opt) {
 
-        case Opt::XRAY_ENABLE:
+        case Opt::XRAY_MODE:
 
-            config.dmaDebug = value;
+            config.mode = (XRayMode)value;
             vic.resetDmaTextures();
             vic.resetEmuTextures();
             return;

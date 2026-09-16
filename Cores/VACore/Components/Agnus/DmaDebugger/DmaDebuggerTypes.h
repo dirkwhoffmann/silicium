@@ -17,6 +17,40 @@ namespace vamiga {
 // Enumerations
 //
 
+enum class XRayMode
+{
+    XRAY_NONE,
+    XRAY_DMA,
+    XRAY_LAYERS
+};
+
+struct XRayModeEnum : Reflectable<XRayModeEnum, XRayMode>
+{
+    static constexpr long minVal = 0;
+    static constexpr long maxVal = long(XRayMode::XRAY_LAYERS);
+
+    static const char *_key(XRayMode value)
+    {
+        switch (value) {
+
+            case XRayMode::XRAY_NONE:   return "XRAY_NONE";
+            case XRayMode::XRAY_DMA:    return "XRAY_DMA";
+            case XRayMode::XRAY_LAYERS: return "XRAY_LAYERS";
+        }
+        return "???";
+    }
+    static const char *help(XRayMode value)
+    {
+        switch (value) {
+
+            case XRayMode::XRAY_NONE:   return "Off";
+            case XRayMode::XRAY_DMA:    return "DMA debugger";
+            case XRayMode::XRAY_LAYERS: return "Layer inspector";
+        }
+        return "???";
+    }
+};
+
 enum class DmaDisplayMode
 {
     FG_LAYER,
@@ -110,8 +144,8 @@ struct DmaChannelEnum : Reflectable<DmaChannelEnum, DmaChannel>
 
 typedef struct
 {
-    // Global enable switch
-    bool enabled;
+    // X-Ray mode (off, DMA debugger, layer inspector)
+    XRayMode mode;
 
     // If true, the visualization is blended into the displayed picture. If
     // false, it is only computed into the dedicated DMA debug texture (see
