@@ -11,6 +11,7 @@
 
 #include "DmaDebuggerTypes.h"
 #include "FrameBufferTypes.h"
+#include "HostTypes.h"
 #include "SubComponent.h"
 #include "Beamtraps.h"
 #include "Colors.h"
@@ -183,7 +184,17 @@ private:
      * preview has something to show independent of the overlay setting.
      * Only additionally blends the result into 'emuPtr' (the real picture)
      * when config.overlay is enabled.
+     *
+     * Dispatches once (per call, not per pixel) to the templated overload
+     * below, matching the host's current HOST_TEX_FORMAT. Fixing the format
+     * as a template parameter lets PixelEngine::toTexel<F>/fromTexel<F>
+     * fold their format switch away at compile time, so the per-pixel loop
+     * -- run across every visible pixel of every scanline -- carries no
+     * runtime format branching at all.
      */
+    void computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val);
+
+    template <TexFormat F>
     void computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val);
 };
 

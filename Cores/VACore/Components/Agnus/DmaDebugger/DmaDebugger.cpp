@@ -378,6 +378,24 @@ DmaDebugger::hsyncHandler(isize vpos)
 void
 DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val)
 {
+    // Dispatched once per call (not per pixel) -- see the class comment in
+    // DmaDebugger.h. Each branch below calls a separate instantiation of
+    // the templated overload, so the format is a compile-time constant for
+    // the whole per-pixel loop inside it.
+    switch (host.getConfig().texFormat) {
+
+        case TexFormat::ABGR: computeOverlay<TexFormat::ABGR>(emuPtr, dmaPtr, first, last, own, val); return;
+        case TexFormat::ARGB: computeOverlay<TexFormat::ARGB>(emuPtr, dmaPtr, first, last, own, val); return;
+
+        default: // RGBA
+            computeOverlay<TexFormat::RGBA>(emuPtr, dmaPtr, first, last, own, val); return;
+    }
+}
+
+template <TexFormat F>
+void
+DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val)
+{
     double opacity = double(config.opacity) / 100.0;
     double bgWeight = 0;
     double fgWeight = 0;
@@ -419,10 +437,10 @@ DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize las
 
             if (config.overlay && bgWeight != 0.0) {
 
-                emuPtr[0] = TEXEL(GpuColor(emuPtr[0]).shade(bgWeight).rawValue);
-                emuPtr[1] = TEXEL(GpuColor(emuPtr[1]).shade(bgWeight).rawValue);
-                emuPtr[2] = TEXEL(GpuColor(emuPtr[2]).shade(bgWeight).rawValue);
-                emuPtr[3] = TEXEL(GpuColor(emuPtr[3]).shade(bgWeight).rawValue);
+                emuPtr[0] = PixelEngine::toTexel<F>(PixelEngine::fromTexel<F>(emuPtr[0]).shade(bgWeight));
+                emuPtr[1] = PixelEngine::toTexel<F>(PixelEngine::fromTexel<F>(emuPtr[1]).shade(bgWeight));
+                emuPtr[2] = PixelEngine::toTexel<F>(PixelEngine::fromTexel<F>(emuPtr[2]).shade(bgWeight));
+                emuPtr[3] = PixelEngine::toTexel<F>(PixelEngine::fromTexel<F>(emuPtr[3]).shade(bgWeight));
             }
             continue;
         }
@@ -437,25 +455,25 @@ DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize las
         // texture, regardless of whether they also get blended into the
         // real picture below -- this is what the Layers inspector's preview
         // shows.
-        dmaPtr[0] = TEXEL(col0.rawValue);
-        dmaPtr[1] = TEXEL(col1.rawValue);
-        dmaPtr[2] = TEXEL(col2.rawValue);
-        dmaPtr[3] = TEXEL(col3.rawValue);
+        dmaPtr[0] = PixelEngine::toTexel<F>(col0);
+        dmaPtr[1] = PixelEngine::toTexel<F>(col1);
+        dmaPtr[2] = PixelEngine::toTexel<F>(col2);
+        dmaPtr[3] = PixelEngine::toTexel<F>(col3);
 
         if (!config.overlay) continue;
 
         if (fgWeight != 0.0) {
 
-            col0 = col0.mix(GpuColor(emuPtr[0]), fgWeight);
-            col1 = col1.mix(GpuColor(emuPtr[2]), fgWeight);
-            col2 = col2.mix(GpuColor(emuPtr[4]), fgWeight);
-            col3 = col3.mix(GpuColor(emuPtr[6]), fgWeight);
+            col0 = col0.mix(PixelEngine::fromTexel<F>(emuPtr[0]), fgWeight);
+            col1 = col1.mix(PixelEngine::fromTexel<F>(emuPtr[2]), fgWeight);
+            col2 = col2.mix(PixelEngine::fromTexel<F>(emuPtr[4]), fgWeight);
+            col3 = col3.mix(PixelEngine::fromTexel<F>(emuPtr[6]), fgWeight);
         }
 
-        emuPtr[0] = TEXEL(col0.rawValue);
-        emuPtr[1] = TEXEL(col1.rawValue);
-        emuPtr[2] = TEXEL(col2.rawValue);
-        emuPtr[3] = TEXEL(col3.rawValue);
+        emuPtr[0] = PixelEngine::toTexel<F>(col0);
+        emuPtr[1] = PixelEngine::toTexel<F>(col1);
+        emuPtr[2] = PixelEngine::toTexel<F>(col2);
+        emuPtr[3] = PixelEngine::toTexel<F>(col3);
     }
 }
 

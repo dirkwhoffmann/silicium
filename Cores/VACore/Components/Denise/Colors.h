@@ -166,17 +166,17 @@ struct GpuColor {
 
     u32 rawValue;
 
-    GpuColor() : rawValue(0) {}
-    GpuColor(u32 v) : rawValue(v) {}
-    GpuColor(u64 v) : rawValue(u32(v)) {}
+    constexpr GpuColor() : rawValue(0) {}
+    constexpr GpuColor(u32 v) : rawValue(v) {}
+    constexpr GpuColor(u64 v) : rawValue(u32(v)) {}
     GpuColor(const RgbColor &c);
     GpuColor(const AmigaColor &c);
     GpuColor(u8 r, u8 g, u8 b);
 
-    u8 r() const { return u8(rawValue       & 0xFF); }
-    u8 g() const { return u8(rawValue >> 8  & 0xFF); }
-    u8 b() const { return u8(rawValue >> 16 & 0xFF); }
-    u8 a() const { return u8(rawValue >> 24 & 0xFF); }
+    constexpr u8 r() const { return u8(rawValue       & 0xFF); }
+    constexpr u8 g() const { return u8(rawValue >> 8  & 0xFF); }
+    constexpr u8 b() const { return u8(rawValue >> 16 & 0xFF); }
+    constexpr u8 a() const { return u8(rawValue >> 24 & 0xFF); }
 
     static const GpuColor black;
     static const GpuColor white;

@@ -56,10 +56,10 @@ void
 PixelEngine::_initialize()
 {
     // Setup the ECS BRDRBLNK color (BORDER_BG is mirrored in updateRGBA)
-    borderPalette[BORDER_BLNK] = TEXEL(GpuColor(0x00, 0x00, 0x00).rawValue);
+    borderPalette[BORDER_BLNK] = toTexel(GpuColor(0x00, 0x00, 0x00));
 
     // Setup the border debug color
-    borderPalette[BORDER_DEBUG] = TEXEL(GpuColor(0xD0, 0x00, 0x00).rawValue);
+    borderPalette[BORDER_DEBUG] = toTexel(GpuColor(0xD0, 0x00, 0x00));
 }
 
 void
@@ -268,6 +268,36 @@ PixelEngine::toTexel(const AmigaColor c) const
 
         default:
             return TEXEL(HI_HI_LO_LO(r, g, b, 0xFF));
+    }
+}
+
+GpuColor
+PixelEngine::fromTexel(Texel t) const
+{
+    // One-off conversion: re-reads the host format and dispatches to the
+    // matching compile-time-specialized instantiation. A hot loop should
+    // do this switch itself, once, and call the template directly per pixel
+    // (see DmaDebugger::computeOverlay).
+    switch (host.getConfig().texFormat) {
+
+        case TexFormat::ABGR: return fromTexel<TexFormat::ABGR>(t);
+        case TexFormat::ARGB: return fromTexel<TexFormat::ARGB>(t);
+
+        default: // RGBA
+            return fromTexel<TexFormat::RGBA>(t);
+    }
+}
+
+Texel
+PixelEngine::toTexel(GpuColor c) const
+{
+    switch (host.getConfig().texFormat) {
+
+        case TexFormat::ABGR: return toTexel<TexFormat::ABGR>(c);
+        case TexFormat::ARGB: return toTexel<TexFormat::ARGB>(c);
+
+        default: // RGBA
+            return toTexel<TexFormat::RGBA>(c);
     }
 }
 
