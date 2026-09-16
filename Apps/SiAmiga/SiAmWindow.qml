@@ -213,6 +213,7 @@ ApplicationWindow {
         keyboardWindowRef: keyboardWindow
         cpuInspectorRef: cpuInspectorWindow
         busInspectorRef: busInspectorWindow
+        layersInspectorRef: layersInspectorWindow
         ciaInspectorRef: ciaInspectorWindow
         memoryInspectorRef: memoryInspectorWindow
         agnusInspectorRef: agnusInspectorWindow
@@ -285,6 +286,13 @@ ApplicationWindow {
     SiAmBusPanel {
 
         id: busInspectorWindow
+        controller: root.amiga
+        actions: root.actions
+    }
+
+    SiAmLayersPanel {
+
+        id: layersInspectorWindow
         controller: root.amiga
         actions: root.actions
     }

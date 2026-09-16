@@ -221,6 +221,9 @@ ToolBar {
                         action: root.window.actions.openBusInspector
                     }
                     SiMenuItem {
+                        action: root.window.actions.openLayersInspector
+                    }
+                    SiMenuItem {
                         action: root.window.actions.openCIAInspector
                     }
                     SiMenuItem {

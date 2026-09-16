@@ -41,6 +41,7 @@ Item {
     required property var keyboardWindowRef
     required property var cpuInspectorRef
     required property var busInspectorRef
+    required property var layersInspectorRef
     required property var ciaInspectorRef
     required property var memoryInspectorRef
     required property var agnusInspectorRef
@@ -54,6 +55,7 @@ Item {
     property alias config: configAction
     property alias openCPUInspector: openCPUInspectorAction
     property alias openBusInspector: openBusInspectorAction
+    property alias openLayersInspector: openLayersInspectorAction
     property alias openCIAInspector: openCIAInspectorAction
     property alias openMemoryInspector: openMemoryInspectorAction
     property alias openAgnusInspector: openAgnusInspectorAction
@@ -120,6 +122,19 @@ Item {
             busInspectorRef.show()
             busInspectorRef.raise()
             busInspectorRef.requestActivate()
+        }
+    }
+
+    Action {
+
+        id: openLayersInspectorAction
+        text: qsTr("Layers...")
+        icon.name: "stack"
+        onTriggered: {
+
+            layersInspectorRef.show()
+            layersInspectorRef.raise()
+            layersInspectorRef.requestActivate()
         }
     }
 

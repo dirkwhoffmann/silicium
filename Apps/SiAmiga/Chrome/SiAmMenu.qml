@@ -420,6 +420,9 @@ SiMenuBar {
                 action: window.actions.openBusInspector
             }
             SiMenuItem {
+                action: window.actions.openLayersInspector
+            }
+            SiMenuItem {
                 action: window.actions.openCIAInspector
             }
             SiMenuItem {

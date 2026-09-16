@@ -27,6 +27,7 @@
 #include "Inspector/SiAmAgnusController.h"
 #include "Inspector/SiAmPaulaController.h"
 #include "Inspector/SiAmBusController.h"
+#include "Inspector/SiAmLayersController.h"
 #include "Inspector/SiAmCPUController.h"
 #include "Inspector/SiAmDeniseController.h"
 #include "Inspector/SiAmPortController.h"
@@ -73,6 +74,7 @@ class SiAmController : public Controller {
     unique_ptr<SiAmAgnusController> m_agnusController;
     unique_ptr<SiAmPaulaController> m_paulaController;
     unique_ptr<SiAmBusController> m_busController;
+    unique_ptr<SiAmLayersController> m_layersController;
     unique_ptr<SiAmCPUController> m_cpuController;
     unique_ptr<SiAmDeniseController> m_deniseController;
     unique_ptr<SiAmPortController> m_portController;
@@ -278,6 +280,7 @@ public:
     Q_PROPERTY(SiAmAgnusController *agnusController READ getAgnusController CONSTANT)
     Q_PROPERTY(SiAmPaulaController *paulaController READ getPaulaController CONSTANT)
     Q_PROPERTY(SiAmBusController *busController READ getBusController CONSTANT)
+    Q_PROPERTY(SiAmLayersController *layersController READ getLayersController CONSTANT)
     Q_PROPERTY(SiAmCPUController *cpuController READ getCPUController CONSTANT)
     Q_PROPERTY(SiAmDeniseController *deniseController READ getDeniseController CONSTANT)
     Q_PROPERTY(SiAmPortController *portController READ getPortController CONSTANT)
@@ -297,6 +300,7 @@ public:
     SiAmAgnusController *getAgnusController() const { return m_agnusController.get(); }
     SiAmPaulaController *getPaulaController() const { return m_paulaController.get(); }
     SiAmBusController *getBusController() const { return m_busController.get(); }
+    SiAmLayersController *getLayersController() const { return m_layersController.get(); }
     SiAmCPUController *getCPUController() const { return m_cpuController.get(); }
     SiAmDeniseController *getDeniseController() const { return m_deniseController.get(); }
     SiAmPortController *getPortController() const { return m_portController.get(); }

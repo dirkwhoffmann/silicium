@@ -14,6 +14,7 @@
 #include "Config/SiAmConfigController.h"
 #include "Inspector/SiAmLogicView.h"
 #include "Inspector/SiAmSpriteView.h"
+#include "Inspector/SiAmDmaView.h"
 #include "AppController.h"
 #include "Assets.h"
 #include "Logger.h"
@@ -64,6 +65,7 @@ main(int argc, char *argv[])
     qmlRegisterType<SiAmConfigController>("Silicium.Controllers", 1, 0, "SiAmConfigController");
     qmlRegisterType<SiAmLogicView>("Silicium.Components", 1, 0, "SiAmLogicView");
     qmlRegisterType<SiAmSpriteView>("Silicium.Components", 1, 0, "SiAmSpriteView");
+    qmlRegisterType<SiAmDmaView>("Silicium.Components", 1, 0, "SiAmDmaView");
 
     // Register attachments
     qmlRegisterUncreatableType<Palette>("Silicium.Theme", 1, 0, "Palette", "Palette is an attached property");

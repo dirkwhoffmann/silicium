@@ -15,17 +15,14 @@ import Silicium.Controllers
 import Silicium.Theme
 
 // Port of vAmiga's own GUI/Inspector/BusPanel.swift + LogicView.swift. Its
-// own top-level window (see SiAmInspectorWindow.qml). Two boxes, matching
-// the Swift window: a "Logic Analyzer" box (the 228-cycle DMA
-// timing-diagram grid -- SiAmLogicView, a QQuickPaintedItem port of
-// LogicView.swift's drawHairlines/drawLabels/drawSignal -- plus its four
-// probe selectors, a zoom slider and the Symbolic checkbox) and a "DMA
-// Debugger" box (the eight visualize-channel checkboxes/colors plus the
-// display-mode combo and opacity slider, straight off SiAmConfigController's
-// DMA_DEBUG_* properties -- same shape as SiC64BusPanel.qml's own
-// ChannelRow, just eight channels instead of six and no separate "show as
-// overlay" toggle, since vAmiga has no DMA_DEBUG_OVERLAY option distinct
-// from DMA_DEBUG_ENABLE).
+// own top-level window (see SiAmInspectorWindow.qml). A single "Logic
+// Analyzer" box, spanning the whole panel: the 228-cycle DMA timing-diagram
+// grid (SiAmLogicView, a QQuickPaintedItem port of LogicView.swift's
+// drawHairlines/drawLabels/drawSignal) plus its four probe selectors, a zoom
+// slider and the Symbolic checkbox. The DMA Debugger box that used to sit
+// next to it (the eight visualize-channel checkboxes/colors plus the
+// display-mode combo and opacity slider) moved to its own window,
+// SiAmLayersPanel.qml, paired there with a live preview.
 SiAmInspectorWindow {
 
     id: root
@@ -34,7 +31,6 @@ SiAmInspectorWindow {
     currentController: controller.busController
 
     readonly property var bus: controller.busController
-    readonly property var cc: controller.configController
     readonly property var ic: controller.inspectorController
 
     property real zoom: 1
@@ -47,38 +43,8 @@ SiAmInspectorWindow {
     // to re-evaluate whenever a preset or custom address is applied.
     property int configVersion: 0
     Connections {
-        target: cc
+        target: controller.configController
         function onConfigChanged() { root.configVersion++ }
-    }
-
-    component ChannelRow: RowLayout {
-
-        id: chRow
-
-        required property string label
-        property bool on: false
-        property color swatch: "black"
-
-        signal toggled(bool value)
-        signal colorPicked(color value)
-
-        Layout.fillWidth: true
-        spacing: Style.mediumSpacing
-
-        SiCheckBoxControl {
-
-            Layout.fillWidth: true
-            enabled: root.cc.DMA_DEBUG_ENABLE
-            checked: chRow.on
-            onClicked: chRow.toggled(checked)
-            r: chRow.label
-        }
-
-        SiColorWell {
-
-            value: chRow.swatch
-            onPicked: (value) => chRow.colorPicked(value)
-        }
     }
 
     // One "Connect..." probe selector: a button showing the current
@@ -151,192 +117,83 @@ SiAmInspectorWindow {
         }
     }
 
-    RowLayout {
+    SiBox {
 
         anchors.fill: parent
         anchors.margins: Style.mediumSpacing
-        spacing: Style.mediumSpacing
 
-        //
-        // Logic Analyzer
-        //
+        title: qsTr("Logic Analyzer")
+        spacing: Style.smallSpacing
 
-        SiBox {
+        ColumnLayout {
 
-            title: qsTr("Logic Analyzer")
             Layout.fillWidth: true
             Layout.fillHeight: true
             spacing: Style.smallSpacing
 
-            ColumnLayout {
+            GridLayout {
 
                 Layout.fillWidth: true
-                Layout.fillHeight: true
-                spacing: Style.smallSpacing
+                columns: 2
+                columnSpacing: Style.largeSpacing
+                rowSpacing: Style.tinySpacing
 
-                GridLayout {
+                ProbeSelector { channel: 0 }
+                ProbeSelector { channel: 1 }
+                ProbeSelector { channel: 2 }
+                ProbeSelector { channel: 3 }
+            }
 
-                    Layout.fillWidth: true
-                    columns: 2
-                    columnSpacing: Style.largeSpacing
-                    rowSpacing: Style.tinySpacing
+            Rectangle {
 
-                    ProbeSelector { channel: 0 }
-                    ProbeSelector { channel: 1 }
-                    ProbeSelector { channel: 2 }
-                    ProbeSelector { channel: 3 }
-                }
+                Layout.fillWidth: true
+                Layout.preferredHeight: 240
+                color: Palette.control
+                border.width: 1
+                border.color: Palette.controlBorder
+                radius: Style.radius
+                clip: true
 
-                Rectangle {
+                Flickable {
 
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 240
-                    color: Palette.control
-                    border.width: 1
-                    border.color: Palette.controlBorder
-                    radius: Style.radius
-                    clip: true
+                    id: flick
+                    anchors.fill: parent
+                    anchors.margins: 1
+                    contentWidth: width * root.zoom
+                    contentHeight: height
+                    boundsBehavior: Flickable.StopAtBounds
+                    ScrollBar.horizontal: ScrollBar { }
 
-                    Flickable {
+                    SiAmLogicView {
 
-                        id: flick
-                        anchors.fill: parent
-                        anchors.margins: 1
-                        contentWidth: width * root.zoom
-                        contentHeight: height
-                        boundsBehavior: Flickable.StopAtBounds
-                        ScrollBar.horizontal: ScrollBar { }
-
-                        SiAmLogicView {
-
-                            width: flick.contentWidth
-                            height: flick.height
-                            hex: root.ic.hex
-                            symbolic: symbolicBox.checked
-                            textColor: Palette.primary
-                            hairlineColor: Palette.controlBorder
-                        }
-                    }
-                }
-
-                RowLayout {
-
-                    Layout.fillWidth: true
-                    spacing: Style.mediumSpacing
-
-                    SiCheckBoxControl { id: symbolicBox; r: qsTr("Symbolic") }
-
-                    SiLabel { text: qsTr("Zoom") }
-
-                    SiSliderControl {
-
-                        Layout.fillWidth: true
-                        from: 1
-                        to: 21
-                        value: root.zoom
-                        onMoved: (value) => root.zoom = value
+                        width: flick.contentWidth
+                        height: flick.height
+                        hex: root.ic.hex
+                        symbolic: symbolicBox.checked
+                        textColor: Palette.primary
+                        hairlineColor: Palette.controlBorder
                     }
                 }
             }
-        }
 
-        //
-        // DMA Debugger
-        //
-
-        SiBox {
-
-            title: qsTr("DMA Debugger")
-            Layout.preferredWidth: 260
-            Layout.fillHeight: true
-            spacing: Style.tinySpacing
-
-            SiCheckBoxControl {
-
-                checked: cc.DMA_DEBUG_ENABLE
-                onClicked: cc.DMA_DEBUG_ENABLE = checked
-                r: qsTr("Visualize bus accesses")
-            }
-
-            ChannelRow {
-                label: qsTr("Copper DMA")
-                on: cc.DMA_DEBUG_CHANNEL0; swatch: cc.DMA_DEBUG_COLOR0
-                onToggled: (value) => cc.DMA_DEBUG_CHANNEL0 = value
-                onColorPicked: (value) => cc.DMA_DEBUG_COLOR0 = value
-            }
-
-            ChannelRow {
-                label: qsTr("Blitter DMA")
-                on: cc.DMA_DEBUG_CHANNEL1; swatch: cc.DMA_DEBUG_COLOR1
-                onToggled: (value) => cc.DMA_DEBUG_CHANNEL1 = value
-                onColorPicked: (value) => cc.DMA_DEBUG_COLOR1 = value
-            }
-
-            ChannelRow {
-                label: qsTr("Disk DMA")
-                on: cc.DMA_DEBUG_CHANNEL2; swatch: cc.DMA_DEBUG_COLOR2
-                onToggled: (value) => cc.DMA_DEBUG_CHANNEL2 = value
-                onColorPicked: (value) => cc.DMA_DEBUG_COLOR2 = value
-            }
-
-            ChannelRow {
-                label: qsTr("Audio DMA")
-                on: cc.DMA_DEBUG_CHANNEL3; swatch: cc.DMA_DEBUG_COLOR3
-                onToggled: (value) => cc.DMA_DEBUG_CHANNEL3 = value
-                onColorPicked: (value) => cc.DMA_DEBUG_COLOR3 = value
-            }
-
-            ChannelRow {
-                label: qsTr("Sprite DMA")
-                on: cc.DMA_DEBUG_CHANNEL4; swatch: cc.DMA_DEBUG_COLOR4
-                onToggled: (value) => cc.DMA_DEBUG_CHANNEL4 = value
-                onColorPicked: (value) => cc.DMA_DEBUG_COLOR4 = value
-            }
-
-            ChannelRow {
-                label: qsTr("Bitplane DMA")
-                on: cc.DMA_DEBUG_CHANNEL5; swatch: cc.DMA_DEBUG_COLOR5
-                onToggled: (value) => cc.DMA_DEBUG_CHANNEL5 = value
-                onColorPicked: (value) => cc.DMA_DEBUG_COLOR5 = value
-            }
-
-            ChannelRow {
-                label: qsTr("CPU DMA")
-                on: cc.DMA_DEBUG_CHANNEL6; swatch: cc.DMA_DEBUG_COLOR6
-                onToggled: (value) => cc.DMA_DEBUG_CHANNEL6 = value
-                onColorPicked: (value) => cc.DMA_DEBUG_COLOR6 = value
-            }
-
-            ChannelRow {
-                label: qsTr("Memory Refresh DMA")
-                on: cc.DMA_DEBUG_CHANNEL7; swatch: cc.DMA_DEBUG_COLOR7
-                onToggled: (value) => cc.DMA_DEBUG_CHANNEL7 = value
-                onColorPicked: (value) => cc.DMA_DEBUG_COLOR7 = value
-            }
-
-            VSpacer { size: Style.mediumSpacing }
-
-            SiComboBoxControl {
+            RowLayout {
 
                 Layout.fillWidth: true
-                enabled: cc.DMA_DEBUG_ENABLE
-                model: [qsTr("Foreground layer"), qsTr("Background layer"), qsTr("Mixed layers")]
-                currentIndex: cc.DMA_DEBUG_MODE
-                onCurrentIndexChanged: cc.DMA_DEBUG_MODE = currentIndex
+                spacing: Style.mediumSpacing
+
+                SiCheckBoxControl { id: symbolicBox; r: qsTr("Symbolic") }
+
+                SiLabel { text: qsTr("Zoom") }
+
+                SiSliderControl {
+
+                    Layout.fillWidth: true
+                    from: 1
+                    to: 21
+                    value: root.zoom
+                    onMoved: (value) => root.zoom = value
+                }
             }
-
-            SiSliderControl {
-
-                enabled: cc.DMA_DEBUG_ENABLE
-                Layout.fillWidth: true
-                l: qsTr("Opacity")
-                from: 0
-                to: 255
-                value: cc.DMA_DEBUG_OPACITY
-                onMoved: (value) => cc.DMA_DEBUG_OPACITY = value
-            }
-
-            VSpacer { }
         }
     }
 }
