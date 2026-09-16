@@ -133,6 +133,8 @@ SiAmInspectorWindow {
                         SiHex16 { l: qsTr("VPOS:"); lwidth: root.labelWidth; value: agnus.vpos }
                         SiHex16 { l: qsTr("HPOS:"); lwidth: root.labelWidth; value: agnus.hpos }
                     }
+
+                    VSpacer {}
                 }
 
                 SiBox {
