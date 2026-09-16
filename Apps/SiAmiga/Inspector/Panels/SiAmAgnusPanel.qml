@@ -23,8 +23,10 @@ SiAmInspectorWindow {
     readonly property var agnus: controller.agnusController
 
     // Shared width for every SiBox (see SiAmCIAPanel)
-    readonly property real columnWidth: Math.max(220,
-        (scrollView.availableWidth - Style.largeSpacing * 3) / 4)
+    readonly property real columnWidth: Math.max(280,
+        (scrollView.availableWidth - Style.largeSpacing * 2) * 2 / 5)
+    readonly property real smallColumnWidth: Math.max(140,
+        (scrollView.availableWidth - Style.largeSpacing * 2) / 5)
 
     // Shared label width for a register name
     readonly property int labelWidth: 62
@@ -32,6 +34,7 @@ SiAmInspectorWindow {
     // 16-bit registers (DMACON, BPLCON0, FMODE, DDFSTRT/STOP, DIWSTRT/STOP,
     // the four modulo pairs) -- fmt16 in the Swift reference.
     component SiHex16: SiNumberViewControl {
+
         size: Size.small
         font.weight: 500
         controlWidth: 48
@@ -42,6 +45,7 @@ SiAmInspectorWindow {
 
     // 24-bit DMA pointer/address registers -- fmt24 in the Swift reference.
     component SiHex24: SiNumberViewControl {
+
         size: Size.small
         font.weight: 500
         controlWidth: 68
@@ -76,7 +80,7 @@ SiAmInspectorWindow {
         clip: true
         contentWidth: content.implicitWidth
 
-        // A single 4-column grid holds all the boxes (see SiAmCIAPanel).
+        // A single 3-column grid holds all the boxes (see SiAmCIAPanel).
         // GridLayout has no per-column stretch factor, so pin every cell's
         // width to root.columnWidth instead, so all four columns stay
         // equal and track window resizes together.
@@ -84,7 +88,7 @@ SiAmInspectorWindow {
 
             id: content
 
-            columns: 4
+            columns: 3
             columnSpacing: Style.largeSpacing
             rowSpacing: Style.largeSpacing
 
@@ -101,8 +105,9 @@ SiAmInspectorWindow {
 
                 SiBox {
 
-                    title: qsTr("DMA Control")
+                    title: qsTr("Cycle Counters")
                     Layout.fillWidth: true
+                    Layout.fillHeight: true
                     spacing: Style.smallSpacing
 
                     GridLayout {
@@ -114,6 +119,22 @@ SiAmInspectorWindow {
 
                         SiHex16 { l: qsTr("VPOS:"); lwidth: root.labelWidth; value: agnus.vpos }
                         SiHex16 { l: qsTr("HPOS:"); lwidth: root.labelWidth; value: agnus.hpos }
+                    }
+                }
+
+                SiBox {
+
+                    title: qsTr("DMA Control")
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    spacing: Style.smallSpacing
+
+                    GridLayout {
+
+                        Layout.alignment: Qt.AlignHCenter
+                        columns: 2
+                        columnSpacing: Style.smallSpacing
+                        rowSpacing: Style.tinySpacing
 
                         SiHex16 { l: qsTr("DMACON:"); lwidth: root.labelWidth; value: agnus.dmacon }
                         SiHex16 { l: qsTr("BPL0CON:"); lwidth: root.labelWidth; value: agnus.bplcon0 }
@@ -128,33 +149,6 @@ SiAmInspectorWindow {
                         SiHex16 { l: qsTr("DIWSTOP:"); lwidth: root.labelWidth; value: agnus.diwstop }
 
                         SiHex16 { l: qsTr("DIWHIGH:"); lwidth: root.labelWidth; value: agnus.diwhigh }
-                        Item { }
-                    }
-                }
-
-                SiBox {
-
-                    title: qsTr("Modulos")
-                    Layout.fillWidth: true
-                    spacing: Style.smallSpacing
-
-                    GridLayout {
-
-                        Layout.alignment: Qt.AlignHCenter
-                        columns: 2
-                        columnSpacing: Style.smallSpacing
-                        rowSpacing: Style.tinySpacing
-
-                        SiHex16 { l: qsTr("BLTAMOD:"); lwidth: root.labelWidth; value: agnus.bltamod }
-                        SiHex16 { l: qsTr("BPL1MOD:"); lwidth: root.labelWidth; value: agnus.bpl1mod }
-
-                        SiHex16 { l: qsTr("BLTBMOD:"); lwidth: root.labelWidth; value: agnus.bltbmod }
-                        SiHex16 { l: qsTr("BPL2MOD:"); lwidth: root.labelWidth; value: agnus.bpl2mod }
-
-                        SiHex16 { l: qsTr("BLTCMOD:"); lwidth: root.labelWidth; value: agnus.bltcmod }
-                        Item { }
-
-                        SiHex16 { l: qsTr("BLTDMOD:"); lwidth: root.labelWidth; value: agnus.bltdmod }
                         Item { }
                     }
                 }
@@ -203,6 +197,74 @@ SiAmInspectorWindow {
             }
 
             //
+            // Blitter DMA
+            //
+
+            ColumnLayout {
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: root.smallColumnWidth
+                spacing: Style.mediumSpacing
+
+                SiBox {
+
+                    title: qsTr("Blitter DMA")
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    spacing: Style.smallSpacing
+
+                    ColumnLayout {
+
+                        Layout.alignment: Qt.AlignHCenter
+                        spacing: Style.tinySpacing
+
+                        DmaRow { label: qsTr("BLTAPT:"); checked: agnus.bltEnabled(0); value: agnus.bltPt(0) }
+                        DmaRow { label: qsTr("BLTBPT:"); checked: agnus.bltEnabled(1); value: agnus.bltPt(1) }
+                        DmaRow { label: qsTr("BLTCPT:"); checked: agnus.bltEnabled(2); value: agnus.bltPt(2) }
+                        DmaRow { label: qsTr("BLTDPT:"); checked: agnus.bltEnabled(3); value: agnus.bltPt(3) }
+
+                        SiCheckBoxControl { size: Size.small; readOnly: true; lwidth: root.labelWidth; l: qsTr("BLTPRI:"); checked: agnus.bltPri }
+                        SiCheckBoxControl { size: Size.small; readOnly: true; lwidth: root.labelWidth; l: qsTr("BLS:"); checked: agnus.bls }
+
+                        VSpacer { }
+                    }
+                }
+            }
+
+            //
+            // Modulos
+            //
+
+            SiBox {
+
+                title: qsTr("Modulos")
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                spacing: Style.smallSpacing
+
+                GridLayout {
+
+                    Layout.alignment: Qt.AlignHCenter
+                    columns: 2
+                    columnSpacing: Style.smallSpacing
+                    rowSpacing: Style.tinySpacing
+
+                    SiHex16 { l: qsTr("BLTAMOD:"); lwidth: root.labelWidth; value: agnus.bltamod }
+                    SiHex16 { l: qsTr("BPL1MOD:"); lwidth: root.labelWidth; value: agnus.bpl1mod }
+
+                    SiHex16 { l: qsTr("BLTBMOD:"); lwidth: root.labelWidth; value: agnus.bltbmod }
+                    SiHex16 { l: qsTr("BPL2MOD:"); lwidth: root.labelWidth; value: agnus.bpl2mod }
+
+                    SiHex16 { l: qsTr("BLTCMOD:"); lwidth: root.labelWidth; value: agnus.bltcmod }
+                    Item { }
+
+                    SiHex16 { l: qsTr("BLTDMOD:"); lwidth: root.labelWidth; value: agnus.bltdmod }
+                    Item { }
+                }
+            }
+
+            //
             // Audio DMA
             //
 
@@ -217,6 +279,7 @@ SiAmInspectorWindow {
 
                     title: qsTr("Audio DMA")
                     Layout.fillWidth: true
+                    Layout.fillHeight: true
                     spacing: Style.smallSpacing
 
                     ColumnLayout {
@@ -245,45 +308,25 @@ SiAmInspectorWindow {
                     }
                 }
 
-                VSpacer { }
+                // VSpacer { }
             }
 
             //
-            // Blitter DMA + Copper DMA + Disk DMA
+            // Copper DMA + Disk DMA
             //
 
             ColumnLayout {
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.preferredWidth: root.columnWidth
+                Layout.preferredWidth: root.smallColumnWidth
                 spacing: Style.mediumSpacing
-
-                SiBox {
-
-                    title: qsTr("Blitter DMA")
-                    Layout.fillWidth: true
-                    spacing: Style.smallSpacing
-
-                    ColumnLayout {
-
-                        Layout.alignment: Qt.AlignHCenter
-                        spacing: Style.tinySpacing
-
-                        DmaRow { label: qsTr("BLTAPT:"); checked: agnus.bltEnabled(0); value: agnus.bltPt(0) }
-                        DmaRow { label: qsTr("BLTBPT:"); checked: agnus.bltEnabled(1); value: agnus.bltPt(1) }
-                        DmaRow { label: qsTr("BLTCPT:"); checked: agnus.bltEnabled(2); value: agnus.bltPt(2) }
-                        DmaRow { label: qsTr("BLTDPT:"); checked: agnus.bltEnabled(3); value: agnus.bltPt(3) }
-
-                        SiCheckBoxControl { size: Size.small; readOnly: true; lwidth: root.labelWidth; l: qsTr("BLTPRI:"); checked: agnus.bltPri }
-                        SiCheckBoxControl { size: Size.small; readOnly: true; lwidth: root.labelWidth; l: qsTr("BLS:"); checked: agnus.bls }
-                    }
-                }
 
                 SiBox {
 
                     title: qsTr("Copper DMA")
                     Layout.fillWidth: true
+                    Layout.fillHeight: true
                     spacing: Style.smallSpacing
 
                     ColumnLayout {
@@ -310,7 +353,7 @@ SiAmInspectorWindow {
                     }
                 }
 
-                VSpacer { }
+                // VSpacer { }
             }
         }
     }

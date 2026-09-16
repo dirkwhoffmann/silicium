@@ -306,201 +306,202 @@ SiAmInspectorWindow {
                 // Timers and Ports
                 //
 
-                    SiBox {
+                SiBox {
 
-                        id: timersBox
-                        title: qsTr("Timers")
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: root.columnWidth
-                        spacing: Style.mediumSpacing
+                    id: timersBox
+                    title: qsTr("Timers")
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: root.columnWidth
+                    spacing: Style.mediumSpacing
 
-                        Timer {
+                    Timer {
 
-                            label: qsTr("A")
-                            Layout.alignment: Qt.AlignHCenter
-                            countValue: cia.timerACount
-                            latchValue: cia.timerALatch
-                            running: cia.timerARunning
-                            toggle: cia.timerAToggle
-                            pbout: cia.timerAPbout
-                            oneShot: cia.timerAOneShot
-                        }
-
-                        Timer {
-
-                            label: qsTr("B")
-                            Layout.alignment: Qt.AlignHCenter
-                            countValue: cia.timerBCount
-                            latchValue: cia.timerBLatch
-                            running: cia.timerBRunning
-                            toggle: cia.timerBToggle
-                            pbout: cia.timerBPbout
-                            oneShot: cia.timerBOneShot
-                        }
-                    }
-
-                    Port {
-
-                        id: portABox
-                        title: qsTr("Data port A")
+                        label: qsTr("A")
                         Layout.alignment: Qt.AlignHCenter
-                        Layout.preferredWidth: root.columnWidth
-                        regValue: cia.portAReg
-                        dirValue: cia.portADir
-                        portValue: cia.portAPort
-                        labels: cia.portALabels
+                        countValue: cia.timerACount
+                        latchValue: cia.timerALatch
+                        running: cia.timerARunning
+                        toggle: cia.timerAToggle
+                        pbout: cia.timerAPbout
+                        oneShot: cia.timerAOneShot
                     }
 
-                    Port {
+                    Timer {
 
-                        id: portBBox
-                        title: qsTr("Data port B")
+                        label: qsTr("B")
                         Layout.alignment: Qt.AlignHCenter
-                        Layout.preferredWidth: root.columnWidth
-                        regValue: cia.portBReg
-                        dirValue: cia.portBDir
-                        portValue: cia.portBPort
-                        labels: cia.portBLabels
+                        countValue: cia.timerBCount
+                        latchValue: cia.timerBLatch
+                        running: cia.timerBRunning
+                        toggle: cia.timerBToggle
+                        pbout: cia.timerBPbout
+                        oneShot: cia.timerBOneShot
                     }
+                }
+
+                Port {
+
+                    id: portABox
+                    title: qsTr("Data port A")
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: root.columnWidth
+                    regValue: cia.portAReg
+                    dirValue: cia.portADir
+                    portValue: cia.portAPort
+                    labels: cia.portALabels
+                }
+
+                Port {
+
+                    id: portBBox
+                    title: qsTr("Data port B")
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: root.columnWidth
+                    regValue: cia.portBReg
+                    dirValue: cia.portBDir
+                    portValue: cia.portBPort
+                    labels: cia.portBLabels
+                }
 
                 //
                 // Interrupts, TOD clock, Serial shift register
                 //
 
-                    SiBox {
+                SiBox {
 
-                        id: interruptsBox
-                        title: qsTr("Interrupts")
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: root.columnWidth
-                        spacing: Style.tinySpacing
+                    id: interruptsBox
+                    title: qsTr("Interrupts")
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: root.columnWidth
+                    spacing: Style.tinySpacing
 
-                        ColumnLayout {
+                    ColumnLayout {
 
-                            Layout.alignment: Qt.AlignHCenter
+                        Layout.alignment: Qt.AlignHCenter
 
-                            SiByteViewControl {
+                        SiByteViewControl {
+
+                            size: Size.small
+                            lwidth: 100
+                            l: qsTr("Mask Register:")
+                            value: cia.imr
+
+                            SiBitViewControl {
 
                                 size: Size.small
-                                lwidth: 100
-                                l: qsTr("Mask Register:")
                                 value: cia.imr
-
-                                SiBitViewControl {
-
-                                    size: Size.small
-                                    value: cia.imr
-                                }
-
-                                HSpacer {}
                             }
 
-                            SiByteViewControl {
+                            HSpacer {
+                            }
+                        }
+
+                        SiByteViewControl {
+
+                            size: Size.small
+                            lwidth: 100
+                            l: qsTr("Control Register:")
+                            value: cia.icr
+
+                            SiBitViewControl {
 
                                 size: Size.small
-                                lwidth: 100
-                                l: qsTr("Control Register:")
                                 value: cia.icr
-
-                                SiBitViewControl {
-
-                                    size: Size.small
-                                    value: cia.icr
-                                }
-                            }
-
-                            SiCheckBoxControl {
-
-                                indent: 100
-                                size: Size.small
-                                checked: cia.intLineLow
-                                r: cia.intLineLabel
                             }
                         }
-                    }
 
-                    SiBox {
+                        SiCheckBoxControl {
 
-                        id: todBox
-                        title: qsTr("Time of Day Clock")
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: root.columnWidth
-                        spacing: Style.tinySpacing
-
-                        ColumnLayout {
-
-                            Layout.alignment: Qt.AlignHCenter
-
-                            SiTODControl {
-
-                                l: qsTr("TOD:")
-                                lwidth: 48
-                                value: cia.todValue
-                            }
-
-                            SiTODControl {
-
-                                l: qsTr("Latch:")
-                                lwidth: 48
-                                value: cia.todLatch
-                            }
-
-                            SiTODControl {
-
-                                l: qsTr("Alarm:")
-                                lwidth: 48
-                                value: cia.todAlarm
-                            }
-
-                            SiCheckBoxControl {
-
-                                size: Size.small
-                                indent: 48
-                                checked: cia.todIntEnable
-                                r: qsTr("IRQ Enabled")
-                            }
+                            indent: 100
+                            size: Size.small
+                            checked: cia.intLineLow
+                            r: cia.intLineLabel
                         }
                     }
+                }
 
-                    SiBox {
+                SiBox {
 
-                        id: sdrBox
-                        title: qsTr("Serial Shift Register")
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: root.columnWidth
-                        spacing: Style.tinySpacing
+                    id: todBox
+                    title: qsTr("Time of Day Clock")
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: root.columnWidth
+                    spacing: Style.tinySpacing
 
-                        ColumnLayout {
+                    ColumnLayout {
 
-                            Layout.alignment: Qt.AlignHCenter
+                        Layout.alignment: Qt.AlignHCenter
 
-                            SiByteViewControl {
+                        SiTODControl {
+
+                            l: qsTr("TOD:")
+                            lwidth: 48
+                            value: cia.todValue
+                        }
+
+                        SiTODControl {
+
+                            l: qsTr("Latch:")
+                            lwidth: 48
+                            value: cia.todLatch
+                        }
+
+                        SiTODControl {
+
+                            l: qsTr("Alarm:")
+                            lwidth: 48
+                            value: cia.todAlarm
+                        }
+
+                        SiCheckBoxControl {
+
+                            size: Size.small
+                            indent: 48
+                            checked: cia.todIntEnable
+                            r: qsTr("IRQ Enabled")
+                        }
+                    }
+                }
+
+                SiBox {
+
+                    id: sdrBox
+                    title: qsTr("Serial Shift Register")
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: root.columnWidth
+                    spacing: Style.tinySpacing
+
+                    ColumnLayout {
+
+                        Layout.alignment: Qt.AlignHCenter
+
+                        SiByteViewControl {
+
+                            size: Size.small
+                            lwidth: 90
+                            l: qsTr("Shift Register:")
+                            value: cia.ssr
+
+                            SiBitViewControl {
 
                                 size: Size.small
-                                lwidth: 90
-                                l: qsTr("Shift Register:")
                                 value: cia.ssr
-
-                                SiBitViewControl {
-
-                                    size: Size.small
-                                    value: cia.ssr
-                                }
-                            }
-
-                            SiByteViewControl {
-
-                                size: Size.small
-                                lwidth: 90
-                                l: qsTr("Data Register:")
-                                value: cia.sdr
                             }
                         }
+
+                        SiByteViewControl {
+
+                            size: Size.small
+                            lwidth: 90
+                            l: qsTr("Data Register:")
+                            value: cia.sdr
+                        }
                     }
+                }
             }
         }
     }
