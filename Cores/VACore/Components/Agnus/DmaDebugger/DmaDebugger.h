@@ -31,26 +31,26 @@ class DmaDebugger final : public SubComponent {
     
     Options options = {
         
-        Opt::DMA_DEBUG_ENABLE,
-        Opt::DMA_DEBUG_OVERLAY,
-        Opt::DMA_DEBUG_MODE,
-        Opt::DMA_DEBUG_OPACITY,
-        Opt::DMA_DEBUG_CHANNEL0,
-        Opt::DMA_DEBUG_CHANNEL1,
-        Opt::DMA_DEBUG_CHANNEL2,
-        Opt::DMA_DEBUG_CHANNEL3,
-        Opt::DMA_DEBUG_CHANNEL4,
-        Opt::DMA_DEBUG_CHANNEL5,
-        Opt::DMA_DEBUG_CHANNEL6,
-        Opt::DMA_DEBUG_CHANNEL7,
-        Opt::DMA_DEBUG_COLOR0,
-        Opt::DMA_DEBUG_COLOR1,
-        Opt::DMA_DEBUG_COLOR2,
-        Opt::DMA_DEBUG_COLOR3,
-        Opt::DMA_DEBUG_COLOR4,
-        Opt::DMA_DEBUG_COLOR5,
-        Opt::DMA_DEBUG_COLOR6,
-        Opt::DMA_DEBUG_COLOR7
+        Opt::XRAY_ENABLE,
+        Opt::XRAY_OVERLAY,
+        Opt::XRAY_OVERLAY_STYLE,
+        Opt::XRAY_OVERLAY_OPACITY,
+        Opt::XRAY_DMA_CHANNEL0,
+        Opt::XRAY_DMA_CHANNEL1,
+        Opt::XRAY_DMA_CHANNEL2,
+        Opt::XRAY_DMA_CHANNEL3,
+        Opt::XRAY_DMA_CHANNEL4,
+        Opt::XRAY_DMA_CHANNEL5,
+        Opt::XRAY_DMA_CHANNEL6,
+        Opt::XRAY_DMA_CHANNEL7,
+        Opt::XRAY_DMA_COLOR0,
+        Opt::XRAY_DMA_COLOR1,
+        Opt::XRAY_DMA_COLOR2,
+        Opt::XRAY_DMA_COLOR3,
+        Opt::XRAY_DMA_COLOR4,
+        Opt::XRAY_DMA_COLOR5,
+        Opt::XRAY_DMA_COLOR6,
+        Opt::XRAY_DMA_COLOR7
     };
     
     // Current configuration

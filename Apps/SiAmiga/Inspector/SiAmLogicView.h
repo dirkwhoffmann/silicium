@@ -95,7 +95,7 @@ class SiAmLogicView : public QQuickPaintedItem {
     // Re-samples the current scanline's bus-owner/address/data/probe data
     // from the core (see LogicView.cacheData()'s owner->label/color switch,
     // reproduced here) and the DMA Debugger's channel colors (read straight
-    // from the packed DMA_DEBUG_COLORx option, decoded the same way
+    // from the packed XRAY_DMA_COLORx option, decoded the same way
     // SiAmConfigController::dmaColor() does).
     void cacheData();
 

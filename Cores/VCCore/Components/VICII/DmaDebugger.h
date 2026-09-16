@@ -31,24 +31,24 @@ class DmaDebugger final : public SubComponent {
 
     Options options = {
 
-        Opt::DMA_DEBUG_ENABLE,
-        Opt::DMA_DEBUG_OVERLAY,
-        Opt::DMA_DEBUG_MODE,
-        Opt::DMA_DEBUG_OPACITY,
+        Opt::XRAY_ENABLE,
+        Opt::XRAY_OVERLAY,
+        Opt::XRAY_OVERLAY_STYLE,
+        Opt::XRAY_OVERLAY_OPACITY,
         Opt::VICII_CUT_LAYERS,
         Opt::VICII_CUT_OPACITY,
-        Opt::DMA_DEBUG_CHANNEL0,
-        Opt::DMA_DEBUG_CHANNEL1,
-        Opt::DMA_DEBUG_CHANNEL2,
-        Opt::DMA_DEBUG_CHANNEL3,
-        Opt::DMA_DEBUG_CHANNEL4,
-        Opt::DMA_DEBUG_CHANNEL5,
-        Opt::DMA_DEBUG_COLOR0,
-        Opt::DMA_DEBUG_COLOR1,
-        Opt::DMA_DEBUG_COLOR2,
-        Opt::DMA_DEBUG_COLOR3,
-        Opt::DMA_DEBUG_COLOR4,
-        Opt::DMA_DEBUG_COLOR5
+        Opt::XRAY_DMA_CHANNEL0,
+        Opt::XRAY_DMA_CHANNEL1,
+        Opt::XRAY_DMA_CHANNEL2,
+        Opt::XRAY_DMA_CHANNEL3,
+        Opt::XRAY_DMA_CHANNEL4,
+        Opt::XRAY_DMA_CHANNEL5,
+        Opt::XRAY_DMA_COLOR0,
+        Opt::XRAY_DMA_COLOR1,
+        Opt::XRAY_DMA_COLOR2,
+        Opt::XRAY_DMA_COLOR3,
+        Opt::XRAY_DMA_COLOR4,
+        Opt::XRAY_DMA_COLOR5
     };
 
     // Current configuration
@@ -130,7 +130,7 @@ public:
     //
 
     // 'color' is the fixed, portable ABGR encoding the option system stores
-    // (see Defaults.cpp / DMA_DEBUG_COLORn) -- independent of the live
+    // (see Defaults.cpp / XRAY_DMA_COLORn) -- independent of the live
     // HOST_TEX_FORMAT. Re-derives the four shades in debugColor[][] in
     // whatever format the host is actually running in right now.
     void setDmaDebugColor(MemAccess type, GpuColor<TexelFormat::ABGR> color);

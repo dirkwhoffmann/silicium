@@ -43,7 +43,7 @@ SiC64InspectorWindow {
 
             Layout.fillWidth: true
             indent: tab
-            enabled: root.cc.DMA_DEBUG_ENABLE
+            enabled: root.cc.XRAY_ENABLE
             checked: chRow.on
             onClicked: chRow.toggled(checked)
             r: chRow.label
@@ -85,57 +85,57 @@ SiC64InspectorWindow {
 
                 SiCheckBoxControl {
 
-                    checked: cc.DMA_DEBUG_ENABLE
-                    onClicked: cc.DMA_DEBUG_ENABLE = checked
+                    checked: cc.XRAY_ENABLE
+                    onClicked: cc.XRAY_ENABLE = checked
                     r: qsTr("DMA Debugger")
                 }
 
                 ChannelRow {
 
                     label: qsTr("Refresh cycles")
-                    on: cc.DMA_DEBUG_CHANNEL0; swatch: cc.DMA_DEBUG_COLOR0
-                    onToggled: (value) => cc.DMA_DEBUG_CHANNEL0 = value
-                    onColorPicked: (value) => cc.DMA_DEBUG_COLOR0 = value
+                    on: cc.XRAY_DMA_CHANNEL0; swatch: cc.XRAY_DMA_COLOR0
+                    onToggled: (value) => cc.XRAY_DMA_CHANNEL0 = value
+                    onColorPicked: (value) => cc.XRAY_DMA_COLOR0 = value
                 }
 
                 ChannelRow {
 
                     label: qsTr("Idle reads")
-                    on: cc.DMA_DEBUG_CHANNEL1; swatch: cc.DMA_DEBUG_COLOR1
-                    onToggled: (value) => cc.DMA_DEBUG_CHANNEL1 = value
-                    onColorPicked: (value) => cc.DMA_DEBUG_COLOR1 = value
+                    on: cc.XRAY_DMA_CHANNEL1; swatch: cc.XRAY_DMA_COLOR1
+                    onToggled: (value) => cc.XRAY_DMA_CHANNEL1 = value
+                    onColorPicked: (value) => cc.XRAY_DMA_COLOR1 = value
                 }
 
                 ChannelRow {
 
                     label: qsTr("Character accesses")
-                    on: cc.DMA_DEBUG_CHANNEL2; swatch: cc.DMA_DEBUG_COLOR2
-                    onToggled: (value) => cc.DMA_DEBUG_CHANNEL2 = value
-                    onColorPicked: (value) => cc.DMA_DEBUG_COLOR2 = value
+                    on: cc.XRAY_DMA_CHANNEL2; swatch: cc.XRAY_DMA_COLOR2
+                    onToggled: (value) => cc.XRAY_DMA_CHANNEL2 = value
+                    onColorPicked: (value) => cc.XRAY_DMA_COLOR2 = value
                 }
 
                 ChannelRow {
 
                     label: qsTr("Graphics accesses")
-                    on: cc.DMA_DEBUG_CHANNEL3; swatch: cc.DMA_DEBUG_COLOR3
-                    onToggled: (value) => cc.DMA_DEBUG_CHANNEL3 = value
-                    onColorPicked: (value) => cc.DMA_DEBUG_COLOR3 = value
+                    on: cc.XRAY_DMA_CHANNEL3; swatch: cc.XRAY_DMA_COLOR3
+                    onToggled: (value) => cc.XRAY_DMA_CHANNEL3 = value
+                    onColorPicked: (value) => cc.XRAY_DMA_COLOR3 = value
                 }
 
                 ChannelRow {
 
                     label: qsTr("Sprite-pointer accesses")
-                    on: cc.DMA_DEBUG_CHANNEL4; swatch: cc.DMA_DEBUG_COLOR4
-                    onToggled: (value) => cc.DMA_DEBUG_CHANNEL4 = value
-                    onColorPicked: (value) => cc.DMA_DEBUG_COLOR4 = value
+                    on: cc.XRAY_DMA_CHANNEL4; swatch: cc.XRAY_DMA_COLOR4
+                    onToggled: (value) => cc.XRAY_DMA_CHANNEL4 = value
+                    onColorPicked: (value) => cc.XRAY_DMA_COLOR4 = value
                 }
 
                 ChannelRow {
 
                     label: qsTr("Sprite-data accesses")
-                    on: cc.DMA_DEBUG_CHANNEL5; swatch: cc.DMA_DEBUG_COLOR5
-                    onToggled: (value) => cc.DMA_DEBUG_CHANNEL5 = value
-                    onColorPicked: (value) => cc.DMA_DEBUG_COLOR5 = value
+                    on: cc.XRAY_DMA_CHANNEL5; swatch: cc.XRAY_DMA_COLOR5
+                    onToggled: (value) => cc.XRAY_DMA_CHANNEL5 = value
+                    onColorPicked: (value) => cc.XRAY_DMA_COLOR5 = value
                 }
 
                 VSpacer { size: Style.mediumSpacing }
@@ -143,9 +143,9 @@ SiC64InspectorWindow {
                 SiCheckBoxControl {
 
                     indent: tab
-                    enabled: cc.DMA_DEBUG_ENABLE
-                    checked: cc.DMA_DEBUG_OVERLAY
-                    onClicked: cc.DMA_DEBUG_OVERLAY = checked
+                    enabled: cc.XRAY_ENABLE
+                    checked: cc.XRAY_OVERLAY
+                    onClicked: cc.XRAY_OVERLAY = checked
                     r: qsTr("Show as overlay")
                 }
 
@@ -153,22 +153,22 @@ SiC64InspectorWindow {
 
                     indent: tabtab
                     Layout.fillWidth: true
-                    enabled: cc.DMA_DEBUG_ENABLE && cc.DMA_DEBUG_OVERLAY
+                    enabled: cc.XRAY_ENABLE && cc.XRAY_OVERLAY
                     model: [qsTr("Foreground layer"), qsTr("Background layer"), qsTr("Mixed layers")]
-                    currentIndex: cc.DMA_DEBUG_MODE
-                    onCurrentIndexChanged: cc.DMA_DEBUG_MODE = currentIndex
+                    currentIndex: cc.XRAY_OVERLAY_STYLE
+                    onCurrentIndexChanged: cc.XRAY_OVERLAY_STYLE = currentIndex
                 }
 
                 SiSliderControl {
 
-                    enabled: cc.DMA_DEBUG_ENABLE && cc.DMA_DEBUG_OVERLAY
+                    enabled: cc.XRAY_ENABLE && cc.XRAY_OVERLAY
                     indent: tabtab
                     Layout.fillWidth: true
                     l: qsTr("Opacity")
                     from: 0
                     to: 255
-                    value: cc.DMA_DEBUG_OPACITY
-                    onMoved: (value) => cc.DMA_DEBUG_OPACITY = value
+                    value: cc.XRAY_OVERLAY_OPACITY
+                    onMoved: (value) => cc.XRAY_OVERLAY_OPACITY = value
 
                 }
 
@@ -192,7 +192,7 @@ SiC64InspectorWindow {
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    visible: cc.DMA_DEBUG_ENABLE
+                    visible: cc.XRAY_ENABLE
                     color: "black"
                     border.width: 1
                     border.color: Palette.surfaceBorder
@@ -215,7 +215,7 @@ SiC64InspectorWindow {
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    visible: !cc.DMA_DEBUG_ENABLE
+                    visible: !cc.XRAY_ENABLE
 
                     SiSymbol {
 

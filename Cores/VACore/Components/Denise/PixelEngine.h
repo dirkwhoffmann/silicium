@@ -56,7 +56,7 @@ private:
      * per-channel visualization (see DmaDebugger::computeOverlay). Kept
      * separate from emuTexture so the Layers inspector's preview can show
      * DMA usage on its own, independent of whether it is also blended into
-     * the real picture (DMA_DEBUG_OVERLAY) -- mirrors VICII's own
+     * the real picture (XRAY_OVERLAY) -- mirrors VICII's own
      * emuTexture/dmaTexture split in the C64 core. Indexed by the same
      * activeBuffer as emuTexture, so both stay in lockstep.
      */

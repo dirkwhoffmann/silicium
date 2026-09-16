@@ -90,7 +90,7 @@ SiAmLogicView::cacheData()
     try { laInfo = core.agnus.logicAnalyzer.getInfo(); } catch (...) { return; }
     if (!laInfo.busOwner || !laInfo.addrBus || !laInfo.dataBus) return;
 
-    // Owner-tint colors, decoded from the packed DMA_DEBUG_COLORx options
+    // Owner-tint colors, decoded from the packed XRAY_DMA_COLORx options
     // the same way SiAmConfigController::dmaColor() does (r<<24|g<<16|b<<8
     // -- see Core/Components/Denise/Colors.h's RgbColor(u32) constructor).
     auto ownerColor = [&core](Opt opt) -> QColor {
@@ -99,14 +99,14 @@ SiAmLogicView::cacheData()
         return QColor((v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF);
     };
 
-    const QColor colCopper = ownerColor(Opt::DMA_DEBUG_COLOR0);
-    const QColor colBlitter = ownerColor(Opt::DMA_DEBUG_COLOR1);
-    const QColor colDisk = ownerColor(Opt::DMA_DEBUG_COLOR2);
-    const QColor colAudio = ownerColor(Opt::DMA_DEBUG_COLOR3);
-    const QColor colSprites = ownerColor(Opt::DMA_DEBUG_COLOR4);
-    const QColor colBitplanes = ownerColor(Opt::DMA_DEBUG_COLOR5);
-    const QColor colCPU = ownerColor(Opt::DMA_DEBUG_COLOR6);
-    const QColor colRefresh = ownerColor(Opt::DMA_DEBUG_COLOR7);
+    const QColor colCopper = ownerColor(Opt::XRAY_DMA_COLOR0);
+    const QColor colBlitter = ownerColor(Opt::XRAY_DMA_COLOR1);
+    const QColor colDisk = ownerColor(Opt::XRAY_DMA_COLOR2);
+    const QColor colAudio = ownerColor(Opt::XRAY_DMA_COLOR3);
+    const QColor colSprites = ownerColor(Opt::XRAY_DMA_COLOR4);
+    const QColor colBitplanes = ownerColor(Opt::XRAY_DMA_COLOR5);
+    const QColor colCPU = ownerColor(Opt::XRAY_DMA_COLOR6);
+    const QColor colRefresh = ownerColor(Opt::XRAY_DMA_COLOR7);
 
     for (long i = 0; i < hpos; i++) {
 

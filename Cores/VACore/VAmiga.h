@@ -1262,9 +1262,9 @@ public:
      *          texture
      *
      * Holds the DMA debugger's raw, unblended per-channel visualization,
-     * independent of whether Opt::DMA_DEBUG_OVERLAY is also blending it into
+     * independent of whether Opt::XRAY_OVERLAY is also blending it into
      * getTexture()'s picture. Same dimensions as getTexture(). Only
-     * meaningful while Opt::DMA_DEBUG_ENABLE is on; otherwise black.
+     * meaningful while Opt::XRAY_ENABLE is on; otherwise black.
      */
     const u32 *getDmaTexture() const;
 
