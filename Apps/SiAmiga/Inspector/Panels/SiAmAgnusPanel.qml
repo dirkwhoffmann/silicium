@@ -163,7 +163,7 @@ SiAmInspectorWindow {
             }
 
             //
-            // Bitplane DMA
+            // Bitplane DMA + Sprite DMA
             //
 
             SiBox {
@@ -174,28 +174,36 @@ SiAmInspectorWindow {
                 Layout.preferredWidth: root.columnWidth
                 spacing: Style.smallSpacing
 
-                ColumnLayout {
+                // 2-column grid: left = the 8 bitplane channels, right = the
+                // 8 sprite channels (odd/even model indices, since GridLayout
+                // fills row-major and both sides happen to have 8 rows).
+                GridLayout {
 
                     Layout.alignment: Qt.AlignHCenter
-                    spacing: Style.tinySpacing
+                    columns: 2
+                    columnSpacing: Style.smallSpacing
+                    rowSpacing: Style.tinySpacing
 
                     Repeater {
 
-                        model: 8
+                        model: 16
 
                         DmaRow {
 
                             required property int index
-                            label: qsTr("BPL%1PT:").arg(index + 1)
-                            checked: agnus.bplEnabled(index)
-                            value: agnus.bplPt(index)
+                            readonly property bool isSprite: index % 2 === 1
+                            readonly property int n: Math.floor(index / 2)
+
+                            label: isSprite ? qsTr("SPR%1PT:").arg(n) : qsTr("BPL%1PT:").arg(n + 1)
+                            checked: isSprite ? agnus.sprEnabled : agnus.bplEnabled(n)
+                            value: isSprite ? agnus.sprPt(n) : agnus.bplPt(n)
                         }
                     }
                 }
             }
 
             //
-            // Sprite DMA + Audio DMA
+            // Audio DMA
             //
 
             ColumnLayout {
@@ -204,32 +212,6 @@ SiAmInspectorWindow {
                 Layout.fillHeight: true
                 Layout.preferredWidth: root.columnWidth
                 spacing: Style.mediumSpacing
-
-                SiBox {
-
-                    title: qsTr("Sprite DMA")
-                    Layout.fillWidth: true
-                    spacing: Style.smallSpacing
-
-                    ColumnLayout {
-
-                        Layout.alignment: Qt.AlignHCenter
-                        spacing: Style.tinySpacing
-
-                        Repeater {
-
-                            model: 8
-
-                            DmaRow {
-
-                                required property int index
-                                label: qsTr("SPR%1PT:").arg(index)
-                                checked: agnus.sprEnabled
-                                value: agnus.sprPt(index)
-                            }
-                        }
-                    }
-                }
 
                 SiBox {
 
