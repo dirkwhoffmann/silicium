@@ -90,7 +90,7 @@ SiAmInspectorWindow {
     // Timer
     //
 
-    component Timer: ColumnLayout {
+    component Timer: GridLayout {
 
         property string label: ""
         property int countValue: 0
@@ -100,46 +100,43 @@ SiAmInspectorWindow {
         property bool pbout: false
         property bool oneShot: false
 
-        spacing: Style.tinySpacing
+        columns: 2
+        columnSpacing: Style.largeSpacing
+        rowSpacing: Style.tinySpacing
 
-        RowLayout {
+        SiWordViewControl { l: qsTr("Timer %1:").arg(label); lwidth: 50; value: countValue }
+        SiCheckBoxControl { size: Size.small; bitStyle: true; readOnly: true; checked: running; r: qsTr("Running") }
 
-            spacing: Style.largeSpacing
+        SiWordViewControl { l: qsTr("Latch %1:").arg(label); lwidth: 50; value: latchValue }
+        SiCheckBoxControl { size: Size.small; bitStyle: true; readOnly: true; checked: toggle; r: qsTr("Toggle") }
 
-            ColumnLayout {
+        Item { }
+        SiCheckBoxControl { size: Size.small; bitStyle: true; readOnly: true; checked: pbout; r: qsTr("PB out") }
 
-                SiWordViewControl {
-
-                    l: qsTr("Timer %1:").arg(label)
-                    lwidth: 50
-                    value: countValue
-                }
-
-                SiWordViewControl {
-
-                    l: qsTr("Latch %1:").arg(label)
-                    lwidth: 50
-                    value: latchValue
-                }
-
-                VSpacer { }
-            }
-
-            ColumnLayout {
-
-                spacing: Style.tinySpacing
-
-                SiCheckBoxControl { size: Size.small; bitStyle: true; readOnly: true; checked: running; r: qsTr("Running") }
-                SiCheckBoxControl { size: Size.small; bitStyle: true; readOnly: true; checked: toggle; r: qsTr("Toggle") }
-                SiCheckBoxControl { size: Size.small; bitStyle: true; readOnly: true; checked: pbout; r: qsTr("PB out") }
-                SiCheckBoxControl { size: Size.small; bitStyle: true; readOnly: true; checked: oneShot; r: qsTr("One shot") }
-            }
-        }
+        Item { }
+        SiCheckBoxControl { size: Size.small; bitStyle: true; readOnly: true; checked: oneShot; r: qsTr("One shot") }
     }
 
     //
     // Data Port
     //
+
+    // A single "bit N of portValue" checkbox row, used for the right column
+    // of the Port grid below. A plain top-level component (QML doesn't allow
+    // nesting an inline component inside another one), so portValue/labels
+    // are passed in explicitly rather than reached via an enclosing id.
+    component Bit: SiCheckBoxControl {
+
+        required property int bitNr
+        property int portValue: 0
+        property var labels: []
+
+        size: Size.small
+        bitStyle: true
+        readOnly: true
+        checked: (portValue & (1 << bitNr)) !== 0
+        r: labels[bitNr]
+    }
 
     component Port: SiBox {
 
@@ -154,64 +151,36 @@ SiAmInspectorWindow {
         Layout.fillHeight: true
         spacing: Style.tinySpacing
 
-        RowLayout {
+        GridLayout {
 
-            spacing: Style.largeSpacing
+            columns: 2
+            columnSpacing: Style.largeSpacing
+            rowSpacing: Style.tinySpacing
+            Layout.alignment: Qt.AlignHCenter
 
-            ColumnLayout {
+            SiByteViewControl { size: Size.small; lwidth: 60; l: qsTr("Register:"); value: portBox.regValue }
+            Bit { bitNr: 7; portValue: portBox.portValue; labels: portBox.labels }
 
-                SiByteViewControl {
+            SiBitViewControl { size: Size.small; indent: 60; value: portBox.regValue }
+            Bit { bitNr: 6; portValue: portBox.portValue; labels: portBox.labels }
 
-                    size: Size.small
-                    lwidth: 60
-                    l: qsTr("Register:")
-                    value: portBox.regValue
-                }
+            SiByteViewControl { size: Size.small; lwidth: 60; l: qsTr("Direction:"); value: portBox.dirValue }
+            Bit { bitNr: 5; portValue: portBox.portValue; labels: portBox.labels }
 
-                SiBitViewControl {
+            SiBitViewControl { size: Size.small; indent: 60; value: portBox.dirValue }
+            Bit { bitNr: 4; portValue: portBox.portValue; labels: portBox.labels }
 
-                    size: Size.small
-                    indent: 60
-                    value: portBox.regValue
-                }
+            Item { }
+            Bit { bitNr: 3; portValue: portBox.portValue; labels: portBox.labels }
 
-                SiByteViewControl {
+            Item { }
+            Bit { bitNr: 2; portValue: portBox.portValue; labels: portBox.labels }
 
-                    size: Size.small
-                    lwidth: 60
-                    l: qsTr("Direction:")
-                    value: portBox.dirValue
-                }
+            Item { }
+            Bit { bitNr: 1; portValue: portBox.portValue; labels: portBox.labels }
 
-                SiBitViewControl {
-
-                    size: Size.small
-                    indent: 60
-                    value: portBox.dirValue
-                }
-
-                VSpacer { }
-            }
-
-            ColumnLayout {
-
-                spacing: Style.tinySpacing
-
-                Repeater {
-
-                    model: 8
-                    delegate: SiCheckBoxControl {
-
-                        size: Size.small
-                        bitStyle: true
-                        readOnly: true
-                        required property int index
-                        readonly property int bitNr: 7 - index
-                        checked: (portBox.portValue & (1 << bitNr)) !== 0
-                        r: portBox.labels[bitNr]
-                    }
-                }
-            }
+            Item { }
+            Bit { bitNr: 0; portValue: portBox.portValue; labels: portBox.labels }
         }
     }
 
@@ -287,16 +256,30 @@ SiAmInspectorWindow {
             Layout.fillHeight: true
 
             clip: true
-            contentWidth: content.implicitWidth
+            contentWidth: content.width
+            contentHeight: content.height
 
             // A single 3-column grid holds all six boxes, wrapping into two
             // rows of three automatically. GridLayout has no per-column
             // stretch factor, so pin every cell's width to root.columnWidth
             // instead, so all three columns stay equal and track window
             // resizes together (see SiC64SIDPanel / SiC64VICPanel).
+            //
+            // A Flickable's content item always sizes to its own implicitWidth/
+            // implicitHeight, so a GridLayout inside a ScrollView never grows
+            // past what its children need, even when the window is bigger than
+            // that -- the extra space just sits blank to the right of / below
+            // it. To have the grid actually stretch to fill a bigger window,
+            // and only fall back to scrolling once the window gets smaller
+            // than the natural content size, both dimensions have to be
+            // driven explicitly: the larger of the GridLayout's own implicit
+            // size and the ScrollView's available size.
             GridLayout {
 
                 id: content
+
+                width: Math.max(implicitWidth, scrollView.availableWidth)
+                height: Math.max(implicitHeight, scrollView.availableHeight)
 
                 columns: 3
                 columnSpacing: Style.largeSpacing
@@ -315,28 +298,34 @@ SiAmInspectorWindow {
                     Layout.preferredWidth: root.columnWidth
                     spacing: Style.mediumSpacing
 
-                    Timer {
+                    ColumnLayout {
 
-                        label: qsTr("A")
+                        spacing: Style.smallSpacing
                         Layout.alignment: Qt.AlignHCenter
-                        countValue: cia.timerACount
-                        latchValue: cia.timerALatch
-                        running: cia.timerARunning
-                        toggle: cia.timerAToggle
-                        pbout: cia.timerAPbout
-                        oneShot: cia.timerAOneShot
-                    }
 
-                    Timer {
+                        Timer {
 
-                        label: qsTr("B")
-                        Layout.alignment: Qt.AlignHCenter
-                        countValue: cia.timerBCount
-                        latchValue: cia.timerBLatch
-                        running: cia.timerBRunning
-                        toggle: cia.timerBToggle
-                        pbout: cia.timerBPbout
-                        oneShot: cia.timerBOneShot
+                            label: qsTr("A")
+                            Layout.alignment: Qt.AlignHCenter
+                            countValue: cia.timerACount
+                            latchValue: cia.timerALatch
+                            running: cia.timerARunning
+                            toggle: cia.timerAToggle
+                            pbout: cia.timerAPbout
+                            oneShot: cia.timerAOneShot
+                        }
+
+                        Timer {
+
+                            label: qsTr("B")
+                            Layout.alignment: Qt.AlignHCenter
+                            countValue: cia.timerBCount
+                            latchValue: cia.timerBLatch
+                            running: cia.timerBRunning
+                            toggle: cia.timerBToggle
+                            pbout: cia.timerBPbout
+                            oneShot: cia.timerBOneShot
+                        }
                     }
                 }
 
