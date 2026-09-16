@@ -79,14 +79,27 @@ SiAmInspectorWindow {
 
         clip: true
         contentWidth: content.implicitWidth
+        contentHeight: content.height
 
         // A single 3-column grid holds all the boxes (see SiAmCIAPanel).
         // GridLayout has no per-column stretch factor, so pin every cell's
         // width to root.columnWidth instead, so all four columns stay
         // equal and track window resizes together.
+        //
+        // Height works differently: a Flickable's content item always sizes
+        // to its own implicitHeight, so a GridLayout inside a ScrollView
+        // never grows past what its children need, even when the window is
+        // taller than that -- the extra space just sits blank below it. To
+        // have the grid (and every Layout.fillHeight cell in it) actually
+        // stretch to fill a taller window, and only fall back to scrolling
+        // once the window gets shorter than the natural content height, the
+        // GridLayout's height has to be driven explicitly: the larger of its
+        // own implicitHeight and the ScrollView's available height.
         GridLayout {
 
             id: content
+
+            height: Math.max(implicitHeight, scrollView.availableHeight)
 
             columns: 3
             columnSpacing: Style.largeSpacing
