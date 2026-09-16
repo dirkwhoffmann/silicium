@@ -19,12 +19,17 @@ RgbColor::RgbColor(const AmigaColor &c)
     b = c.b / 255.0;
 }
 
-RgbColor::RgbColor(const GpuColor &c)
+template <TexelFormat F>
+RgbColor::RgbColor(const GpuColor<F> &c)
 {
-    r = (c.rawValue & 0xFF) / 255.0;
-    g = ((c.rawValue >> 8) & 0xFF) / 255.0;
-    b = ((c.rawValue >> 16) & 0xFF) / 255.0;
+    r = c.r() / 255.0;
+    g = c.g() / 255.0;
+    b = c.b() / 255.0;
 }
+
+template RgbColor::RgbColor(const GpuColor<TexelFormat::ABGR> &);
+template RgbColor::RgbColor(const GpuColor<TexelFormat::ARGB> &);
+template RgbColor::RgbColor(const GpuColor<TexelFormat::RGBA> &);
 
 RgbColor::RgbColor(const YuvColor &c)
 {
@@ -80,7 +85,8 @@ const YuvColor YuvColor::cyan(RgbColor::cyan);
 //
 //
 
-AmigaColor::AmigaColor(const GpuColor &c)
+template <TexelFormat F>
+AmigaColor::AmigaColor(const GpuColor<F> &c)
 {
     r = c.r();
     g = c.g();
@@ -158,41 +164,41 @@ AmigaColor::mix(const AmigaColor &c) const
 //
 //
 
-GpuColor::GpuColor(const AmigaColor &c)
+template <TexelFormat F>
+GpuColor<F>::GpuColor(const AmigaColor &c) : rawValue(pack(c.r, c.g, c.b, 0xFF))
 {
-    rawValue = u32(0xFF << 24 | c.b << 16 | c.g << 8 | c.r);
+
 }
 
-GpuColor::GpuColor(const RgbColor &c)
+template <TexelFormat F>
+GpuColor<F>::GpuColor(const RgbColor &c) :
+rawValue(pack(u8(c.r * 255), u8(c.g * 255), u8(c.b * 255), 0xFF))
 {
-    auto a = 255;
-    auto r = u8(c.r * 255);
-    auto g = u8(c.g * 255);
-    auto b = u8(c.b * 255);
 
-    rawValue = u32(a << 24 | b << 16 | g << 8 | r);
 }
 
-GpuColor::GpuColor(u8 r, u8 g, u8 b)
-{
-    auto a = 255;
-    rawValue = u32(a << 24 | b << 16 | g << 8 | r);
-}
+template <TexelFormat F> const GpuColor<F> GpuColor<F>::black(RgbColor::black);
+template <TexelFormat F> const GpuColor<F> GpuColor<F>::white(RgbColor::white);
+template <TexelFormat F> const GpuColor<F> GpuColor<F>::red(RgbColor::red);
+template <TexelFormat F> const GpuColor<F> GpuColor<F>::green(RgbColor::green);
+template <TexelFormat F> const GpuColor<F> GpuColor<F>::blue(RgbColor::blue);
+template <TexelFormat F> const GpuColor<F> GpuColor<F>::yellow(RgbColor::yellow);
+template <TexelFormat F> const GpuColor<F> GpuColor<F>::magenta(RgbColor::magenta);
+template <TexelFormat F> const GpuColor<F> GpuColor<F>::cyan(RgbColor::cyan);
 
-const GpuColor GpuColor::black(RgbColor::black);
-const GpuColor GpuColor::white(RgbColor::white);
-const GpuColor GpuColor::red(RgbColor::red);
-const GpuColor GpuColor::green(RgbColor::green);
-const GpuColor GpuColor::blue(RgbColor::blue);
-const GpuColor GpuColor::yellow(RgbColor::yellow);
-const GpuColor GpuColor::magenta(RgbColor::magenta);
-const GpuColor GpuColor::cyan(RgbColor::cyan);
-
-GpuColor
-GpuColor::mix(const RgbColor &color, double weight) const
+template <TexelFormat F>
+GpuColor<F>
+GpuColor<F>::mix(const RgbColor &color, double weight) const
 {
     RgbColor mixedColor = RgbColor(*this).mix(color, weight);
-    return GpuColor(mixedColor);
+    return GpuColor<F>(mixedColor);
 }
+
+// GpuColor<F> exists for exactly these three formats -- explicitly
+// instantiate all of it here rather than pulling the definitions into the
+// header, keeping the format-specific bit-twiddling compiled once each.
+template struct GpuColor<TexelFormat::ABGR>;
+template struct GpuColor<TexelFormat::ARGB>;
+template struct GpuColor<TexelFormat::RGBA>;
 
 }

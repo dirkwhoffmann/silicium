@@ -384,15 +384,15 @@ DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize las
     // the whole per-pixel loop inside it.
     switch (host.getConfig().texFormat) {
 
-        case TexFormat::ABGR: computeOverlay<TexFormat::ABGR>(emuPtr, dmaPtr, first, last, own, val); return;
-        case TexFormat::ARGB: computeOverlay<TexFormat::ARGB>(emuPtr, dmaPtr, first, last, own, val); return;
+        case TexelFormat::ABGR: computeOverlay<TexelFormat::ABGR>(emuPtr, dmaPtr, first, last, own, val); return;
+        case TexelFormat::ARGB: computeOverlay<TexelFormat::ARGB>(emuPtr, dmaPtr, first, last, own, val); return;
 
         default: // RGBA
-            computeOverlay<TexFormat::RGBA>(emuPtr, dmaPtr, first, last, own, val); return;
+            computeOverlay<TexelFormat::RGBA>(emuPtr, dmaPtr, first, last, own, val); return;
     }
 }
 
-template <TexFormat F>
+template <TexelFormat F>
 void
 DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val)
 {
@@ -446,10 +446,10 @@ DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize las
         }
 
         // Get RGBA values of foreground pixels
-        GpuColor col0 = debugColor[owner][(val[i] & 0xC000) >> 14];
-        GpuColor col1 = debugColor[owner][(val[i] & 0x0C00) >> 10];
-        GpuColor col2 = debugColor[owner][(val[i] & 0x00C0) >> 6];
-        GpuColor col3 = debugColor[owner][(val[i] & 0x000C) >> 2];
+        GpuColor<F> col0 = debugColor[owner][(val[i] & 0xC000) >> 14];
+        GpuColor<F> col1 = debugColor[owner][(val[i] & 0x0C00) >> 10];
+        GpuColor<F> col2 = debugColor[owner][(val[i] & 0x00C0) >> 6];
+        GpuColor<F> col3 = debugColor[owner][(val[i] & 0x000C) >> 2];
 
         // Always paint the raw, unblended colors into the DMA debug
         // texture, regardless of whether they also get blended into the
@@ -464,10 +464,14 @@ DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize las
 
         if (fgWeight != 0.0) {
 
+            // Mix each color with the pixel it's about to replace, not with
+            // pixels 2 apart -- a plain off-by-double that made the opacity
+            // slider blend against the wrong existing pixel (bleeding into
+            // the next DMA cycle for col3).
             col0 = col0.mix(PixelEngine::fromTexel<F>(emuPtr[0]), fgWeight);
-            col1 = col1.mix(PixelEngine::fromTexel<F>(emuPtr[2]), fgWeight);
-            col2 = col2.mix(PixelEngine::fromTexel<F>(emuPtr[4]), fgWeight);
-            col3 = col3.mix(PixelEngine::fromTexel<F>(emuPtr[6]), fgWeight);
+            col1 = col1.mix(PixelEngine::fromTexel<F>(emuPtr[1]), fgWeight);
+            col2 = col2.mix(PixelEngine::fromTexel<F>(emuPtr[2]), fgWeight);
+            col3 = col3.mix(PixelEngine::fromTexel<F>(emuPtr[3]), fgWeight);
         }
 
         emuPtr[0] = PixelEngine::toTexel<F>(col0);

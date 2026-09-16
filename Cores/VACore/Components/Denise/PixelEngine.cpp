@@ -56,10 +56,10 @@ void
 PixelEngine::_initialize()
 {
     // Setup the ECS BRDRBLNK color (BORDER_BG is mirrored in updateRGBA)
-    borderPalette[BORDER_BLNK] = toTexel(GpuColor(0x00, 0x00, 0x00));
+    borderPalette[BORDER_BLNK] = toTexel(0x00, 0x00, 0x00);
 
     // Setup the border debug color
-    borderPalette[BORDER_DEBUG] = toTexel(GpuColor(0xD0, 0x00, 0x00));
+    borderPalette[BORDER_DEBUG] = toTexel(0xD0, 0x00, 0x00);
 }
 
 void
@@ -263,16 +263,16 @@ PixelEngine::toTexel(const AmigaColor c) const
 
     switch (host.getConfig().texFormat) {
 
-        case TexFormat::ABGR: return TEXEL(HI_HI_LO_LO(0xFF, b, g, r));
-        case TexFormat::ARGB: return TEXEL(HI_HI_LO_LO(0xFF, r, g, b));
+        case TexelFormat::ABGR: return TEXEL(HI_HI_LO_LO(0xFF, b, g, r));
+        case TexelFormat::ARGB: return TEXEL(HI_HI_LO_LO(0xFF, r, g, b));
 
         default:
             return TEXEL(HI_HI_LO_LO(r, g, b, 0xFF));
     }
 }
 
-GpuColor
-PixelEngine::fromTexel(Texel t) const
+Texel
+PixelEngine::toTexel(u8 r, u8 g, u8 b, u8 a) const
 {
     // One-off conversion: re-reads the host format and dispatches to the
     // matching compile-time-specialized instantiation. A hot loop should
@@ -280,24 +280,11 @@ PixelEngine::fromTexel(Texel t) const
     // (see DmaDebugger::computeOverlay).
     switch (host.getConfig().texFormat) {
 
-        case TexFormat::ABGR: return fromTexel<TexFormat::ABGR>(t);
-        case TexFormat::ARGB: return fromTexel<TexFormat::ARGB>(t);
+        case TexelFormat::ABGR: return toTexel(GpuColor<TexelFormat::ABGR>(r, g, b, a));
+        case TexelFormat::ARGB: return toTexel(GpuColor<TexelFormat::ARGB>(r, g, b, a));
 
         default: // RGBA
-            return fromTexel<TexFormat::RGBA>(t);
-    }
-}
-
-Texel
-PixelEngine::toTexel(GpuColor c) const
-{
-    switch (host.getConfig().texFormat) {
-
-        case TexFormat::ABGR: return toTexel<TexFormat::ABGR>(c);
-        case TexFormat::ARGB: return toTexel<TexFormat::ARGB>(c);
-
-        default: // RGBA
-            return toTexel<TexFormat::RGBA>(c);
+            return toTexel(GpuColor<TexelFormat::RGBA>(r, g, b, a));
     }
 }
 

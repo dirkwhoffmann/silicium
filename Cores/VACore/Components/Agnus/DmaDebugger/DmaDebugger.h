@@ -11,7 +11,6 @@
 
 #include "DmaDebuggerTypes.h"
 #include "FrameBufferTypes.h"
-#include "HostTypes.h"
 #include "SubComponent.h"
 #include "Beamtraps.h"
 #include "Colors.h"
@@ -194,7 +193,7 @@ private:
      */
     void computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val);
 
-    template <TexFormat F>
+    template <TexelFormat F>
     void computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val);
 };
 

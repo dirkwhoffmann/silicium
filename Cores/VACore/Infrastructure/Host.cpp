@@ -38,8 +38,8 @@ Host::checkOption(Opt opt, i64 value)
 
         case Opt::HOST_TEX_FORMAT:
 
-            if (!TexFormatEnum::isValid(value)) {
-                throw CoreError(CoreError::OPT_INV_ARG, TexFormatEnum::keyList());
+            if (!TexelFormatEnum::isValid(value)) {
+                throw CoreError(CoreError::OPT_INV_ARG, TexelFormatEnum::keyList());
             }
             return;
 
@@ -72,7 +72,7 @@ Host::setOption(Opt opt, i64 value)
 
         case Opt::HOST_TEX_FORMAT:
 
-            config.texFormat = TexFormat(value);
+            config.texFormat = TexelFormat(value);
             pixelEngine.updateRGBA();
             return;
 

@@ -321,54 +321,42 @@ public:
     // Converts an Amiga color into a texel, applying the monitor settings
     Texel toTexel(const AmigaColor c) const;
 
-    /* Converts to and from a GpuColor, applying the host's texel format
-     * (HOST_TEX_FORMAT). GpuColor's own rawValue is always packed R,G,B,A
-     * (little-endian) regardless of the host format -- these are the only
-     * two places that byte order is supposed to leak into an actual pixel
-     * buffer, so any code that reads an existing Texel as a GpuColor (to mix
-     * or shade it, say) or writes a GpuColor into one must go through them
-     * instead of GpuColor's rawValue/TEXEL directly, or it'll get the wrong
-     * channel order whenever the host isn't running in ABGR.
+    /* Converts to and from a GpuColor<F>. Since GpuColor<F>'s rawValue is
+     * already packed exactly as a texel of format F (see Colors.h), this is
+     * now just a bitcast plus the TEXEL sub-pixel duplication -- there is no
+     * format-dependent shuffling left to do here at all, which is the point:
+     * the old fixed-layout GpuColor needed a matching pair of conversions at
+     * every read/write of an actual pixel buffer, and a mismatch there (or a
+     * caller that skipped them) silently mixed the wrong channel whenever
+     * the host wasn't running in ABGR. With F carried in the type, a
+     * GpuColor<F> and a Texel produced under HOST_TEX_FORMAT == F agree by
+     * construction.
      *
-     * These two re-read host.getConfig().texFormat and switch on it every
-     * call, which is fine for one-off conversions but too much for a
-     * per-pixel hot path (DmaDebugger::computeOverlay runs this across every
-     * visible pixel of every scanline). For that, fix the format as a
-     * template parameter instead (see the static overloads below): with F a
-     * compile-time constant, `if constexpr` folds the switch away entirely
-     * at compile time, leaving only the one branch's fixed shifts. Callers
-     * on a hot path should switch on host.getConfig().texFormat once (not
-     * per pixel) and call the matching instantiation from there on.
+     * F is still a template parameter (rather than each Texel simply
+     * knowing its own format at runtime) because these run in per-pixel hot
+     * paths (DmaDebugger::computeOverlay runs this across every visible
+     * pixel of every scanline): callers should switch on
+     * host.getConfig().texFormat once, not per pixel, and call the matching
+     * instantiation from there on.
      */
-    GpuColor fromTexel(Texel t) const;
-    Texel toTexel(GpuColor c) const;
-
-    template <TexFormat F> static constexpr GpuColor
+    template <TexelFormat F> static constexpr GpuColor<F>
     fromTexel(Texel t)
     {
-        u32 raw = u32(t);
-        u8 r, g, b;
-
-        if constexpr (F == TexFormat::ABGR) {
-            r = u8(raw); g = u8(raw >> 8); b = u8(raw >> 16);
-        } else if constexpr (F == TexFormat::ARGB) {
-            b = u8(raw); g = u8(raw >> 8); r = u8(raw >> 16);
-        } else { // RGBA
-            b = u8(raw >> 8); g = u8(raw >> 16); r = u8(raw >> 24);
-        }
-
-        return GpuColor(u32(0xFF) << 24 | u32(b) << 16 | u32(g) << 8 | u32(r));
+        return GpuColor<F>(u32(t));
     }
 
-    template <TexFormat F> static constexpr Texel
-    toTexel(GpuColor c)
+    template <TexelFormat F> static constexpr Texel
+    toTexel(GpuColor<F> c)
     {
-        u8 r = c.r(), g = c.g(), b = c.b(), a = c.a();
-
-        if constexpr (F == TexFormat::ABGR) return TEXEL(HI_HI_LO_LO(a, b, g, r));
-        else if constexpr (F == TexFormat::ARGB) return TEXEL(HI_HI_LO_LO(a, r, g, b));
-        else return TEXEL(HI_HI_LO_LO(r, g, b, a)); // RGBA
+        return TEXEL(c.rawValue);
     }
+
+    // One-off, runtime-dispatched construction of a GpuColor for whatever
+    // the host's current HOST_TEX_FORMAT happens to be, converted straight
+    // to a Texel -- for setup code that isn't a per-pixel hot path (e.g. the
+    // border debug color below). Prefer the templated overloads above on a
+    // hot path.
+    Texel toTexel(u8 r, u8 g, u8 b, u8 a = 0xFF) const;
 
 private:
     

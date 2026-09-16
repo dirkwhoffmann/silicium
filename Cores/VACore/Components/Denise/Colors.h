@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "ColorTypes.h"
 #include "utl/abilities/Streamable.h"
 
 namespace vamiga {
@@ -18,7 +19,7 @@ using namespace utl;
 struct RgbColor;
 struct YuvColor;
 struct AmigaColor;
-struct GpuColor;
+template <TexelFormat> struct GpuColor;
 
 struct RgbColor : Streamable {
 
@@ -32,7 +33,7 @@ struct RgbColor : Streamable {
     RgbColor(u32 rgba) : RgbColor(u8(rgba >> 24), u8(rgba >> 16), u8(rgba >> 8)) {}
     RgbColor(const YuvColor &c);
     RgbColor(const AmigaColor &c);
-    RgbColor(const GpuColor &c);
+    template <TexelFormat F> RgbColor(const GpuColor<F> &c);
 
     static const RgbColor black;
     static const RgbColor white;
@@ -63,7 +64,7 @@ struct YuvColor {
     YuvColor(u8 yv, u8 uv, u8 vv) : y(yv / 255.0), u(uv / 255.0), v(vv / 255.0) { }
     YuvColor(const RgbColor &c);
     YuvColor(const AmigaColor &c) : YuvColor(RgbColor(c)) { }
-    YuvColor(const GpuColor &c) : YuvColor(RgbColor(c)) { }
+    template <TexelFormat F> YuvColor(const GpuColor<F> &c) : YuvColor(RgbColor(c)) { }
 
     static const YuvColor black;
     static const YuvColor white;
@@ -91,7 +92,7 @@ struct AmigaColor : Streamable
     AmigaColor(u16 hi, u16 lo) : r(0), g(0), b(0) { setHiNibbles(hi); setLoNibbles(lo); }
     AmigaColor(const RgbColor &c);
     AmigaColor(const YuvColor &c) : AmigaColor(RgbColor(c)) { }
-    AmigaColor(const GpuColor &c);
+    template <TexelFormat F> AmigaColor(const GpuColor<F> &c);
 
     //
     // Methods from Serializable
@@ -162,21 +163,64 @@ public:
     AmigaColor mix(const AmigaColor &c) const;
 };
 
+/* A 32-bit pixel color, laid out exactly as a texel of format F.
+ *
+ * Making the layout a template parameter rather than a fixed internal
+ * convention (translated to/from the host's actual HOST_TEX_FORMAT at the
+ * edges by a separate pair of functions) means a GpuColor<F> is never
+ * ambiguous about which bytes mean what: r()/g()/b()/a() and every
+ * constructor below decode/encode according to F itself, so there is no
+ * separate conversion step left where the format and the data could get out
+ * of sync -- which is exactly how the DMA debugger's opacity blending used
+ * to silently mix the wrong channel whenever the host wasn't running in
+ * ABGR (the format GpuColor's old fixed layout happened to match).
+ *
+ * Only three instantiations exist (one per TexelFormat), explicitly
+ * instantiated in Colors.cpp.
+ */
+template <TexelFormat F>
 struct GpuColor {
 
     u32 rawValue;
 
     constexpr GpuColor() : rawValue(0) {}
-    constexpr GpuColor(u32 v) : rawValue(v) {}
-    constexpr GpuColor(u64 v) : rawValue(u32(v)) {}
+    constexpr explicit GpuColor(u32 v) : rawValue(v) {}
+    constexpr explicit GpuColor(u64 v) : rawValue(u32(v)) {}
     GpuColor(const RgbColor &c);
     GpuColor(const AmigaColor &c);
-    GpuColor(u8 r, u8 g, u8 b);
+    constexpr GpuColor(u8 r, u8 g, u8 b, u8 a = 0xFF) : rawValue(pack(r, g, b, a)) {}
 
-    constexpr u8 r() const { return u8(rawValue       & 0xFF); }
-    constexpr u8 g() const { return u8(rawValue >> 8  & 0xFF); }
-    constexpr u8 b() const { return u8(rawValue >> 16 & 0xFF); }
-    constexpr u8 a() const { return u8(rawValue >> 24 & 0xFF); }
+    // Packs/unpacks the four channels per F -- the only place that needs to
+    // know the byte layout at all.
+    static constexpr u32 pack(u8 r, u8 g, u8 b, u8 a)
+    {
+        if constexpr (F == TexelFormat::ABGR) return u32(a) << 24 | u32(b) << 16 | u32(g) << 8 | u32(r);
+        else if constexpr (F == TexelFormat::ARGB) return u32(a) << 24 | u32(r) << 16 | u32(g) << 8 | u32(b);
+        else return u32(r) << 24 | u32(g) << 16 | u32(b) << 8 | u32(a); // RGBA
+    }
+
+    constexpr u8 r() const
+    {
+        if constexpr (F == TexelFormat::ABGR) return u8(rawValue);
+        else if constexpr (F == TexelFormat::ARGB) return u8(rawValue >> 16);
+        else return u8(rawValue >> 24); // RGBA
+    }
+    constexpr u8 g() const
+    {
+        if constexpr (F == TexelFormat::RGBA) return u8(rawValue >> 16);
+        else return u8(rawValue >> 8); // ABGR and ARGB agree on green's position
+    }
+    constexpr u8 b() const
+    {
+        if constexpr (F == TexelFormat::ABGR) return u8(rawValue >> 16);
+        else if constexpr (F == TexelFormat::ARGB) return u8(rawValue);
+        else return u8(rawValue >> 8); // RGBA
+    }
+    constexpr u8 a() const
+    {
+        if constexpr (F == TexelFormat::RGBA) return u8(rawValue);
+        else return u8(rawValue >> 24); // ABGR and ARGB agree on alpha's position
+    }
 
     static const GpuColor black;
     static const GpuColor white;

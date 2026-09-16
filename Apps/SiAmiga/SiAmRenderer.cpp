@@ -52,7 +52,7 @@ SiAmRenderer::start()
     }
 
     // Set the texture format
-    controller->getConfigController()->setHostTexFormat((int)vamiga::TexFormat::ARGB);
+    controller->getConfigController()->setHostTexFormat((int)vamiga::TexelFormat::ARGB);
 
     // Only proceed if no connection exists yet
     if (m_frameConnection) return;
