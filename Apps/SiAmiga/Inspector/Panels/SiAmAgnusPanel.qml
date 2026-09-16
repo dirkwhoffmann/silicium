@@ -13,19 +13,6 @@ import QtQuick.Layouts
 import Silicium.Controllers
 import Silicium.Theme
 
-// Port of vAmiga's own GUI/Inspector/AgnusPanel.swift. Its own top-level
-// window (see SiAmInspectorWindow.qml).
-//
-// Four departures from the Swift reference:
-//
-//  - Cycle counters (VPOS/HPOS) and DMA Control are one SiBox here, not two
-//    -- a plain 4-column grid rather than a single-column box stacked on
-//    top of a two-column one.
-//  - FMODE (the AGA bitplane/sprite fetch-mode register) and DIWHIGH (the
-//    ECS/AGA extended display-window register) are new rows in DMA Control
-//    -- see SiAmAgnusController's class comment.
-//  - Bitplane DMA lists all eight AGA bitplane channels (BPL1PT..BPL8PT),
-//    not just the six OCS/ECS ones the Swift reference has fields for.
 SiAmInspectorWindow {
 
     id: root
@@ -121,7 +108,7 @@ SiAmInspectorWindow {
                     GridLayout {
 
                         Layout.alignment: Qt.AlignHCenter
-                        columns: 4
+                        columns: 2
                         columnSpacing: Style.smallSpacing
                         rowSpacing: Style.tinySpacing
 
@@ -154,7 +141,7 @@ SiAmInspectorWindow {
                     GridLayout {
 
                         Layout.alignment: Qt.AlignHCenter
-                        columns: 4
+                        columns: 2
                         columnSpacing: Style.smallSpacing
                         rowSpacing: Style.tinySpacing
 
