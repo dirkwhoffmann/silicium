@@ -82,8 +82,7 @@ typedef struct
     u8 hiddenSprites;
     
     // Hides certain graphics layers (only takes effect in XRayMode::XRAY_LAYERS,
-    // see Agnus::dmaDebugger; the cutout opacity is shared with
-    // Opt::XRAY_OVERLAY_OPACITY rather than kept as a Denise-local option)
+    // see Agnus::dmaDebugger)
     u16 hiddenLayers;
 
     // Checks for sprite-sprite collisions

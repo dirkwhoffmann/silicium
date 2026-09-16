@@ -887,8 +887,6 @@ PixelEngine::hide(isize line, u16 layers)
     auto *emu = workingPtr(line);
     auto *xray = xrayWorkingPtr(line);
 
-    double scale = dmaDebugger.getConfig().opacity / 255.0;
-
     for (Pixel i = 0; i < Denise::PIXEL_CNT; i++) {
 
         u16 z = denise.zBuffer[i];
@@ -922,16 +920,13 @@ PixelEngine::hide(isize line, u16 layers)
             continue;
         }
 
-        GpuColor<F> color = fromTexel<F>(emu[i]);
-
+        // Show a pure checkerboard pixel here -- not a blend with the
+        // original color -- so the cutout reads as "this pixel is missing"
+        // rather than a partial fade. Paint it into the xray texture alone;
+        // see mergeXray for how (and whether) it ends up blended into the
+        // real picture.
         u8 bg = (line / 4) % 2 == (i / 16) % 2 ? 0x22 : 0x44;
-        u8 newr = (u8)(color.r() * (1 - scale) + bg * scale);
-        u8 newg = (u8)(color.g() * (1 - scale) + bg * scale);
-        u8 newb = (u8)(color.b() * (1 - scale) + bg * scale);
-
-        // Paint the cutout into the xray texture alone -- see mergeXray for
-        // how (and whether) it ends up blended into the real picture.
-        xray[i] = toTexel<F>(GpuColor<F>(newr, newg, newb));
+        xray[i] = toTexel<F>(GpuColor<F>(bg, bg, bg));
     }
 
     mergeXray(emu, xray, Denise::PIXEL_CNT);

@@ -1650,7 +1650,7 @@ Denise::hsyncHandler(isize vpos)
         pixelEngine.colorize(vpos);
 
         // Cut out certain graphics layers if requested
-        if (agnus.dmaDebugger.getConfig().mode == XRayMode::XRAY_LAYERS && config.hiddenLayers) {
+        if (agnus.dmaDebugger.getConfig().mode == XRayMode::XRAY_LAYERS) {
             pixelEngine.hide(vpos, config.hiddenLayers);
         }
         
