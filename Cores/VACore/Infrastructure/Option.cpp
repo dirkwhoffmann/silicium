@@ -94,14 +94,16 @@ OptionParser::create(Opt opt, i64 arg)
         case Opt::XRAY_DMA_CHANNEL5:        return boolParser();
         case Opt::XRAY_DMA_CHANNEL6:        return boolParser();
         case Opt::XRAY_DMA_CHANNEL7:        return boolParser();
-        case Opt::XRAY_DMA_COLOR0:          return numParser();
-        case Opt::XRAY_DMA_COLOR1:          return numParser();
-        case Opt::XRAY_DMA_COLOR2:          return numParser();
-        case Opt::XRAY_DMA_COLOR3:          return numParser();
-        case Opt::XRAY_DMA_COLOR4:          return numParser();
-        case Opt::XRAY_DMA_COLOR5:          return numParser();
-        case Opt::XRAY_DMA_COLOR6:          return numParser();
-        case Opt::XRAY_DMA_COLOR7:          return numParser();
+        case Opt::XRAY_COLOR0:          return numParser();
+        case Opt::XRAY_COLOR1:          return numParser();
+        case Opt::XRAY_COLOR2:          return numParser();
+        case Opt::XRAY_COLOR3:          return numParser();
+        case Opt::XRAY_COLOR4:          return numParser();
+        case Opt::XRAY_COLOR5:          return numParser();
+        case Opt::XRAY_COLOR6:          return numParser();
+        case Opt::XRAY_COLOR7:          return numParser();
+        case Opt::XRAY_COLOR8:          return numParser();
+        case Opt::XRAY_COLOR9:          return numParser();
 
         case Opt::LA_PROBE0:                 return enumParser.template operator()<ProbeEnum,Probe>();
         case Opt::LA_PROBE1:                 return enumParser.template operator()<ProbeEnum,Probe>();

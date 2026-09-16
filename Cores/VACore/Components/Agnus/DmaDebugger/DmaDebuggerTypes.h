@@ -137,6 +137,14 @@ struct DmaChannelEnum : Reflectable<DmaChannelEnum, DmaChannel>
     }
 };
 
+/* Number of persisted Opt::XRAY_COLORn slots. XRayMode::XRAY_DMA uses the
+ * first isize(DmaChannel::COUNT) of these, indexed by DmaChannel.
+ * XRayMode::XRAY_LAYERS (see PixelEngine::hide) uses all of them, indexed
+ * by sprite number 0-7, then playfield 1 and playfield 2 -- both modes
+ * share the same palette.
+ */
+constexpr isize XRAY_COLOR_COUNT = 10;
+
 
 //
 // Structures
@@ -156,7 +164,7 @@ typedef struct
     bool visualize[isize(DmaChannel::COUNT)];
     
     // Color palette
-    u32 debugColor[isize(DmaChannel::COUNT)];
+    u32 debugColor[XRAY_COLOR_COUNT];
     
     // Display mode
     DmaDisplayMode displayMode;

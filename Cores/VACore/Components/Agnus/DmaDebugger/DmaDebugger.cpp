@@ -74,14 +74,16 @@ DmaDebugger::getOption(Opt option) const
         case Opt::XRAY_DMA_CHANNEL6:    return config.visualize[6];
         case Opt::XRAY_DMA_CHANNEL7:    return config.visualize[7];
 
-        case Opt::XRAY_DMA_COLOR0:      return config.debugColor[0];
-        case Opt::XRAY_DMA_COLOR1:      return config.debugColor[1];
-        case Opt::XRAY_DMA_COLOR2:      return config.debugColor[2];
-        case Opt::XRAY_DMA_COLOR3:      return config.debugColor[3];
-        case Opt::XRAY_DMA_COLOR4:      return config.debugColor[4];
-        case Opt::XRAY_DMA_COLOR5:      return config.debugColor[5];
-        case Opt::XRAY_DMA_COLOR6:      return config.debugColor[6];
-        case Opt::XRAY_DMA_COLOR7:      return config.debugColor[7];
+        case Opt::XRAY_COLOR0:      return config.debugColor[0];
+        case Opt::XRAY_COLOR1:      return config.debugColor[1];
+        case Opt::XRAY_COLOR2:      return config.debugColor[2];
+        case Opt::XRAY_COLOR3:      return config.debugColor[3];
+        case Opt::XRAY_COLOR4:      return config.debugColor[4];
+        case Opt::XRAY_COLOR5:      return config.debugColor[5];
+        case Opt::XRAY_COLOR6:      return config.debugColor[6];
+        case Opt::XRAY_COLOR7:      return config.debugColor[7];
+        case Opt::XRAY_COLOR8:      return config.debugColor[8];
+        case Opt::XRAY_COLOR9:      return config.debugColor[9];
 
         default:
             fatalError;
@@ -117,14 +119,16 @@ DmaDebugger::checkOption(Opt opt, i64 value)
         case Opt::XRAY_DMA_CHANNEL5:
         case Opt::XRAY_DMA_CHANNEL6:
         case Opt::XRAY_DMA_CHANNEL7:
-        case Opt::XRAY_DMA_COLOR0:
-        case Opt::XRAY_DMA_COLOR1:
-        case Opt::XRAY_DMA_COLOR2:
-        case Opt::XRAY_DMA_COLOR3:
-        case Opt::XRAY_DMA_COLOR4:
-        case Opt::XRAY_DMA_COLOR5:
-        case Opt::XRAY_DMA_COLOR6:
-        case Opt::XRAY_DMA_COLOR7:
+        case Opt::XRAY_COLOR0:
+        case Opt::XRAY_COLOR1:
+        case Opt::XRAY_COLOR2:
+        case Opt::XRAY_COLOR3:
+        case Opt::XRAY_COLOR4:
+        case Opt::XRAY_COLOR5:
+        case Opt::XRAY_COLOR6:
+        case Opt::XRAY_COLOR7:
+        case Opt::XRAY_COLOR8:
+        case Opt::XRAY_COLOR9:
 
             return;
 
@@ -220,25 +224,25 @@ DmaDebugger::setOption(Opt option, i64 value)
             visualize[BUS_REFRESH] = value;
             return;
 
-        case Opt::XRAY_DMA_COLOR0:
+        case Opt::XRAY_COLOR0:
 
             config.debugColor[0] = u32(value);
             setColor(BusOwner::COPPER, (u32)value);
             return;
 
-        case Opt::XRAY_DMA_COLOR1:
+        case Opt::XRAY_COLOR1:
 
             config.debugColor[1] = u32(value);
             setColor(BusOwner::BLITTER, (u32)value);
             return;
 
-        case Opt::XRAY_DMA_COLOR2:
+        case Opt::XRAY_COLOR2:
 
             config.debugColor[2] = u32(value);
             setColor(BusOwner::DISK, (u32)value);
             return;
 
-        case Opt::XRAY_DMA_COLOR3:
+        case Opt::XRAY_COLOR3:
 
             config.debugColor[3] = u32(value);
             setColor(BusOwner::AUD0, (u32)value);
@@ -247,7 +251,7 @@ DmaDebugger::setOption(Opt option, i64 value)
             setColor(BusOwner::AUD3, (u32)value);
             return;
 
-        case Opt::XRAY_DMA_COLOR4:
+        case Opt::XRAY_COLOR4:
 
             config.debugColor[4] = u32(value);
             setColor(BusOwner::SPRITE0, (u32)value);
@@ -260,7 +264,7 @@ DmaDebugger::setOption(Opt option, i64 value)
             setColor(BusOwner::SPRITE7, (u32)value);
             return;
 
-        case Opt::XRAY_DMA_COLOR5:
+        case Opt::XRAY_COLOR5:
 
             config.debugColor[5] = u32(value);
             setColor(BusOwner::BPL1, (u32)value);
@@ -271,18 +275,31 @@ DmaDebugger::setOption(Opt option, i64 value)
             setColor(BusOwner::BPL6, (u32)value);
             return;
 
-        case Opt::XRAY_DMA_COLOR6:
+        case Opt::XRAY_COLOR6:
 
             config.debugColor[6] = u32(value);
             setColor(BusOwner::CPU, (u32)value);
             return;
 
-        case Opt::XRAY_DMA_COLOR7:
+        case Opt::XRAY_COLOR7:
 
             config.debugColor[7] = u32(value);
             setColor(BusOwner::REFRESH, (u32)value);
             return;
-            
+
+        case Opt::XRAY_COLOR8:
+
+            // No BusOwner backs this slot -- it's XRayMode::XRAY_LAYERS'
+            // playfield 1 color (see PixelEngine::hide), not a DMA channel.
+            config.debugColor[8] = u32(value);
+            return;
+
+        case Opt::XRAY_COLOR9:
+
+            // Playfield 2 color (see PixelEngine::hide).
+            config.debugColor[9] = u32(value);
+            return;
+
         default:
             fatalError;
     }

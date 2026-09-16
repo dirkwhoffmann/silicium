@@ -43,14 +43,16 @@ class DmaDebugger final : public SubComponent {
         Opt::XRAY_DMA_CHANNEL5,
         Opt::XRAY_DMA_CHANNEL6,
         Opt::XRAY_DMA_CHANNEL7,
-        Opt::XRAY_DMA_COLOR0,
-        Opt::XRAY_DMA_COLOR1,
-        Opt::XRAY_DMA_COLOR2,
-        Opt::XRAY_DMA_COLOR3,
-        Opt::XRAY_DMA_COLOR4,
-        Opt::XRAY_DMA_COLOR5,
-        Opt::XRAY_DMA_COLOR6,
-        Opt::XRAY_DMA_COLOR7
+        Opt::XRAY_COLOR0,
+        Opt::XRAY_COLOR1,
+        Opt::XRAY_COLOR2,
+        Opt::XRAY_COLOR3,
+        Opt::XRAY_COLOR4,
+        Opt::XRAY_COLOR5,
+        Opt::XRAY_COLOR6,
+        Opt::XRAY_COLOR7,
+        Opt::XRAY_COLOR8,
+        Opt::XRAY_COLOR9
     };
     
     // Current configuration

@@ -99,14 +99,14 @@ SiAmLogicView::cacheData()
         return QColor((v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF);
     };
 
-    const QColor colCopper = ownerColor(Opt::XRAY_DMA_COLOR0);
-    const QColor colBlitter = ownerColor(Opt::XRAY_DMA_COLOR1);
-    const QColor colDisk = ownerColor(Opt::XRAY_DMA_COLOR2);
-    const QColor colAudio = ownerColor(Opt::XRAY_DMA_COLOR3);
-    const QColor colSprites = ownerColor(Opt::XRAY_DMA_COLOR4);
-    const QColor colBitplanes = ownerColor(Opt::XRAY_DMA_COLOR5);
-    const QColor colCPU = ownerColor(Opt::XRAY_DMA_COLOR6);
-    const QColor colRefresh = ownerColor(Opt::XRAY_DMA_COLOR7);
+    const QColor colCopper = ownerColor(Opt::XRAY_COLOR0);
+    const QColor colBlitter = ownerColor(Opt::XRAY_COLOR1);
+    const QColor colDisk = ownerColor(Opt::XRAY_COLOR2);
+    const QColor colAudio = ownerColor(Opt::XRAY_COLOR3);
+    const QColor colSprites = ownerColor(Opt::XRAY_COLOR4);
+    const QColor colBitplanes = ownerColor(Opt::XRAY_COLOR5);
+    const QColor colCPU = ownerColor(Opt::XRAY_COLOR6);
+    const QColor colRefresh = ownerColor(Opt::XRAY_COLOR7);
 
     for (long i = 0; i < hpos; i++) {
 

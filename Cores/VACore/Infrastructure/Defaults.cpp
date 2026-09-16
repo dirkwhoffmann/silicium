@@ -100,14 +100,16 @@ Defaults::fallbacks()
     registerDefault(Opt::XRAY_DMA_CHANNEL5,         true);
     registerDefault(Opt::XRAY_DMA_CHANNEL6,         false);
     registerDefault(Opt::XRAY_DMA_CHANNEL7,         true);
-    registerDefault(Opt::XRAY_DMA_COLOR0,           0xFFFF0000);
-    registerDefault(Opt::XRAY_DMA_COLOR1,           0xFFCC0000);
-    registerDefault(Opt::XRAY_DMA_COLOR2,           0x00FF0000);
-    registerDefault(Opt::XRAY_DMA_COLOR3,           0xFF00FF00);
-    registerDefault(Opt::XRAY_DMA_COLOR4,           0x0088FF00);
-    registerDefault(Opt::XRAY_DMA_COLOR5,           0x00FFFF00);
-    registerDefault(Opt::XRAY_DMA_COLOR6,           0xFFFFFF00);
-    registerDefault(Opt::XRAY_DMA_COLOR7,           0xFF000000);
+    registerDefault(Opt::XRAY_COLOR0,           0xFFFF0000);
+    registerDefault(Opt::XRAY_COLOR1,           0xFFCC0000);
+    registerDefault(Opt::XRAY_COLOR2,           0x00FF0000);
+    registerDefault(Opt::XRAY_COLOR3,           0xFF00FF00);
+    registerDefault(Opt::XRAY_COLOR4,           0x0088FF00);
+    registerDefault(Opt::XRAY_COLOR5,           0x00FFFF00);
+    registerDefault(Opt::XRAY_COLOR6,           0xFFFFFF00);
+    registerDefault(Opt::XRAY_COLOR7,           0xFF000000);
+    registerDefault(Opt::XRAY_COLOR8,           0xFFFF00FF);
+    registerDefault(Opt::XRAY_COLOR9,           0xFF00FFFF);
 
     registerDefault(Opt::LA_PROBE0,                  (i64)Probe::NONE);
     registerDefault(Opt::LA_PROBE1,                  (i64)Probe::NONE);

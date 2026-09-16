@@ -887,46 +887,51 @@ PixelEngine::hide(isize line, u16 layers)
     auto *emu = workingPtr(line);
     auto *xray = xrayWorkingPtr(line);
 
+    // Resolve the ten possible Opt::XRAY_COLORn values into GpuColor<F>
+    // once per line (not per pixel) -- same palette DmaDebugger uses for
+    // its own DMA channels 0-7 (see DmaDebuggerTypes::XRAY_COLOR_COUNT).
+    auto &debugColor = dmaDebugger.getConfig().debugColor;
+    GpuColor<F> layerColor[XRAY_COLOR_COUNT];
+    for (isize n = 0; n < XRAY_COLOR_COUNT; n++) {
+        layerColor[n] = GpuColor<F>(RgbColor(debugColor[n]));
+    }
+
     for (Pixel i = 0; i < Denise::PIXEL_CNT; i++) {
 
         u16 z = denise.zBuffer[i];
-        bool hidden;
+        isize idx = -1;
 
         // Check for case 1: A sprite is visible
         if (Denise::isSpritePixel(z)) {
 
-            hidden =
-            (Denise::isSpritePixel<0>(z) && (layers & 0x01)) ||
-            (Denise::isSpritePixel<1>(z) && (layers & 0x02)) ||
-            (Denise::isSpritePixel<2>(z) && (layers & 0x04)) ||
-            (Denise::isSpritePixel<3>(z) && (layers & 0x08)) ||
-            (Denise::isSpritePixel<4>(z) && (layers & 0x10)) ||
-            (Denise::isSpritePixel<5>(z) && (layers & 0x20)) ||
-            (Denise::isSpritePixel<6>(z) && (layers & 0x40)) ||
-            (Denise::isSpritePixel<7>(z) && (layers & 0x80));
+            if      (Denise::isSpritePixel<0>(z) && (layers & 0x01)) idx = 0;
+            else if (Denise::isSpritePixel<1>(z) && (layers & 0x02)) idx = 1;
+            else if (Denise::isSpritePixel<2>(z) && (layers & 0x04)) idx = 2;
+            else if (Denise::isSpritePixel<3>(z) && (layers & 0x08)) idx = 3;
+            else if (Denise::isSpritePixel<4>(z) && (layers & 0x10)) idx = 4;
+            else if (Denise::isSpritePixel<5>(z) && (layers & 0x20)) idx = 5;
+            else if (Denise::isSpritePixel<6>(z) && (layers & 0x40)) idx = 6;
+            else if (Denise::isSpritePixel<7>(z) && (layers & 0x80)) idx = 7;
 
         } else {
 
             // Playfield 1 or playfield 2 is visible
-            hidden =
-            ((Denise::upperPlayfield(z) == 1) && (layers & 0x100)) ||
-            ((Denise::upperPlayfield(z) == 2) && (layers & 0x200));
+            if      ((Denise::upperPlayfield(z) == 1) && (layers & 0x100)) idx = 8;
+            else if ((Denise::upperPlayfield(z) == 2) && (layers & 0x200)) idx = 9;
         }
 
-        if (!hidden) {
+        if (idx < 0) {
 
             // Nothing to show at this pixel in the xray texture
             xray[i] = Texture::black;
             continue;
         }
 
-        // Show a pure checkerboard pixel here -- not a blend with the
-        // original color -- so the cutout reads as "this pixel is missing"
-        // rather than a partial fade. Paint it into the xray texture alone;
-        // see mergeXray for how (and whether) it ends up blended into the
-        // real picture.
-        u8 bg = (line / 4) % 2 == (i / 16) % 2 ? 0x22 : 0x44;
-        xray[i] = toTexel<F>(GpuColor<F>(bg, bg, bg));
+        // Paint the cutout's assigned XRAY_COLOR into the xray texture
+        // alone -- the same channel-coloring pipeline XRayMode::XRAY_DMA
+        // uses. See mergeXray for how (and whether) it ends up blended
+        // into the real picture.
+        xray[i] = toTexel<F>(layerColor[idx]);
     }
 
     mergeXray(emu, xray, Denise::PIXEL_CNT);

@@ -70,24 +70,18 @@ SiAmInspectorWindow {
         }
     }
 
-    // A single bit of Opt.DENISE_HIDDEN_LAYERS (see PixelEngine::hide for
-    // the bit layout: sprites 0-7 in bits 0x01-0x80, playfield 1 in 0x100,
+    // A single bit of Opt.DENISE_HIDDEN_LAYERS, paired with the XRAY_COLORn
+    // slot it shares with XRayMode::XRAY_DMA (see PixelEngine::hide for the
+    // bit layout: sprites 0-7 in bits 0x01-0x80, playfield 1 in 0x100,
     // playfield 2 in 0x200).
-    component LayerRow: SiCheckBoxControl {
+    component LayerRow: ChannelRow {
 
-        id: layerRow
-
-        required property string label
         required property int bit
 
-        Layout.fillWidth: true
-        indent: tab
-        // Inverted: checked means the layer is shown, i.e. its bit is 0.
-        checked: (cc.DENISE_HIDDEN_LAYERS & bit) === 0
-        onClicked: cc.DENISE_HIDDEN_LAYERS = checked ?
-                       (cc.DENISE_HIDDEN_LAYERS & ~bit) :
-                       (cc.DENISE_HIDDEN_LAYERS | bit)
-        r: layerRow.label
+        on: (cc.DENISE_HIDDEN_LAYERS & bit) !== 0
+        onToggled: (value) => cc.DENISE_HIDDEN_LAYERS = value ?
+                       (cc.DENISE_HIDDEN_LAYERS | bit) :
+                       (cc.DENISE_HIDDEN_LAYERS & ~bit)
     }
 
     RowLayout {
@@ -125,88 +119,148 @@ SiAmInspectorWindow {
 
                 visible: cc.XRAY_MODE === xrayDma
                 label: qsTr("Copper DMA")
-                on: cc.XRAY_DMA_CHANNEL0; swatch: cc.XRAY_DMA_COLOR0
+                on: cc.XRAY_DMA_CHANNEL0; swatch: cc.XRAY_COLOR0
                 onToggled: (value) => cc.XRAY_DMA_CHANNEL0 = value
-                onColorPicked: (value) => cc.XRAY_DMA_COLOR0 = value
+                onColorPicked: (value) => cc.XRAY_COLOR0 = value
             }
 
             ChannelRow {
 
                 visible: cc.XRAY_MODE === xrayDma
                 label: qsTr("Blitter DMA")
-                on: cc.XRAY_DMA_CHANNEL1; swatch: cc.XRAY_DMA_COLOR1
+                on: cc.XRAY_DMA_CHANNEL1; swatch: cc.XRAY_COLOR1
                 onToggled: (value) => cc.XRAY_DMA_CHANNEL1 = value
-                onColorPicked: (value) => cc.XRAY_DMA_COLOR1 = value
+                onColorPicked: (value) => cc.XRAY_COLOR1 = value
             }
 
             ChannelRow {
 
                 visible: cc.XRAY_MODE === xrayDma
                 label: qsTr("Disk DMA")
-                on: cc.XRAY_DMA_CHANNEL2; swatch: cc.XRAY_DMA_COLOR2
+                on: cc.XRAY_DMA_CHANNEL2; swatch: cc.XRAY_COLOR2
                 onToggled: (value) => cc.XRAY_DMA_CHANNEL2 = value
-                onColorPicked: (value) => cc.XRAY_DMA_COLOR2 = value
+                onColorPicked: (value) => cc.XRAY_COLOR2 = value
             }
 
             ChannelRow {
 
                 visible: cc.XRAY_MODE === xrayDma
                 label: qsTr("Audio DMA")
-                on: cc.XRAY_DMA_CHANNEL3; swatch: cc.XRAY_DMA_COLOR3
+                on: cc.XRAY_DMA_CHANNEL3; swatch: cc.XRAY_COLOR3
                 onToggled: (value) => cc.XRAY_DMA_CHANNEL3 = value
-                onColorPicked: (value) => cc.XRAY_DMA_COLOR3 = value
+                onColorPicked: (value) => cc.XRAY_COLOR3 = value
             }
 
             ChannelRow {
 
                 visible: cc.XRAY_MODE === xrayDma
                 label: qsTr("Sprite DMA")
-                on: cc.XRAY_DMA_CHANNEL4; swatch: cc.XRAY_DMA_COLOR4
+                on: cc.XRAY_DMA_CHANNEL4; swatch: cc.XRAY_COLOR4
                 onToggled: (value) => cc.XRAY_DMA_CHANNEL4 = value
-                onColorPicked: (value) => cc.XRAY_DMA_COLOR4 = value
+                onColorPicked: (value) => cc.XRAY_COLOR4 = value
             }
 
             ChannelRow {
 
                 visible: cc.XRAY_MODE === xrayDma
                 label: qsTr("Bitplane DMA")
-                on: cc.XRAY_DMA_CHANNEL5; swatch: cc.XRAY_DMA_COLOR5
+                on: cc.XRAY_DMA_CHANNEL5; swatch: cc.XRAY_COLOR5
                 onToggled: (value) => cc.XRAY_DMA_CHANNEL5 = value
-                onColorPicked: (value) => cc.XRAY_DMA_COLOR5 = value
+                onColorPicked: (value) => cc.XRAY_COLOR5 = value
             }
 
             ChannelRow {
 
                 visible: cc.XRAY_MODE === xrayDma
                 label: qsTr("CPU DMA")
-                on: cc.XRAY_DMA_CHANNEL6; swatch: cc.XRAY_DMA_COLOR6
+                on: cc.XRAY_DMA_CHANNEL6; swatch: cc.XRAY_COLOR6
                 onToggled: (value) => cc.XRAY_DMA_CHANNEL6 = value
-                onColorPicked: (value) => cc.XRAY_DMA_COLOR6 = value
+                onColorPicked: (value) => cc.XRAY_COLOR6 = value
             }
 
             ChannelRow {
 
                 visible: cc.XRAY_MODE === xrayDma
                 label: qsTr("Memory Refresh DMA")
-                on: cc.XRAY_DMA_CHANNEL7; swatch: cc.XRAY_DMA_COLOR7
+                on: cc.XRAY_DMA_CHANNEL7; swatch: cc.XRAY_COLOR7
                 onToggled: (value) => cc.XRAY_DMA_CHANNEL7 = value
-                onColorPicked: (value) => cc.XRAY_DMA_COLOR7 = value
+                onColorPicked: (value) => cc.XRAY_COLOR7 = value
             }
 
             //
-            // Hidden layers (only shown in Layers mode)
+            // Hidden layers (only shown in Layers mode) -- share the same
+            // XRAY_COLORn palette as the DMA channels above.
             //
 
-            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Sprite 0"); bit: 0x01 }
-            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Sprite 1"); bit: 0x02 }
-            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Sprite 2"); bit: 0x04 }
-            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Sprite 3"); bit: 0x08 }
-            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Sprite 4"); bit: 0x10 }
-            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Sprite 5"); bit: 0x20 }
-            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Sprite 6"); bit: 0x40 }
-            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Sprite 7"); bit: 0x80 }
-            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Playfield 1"); bit: 0x100 }
-            LayerRow { visible: cc.XRAY_MODE === xrayLayers; label: qsTr("Playfield 2"); bit: 0x200 }
+            LayerRow {
+                visible: cc.XRAY_MODE === xrayLayers
+                label: qsTr("Sprite 0"); bit: 0x01
+                swatch: cc.XRAY_COLOR0
+                onColorPicked: (value) => cc.XRAY_COLOR0 = value
+            }
+
+            LayerRow {
+                visible: cc.XRAY_MODE === xrayLayers
+                label: qsTr("Sprite 1"); bit: 0x02
+                swatch: cc.XRAY_COLOR1
+                onColorPicked: (value) => cc.XRAY_COLOR1 = value
+            }
+
+            LayerRow {
+                visible: cc.XRAY_MODE === xrayLayers
+                label: qsTr("Sprite 2"); bit: 0x04
+                swatch: cc.XRAY_COLOR2
+                onColorPicked: (value) => cc.XRAY_COLOR2 = value
+            }
+
+            LayerRow {
+                visible: cc.XRAY_MODE === xrayLayers
+                label: qsTr("Sprite 3"); bit: 0x08
+                swatch: cc.XRAY_COLOR3
+                onColorPicked: (value) => cc.XRAY_COLOR3 = value
+            }
+
+            LayerRow {
+                visible: cc.XRAY_MODE === xrayLayers
+                label: qsTr("Sprite 4"); bit: 0x10
+                swatch: cc.XRAY_COLOR4
+                onColorPicked: (value) => cc.XRAY_COLOR4 = value
+            }
+
+            LayerRow {
+                visible: cc.XRAY_MODE === xrayLayers
+                label: qsTr("Sprite 5"); bit: 0x20
+                swatch: cc.XRAY_COLOR5
+                onColorPicked: (value) => cc.XRAY_COLOR5 = value
+            }
+
+            LayerRow {
+                visible: cc.XRAY_MODE === xrayLayers
+                label: qsTr("Sprite 6"); bit: 0x40
+                swatch: cc.XRAY_COLOR6
+                onColorPicked: (value) => cc.XRAY_COLOR6 = value
+            }
+
+            LayerRow {
+                visible: cc.XRAY_MODE === xrayLayers
+                label: qsTr("Sprite 7"); bit: 0x80
+                swatch: cc.XRAY_COLOR7
+                onColorPicked: (value) => cc.XRAY_COLOR7 = value
+            }
+
+            LayerRow {
+                visible: cc.XRAY_MODE === xrayLayers
+                label: qsTr("Playfield 1"); bit: 0x100
+                swatch: cc.XRAY_COLOR8
+                onColorPicked: (value) => cc.XRAY_COLOR8 = value
+            }
+
+            LayerRow {
+                visible: cc.XRAY_MODE === xrayLayers
+                label: qsTr("Playfield 2"); bit: 0x200
+                swatch: cc.XRAY_COLOR9
+                onColorPicked: (value) => cc.XRAY_COLOR9 = value
+            }
 
             VSpacer { size: Style.mediumSpacing }
 

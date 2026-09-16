@@ -96,15 +96,17 @@ enum class Opt : long
     XRAY_DMA_CHANNEL5,
     XRAY_DMA_CHANNEL6,
     XRAY_DMA_CHANNEL7,
-    XRAY_DMA_COLOR0,
-    XRAY_DMA_COLOR1,
-    XRAY_DMA_COLOR2,
-    XRAY_DMA_COLOR3,
-    XRAY_DMA_COLOR4,
-    XRAY_DMA_COLOR5,
-    XRAY_DMA_COLOR6,
-    XRAY_DMA_COLOR7,
-    
+    XRAY_COLOR0,
+    XRAY_COLOR1,
+    XRAY_COLOR2,
+    XRAY_COLOR3,
+    XRAY_COLOR4,
+    XRAY_COLOR5,
+    XRAY_COLOR6,
+    XRAY_COLOR7,
+    XRAY_COLOR8,
+    XRAY_COLOR9,
+
     // Logic analyzer
     LA_PROBE0,              ///< Probe on channel 0
     LA_PROBE1,              ///< Probe on channel 1
@@ -306,14 +308,16 @@ struct OptEnum : Reflectable<OptEnum, Opt>
             case Opt::XRAY_DMA_CHANNEL5:        return "XRAY.DMA_CHANNEL5";
             case Opt::XRAY_DMA_CHANNEL6:        return "XRAY.DMA_CHANNEL6";
             case Opt::XRAY_DMA_CHANNEL7:        return "XRAY.DMA_CHANNEL7";
-            case Opt::XRAY_DMA_COLOR0:          return "XRAY.DMA_COLOR0";
-            case Opt::XRAY_DMA_COLOR1:          return "XRAY.DMA_COLOR1";
-            case Opt::XRAY_DMA_COLOR2:          return "XRAY.DMA_COLOR2";
-            case Opt::XRAY_DMA_COLOR3:          return "XRAY.DMA_COLOR3";
-            case Opt::XRAY_DMA_COLOR4:          return "XRAY.DMA_COLOR4";
-            case Opt::XRAY_DMA_COLOR5:          return "XRAY.DMA_COLOR5";
-            case Opt::XRAY_DMA_COLOR6:          return "XRAY.DMA_COLOR6";
-            case Opt::XRAY_DMA_COLOR7:          return "XRAY.DMA_COLOR7";
+            case Opt::XRAY_COLOR0:          return "XRAY.COLOR0";
+            case Opt::XRAY_COLOR1:          return "XRAY.COLOR1";
+            case Opt::XRAY_COLOR2:          return "XRAY.COLOR2";
+            case Opt::XRAY_COLOR3:          return "XRAY.COLOR3";
+            case Opt::XRAY_COLOR4:          return "XRAY.COLOR4";
+            case Opt::XRAY_COLOR5:          return "XRAY.COLOR5";
+            case Opt::XRAY_COLOR6:          return "XRAY.COLOR6";
+            case Opt::XRAY_COLOR7:          return "XRAY.COLOR7";
+            case Opt::XRAY_COLOR8:          return "XRAY.COLOR8";
+            case Opt::XRAY_COLOR9:          return "XRAY.COLOR9";
                 
             case Opt::LA_PROBE0:                 return "LA.PROBE0";
             case Opt::LA_PROBE1:                 return "LA.PROBE1";
@@ -494,15 +498,17 @@ struct OptEnum : Reflectable<OptEnum, Opt>
             case Opt::XRAY_DMA_CHANNEL5:        return "Bitplane DMA";
             case Opt::XRAY_DMA_CHANNEL6:        return "CPU DMA";
             case Opt::XRAY_DMA_CHANNEL7:        return "Memory Refresh DMA";
-            case Opt::XRAY_DMA_COLOR0:          return "Copper color";
-            case Opt::XRAY_DMA_COLOR1:          return "Blitter color";
-            case Opt::XRAY_DMA_COLOR2:          return "Disk color";
-            case Opt::XRAY_DMA_COLOR3:          return "Audio color";
-            case Opt::XRAY_DMA_COLOR4:          return "Sprite color";
-            case Opt::XRAY_DMA_COLOR5:          return "Bitplane color";
-            case Opt::XRAY_DMA_COLOR6:          return "CPU color";
-            case Opt::XRAY_DMA_COLOR7:          return "Memory refresh color";
-                
+            case Opt::XRAY_COLOR0:          return "Copper color";
+            case Opt::XRAY_COLOR1:          return "Blitter color";
+            case Opt::XRAY_COLOR2:          return "Disk color";
+            case Opt::XRAY_COLOR3:          return "Audio color";
+            case Opt::XRAY_COLOR4:          return "Sprite color";
+            case Opt::XRAY_COLOR5:          return "Bitplane color";
+            case Opt::XRAY_COLOR6:          return "CPU color";
+            case Opt::XRAY_COLOR7:          return "Memory refresh color";
+            case Opt::XRAY_COLOR8:          return "Playfield 1 color";
+            case Opt::XRAY_COLOR9:          return "Playfield 2 color";
+
             case Opt::LA_PROBE0:                 return "Probe on channel 0";
             case Opt::LA_PROBE1:                 return "Probe on channel 1";
             case Opt::LA_PROBE2:                 return "Probe on channel 2";

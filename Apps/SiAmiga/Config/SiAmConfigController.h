@@ -796,14 +796,16 @@ class SiAmConfigController : public Controller {
     Q_PROPERTY(bool XRAY_DMA_CHANNEL5 READ dmaDebugChannel5 WRITE setDmaDebugChannel5 NOTIFY configChanged)
     Q_PROPERTY(bool XRAY_DMA_CHANNEL6 READ dmaDebugChannel6 WRITE setDmaDebugChannel6 NOTIFY configChanged)
     Q_PROPERTY(bool XRAY_DMA_CHANNEL7 READ dmaDebugChannel7 WRITE setDmaDebugChannel7 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_DMA_COLOR0 READ dmaDebugColor0 WRITE setDmaDebugColor0 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_DMA_COLOR1 READ dmaDebugColor1 WRITE setDmaDebugColor1 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_DMA_COLOR2 READ dmaDebugColor2 WRITE setDmaDebugColor2 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_DMA_COLOR3 READ dmaDebugColor3 WRITE setDmaDebugColor3 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_DMA_COLOR4 READ dmaDebugColor4 WRITE setDmaDebugColor4 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_DMA_COLOR5 READ dmaDebugColor5 WRITE setDmaDebugColor5 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_DMA_COLOR6 READ dmaDebugColor6 WRITE setDmaDebugColor6 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_DMA_COLOR7 READ dmaDebugColor7 WRITE setDmaDebugColor7 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR0 READ dmaDebugColor0 WRITE setDmaDebugColor0 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR1 READ dmaDebugColor1 WRITE setDmaDebugColor1 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR2 READ dmaDebugColor2 WRITE setDmaDebugColor2 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR3 READ dmaDebugColor3 WRITE setDmaDebugColor3 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR4 READ dmaDebugColor4 WRITE setDmaDebugColor4 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR5 READ dmaDebugColor5 WRITE setDmaDebugColor5 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR6 READ dmaDebugColor6 WRITE setDmaDebugColor6 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR7 READ dmaDebugColor7 WRITE setDmaDebugColor7 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR8 READ xrayColor8 WRITE setXrayColor8 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR9 READ xrayColor9 WRITE setXrayColor9 NOTIFY configChanged)
 
     int xrayMode() const { return (int)get(vamiga::Opt::XRAY_MODE); }
     void setXrayMode(int value) { set(vamiga::Opt::XRAY_MODE, (i64)value); }
@@ -829,22 +831,26 @@ class SiAmConfigController : public Controller {
     void setDmaDebugChannel6(bool value) { set(vamiga::Opt::XRAY_DMA_CHANNEL6, (i64)value); }
     bool dmaDebugChannel7() const { return (bool)get(vamiga::Opt::XRAY_DMA_CHANNEL7); }
     void setDmaDebugChannel7(bool value) { set(vamiga::Opt::XRAY_DMA_CHANNEL7, (i64)value); }
-    QColor dmaDebugColor0() const { return dmaColor(vamiga::Opt::XRAY_DMA_COLOR0); }
-    void setDmaDebugColor0(const QColor &c) { setDmaColor(vamiga::Opt::XRAY_DMA_COLOR0, c); }
-    QColor dmaDebugColor1() const { return dmaColor(vamiga::Opt::XRAY_DMA_COLOR1); }
-    void setDmaDebugColor1(const QColor &c) { setDmaColor(vamiga::Opt::XRAY_DMA_COLOR1, c); }
-    QColor dmaDebugColor2() const { return dmaColor(vamiga::Opt::XRAY_DMA_COLOR2); }
-    void setDmaDebugColor2(const QColor &c) { setDmaColor(vamiga::Opt::XRAY_DMA_COLOR2, c); }
-    QColor dmaDebugColor3() const { return dmaColor(vamiga::Opt::XRAY_DMA_COLOR3); }
-    void setDmaDebugColor3(const QColor &c) { setDmaColor(vamiga::Opt::XRAY_DMA_COLOR3, c); }
-    QColor dmaDebugColor4() const { return dmaColor(vamiga::Opt::XRAY_DMA_COLOR4); }
-    void setDmaDebugColor4(const QColor &c) { setDmaColor(vamiga::Opt::XRAY_DMA_COLOR4, c); }
-    QColor dmaDebugColor5() const { return dmaColor(vamiga::Opt::XRAY_DMA_COLOR5); }
-    void setDmaDebugColor5(const QColor &c) { setDmaColor(vamiga::Opt::XRAY_DMA_COLOR5, c); }
-    QColor dmaDebugColor6() const { return dmaColor(vamiga::Opt::XRAY_DMA_COLOR6); }
-    void setDmaDebugColor6(const QColor &c) { setDmaColor(vamiga::Opt::XRAY_DMA_COLOR6, c); }
-    QColor dmaDebugColor7() const { return dmaColor(vamiga::Opt::XRAY_DMA_COLOR7); }
-    void setDmaDebugColor7(const QColor &c) { setDmaColor(vamiga::Opt::XRAY_DMA_COLOR7, c); }
+    QColor dmaDebugColor0() const { return dmaColor(vamiga::Opt::XRAY_COLOR0); }
+    void setDmaDebugColor0(const QColor &c) { setDmaColor(vamiga::Opt::XRAY_COLOR0, c); }
+    QColor dmaDebugColor1() const { return dmaColor(vamiga::Opt::XRAY_COLOR1); }
+    void setDmaDebugColor1(const QColor &c) { setDmaColor(vamiga::Opt::XRAY_COLOR1, c); }
+    QColor dmaDebugColor2() const { return dmaColor(vamiga::Opt::XRAY_COLOR2); }
+    void setDmaDebugColor2(const QColor &c) { setDmaColor(vamiga::Opt::XRAY_COLOR2, c); }
+    QColor dmaDebugColor3() const { return dmaColor(vamiga::Opt::XRAY_COLOR3); }
+    void setDmaDebugColor3(const QColor &c) { setDmaColor(vamiga::Opt::XRAY_COLOR3, c); }
+    QColor dmaDebugColor4() const { return dmaColor(vamiga::Opt::XRAY_COLOR4); }
+    void setDmaDebugColor4(const QColor &c) { setDmaColor(vamiga::Opt::XRAY_COLOR4, c); }
+    QColor dmaDebugColor5() const { return dmaColor(vamiga::Opt::XRAY_COLOR5); }
+    void setDmaDebugColor5(const QColor &c) { setDmaColor(vamiga::Opt::XRAY_COLOR5, c); }
+    QColor dmaDebugColor6() const { return dmaColor(vamiga::Opt::XRAY_COLOR6); }
+    void setDmaDebugColor6(const QColor &c) { setDmaColor(vamiga::Opt::XRAY_COLOR6, c); }
+    QColor dmaDebugColor7() const { return dmaColor(vamiga::Opt::XRAY_COLOR7); }
+    void setDmaDebugColor7(const QColor &c) { setDmaColor(vamiga::Opt::XRAY_COLOR7, c); }
+    QColor xrayColor8() const { return dmaColor(vamiga::Opt::XRAY_COLOR8); }
+    void setXrayColor8(const QColor &c) { setDmaColor(vamiga::Opt::XRAY_COLOR8, c); }
+    QColor xrayColor9() const { return dmaColor(vamiga::Opt::XRAY_COLOR9); }
+    void setXrayColor9(const QColor &c) { setDmaColor(vamiga::Opt::XRAY_COLOR9, c); }
 
     //
     // Logic Analyzer
