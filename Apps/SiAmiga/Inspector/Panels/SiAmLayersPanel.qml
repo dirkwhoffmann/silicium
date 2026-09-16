@@ -16,13 +16,12 @@ import Silicium.Theme
 
 // The DMA Debugger box that used to live in SiAmBusPanel.qml, paired with a
 // live preview -- same split as SiC64BusPanel.qml's "DMA Channels" +
-// "Preview" boxes. Its own top-level window (see SiAmInspectorWindow.qml).
-//
-// Unlike SiC64 (whose VICII DMA debugger renders into a texture of its own),
-// vAmiga's DmaDebugger paints its overlay straight into the regular video
-// texture, so the preview here is just the emulator's normal output
-// (SiAmDmaView) -- it only shows anything DMA-debug-specific once
-// DMA_DEBUG_ENABLE is on.
+// "Preview" boxes, including the same "Show as overlay" toggle: DmaDebugger
+// always paints its raw visualization into its own texture (PixelEngine::
+// dmaTexture, mirrored here by SiAmDmaView) whenever DMA_DEBUG_ENABLE is on,
+// and only additionally blends it into the real picture when
+// DMA_DEBUG_OVERLAY is also on -- so the preview works independently of
+// whether the live display is affected.
 SiAmInspectorWindow {
 
     id: root
@@ -144,10 +143,18 @@ SiAmInspectorWindow {
 
             VSpacer { size: Style.mediumSpacing }
 
+            SiCheckBoxControl {
+
+                enabled: cc.DMA_DEBUG_ENABLE
+                checked: cc.DMA_DEBUG_OVERLAY
+                onClicked: cc.DMA_DEBUG_OVERLAY = checked
+                r: qsTr("Show as overlay")
+            }
+
             SiComboBoxControl {
 
                 Layout.fillWidth: true
-                enabled: cc.DMA_DEBUG_ENABLE
+                enabled: cc.DMA_DEBUG_ENABLE && cc.DMA_DEBUG_OVERLAY
                 model: [qsTr("Foreground layer"), qsTr("Background layer"), qsTr("Mixed layers")]
                 currentIndex: cc.DMA_DEBUG_MODE
                 onCurrentIndexChanged: cc.DMA_DEBUG_MODE = currentIndex
@@ -155,7 +162,7 @@ SiAmInspectorWindow {
 
             SiSliderControl {
 
-                enabled: cc.DMA_DEBUG_ENABLE
+                enabled: cc.DMA_DEBUG_ENABLE && cc.DMA_DEBUG_OVERLAY
                 Layout.fillWidth: true
                 l: qsTr("Opacity")
                 from: 0

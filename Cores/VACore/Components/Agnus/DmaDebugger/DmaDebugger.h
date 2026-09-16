@@ -32,6 +32,7 @@ class DmaDebugger final : public SubComponent {
     Options options = {
         
         Opt::DMA_DEBUG_ENABLE,
+        Opt::DMA_DEBUG_OVERLAY,
         Opt::DMA_DEBUG_MODE,
         Opt::DMA_DEBUG_OPACITY,
         Opt::DMA_DEBUG_CHANNEL0,
@@ -176,8 +177,14 @@ public:
     
 private:
     
-    // Visualizes DMA usage for a certain range of DMA cycles
-    void computeOverlay(Texel *ptr, isize first, isize last, BusOwner *own, u16 *val);
+    /* Visualizes DMA usage for a certain range of DMA cycles. Always paints
+     * the raw, unblended per-channel colors into 'dmaPtr' (the DMA debug
+     * texture, see PixelEngine::dmaTexture), so the Layers inspector's
+     * preview has something to show independent of the overlay setting.
+     * Only additionally blends the result into 'emuPtr' (the real picture)
+     * when config.overlay is enabled.
+     */
+    void computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val);
 };
 
 }

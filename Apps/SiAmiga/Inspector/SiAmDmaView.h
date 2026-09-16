@@ -14,18 +14,18 @@
 #include <cstdint>
 
 //
-// Live preview of the DMA debugger's overlay, shown in the Layers inspector
-// (SiAmLayersPanel.qml). Unlike SiC64 -- whose VICII DMA debugger renders
-// into a texture of its own (VideoPort::getDmaTexture) -- vAmiga's
-// DmaDebugger::computeOverlay() paints straight into the emulator's regular
-// video texture, so there is no separate DMA-only texture to grab: this view
-// just mirrors the main stable texture (getTexture()), which already carries
-// the overlay once DMA_DEBUG_ENABLE is on.
+// Live preview of the DMA debugger's raw visualization, shown in the Layers
+// inspector (SiAmLayersPanel.qml). Grabs VideoPortAPI::getDmaTexture() --
+// PixelEngine's dmaTexture ring buffer, painted by DmaDebugger::
+// computeOverlay() independently of the real picture -- so it shows DMA
+// usage whenever DMA_DEBUG_ENABLE is on, whether or not DMA_DEBUG_OVERLAY is
+// also blending it into the display. Mirrors SiC64DmaView, which does the
+// same for VICII's own separate DMA texture.
 //
-// A self-contained QQuickItem, otherwise the same shape as SiC64DmaView: it
-// self-drives off its window's frameSwapped signal while visible, so it only
-// grabs a fresh texture while the Layers inspector window is actually on
-// screen, and needs no controller wiring beyond the static core() accessor.
+// A self-contained QQuickItem: it self-drives off its window's frameSwapped
+// signal while visible, so it only grabs a fresh texture while the Layers
+// inspector window is actually on screen, and needs no controller wiring
+// beyond the static core() accessor.
 //
 
 class SiAmDmaView : public QQuickItem {

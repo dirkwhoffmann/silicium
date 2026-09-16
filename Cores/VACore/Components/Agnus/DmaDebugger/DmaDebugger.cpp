@@ -61,6 +61,7 @@ DmaDebugger::getOption(Opt option) const
     switch (option) {
             
         case Opt::DMA_DEBUG_ENABLE:      return config.enabled;
+        case Opt::DMA_DEBUG_OVERLAY:     return config.overlay;
         case Opt::DMA_DEBUG_MODE:        return (i64)config.displayMode;
         case Opt::DMA_DEBUG_OPACITY:     return config.opacity;
 
@@ -93,6 +94,7 @@ DmaDebugger::checkOption(Opt opt, i64 value)
     switch (opt) {
 
         case Opt::DMA_DEBUG_ENABLE:
+        case Opt::DMA_DEBUG_OVERLAY:
 
             return;
 
@@ -138,7 +140,12 @@ DmaDebugger::setOption(Opt option, i64 value)
             config.enabled = value;
             msgQueue.put(Msg::DMA_DEBUG, value);
             return;
-            
+
+        case Opt::DMA_DEBUG_OVERLAY:
+
+            config.overlay = value;
+            return;
+
         case Opt::DMA_DEBUG_MODE:
             
             config.displayMode = (DmaDisplayMode)value;
@@ -354,20 +361,22 @@ DmaDebugger::hsyncHandler(isize vpos)
     assert(agnus.pos.h == 0x12);
 
     if (config.enabled) {
-        
+
         // Draw first chunk (data from previous DMA line)
         auto *ptr1 = pixelEngine.workingPtr(vpos);
-        computeOverlay(ptr1, HBLANK_MIN, HPOS_MAX, busOwner, busData);
-        
+        auto *dma1 = pixelEngine.dmaWorkingPtr(vpos);
+        computeOverlay(ptr1, dma1, HBLANK_MIN, HPOS_MAX, busOwner, busData);
+
         // Draw second chunk (data from current DMA line)
         // pos.pixel() counts super-hires pixels, ptr1 counts Texels (hires)
         auto *ptr2 = ptr1 + agnus.pos.pixel(0) / 2;
-        computeOverlay(ptr2, 0, HBLANK_MIN - 1, agnus.busOwner, agnus.busData);
+        auto *dma2 = dma1 + agnus.pos.pixel(0) / 2;
+        computeOverlay(ptr2, dma2, 0, HBLANK_MIN - 1, agnus.busOwner, agnus.busData);
     }
 }
 
 void
-DmaDebugger::computeOverlay(Texel *ptr, isize first, isize last, BusOwner *own, u16 *val)
+DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val)
 {
     double opacity = double(config.opacity) / 100.0;
     double bgWeight = 0;
@@ -398,20 +407,22 @@ DmaDebugger::computeOverlay(Texel *ptr, isize first, isize last, BusOwner *own, 
 
     }
 
-    for (isize i = first; i <= last; i++, ptr += 4) {
+    for (isize i = first; i <= last; i++, emuPtr += 4, dmaPtr += 4) {
 
         auto owner = isize(own[i]);
-        // u32 *ptr32 = (u32 *)ptr;
 
         // Handle the easy case first: No foreground pixels
         if (!visualize[owner]) {
 
-            if (bgWeight != 0.0) {
+            // The DMA debug texture has nothing to show here
+            dmaPtr[0] = dmaPtr[1] = dmaPtr[2] = dmaPtr[3] = Texture::black;
 
-                ptr[0] = TEXEL(GpuColor(ptr[0]).shade(bgWeight).rawValue);
-                ptr[1] = TEXEL(GpuColor(ptr[1]).shade(bgWeight).rawValue);
-                ptr[2] = TEXEL(GpuColor(ptr[2]).shade(bgWeight).rawValue);
-                ptr[3] = TEXEL(GpuColor(ptr[3]).shade(bgWeight).rawValue);
+            if (config.overlay && bgWeight != 0.0) {
+
+                emuPtr[0] = TEXEL(GpuColor(emuPtr[0]).shade(bgWeight).rawValue);
+                emuPtr[1] = TEXEL(GpuColor(emuPtr[1]).shade(bgWeight).rawValue);
+                emuPtr[2] = TEXEL(GpuColor(emuPtr[2]).shade(bgWeight).rawValue);
+                emuPtr[3] = TEXEL(GpuColor(emuPtr[3]).shade(bgWeight).rawValue);
             }
             continue;
         }
@@ -422,18 +433,29 @@ DmaDebugger::computeOverlay(Texel *ptr, isize first, isize last, BusOwner *own, 
         GpuColor col2 = debugColor[owner][(val[i] & 0x00C0) >> 6];
         GpuColor col3 = debugColor[owner][(val[i] & 0x000C) >> 2];
 
+        // Always paint the raw, unblended colors into the DMA debug
+        // texture, regardless of whether they also get blended into the
+        // real picture below -- this is what the Layers inspector's preview
+        // shows.
+        dmaPtr[0] = TEXEL(col0.rawValue);
+        dmaPtr[1] = TEXEL(col1.rawValue);
+        dmaPtr[2] = TEXEL(col2.rawValue);
+        dmaPtr[3] = TEXEL(col3.rawValue);
+
+        if (!config.overlay) continue;
+
         if (fgWeight != 0.0) {
 
-            col0 = col0.mix(GpuColor(ptr[0]), fgWeight);
-            col1 = col1.mix(GpuColor(ptr[2]), fgWeight);
-            col2 = col2.mix(GpuColor(ptr[4]), fgWeight);
-            col3 = col3.mix(GpuColor(ptr[6]), fgWeight);
+            col0 = col0.mix(GpuColor(emuPtr[0]), fgWeight);
+            col1 = col1.mix(GpuColor(emuPtr[2]), fgWeight);
+            col2 = col2.mix(GpuColor(emuPtr[4]), fgWeight);
+            col3 = col3.mix(GpuColor(emuPtr[6]), fgWeight);
         }
 
-        ptr[0] = TEXEL(col0.rawValue);
-        ptr[1] = TEXEL(col1.rawValue);
-        ptr[2] = TEXEL(col2.rawValue);
-        ptr[3] = TEXEL(col3.rawValue);
+        emuPtr[0] = TEXEL(col0.rawValue);
+        emuPtr[1] = TEXEL(col1.rawValue);
+        emuPtr[2] = TEXEL(col2.rawValue);
+        emuPtr[3] = TEXEL(col3.rawValue);
     }
 }
 
@@ -448,9 +470,12 @@ DmaDebugger::vSyncHandler()
     for (isize row = 0; row < cnt; row++) {
 
         auto *ptr = denise.pixelEngine.workingPtr(row);
+        auto *dma = denise.pixelEngine.dmaWorkingPtr(row);
+
         for (isize col = 0; col < HPIXELS; col++) {
 
             ptr[col] = Texture::vblank;
+            dma[col] = Texture::black;
         }
     }
 }

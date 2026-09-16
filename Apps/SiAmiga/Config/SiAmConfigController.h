@@ -788,6 +788,7 @@ class SiAmConfigController : public Controller {
   public:
 
     Q_PROPERTY(bool DMA_DEBUG_ENABLE READ dmaDebugEnable WRITE setDmaDebugEnable NOTIFY configChanged)
+    Q_PROPERTY(bool DMA_DEBUG_OVERLAY READ dmaDebugOverlay WRITE setDmaDebugOverlay NOTIFY configChanged)
     Q_PROPERTY(int DMA_DEBUG_MODE READ dmaDebugMode WRITE setDmaDebugMode NOTIFY configChanged)
     Q_PROPERTY(int DMA_DEBUG_OPACITY READ dmaDebugOpacity WRITE setDmaDebugOpacity NOTIFY configChanged)
     Q_PROPERTY(bool DMA_DEBUG_CHANNEL0 READ dmaDebugChannel0 WRITE setDmaDebugChannel0 NOTIFY configChanged)
@@ -809,6 +810,8 @@ class SiAmConfigController : public Controller {
 
     bool dmaDebugEnable() const { return (bool)get(vamiga::Opt::DMA_DEBUG_ENABLE); }
     void setDmaDebugEnable(bool value) { set(vamiga::Opt::DMA_DEBUG_ENABLE, (i64)value); }
+    bool dmaDebugOverlay() const { return (bool)get(vamiga::Opt::DMA_DEBUG_OVERLAY); }
+    void setDmaDebugOverlay(bool value) { set(vamiga::Opt::DMA_DEBUG_OVERLAY, (i64)value); }
     int dmaDebugMode() const { return (int)get(vamiga::Opt::DMA_DEBUG_MODE); }
     void setDmaDebugMode(int value) { set(vamiga::Opt::DMA_DEBUG_MODE, (i64)value); }
     int dmaDebugOpacity() const { return (int)get(vamiga::Opt::DMA_DEBUG_OPACITY); }

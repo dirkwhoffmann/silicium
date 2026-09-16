@@ -37,7 +37,10 @@ void
 PixelEngine::clearAll()
 {
     // Wipe out all textures
-    for (isize i = 0; i < NUM_TEXTURES; i++) emuTexture[i].clear();
+    for (isize i = 0; i < NUM_TEXTURES; i++) {
+        emuTexture[i].clear();
+        dmaTexture[i].clear();
+    }
 }
 
 void
@@ -417,6 +420,28 @@ PixelEngine::stablePtr(isize row, isize col)
     assert(col >= 0 && col <= HPOS_MAX);
 
     return getStableBuffer().pixels.ptr + row * HPIXELS + col;
+}
+
+Texture &
+PixelEngine::getWorkingDmaBuffer()
+{
+    return dmaTexture[activeBuffer];
+}
+
+const Texture &
+PixelEngine::getStableDmaBuffer(isize offset) const
+{
+    auto nr = activeBuffer + offset - 1;
+    return dmaTexture[(nr + NUM_TEXTURES) % NUM_TEXTURES];
+}
+
+Texel *
+PixelEngine::dmaWorkingPtr(isize row, isize col)
+{
+    assert(row >= 0 && row <= VPOS_MAX);
+    assert(col >= 0 && col <= HPOS_MAX);
+
+    return getWorkingDmaBuffer().pixels.ptr + row * HPIXELS + col;
 }
 
 void

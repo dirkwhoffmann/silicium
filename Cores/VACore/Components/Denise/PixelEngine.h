@@ -50,6 +50,16 @@ private:
      */
     Texture emuTexture[NUM_TEXTURES];
 
+    /* Parallel ring buffer holding the DMA debugger's raw, unblended
+     * per-channel visualization (see DmaDebugger::computeOverlay). Kept
+     * separate from emuTexture so the Layers inspector's preview can show
+     * DMA usage on its own, independent of whether it is also blended into
+     * the real picture (DMA_DEBUG_OVERLAY) -- mirrors VICII's own
+     * emuTexture/dmaTexture split in the C64 core. Indexed by the same
+     * activeBuffer as emuTexture, so both stay in lockstep.
+     */
+    Texture dmaTexture[NUM_TEXTURES];
+
     // The currently active buffer
     isize activeBuffer = 0;
 
@@ -328,7 +338,12 @@ public:
     // Return a pointer into the pixel storage
     Texel *workingPtr(isize row = 0, isize col = 0);
     Texel *stablePtr(isize row = 0, isize col = 0);
-    
+
+    // Same as above, but for the DMA debugger's own texture (see dmaTexture)
+    Texture &getWorkingDmaBuffer();
+    const Texture &getStableDmaBuffer(isize offset = 0) const;
+    Texel *dmaWorkingPtr(isize row = 0, isize col = 0);
+
     // Swaps the working buffer and the stable buffer
     void swapBuffers();
     

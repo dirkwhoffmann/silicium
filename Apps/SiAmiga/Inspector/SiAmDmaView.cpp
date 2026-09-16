@@ -65,7 +65,7 @@ SiAmDmaView::grab()
 
     core.videoPort.lockTexture();
 
-    if (auto *tex = core.videoPort.getTexture()) {
+    if (auto *tex = core.videoPort.getDmaTexture()) {
         buffer.assign(tex, tex + (texWidth * texHeight));
     }
 
