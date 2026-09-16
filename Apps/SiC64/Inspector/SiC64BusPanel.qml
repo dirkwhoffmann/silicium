@@ -34,7 +34,6 @@ SiC64InspectorWindow {
         property color swatch: "black"
 
         signal toggled(bool value)
-
         signal colorPicked(color value)
 
         Layout.fillWidth: true
@@ -43,15 +42,14 @@ SiC64InspectorWindow {
         SiCheckBoxControl {
 
             Layout.fillWidth: true
-            enabled: root.cc.DMA_DEBUG_ENABLE
             indent: tab
+            enabled: root.cc.DMA_DEBUG_ENABLE
             checked: chRow.on
             onClicked: chRow.toggled(checked)
             r: chRow.label
         }
 
-        HSpacer {
-        }
+        HSpacer { }
 
         SiColorWell {
 
@@ -178,7 +176,7 @@ SiC64InspectorWindow {
             }
 
             //
-            // Live DMA texture preview
+            // Live preview
             //
 
             SiBox {

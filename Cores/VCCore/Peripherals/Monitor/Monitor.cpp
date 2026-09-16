@@ -249,8 +249,8 @@ Monitor::getColor(isize nr, Palette palette)
 
     switch (host.getConfig().texFormat) {
 
-        case TexFormat::ABGR: return HI_HI_LO_LO(0xFF, (u8)b, (u8)g, (u8)r);
-        case TexFormat::ARGB: return HI_HI_LO_LO(0xFF, (u8)r, (u8)g, (u8)b);
+        case TexelFormat::ABGR: return HI_HI_LO_LO(0xFF, (u8)b, (u8)g, (u8)r);
+        case TexelFormat::ARGB: return HI_HI_LO_LO(0xFF, (u8)r, (u8)g, (u8)b);
 
         default:
             return HI_HI_LO_LO((u8)r, (u8)g, (u8)b, 0xFF);

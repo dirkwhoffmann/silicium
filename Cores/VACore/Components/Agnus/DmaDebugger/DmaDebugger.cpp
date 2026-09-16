@@ -396,7 +396,7 @@ template <TexelFormat F>
 void
 DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val)
 {
-    double opacity = double(config.opacity) / 100.0;
+    double opacity = config.opacity / 255.0;
     double bgWeight = 0;
     double fgWeight = 0;
 

@@ -30,6 +30,8 @@ SiAmInspectorWindow {
     currentController: controller.layersController
 
     readonly property var cc: controller.configController
+    readonly property int tab: 21
+    readonly property int tabtab: 42
 
     component ChannelRow: RowLayout {
 
@@ -48,11 +50,14 @@ SiAmInspectorWindow {
         SiCheckBoxControl {
 
             Layout.fillWidth: true
+            indent: tab
             enabled: root.cc.DMA_DEBUG_ENABLE
             checked: chRow.on
             onClicked: chRow.toggled(checked)
             r: chRow.label
         }
+
+        HSpacer { }
 
         SiColorWell {
 
@@ -73,8 +78,8 @@ SiAmInspectorWindow {
 
         SiBox {
 
-            title: qsTr("DMA Debugger")
-            Layout.preferredWidth: 260
+            title: qsTr("DMA Channels")
+            Layout.preferredWidth: 280
             Layout.fillHeight: true
             spacing: Style.tinySpacing
 
@@ -82,10 +87,11 @@ SiAmInspectorWindow {
 
                 checked: cc.DMA_DEBUG_ENABLE
                 onClicked: cc.DMA_DEBUG_ENABLE = checked
-                r: qsTr("Visualize bus accesses")
+                r: qsTr("DMA Debugger")
             }
 
             ChannelRow {
+
                 label: qsTr("Copper DMA")
                 on: cc.DMA_DEBUG_CHANNEL0; swatch: cc.DMA_DEBUG_COLOR0
                 onToggled: (value) => cc.DMA_DEBUG_CHANNEL0 = value
@@ -93,6 +99,7 @@ SiAmInspectorWindow {
             }
 
             ChannelRow {
+
                 label: qsTr("Blitter DMA")
                 on: cc.DMA_DEBUG_CHANNEL1; swatch: cc.DMA_DEBUG_COLOR1
                 onToggled: (value) => cc.DMA_DEBUG_CHANNEL1 = value
@@ -100,6 +107,7 @@ SiAmInspectorWindow {
             }
 
             ChannelRow {
+
                 label: qsTr("Disk DMA")
                 on: cc.DMA_DEBUG_CHANNEL2; swatch: cc.DMA_DEBUG_COLOR2
                 onToggled: (value) => cc.DMA_DEBUG_CHANNEL2 = value
@@ -107,6 +115,7 @@ SiAmInspectorWindow {
             }
 
             ChannelRow {
+
                 label: qsTr("Audio DMA")
                 on: cc.DMA_DEBUG_CHANNEL3; swatch: cc.DMA_DEBUG_COLOR3
                 onToggled: (value) => cc.DMA_DEBUG_CHANNEL3 = value
@@ -114,6 +123,7 @@ SiAmInspectorWindow {
             }
 
             ChannelRow {
+
                 label: qsTr("Sprite DMA")
                 on: cc.DMA_DEBUG_CHANNEL4; swatch: cc.DMA_DEBUG_COLOR4
                 onToggled: (value) => cc.DMA_DEBUG_CHANNEL4 = value
@@ -121,6 +131,7 @@ SiAmInspectorWindow {
             }
 
             ChannelRow {
+
                 label: qsTr("Bitplane DMA")
                 on: cc.DMA_DEBUG_CHANNEL5; swatch: cc.DMA_DEBUG_COLOR5
                 onToggled: (value) => cc.DMA_DEBUG_CHANNEL5 = value
@@ -128,6 +139,7 @@ SiAmInspectorWindow {
             }
 
             ChannelRow {
+
                 label: qsTr("CPU DMA")
                 on: cc.DMA_DEBUG_CHANNEL6; swatch: cc.DMA_DEBUG_COLOR6
                 onToggled: (value) => cc.DMA_DEBUG_CHANNEL6 = value
@@ -135,6 +147,7 @@ SiAmInspectorWindow {
             }
 
             ChannelRow {
+
                 label: qsTr("Memory Refresh DMA")
                 on: cc.DMA_DEBUG_CHANNEL7; swatch: cc.DMA_DEBUG_COLOR7
                 onToggled: (value) => cc.DMA_DEBUG_CHANNEL7 = value
@@ -145,6 +158,7 @@ SiAmInspectorWindow {
 
             SiCheckBoxControl {
 
+                indent: tab
                 enabled: cc.DMA_DEBUG_ENABLE
                 checked: cc.DMA_DEBUG_OVERLAY
                 onClicked: cc.DMA_DEBUG_OVERLAY = checked
@@ -153,6 +167,7 @@ SiAmInspectorWindow {
 
             SiComboBoxControl {
 
+                indent: tabtab
                 Layout.fillWidth: true
                 enabled: cc.DMA_DEBUG_ENABLE && cc.DMA_DEBUG_OVERLAY
                 model: [qsTr("Foreground layer"), qsTr("Background layer"), qsTr("Mixed layers")]
@@ -217,7 +232,7 @@ SiAmInspectorWindow {
                 SiSymbol {
 
                     anchors.centerIn: parent
-                    phosphor: "stack"
+                    phosphor: "eye"
                     // Scales with the cell -- size the glyph in pixels directly.
                     width: Math.min(parent.width, parent.height) * 0.75
                     height: width

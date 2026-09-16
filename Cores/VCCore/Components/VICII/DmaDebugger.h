@@ -128,33 +128,57 @@ public:
     //
     // Managing colors
     //
-    
-    void setDmaDebugColor(MemAccess type, GpuColor color);
+
+    // 'color' is the fixed, portable ABGR encoding the option system stores
+    // (see Defaults.cpp / DMA_DEBUG_COLORn) -- independent of the live
+    // HOST_TEX_FORMAT. Re-derives the four shades in debugColor[][] in
+    // whatever format the host is actually running in right now.
+    void setDmaDebugColor(MemAccess type, GpuColor<TexelFormat::ABGR> color);
     void setDmaDebugColor(MemAccess type, RgbColor color);
 
-    
+    // Re-derives every channel's debugColor[][] shades for the host's
+    // current HOST_TEX_FORMAT. Called whenever a channel's color changes,
+    // and whenever HOST_TEX_FORMAT itself changes (see Host::setOption),
+    // since debugColor[][] caches already-packed texels rather than
+    // recomputing them per pixel in the hot path (visualizeDma).
+    void updateDebugColors();
+
+private:
+
+    template <TexelFormat F> void updateDebugColor(long channel, const RgbColor &color);
+
+
     //
     // Visualizing DMA
     //
-    
+
 public:
-    
+
     // Visualizes a memory access by drawing into the DMA debuger texture
     void visualizeDma(isize offset, u8 data, MemAccess type);
     void visualizeDma(u32 *ptr, u8 data, MemAccess type);
-    
-    // Superimposes the debug output onto the current scanline
+
+    // Superimposes the debug output onto the current scanline. Dispatches
+    // once (per call, not per pixel) to the templated overload below,
+    // matching the host's current HOST_TEX_FORMAT -- mirrors vAmiga's own
+    // DmaDebugger::computeOverlay (Components/Agnus/DmaDebugger/
+    // DmaDebugger.h), see its class comment for why.
     void computeOverlay(u32 *emuTexture, u32 *dmaTexture);
 
-    
+    template <TexelFormat F> void computeOverlay(u32 *emuTexture, u32 *dmaTexture);
+
+
     //
     // Cutting layers
     //
-    
+
 public:
-    
-    // Cuts out certain graphics layers
+
+    // Cuts out certain graphics layers. Same dispatch shape as
+    // computeOverlay -- see there.
     void cutLayers();
+
+    template <TexelFormat F> void cutLayers();
 };
 
 }

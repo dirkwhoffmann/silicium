@@ -20,7 +20,7 @@ Defaults::Defaults()
 {
     setFallback(Opt::HOST_REFRESH_RATE,          60);
     setFallback(Opt::HOST_SAMPLE_RATE,           44100);
-    setFallback(Opt::HOST_TEX_FORMAT,            (i64)TexFormat::RGBA);
+    setFallback(Opt::HOST_TEX_FORMAT,            (i64)TexelFormat::RGBA);
     setFallback(Opt::HOST_FRAMEBUF_WIDTH,        0);
     setFallback(Opt::HOST_FRAMEBUF_HEIGHT,       0);
 
@@ -59,12 +59,15 @@ Defaults::Defaults()
     setFallback(Opt::DMA_DEBUG_CHANNEL3,         true);
     setFallback(Opt::DMA_DEBUG_CHANNEL4,         true);
     setFallback(Opt::DMA_DEBUG_CHANNEL5,         true);
-    setFallback(Opt::DMA_DEBUG_COLOR0,           GpuColor(0xFF, 0x00, 0x00).abgr);
-    setFallback(Opt::DMA_DEBUG_COLOR1,           GpuColor(0xFF, 0xC0, 0x00).abgr);
-    setFallback(Opt::DMA_DEBUG_COLOR2,           GpuColor(0xFF, 0xFF, 0x00).abgr);
-    setFallback(Opt::DMA_DEBUG_COLOR3,           GpuColor(0x00, 0xFF, 0xFF).abgr);
-    setFallback(Opt::DMA_DEBUG_COLOR4,           GpuColor(0x00, 0xFF, 0x00).abgr);
-    setFallback(Opt::DMA_DEBUG_COLOR5,           GpuColor(0x00, 0x80, 0xFF).abgr);
+    // Fixed, portable encoding (ABGR) for a persisted option value --
+    // independent of the live HOST_TEX_FORMAT, which DmaDebugger re-derives
+    // its actual on-screen shades from (see DmaDebugger::updateDebugColors).
+    setFallback(Opt::DMA_DEBUG_COLOR0,           GpuColor<TexelFormat::ABGR>(0xFF, 0x00, 0x00).rawValue);
+    setFallback(Opt::DMA_DEBUG_COLOR1,           GpuColor<TexelFormat::ABGR>(0xFF, 0xC0, 0x00).rawValue);
+    setFallback(Opt::DMA_DEBUG_COLOR2,           GpuColor<TexelFormat::ABGR>(0xFF, 0xFF, 0x00).rawValue);
+    setFallback(Opt::DMA_DEBUG_COLOR3,           GpuColor<TexelFormat::ABGR>(0x00, 0xFF, 0xFF).rawValue);
+    setFallback(Opt::DMA_DEBUG_COLOR4,           GpuColor<TexelFormat::ABGR>(0x00, 0xFF, 0x00).rawValue);
+    setFallback(Opt::DMA_DEBUG_COLOR5,           GpuColor<TexelFormat::ABGR>(0x00, 0x80, 0xFF).rawValue);
 
     setFallback(Opt::EXP_REU_SPEED,              1);
 

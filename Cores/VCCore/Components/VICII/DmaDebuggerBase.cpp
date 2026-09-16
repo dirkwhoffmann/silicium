@@ -137,12 +137,12 @@ DmaDebugger::setOption(Opt opt, i64 value)
         case Opt::DMA_DEBUG_CHANNEL4:    config.dmaChannel[4] = value; return;
         case Opt::DMA_DEBUG_CHANNEL5:    config.dmaChannel[5] = value; return;
 
-        case Opt::DMA_DEBUG_COLOR0:      setDmaDebugColor(MemAccess::R, GpuColor((u32)value)); return;
-        case Opt::DMA_DEBUG_COLOR1:      setDmaDebugColor(MemAccess::I, GpuColor((u32)value)); return;
-        case Opt::DMA_DEBUG_COLOR2:      setDmaDebugColor(MemAccess::C, GpuColor((u32)value)); return;
-        case Opt::DMA_DEBUG_COLOR3:      setDmaDebugColor(MemAccess::G, GpuColor((u32)value)); return;
-        case Opt::DMA_DEBUG_COLOR4:      setDmaDebugColor(MemAccess::P, GpuColor((u32)value)); return;
-        case Opt::DMA_DEBUG_COLOR5:      setDmaDebugColor(MemAccess::S, GpuColor((u32)value)); return;
+        case Opt::DMA_DEBUG_COLOR0:      setDmaDebugColor(MemAccess::R, GpuColor<TexelFormat::ABGR>((u32)value)); return;
+        case Opt::DMA_DEBUG_COLOR1:      setDmaDebugColor(MemAccess::I, GpuColor<TexelFormat::ABGR>((u32)value)); return;
+        case Opt::DMA_DEBUG_COLOR2:      setDmaDebugColor(MemAccess::C, GpuColor<TexelFormat::ABGR>((u32)value)); return;
+        case Opt::DMA_DEBUG_COLOR3:      setDmaDebugColor(MemAccess::G, GpuColor<TexelFormat::ABGR>((u32)value)); return;
+        case Opt::DMA_DEBUG_COLOR4:      setDmaDebugColor(MemAccess::P, GpuColor<TexelFormat::ABGR>((u32)value)); return;
+        case Opt::DMA_DEBUG_COLOR5:      setDmaDebugColor(MemAccess::S, GpuColor<TexelFormat::ABGR>((u32)value)); return;
 
         default:
             fatalError;
