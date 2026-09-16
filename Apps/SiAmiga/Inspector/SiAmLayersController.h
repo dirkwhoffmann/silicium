@@ -12,10 +12,10 @@
 #include "SiAmInspectorController.h"
 
 //
-// Layers inspector controller -- supplies SiAmLayersPanel's inspector-window
+// Layers inspector controller -- supplies SiAmXRayPanel's inspector-window
 // chrome (currentController for the toolbar, the shared active flag, tick
 // throttle and beam-position readout from SiAmInspectorController). It owns
-// no properties of its own: the DMA debugger's settings are DMA_DEBUG_*
+// no properties of its own: the X-Ray debugger's settings are XRAY_*
 // config options, and the panel binds to those directly on the shared
 // SiAmConfigController (controller.configController) instead of proxying
 // them through here. Mirrors SiC64BusController, which plays the same

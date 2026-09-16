@@ -177,12 +177,13 @@ public:
     
 private:
     
-    /* Visualizes DMA usage for a certain range of DMA cycles. Always paints
-     * the raw, unblended per-channel colors into 'dmaPtr' (the DMA debug
-     * texture, see PixelEngine::xrayTexture), so the Layers inspector's
-     * preview has something to show independent of the overlay setting.
-     * Only additionally blends the result into 'emuPtr' (the real picture)
-     * when config.overlay is enabled.
+    /* Visualizes DMA usage for a certain range of DMA cycles. Paints only
+     * the final, ready-to-merge per-channel colors into 'dmaPtr' (the xray
+     * texture, see PixelEngine::xrayTexture) -- 'emuPtr' (the real picture)
+     * is read for blending but never written here. Finishes by calling
+     * PixelEngine::mergeXray, which blends the xray texture into 'emuPtr'
+     * when config.overlay is enabled; XRayMode::XRAY_LAYERS (PixelEngine::
+     * hide) follows the exact same build-then-merge shape.
      *
      * Dispatches once (per call, not per pixel) to the templated overload
      * below, matching the host's current HOST_TEX_FORMAT. Fixing the format

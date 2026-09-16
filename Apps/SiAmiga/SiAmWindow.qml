@@ -290,7 +290,7 @@ ApplicationWindow {
         actions: root.actions
     }
 
-    SiAmLayersPanel {
+    SiAmXRayPanel {
 
         id: layersInspectorWindow
         controller: root.amiga

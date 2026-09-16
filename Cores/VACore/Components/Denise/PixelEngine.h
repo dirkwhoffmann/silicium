@@ -429,6 +429,24 @@ private:
     void removeBorderOverSprites(Pixel from, Pixel to);
     
     //
+    // Merging X-Ray effects
+    //
+
+public:
+
+    /* Merges previously computed xray-texture pixels into the emulator
+     * texture wherever an X-Ray effect is present, indicated by a value
+     * other than Texture::black, provided Opt::XRAY_OVERLAY is enabled
+     * (a no-op otherwise). Both XRayMode::XRAY_DMA (DmaDebugger::
+     * computeOverlay) and XRayMode::XRAY_LAYERS (hide) build their own
+     * "ready to merge" effect pixels into the xray texture and then call
+     * this identical function to blend them into the real picture -- the
+     * mode-specific code never writes to the emulator texture itself.
+     */
+    void mergeXray(Texel *emuPtr, const Texel *xrayPtr, isize count);
+
+
+    //
     // Hiding graphics layers
     //
 
@@ -436,11 +454,10 @@ public:
 
     /* Cuts out certain graphics layers (see DENISE_HIDDEN_LAYERS), only
      * active in XRayMode::XRAY_LAYERS. Mirrors DmaDebugger::computeOverlay:
-     * always paints the raw cutout into the xray texture (see xrayTexture),
-     * so the Layers inspector's preview has something to show, and
-     * additionally blends it into the real picture when config.overlay
-     * is enabled. Shares its opacity with the DMA overlay
-     * (Opt::XRAY_OVERLAY_OPACITY) rather than keeping its own.
+     * paints only the raw cutout into the xray texture (see xrayTexture),
+     * so the Layers inspector's preview has something to show, and never
+     * touches the emulator texture directly -- see mergeXray for how (and
+     * whether) that cutout ends up blended into the real picture.
      *
      * Dispatches once (per call, not per pixel) to the templated overload
      * below, matching the host's current HOST_TEX_FORMAT -- see

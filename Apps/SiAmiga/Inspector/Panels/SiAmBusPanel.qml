@@ -22,7 +22,7 @@ import Silicium.Theme
 // slider and the Symbolic checkbox. The DMA Debugger box that used to sit
 // next to it (the eight visualize-channel checkboxes/colors plus the
 // display-mode combo and opacity slider) moved to its own window,
-// SiAmLayersPanel.qml, paired there with a live preview.
+// SiAmXRayPanel.qml, paired there with a live preview.
 SiAmInspectorWindow {
 
     id: root

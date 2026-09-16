@@ -855,6 +855,16 @@ PixelEngine::removeBorderOverSprites(Pixel from, Pixel to)
 }
 
 void
+PixelEngine::mergeXray(Texel *emuPtr, const Texel *xrayPtr, isize count)
+{
+    if (!dmaDebugger.getConfig().overlay) return;
+
+    for (isize i = 0; i < count; i++) {
+        if (xrayPtr[i] != Texture::black) emuPtr[i] = xrayPtr[i];
+    }
+}
+
+void
 PixelEngine::hide(isize line, u16 layers)
 {
     // Dispatched once per call (not per pixel) -- see the declaration's
@@ -877,9 +887,7 @@ PixelEngine::hide(isize line, u16 layers)
     auto *emu = workingPtr(line);
     auto *xray = xrayWorkingPtr(line);
 
-    auto &dmaConfig = dmaDebugger.getConfig();
-    bool overlay = dmaConfig.overlay;
-    double scale = dmaConfig.opacity / 255.0;
+    double scale = dmaDebugger.getConfig().opacity / 255.0;
 
     for (Pixel i = 0; i < Denise::PIXEL_CNT; i++) {
 
@@ -921,15 +929,12 @@ PixelEngine::hide(isize line, u16 layers)
         u8 newg = (u8)(color.g() * (1 - scale) + bg * scale);
         u8 newb = (u8)(color.b() * (1 - scale) + bg * scale);
 
-        Texel cutout = toTexel<F>(GpuColor<F>(newr, newg, newb));
-
-        // Always paint the raw cutout into the xray texture, regardless of
-        // whether it also gets blended into the real picture below -- this
-        // is what the Layers inspector's preview shows.
-        xray[i] = cutout;
-
-        if (overlay) emu[i] = cutout;
+        // Paint the cutout into the xray texture alone -- see mergeXray for
+        // how (and whether) it ends up blended into the real picture.
+        xray[i] = toTexel<F>(GpuColor<F>(newr, newg, newb));
     }
+
+    mergeXray(emu, xray, Denise::PIXEL_CNT);
 }
 
 }

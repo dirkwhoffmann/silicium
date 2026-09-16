@@ -82,10 +82,11 @@ SiAmInspectorWindow {
 
         Layout.fillWidth: true
         indent: tab
-        checked: (cc.DENISE_HIDDEN_LAYERS & bit) !== 0
+        // Inverted: checked means the layer is shown, i.e. its bit is 0.
+        checked: (cc.DENISE_HIDDEN_LAYERS & bit) === 0
         onClicked: cc.DENISE_HIDDEN_LAYERS = checked ?
-                       (cc.DENISE_HIDDEN_LAYERS | bit) :
-                       (cc.DENISE_HIDDEN_LAYERS & ~bit)
+                       (cc.DENISE_HIDDEN_LAYERS & ~bit) :
+                       (cc.DENISE_HIDDEN_LAYERS | bit)
         r: layerRow.label
     }
 

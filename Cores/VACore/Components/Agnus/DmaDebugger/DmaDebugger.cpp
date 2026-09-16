@@ -397,6 +397,9 @@ template <TexelFormat F>
 void
 DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val)
 {
+    Texel *emuStart = emuPtr;
+    Texel *dmaStart = dmaPtr;
+
     double opacity = config.opacity / 255.0;
     double bgWeight = 0;
     double fgWeight = 0;
@@ -433,15 +436,19 @@ DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize las
         // Handle the easy case first: No foreground pixels
         if (!visualize[owner]) {
 
-            // The DMA debug texture has nothing to show here
-            dmaPtr[0] = dmaPtr[1] = dmaPtr[2] = dmaPtr[3] = Texture::black;
+            // Nothing to show here, unless the display mode dims the
+            // background (BG_LAYER / ODD_EVEN_LAYERS) -- either way, this
+            // is the final, ready-to-merge pixel; mergeXray below never
+            // does any further blending of its own.
+            if (bgWeight != 0.0) {
 
-            if (config.overlay && bgWeight != 0.0) {
+                dmaPtr[0] = PixelEngine::toTexel<F>(PixelEngine::fromTexel<F>(emuPtr[0]).shade(bgWeight));
+                dmaPtr[1] = PixelEngine::toTexel<F>(PixelEngine::fromTexel<F>(emuPtr[1]).shade(bgWeight));
+                dmaPtr[2] = PixelEngine::toTexel<F>(PixelEngine::fromTexel<F>(emuPtr[2]).shade(bgWeight));
+                dmaPtr[3] = PixelEngine::toTexel<F>(PixelEngine::fromTexel<F>(emuPtr[3]).shade(bgWeight));
+            } else {
 
-                emuPtr[0] = PixelEngine::toTexel<F>(PixelEngine::fromTexel<F>(emuPtr[0]).shade(bgWeight));
-                emuPtr[1] = PixelEngine::toTexel<F>(PixelEngine::fromTexel<F>(emuPtr[1]).shade(bgWeight));
-                emuPtr[2] = PixelEngine::toTexel<F>(PixelEngine::fromTexel<F>(emuPtr[2]).shade(bgWeight));
-                emuPtr[3] = PixelEngine::toTexel<F>(PixelEngine::fromTexel<F>(emuPtr[3]).shade(bgWeight));
+                dmaPtr[0] = dmaPtr[1] = dmaPtr[2] = dmaPtr[3] = Texture::black;
             }
             continue;
         }
@@ -451,17 +458,6 @@ DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize las
         GpuColor<F> col1 = debugColor[owner][(val[i] & 0x0C00) >> 10];
         GpuColor<F> col2 = debugColor[owner][(val[i] & 0x00C0) >> 6];
         GpuColor<F> col3 = debugColor[owner][(val[i] & 0x000C) >> 2];
-
-        // Always paint the raw, unblended colors into the DMA debug
-        // texture, regardless of whether they also get blended into the
-        // real picture below -- this is what the Layers inspector's preview
-        // shows.
-        dmaPtr[0] = PixelEngine::toTexel<F>(col0);
-        dmaPtr[1] = PixelEngine::toTexel<F>(col1);
-        dmaPtr[2] = PixelEngine::toTexel<F>(col2);
-        dmaPtr[3] = PixelEngine::toTexel<F>(col3);
-
-        if (!config.overlay) continue;
 
         if (fgWeight != 0.0) {
 
@@ -475,11 +471,18 @@ DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize las
             col3 = col3.mix(PixelEngine::fromTexel<F>(emuPtr[3]), fgWeight);
         }
 
-        emuPtr[0] = PixelEngine::toTexel<F>(col0);
-        emuPtr[1] = PixelEngine::toTexel<F>(col1);
-        emuPtr[2] = PixelEngine::toTexel<F>(col2);
-        emuPtr[3] = PixelEngine::toTexel<F>(col3);
+        // Paint the final, already-weighted pixel into the xray texture
+        // alone -- see mergeXray for how (and whether) it ends up blended
+        // into the real picture.
+        dmaPtr[0] = PixelEngine::toTexel<F>(col0);
+        dmaPtr[1] = PixelEngine::toTexel<F>(col1);
+        dmaPtr[2] = PixelEngine::toTexel<F>(col2);
+        dmaPtr[3] = PixelEngine::toTexel<F>(col3);
     }
+
+    // Merge the xray texture into the real picture, if enabled -- the exact
+    // same function PixelEngine::hide (XRayMode::XRAY_LAYERS) calls.
+    pixelEngine.mergeXray(emuStart, dmaStart, (last - first + 1) * 4);
 }
 
 void
