@@ -102,7 +102,7 @@ SiAmInspectorWindow {
 
             SiBox {
 
-                title: qsTr("Controls")
+                title: qsTr("X-Ray Control")
                 Layout.preferredWidth: 280
                 // Layout.fillWidth: true
                 spacing: Style.tinySpacing
@@ -110,7 +110,7 @@ SiAmInspectorWindow {
                 SiComboBoxControl {
 
                     Layout.fillWidth: true
-                    model: [qsTr("Off"), qsTr("DMA Debugger"), qsTr("Layers")]
+                    model: [qsTr("Off"), qsTr("DMA scan"), qsTr("Layer scan")]
                     currentIndex: cc.XRAY_MODE
                     onCurrentIndexChanged: cc.XRAY_MODE = currentIndex
                 }
@@ -122,7 +122,7 @@ SiAmInspectorWindow {
                 VSpacer {
 
                     visible: cc.XRAY_MODE !== xrayNone
-                    size: Style.mediumSpacing
+                    size: Style.smallSpacing
                 }
 
                 SiCheckBoxControl {
@@ -150,7 +150,7 @@ SiAmInspectorWindow {
                     visible: cc.XRAY_MODE !== xrayNone
                     indent: tab
                     Layout.fillWidth: true
-                    l: qsTr("Opacity")
+                    // l: qsTr("Opacity")
                     from: 0
                     to: 255
                     value: cc.XRAY_OVERLAY_OPACITY
@@ -179,7 +179,6 @@ SiAmInspectorWindow {
                 Layout.preferredWidth: 280
                 // Layout.fillWidth: true
                 Layout.fillHeight: true
-                padding: 0
 
                 ScrollView {
 
