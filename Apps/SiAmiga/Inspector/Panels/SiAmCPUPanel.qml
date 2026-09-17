@@ -65,44 +65,45 @@ SiAmInspectorWindow {
         padded: root.numPadded
     }
 
-    // A single status-register bit: a checkbox with its name below. Some
-    // SR bits don't exist on every 68k model (T0/M were added in the
-    // 68020) and four more are permanently unused padding on every model
-    // (see the Flags box below) -- 'unused' hides the checkbox and shows a
-    // dash instead of the label for those, while keeping the same
-    // footprint as a real flag so the row stays aligned column by column.
-    component FlagCheck: ColumnLayout {
+    // One status-register bit's checkbox (row 0/2 of the Flags grid below).
+    // Some SR bits don't exist on every 68k model (T0/M were added in the
+    // 68020) and four more are permanently unused padding on every model --
+    // 'unused' hides the checkbox but keeps the cell (and its width) so the
+    // grid stays aligned column by column.
+    component FlagBit: Item {
 
         property bool on: false
+        property bool unused: false
+
+        Layout.preferredWidth: 15
+        Layout.preferredHeight: check.implicitHeight
+        Layout.alignment: Qt.AlignHCenter
+
+        SiCheckBox {
+
+            id: check
+            size: Size.small
+            anchors.centerIn: parent
+            checked: parent.on
+            readOnly: true
+            visible: !parent.unused
+        }
+    }
+
+    // The label underneath a FlagBit (or a group of them). Every cell --
+    // checkbox or label -- shares the same Layout.preferredWidth, so all 16
+    // grid columns come out equally wide regardless of what's in them.
+    component FlagLabel: SiText {
+
         property string label: ""
         property bool unused: false
 
-        spacing: 1
-
-        Item {
-
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: check.implicitWidth
-            Layout.preferredHeight: check.implicitHeight
-
-            SiCheckBox {
-
-                id: check
-                size: Size.small
-                anchors.fill: parent
-                checked: on
-                readOnly: true
-                visible: !unused
-            }
-        }
-
-        SiText {
-
-            Layout.alignment: Qt.AlignHCenter
-            text: unused ? "-" : label
-            font.pixelSize: Style.tiny
-            color: unused ? Palette.disabled : Palette.primary
-        }
+        Layout.preferredWidth: 15
+        Layout.alignment: Qt.AlignHCenter
+        horizontalAlignment: Text.AlignHCenter
+        text: unused ? "-" : label
+        font.pixelSize: Style.tiny
+        color: unused ? Palette.disabled : Palette.primary
     }
 
     RowLayout {
@@ -296,80 +297,100 @@ SiAmInspectorWindow {
                 Layout.fillWidth: true
                 spacing: Style.tinySpacing
 
-                // A GridLayout's own implicit width is the sum of what its
-                // 16 columns naturally want -- Layout.fillWidth on a child
-                // only governs how it's stretched into extra room, it does
-                // NOT cap what that child contributes to an ancestor's
-                // implicit size. With Size.regular checkboxes and
-                // Style.smallSpacing gaps, 16 columns want more width than
-                // this 300px sidebar has, and since nothing here clips or
-                // caps that, the oversized implicit width silently
-                // propagates up through SiBox into the wrapping
-                // ColumnLayout and blows up the whole window's layout.
-                // Size.small checkboxes + tighter spacing keep the natural
-                // width under budget, and Layout.maximumWidth is a hard
-                // backstop against exactly that failure mode regardless.
+                // Four flat rows -- checkboxes, their labels, checkboxes
+                // again, their labels again -- instead of a checkbox+label
+                // pair per cell: every item (FlagBit or FlagLabel) shares
+                // the same Layout.preferredWidth, so all 16 columns come
+                // out equally wide and stay aligned across all four rows.
+                //
+                // Row 0/1: the 16-bit status register (MSB to LSB: [T/T1]
+                // T0 S M - I2 I1 I0 - - - X N Z V C, the dashes being
+                // padding bits that read as 0 on every 68k model). T0 and M
+                // only exist from the 68020 onward (root.below20).
+                //
+                // Row 2/3: the IPL/FC bus pins and the HLT signal, exactly
+                // as wide as the cells above, positioned under the SR
+                // columns they relate to -- these exist on every 68k model.
                 GridLayout {
 
                     Layout.alignment: Qt.AlignHCenter
-                    Layout.maximumWidth: 280
                     columns: 16
                     columnSpacing: Style.tinySpacing
                     rowSpacing: Style.tinySpacing
 
-                    FlagCheck { Layout.row: 0; Layout.column: 0;  on: cpu.t1; label: root.below20 ? "T" : "T1" }
-                    FlagCheck { Layout.row: 0; Layout.column: 1;  on: cpu.t0; label: "T0"; unused: root.below20 }
-                    FlagCheck { Layout.row: 0; Layout.column: 2;  on: cpu.s;  label: "S" }
-                    FlagCheck { Layout.row: 0; Layout.column: 3;  on: cpu.m;  label: "M"; unused: root.below20 }
-                    FlagCheck { Layout.row: 0; Layout.column: 4;  unused: true }
-                    FlagCheck { Layout.row: 0; Layout.column: 5;  on: cpu.i2; label: "I2" }
-                    FlagCheck { Layout.row: 0; Layout.column: 6;  on: cpu.i1; label: "I1" }
-                    FlagCheck { Layout.row: 0; Layout.column: 7;  on: cpu.i0; label: "I0" }
-                    FlagCheck { Layout.row: 0; Layout.column: 8;  unused: true }
-                    FlagCheck { Layout.row: 0; Layout.column: 9;  unused: true }
-                    FlagCheck { Layout.row: 0; Layout.column: 10; unused: true }
-                    FlagCheck { Layout.row: 0; Layout.column: 11; on: cpu.x;  label: "X" }
-                    FlagCheck { Layout.row: 0; Layout.column: 12; on: cpu.n;  label: "N" }
-                    FlagCheck { Layout.row: 0; Layout.column: 13; on: cpu.z;  label: "Z" }
-                    FlagCheck { Layout.row: 0; Layout.column: 14; on: cpu.v;  label: "V" }
-                    FlagCheck { Layout.row: 0; Layout.column: 15; on: cpu.c;  label: "C" }
+                    // No explicit Layout.row/Layout.column: with exactly 16
+                    // items per row, GridLayout's normal left-to-right,
+                    // top-to-bottom flow already lands each one in the
+                    // right cell -- an Item filler (same width as
+                    // FlagBit/FlagLabel) stands in wherever a column has no
+                    // flag of its own.
+                    FlagBit { on: cpu.t1 }
+                    FlagBit { on: cpu.t0; unused: root.below20 }
+                    FlagBit { on: cpu.s }
+                    FlagBit { on: cpu.m;  unused: root.below20 }
+                    FlagBit { unused: true }
+                    FlagBit { on: cpu.i2 }
+                    FlagBit { on: cpu.i1 }
+                    FlagBit { on: cpu.i0 }
+                    FlagBit { unused: true }
+                    FlagBit { unused: true }
+                    FlagBit { unused: true }
+                    FlagBit { on: cpu.x }
+                    FlagBit { on: cpu.n }
+                    FlagBit { on: cpu.z }
+                    FlagBit { on: cpu.v }
+                    FlagBit { on: cpu.c }
 
-                    SiCheckBox { size: Size.small; Layout.row: 1; Layout.column: 5;  Layout.alignment: Qt.AlignHCenter; checked: cpu.ipl2; readOnly: true }
-                    SiCheckBox { size: Size.small; Layout.row: 1; Layout.column: 6;  Layout.alignment: Qt.AlignHCenter; checked: cpu.ipl1; readOnly: true }
-                    SiCheckBox { size: Size.small; Layout.row: 1; Layout.column: 7;  Layout.alignment: Qt.AlignHCenter; checked: cpu.ipl0; readOnly: true }
-                    SiText {
+                    FlagLabel { label: root.below20 ? "T" : "T1" }
+                    FlagLabel { label: "T0"; unused: root.below20 }
+                    FlagLabel { label: "S" }
+                    FlagLabel { label: "M"; unused: root.below20 }
+                    FlagLabel { unused: true }
+                    FlagLabel { label: "I2" }
+                    FlagLabel { label: "I1" }
+                    FlagLabel { label: "I0" }
+                    FlagLabel { unused: true }
+                    FlagLabel { unused: true }
+                    FlagLabel { unused: true }
+                    FlagLabel { label: "X" }
+                    FlagLabel { label: "N" }
+                    FlagLabel { label: "Z" }
+                    FlagLabel { label: "V" }
+                    FlagLabel { label: "C" }
 
-                        Layout.row: 2; Layout.column: 5; Layout.columnSpan: 3
-                        Layout.fillWidth: true
-                        horizontalAlignment: Text.AlignHCenter
-                        text: qsTr("IPL")
-                        font.pixelSize: Style.tiny
-                        color: Palette.primary
-                    }
+                    Item { Layout.preferredWidth: 15 }
+                    Item { Layout.preferredWidth: 15 }
+                    Item { Layout.preferredWidth: 15 }
+                    Item { Layout.preferredWidth: 15 }
+                    Item { Layout.preferredWidth: 15 }
+                    FlagBit { on: cpu.ipl2 }
+                    FlagBit { on: cpu.ipl1 }
+                    FlagBit { on: cpu.ipl0 }
+                    Item { Layout.preferredWidth: 15 }
+                    Item { Layout.preferredWidth: 15 }
+                    Item { Layout.preferredWidth: 15 }
+                    FlagBit { on: cpu.fc2 }
+                    FlagBit { on: cpu.fc1 }
+                    FlagBit { on: cpu.fc0 }
+                    FlagBit { on: controller.info.halt }
+                    Item { Layout.preferredWidth: 15 }
 
-                    SiCheckBox { size: Size.small; Layout.row: 1; Layout.column: 11; Layout.alignment: Qt.AlignHCenter; checked: cpu.fc2; readOnly: true }
-                    SiCheckBox { size: Size.small; Layout.row: 1; Layout.column: 12; Layout.alignment: Qt.AlignHCenter; checked: cpu.fc1; readOnly: true }
-                    SiCheckBox { size: Size.small; Layout.row: 1; Layout.column: 13; Layout.alignment: Qt.AlignHCenter; checked: cpu.fc0; readOnly: true }
-                    SiText {
-
-                        Layout.row: 2; Layout.column: 11; Layout.columnSpan: 3
-                        Layout.fillWidth: true
-                        horizontalAlignment: Text.AlignHCenter
-                        text: qsTr("FC")
-                        font.pixelSize: Style.tiny
-                        color: Palette.primary
-                    }
-
-                    SiCheckBox { size: Size.small; Layout.row: 1; Layout.column: 14; Layout.columnSpan: 2; Layout.alignment: Qt.AlignHCenter; checked: controller.info.halt; readOnly: true }
-                    SiText {
-
-                        Layout.row: 2; Layout.column: 14; Layout.columnSpan: 2
-                        Layout.fillWidth: true
-                        horizontalAlignment: Text.AlignHCenter
-                        text: qsTr("HLT")
-                        font.pixelSize: Style.tiny
-                        color: Palette.primary
-                    }
+                    Item { Layout.preferredWidth: 15 }
+                    Item { Layout.preferredWidth: 15 }
+                    Item { Layout.preferredWidth: 15 }
+                    Item { Layout.preferredWidth: 15 }
+                    Item { Layout.preferredWidth: 15 }
+                    FlagLabel { Layout.columnSpan: 3; label: "IPL" }
+                    // Item { Layout.preferredWidth: 15 }
+                    // Item { Layout.preferredWidth: 15 }
+                    Item { Layout.preferredWidth: 15 }
+                    Item { Layout.preferredWidth: 15 }
+                    Item { Layout.preferredWidth: 15 }
+                    FlagLabel { Layout.columnSpan: 3; label: "FC" }
+                    // Item { Layout.preferredWidth: 15 }
+                    // Item { Layout.preferredWidth: 15 }
+                    FlagLabel { label: "HLT" }
+                    Item { Layout.preferredWidth: 15 }
                 }
 
                 VSpacer { }
