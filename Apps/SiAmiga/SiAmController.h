@@ -26,7 +26,7 @@
 #include "Inspector/SiAmBlitterController.h"
 #include "Inspector/SiAmAgnusController.h"
 #include "Inspector/SiAmPaulaController.h"
-#include "Inspector/SiAmBusController.h"
+#include "Inspector/SiAmLogicAnalyzerController.h"
 #include "Inspector/SiAmLayersController.h"
 #include "Inspector/SiAmCPUController.h"
 #include "Inspector/SiAmDeniseController.h"
@@ -73,7 +73,7 @@ class SiAmController : public Controller {
     unique_ptr<SiAmBlitterController> m_blitterController;
     unique_ptr<SiAmAgnusController> m_agnusController;
     unique_ptr<SiAmPaulaController> m_paulaController;
-    unique_ptr<SiAmBusController> m_busController;
+    unique_ptr<SiAmLogicAnalyzerController> m_logicAnalyzerController;
     unique_ptr<SiAmLayersController> m_layersController;
     unique_ptr<SiAmCPUController> m_cpuController;
     unique_ptr<SiAmDeniseController> m_deniseController;
@@ -279,7 +279,7 @@ public:
     Q_PROPERTY(SiAmBlitterController *blitterController READ getBlitterController CONSTANT)
     Q_PROPERTY(SiAmAgnusController *agnusController READ getAgnusController CONSTANT)
     Q_PROPERTY(SiAmPaulaController *paulaController READ getPaulaController CONSTANT)
-    Q_PROPERTY(SiAmBusController *busController READ getBusController CONSTANT)
+    Q_PROPERTY(SiAmLogicAnalyzerController *logicAnalyzerController READ getLogicAnalyzerController CONSTANT)
     Q_PROPERTY(SiAmLayersController *layersController READ getLayersController CONSTANT)
     Q_PROPERTY(SiAmCPUController *cpuController READ getCPUController CONSTANT)
     Q_PROPERTY(SiAmDeniseController *deniseController READ getDeniseController CONSTANT)
@@ -299,7 +299,7 @@ public:
     SiAmBlitterController *getBlitterController() const { return m_blitterController.get(); }
     SiAmAgnusController *getAgnusController() const { return m_agnusController.get(); }
     SiAmPaulaController *getPaulaController() const { return m_paulaController.get(); }
-    SiAmBusController *getBusController() const { return m_busController.get(); }
+    SiAmLogicAnalyzerController *getLogicAnalyzerController() const { return m_logicAnalyzerController.get(); }
     SiAmLayersController *getLayersController() const { return m_layersController.get(); }
     SiAmCPUController *getCPUController() const { return m_cpuController.get(); }
     SiAmDeniseController *getDeniseController() const { return m_deniseController.get(); }

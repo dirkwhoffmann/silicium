@@ -98,7 +98,7 @@ SiAmRenderer::tick()
     controller->getCopperController()->tick();
     controller->getBlitterController()->tick();
     controller->getPaulaController()->tick();
-    controller->getBusController()->tick();
+    controller->getLogicAnalyzerController()->tick();
     controller->getCPUController()->tick();
     controller->getDeniseController()->tick();
     controller->getPortController()->tick();

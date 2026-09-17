@@ -212,8 +212,8 @@ ApplicationWindow {
         configWindowRef: configWindow
         keyboardWindowRef: keyboardWindow
         cpuInspectorRef: cpuInspectorWindow
-        busInspectorRef: busInspectorWindow
-        layersInspectorRef: layersInspectorWindow
+        logicAnalyzerRef: logicAnalyzerWindow
+        xrayScannerRef: xrayScannerWindow
         ciaInspectorRef: ciaInspectorWindow
         memoryInspectorRef: memoryInspectorWindow
         agnusInspectorRef: agnusInspectorWindow
@@ -283,16 +283,16 @@ ApplicationWindow {
         actions: root.actions
     }
 
-    SiAmBusPanel {
+    SiAmLogicAnalyzerPanel {
 
-        id: busInspectorWindow
+        id: logicAnalyzerWindow
         controller: root.amiga
         actions: root.actions
     }
 
     SiAmXRayPanel {
 
-        id: layersInspectorWindow
+        id: xrayScannerWindow
         controller: root.amiga
         actions: root.actions
     }

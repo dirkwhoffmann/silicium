@@ -248,10 +248,10 @@ ToolBar {
 
                     }
                     SiMenuItem {
-                        action: root.window.actions.openBusInspector
+                        action: root.window.actions.openLogicAnalyzer
                     }
                     SiMenuItem {
-                        action: root.window.actions.openLayersInspector
+                        action: root.window.actions.openXRayScanner
                     }
                 }
             }

@@ -15,7 +15,7 @@ import Silicium.Preferences
 //
 // Central definition of all SiAmiga window actions. Port of SiC64Actions.qml,
 // trimmed to what SiAmiga actually has: the per-panel inspector actions
-// below (openCPUInspector, openBusInspector, ...) mirror C64Actions' own
+// below (openCPUInspector, openLogicAnalyzer, ...) mirror C64Actions' own
 // set one-for-one, each raising its own top-level window (see
 // SiAmInspectorWindow.qml) so several inspectors can stay open side by
 // side, exactly like SiC64. No saveWorkspace/saveSnapshot/loadSnapshot or
@@ -40,8 +40,8 @@ Item {
     required property var configWindowRef
     required property var keyboardWindowRef
     required property var cpuInspectorRef
-    required property var busInspectorRef
-    required property var layersInspectorRef
+    required property var logicAnalyzerRef
+    required property var xrayScannerRef
     required property var ciaInspectorRef
     required property var memoryInspectorRef
     required property var agnusInspectorRef
@@ -54,8 +54,8 @@ Item {
 
     property alias config: configAction
     property alias openCPUInspector: openCPUInspectorAction
-    property alias openBusInspector: openBusInspectorAction
-    property alias openLayersInspector: openLayersInspectorAction
+    property alias openLogicAnalyzer: openLogicAnalyzerAction
+    property alias openXRayScanner: openXRayScannerAction
     property alias openCIAInspector: openCIAInspectorAction
     property alias openMemoryInspector: openMemoryInspectorAction
     property alias openAgnusInspector: openAgnusInspectorAction
@@ -114,27 +114,27 @@ Item {
 
     Action {
 
-        id: openBusInspectorAction
-        text: qsTr("Bus...")
+        id: openLogicAnalyzerAction
+        text: qsTr("Logic Analyzer...")
         icon.name: "cable"
         onTriggered: {
 
-            busInspectorRef.show()
-            busInspectorRef.raise()
-            busInspectorRef.requestActivate()
+            logicAnalyzerRef.show()
+            logicAnalyzerRef.raise()
+            logicAnalyzerRef.requestActivate()
         }
     }
 
     Action {
 
-        id: openLayersInspectorAction
-        text: qsTr("Layers...")
+        id: openXRayScannerAction
+        text: qsTr("XRay...")
         icon.name: "stack"
         onTriggered: {
 
-            layersInspectorRef.show()
-            layersInspectorRef.raise()
-            layersInspectorRef.requestActivate()
+            xrayScannerRef.show()
+            xrayScannerRef.raise()
+            xrayScannerRef.requestActivate()
         }
     }
 

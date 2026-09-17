@@ -14,7 +14,7 @@ import Silicium.Components
 import Silicium.Controllers
 import Silicium.Theme
 
-// The X-Ray box that used to live in SiAmBusPanel.qml, paired with a live
+// The X-Ray box that used to live in SiAmLogicAnalyzerPanel.qml, paired with a live
 // preview -- same split as SiC64BusPanel.qml's "DMA Channels" + "Preview"
 // boxes, including the same "Show as overlay" toggle: the X-Ray debugger
 // always paints its raw visualization into its own texture (PixelEngine::

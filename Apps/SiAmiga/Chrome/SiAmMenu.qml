@@ -417,10 +417,10 @@ SiMenuBar {
                 action: window.actions.openCPUInspector
             }
             SiMenuItem {
-                action: window.actions.openBusInspector
+                action: window.actions.openLogicAnalyzer
             }
             SiMenuItem {
-                action: window.actions.openLayersInspector
+                action: window.actions.openXRayScanner
             }
             SiMenuItem {
                 action: window.actions.openCIAInspector

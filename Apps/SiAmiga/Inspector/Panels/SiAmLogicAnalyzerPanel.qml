@@ -27,10 +27,10 @@ SiAmInspectorWindow {
 
     id: root
 
-    title: qsTr("Bus Inspector")
-    currentController: controller.busController
+    title: qsTr("Logic Analyzer")
+    currentController: controller.logicAnalyzerController
 
-    readonly property var bus: controller.busController
+    readonly property var logicAnalyzer: controller.logicAnalyzerController
     readonly property var ic: controller.inspectorController
 
     property real zoom: 1
@@ -66,7 +66,7 @@ SiAmInspectorWindow {
 
             id: presetButton
             Layout.preferredWidth: 110
-            text: (root.configVersion, root.bus.probeLabel(sel.channel))
+            text: (root.configVersion, root.logicAnalyzer.probeLabel(sel.channel))
 
             onClicked: presetMenu.popup()
 
@@ -76,7 +76,7 @@ SiAmInspectorWindow {
 
                 Instantiator {
 
-                    model: root.bus.presetModel()
+                    model: root.logicAnalyzer.presetModel()
 
                     delegate: Loader {
 
@@ -94,7 +94,7 @@ SiAmInspectorWindow {
                             id: itemComp
                             MenuItem {
                                 text: modelData.name
-                                onTriggered: root.bus.selectPreset(sel.channel, index)
+                                onTriggered: root.logicAnalyzer.selectPreset(sel.channel, index)
                             }
                         }
                     }
@@ -112,7 +112,7 @@ SiAmInspectorWindow {
             selectByMouse: true
 
             onAccepted: {
-                if (root.bus.selectAddress(sel.channel, text)) text = ""
+                if (root.logicAnalyzer.selectAddress(sel.channel, text)) text = ""
             }
         }
     }

@@ -15,14 +15,14 @@
 #include <QVariantList>
 
 //
-// Bus inspector controller -- port of vAmiga's own GUI/Inspector/
+// Logic analyzer controller -- port of vAmiga's own GUI/Inspector/
 // BusPanel.swift (the non-drawing half; the timing-diagram grid itself is
 // SiAmLogicView, a QQuickPaintedItem, since that's a drawing job rather
 // than a data-controller one). Owns the four probe-selector "Connect..."
 // menus (LA_PROBE0..3 / LA_ADDR0..3, read/written through
 // SiAmConfigController) and their preset list, which Swift builds as an
 // NSMenu off Inspector.presets -- exposed here as a plain QVariantList so
-// SiAmBusPanel.qml can build the equivalent with a Menu/Repeater.
+// SiAmLogicAnalyzerPanel.qml can build the equivalent with a Menu/Repeater.
 //
 // The DMA Debugger box (DMA_DEBUG_* options) needs no controller of its
 // own -- it's plain option reads/writes, already exposed by
@@ -38,18 +38,18 @@
 
 class SiAmController;
 
-class SiAmBusController : public SiAmInspectorController {
+class SiAmLogicAnalyzerController : public SiAmInspectorController {
 
     Q_OBJECT
 
   public:
 
-    explicit SiAmBusController(SiAmController *parent = nullptr);
+    explicit SiAmLogicAnalyzerController(SiAmController *parent = nullptr);
 
     // The preset list a probe-selector menu offers, in order -- each entry
     // is {name: string, separator: bool}. Mirrors Inspector.presets
     // (BusPanel.swift), minus the trailing separator that precedes Swift's
-    // embedded free-text field there (SiAmBusPanel.qml has its own address
+    // embedded free-text field there (SiAmLogicAnalyzerPanel.qml has its own address
     // field per channel instead, not folded into the menu).
     Q_INVOKABLE QVariantList presetModel() const;
 

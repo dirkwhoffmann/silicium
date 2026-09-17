@@ -62,7 +62,7 @@ SiAmController::SiAmController()
     m_blitterController = make_unique<SiAmBlitterController>(this);
     m_agnusController = make_unique<SiAmAgnusController>(this);
     m_paulaController = make_unique<SiAmPaulaController>(this);
-    m_busController = make_unique<SiAmBusController>(this);
+    m_logicAnalyzerController = make_unique<SiAmLogicAnalyzerController>(this);
     m_layersController = make_unique<SiAmLayersController>(this);
     m_cpuController = make_unique<SiAmCPUController>(this);
     m_deniseController = make_unique<SiAmDeniseController>(this);

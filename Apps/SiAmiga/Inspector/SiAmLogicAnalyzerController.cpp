@@ -7,14 +7,14 @@
 // See https://www.gnu.org for license information
 // -----------------------------------------------------------------------------
 
-#include "SiAmBusController.h"
+#include "SiAmLogicAnalyzerController.h"
 #include "SiAmController.h"
 
 using namespace vamiga;
 
 // Mirrors Inspector.presets (BusPanel.swift), separators marked by a null
 // name.
-const SiAmBusController::Preset SiAmBusController::presets[] = {
+const SiAmLogicAnalyzerController::Preset SiAmLogicAnalyzerController::presets[] = {
 
     { "None",     Probe::NONE,   false, 0 },
     { nullptr,    Probe::NONE,   false, 0 },
@@ -38,14 +38,14 @@ const SiAmBusController::Preset SiAmBusController::presets[] = {
     { "IPL",      Probe::IPL,    false, 0 },
 };
 
-SiAmBusController::SiAmBusController(SiAmController *parent)
+SiAmLogicAnalyzerController::SiAmLogicAnalyzerController(SiAmController *parent)
     : SiAmInspectorController(parent)
 {
 
 }
 
 QVariantList
-SiAmBusController::presetModel() const
+SiAmLogicAnalyzerController::presetModel() const
 {
     QVariantList list;
 
@@ -60,7 +60,7 @@ SiAmBusController::presetModel() const
 }
 
 void
-SiAmBusController::selectPreset(int channel, int index)
+SiAmLogicAnalyzerController::selectPreset(int channel, int index)
 {
     if (channel < 0 || channel > 3 || index < 0 || index >= numPresets) return;
 
@@ -78,7 +78,7 @@ SiAmBusController::selectPreset(int channel, int index)
 }
 
 bool
-SiAmBusController::selectAddress(int channel, const QString &hex)
+SiAmLogicAnalyzerController::selectAddress(int channel, const QString &hex)
 {
     if (channel < 0 || channel > 3) return false;
 
@@ -101,7 +101,7 @@ SiAmBusController::selectAddress(int channel, const QString &hex)
 }
 
 QString
-SiAmBusController::probeLabel(int channel) const
+SiAmLogicAnalyzerController::probeLabel(int channel) const
 {
     if (channel < 0 || channel > 3) return QString();
 
