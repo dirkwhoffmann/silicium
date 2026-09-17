@@ -252,14 +252,21 @@ SiAmInspectorWindow {
                         readonly property var info: controller.info
 
                         SiHex32 { l: qsTr("PC"); lwidth: parent.lw; value: controller.info.pc }
+                        Item { }
+
                         SiHex16 { l: qsTr("IRD"); lwidth: parent.lw; value: cpu.ird }
                         SiHex16 { l: qsTr("IRC"); lwidth: parent.lw; value: cpu.irc }
                         SiHex32 { l: qsTr("ISP"); lwidth: parent.lw; value: cpu.isp }
                         SiHex32 { l: qsTr("USP"); lwidth: parent.lw; value: cpu.usp }
+
                         SiHex32 { l: qsTr("MSP"); lwidth: parent.lw; value: cpu.msp; visible: !root.below20 }
+                        Item { visible: !root.below20 }
+
                         SiHex32 { l: qsTr("VBR"); lwidth: parent.lw; value: cpu.vbr; visible: !root.below10 }
                         SiHex16 { l: qsTr("SFC"); lwidth: parent.lw; value: cpu.sfc; visible: !root.below10 }
                         SiHex16 { l: qsTr("DFC"); lwidth: parent.lw; value: cpu.dfc; visible: !root.below10 }
+                        Item { visible: !root.below10 }
+
                         SiHex32 { l: qsTr("CACR"); lwidth: parent.lw; value: cpu.cacr; visible: !root.below20 }
                         SiHex32 { l: qsTr("CAAR"); lwidth: parent.lw; value: cpu.caar; visible: !root.below20 }
 
