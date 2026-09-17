@@ -30,13 +30,6 @@ SiAmPaulaController::intBitLabel(int n) const
     return n >= 0 && n < 15 ? QString(labels[n]) : QString();
 }
 
-QString
-SiAmPaulaController::fifoAt(int i) const
-{
-    if (i < 0 || i >= m_fifoCount || i >= 6) return QString();
-    return formatNumber(m_fifo[i], 2);
-}
-
 void
 SiAmPaulaController::refreshData()
 {

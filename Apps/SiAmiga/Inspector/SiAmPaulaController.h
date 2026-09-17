@@ -115,10 +115,11 @@ class SiAmPaulaController : public SiAmInspectorController {
     Q_PROPERTY(int dsksync READ dsksync NOTIFY paulaChanged)
     Q_PROPERTY(bool dsksyncWarning READ dsksyncWarning NOTIFY paulaChanged)
 
-    // FIFO byte 'i' (0..5), formatted, or "" once i reaches fifoCount --
-    // mirrors the Swift reference's cascading-fallthrough show/clear logic.
+    // FIFO byte 'i' (0..5); the QML side hides slots once i reaches
+    // fifoCount -- mirrors the Swift reference's cascading-fallthrough
+    // show/clear logic.
     Q_PROPERTY(int fifoCount READ fifoCount NOTIFY paulaChanged)
-    Q_INVOKABLE QString fifoAt(int i) const;
+    Q_INVOKABLE int fifoValueAt(int i) const { return i >= 0 && i < 6 ? m_fifo[i] : 0; }
 
     // Audio channel 'ch' (0..3) registers.
     Q_INVOKABLE int audioLen(int ch) const { return ch >= 0 && ch < 4 ? m_audLen[ch] : 0; }

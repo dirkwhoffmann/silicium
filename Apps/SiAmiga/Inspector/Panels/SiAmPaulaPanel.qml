@@ -68,28 +68,6 @@ SiAmInspectorWindow {
         readOnly: true
     }
 
-    // A single FIFO byte slot -- blank once its index reaches
-    // paula.fifoCount, unlike SiHex8 (which always shows a formatted
-    // number) -- see SiAmPaulaController::fifoAt().
-    component FifoCell: Rectangle {
-
-        property string value: ""
-
-        implicitWidth: 36
-        implicitHeight: Size.controlHeight(Size.small)
-        radius: 4
-        color: Palette.control
-        border.width: 1
-        border.color: Palette.controlBorder
-
-        SiText {
-            anchors.centerIn: parent
-            text: parent.value
-            font.family: Fonts.mono
-            font.weight: 500
-        }
-    }
-
     // Five-node DMA state-machine diagram -- one of five pre-rendered
     // template images (see the class comment), picked by currentState (0,
     // 1, 2, 3 or 5 -- anything else falls back to the idle/state0 image).
@@ -101,8 +79,8 @@ SiAmInspectorWindow {
 
         property int currentState: 0
 
-        implicitWidth: 0 // 150
-        implicitHeight: 0 // 150
+        implicitWidth: 0
+        implicitHeight: 0
         Layout.fillWidth: true
         Layout.fillHeight: true
 
@@ -173,7 +151,7 @@ SiAmInspectorWindow {
                     Layout.alignment: Qt.AlignHCenter
                     columns: 2
                     columnSpacing: Style.largeSpacing
-                    rowSpacing: Style.tinySpacing
+                    rowSpacing: 0 // Style.tinySpacing
 
                     // INTENA/INTREQ header, embedded into a single
                     // SiHex16 the same way SiAmCIAPanel's Mask/
@@ -301,6 +279,10 @@ SiAmInspectorWindow {
 
             SiBox {
 
+                id: dc
+
+                readonly property int lw: 80
+
                 title: qsTr("Disk Controller")
                 Layout.preferredWidth: root.columnWidth
                 Layout.fillWidth: true
@@ -350,71 +332,64 @@ SiAmInspectorWindow {
                         rowSpacing: Style.tinySpacing
 
                         SiHex16 {
-                            l: qsTr("DSKLEN"); lwidth: 90; value: paula.dsklen
+                            l: qsTr("DSKLEN"); lwidth: dc.lw; value: paula.dsklen
                         }
                         SiHex8 {
-                            l: qsTr("ADKCON HI"); lwidth: 90; value: paula.adkconHi
+                            l: qsTr("ADKCON HI"); lwidth: dc.lw; value: paula.adkconHi
                         }
 
                         SiBitViewControl {
-                            readOnly: true; checked: paula.dmaen; l: qsTr("DMAEN"); lwidth: 90
+                            checked: paula.dmaen; l: qsTr("DMAEN"); lwidth: dc.lw
                         }
                         SiBitViewControl {
-                            readOnly: true; checked: paula.precomp1; l: qsTr("PRECOMP1"); lwidth: 90
+                            checked: paula.precomp1; l: qsTr("PRECOMP1"); lwidth: dc.lw
                         }
 
                         SiBitViewControl {
-                            readOnly: true; checked: paula.write; l: qsTr("WRITE"); lwidth: 90
+                            checked: paula.write; l: qsTr("WRITE"); lwidth: dc.lw
                         }
                         SiBitViewControl {
-                            readOnly: true; checked: paula.precomp0; l: qsTr("PRECOMP0"); lwidth: 90
+                            checked: paula.precomp0; l: qsTr("PRECOMP0"); lwidth: dc.lw
+                        }
+
+                        SiHex16 {
+                            l: qsTr("DSKBYTE"); lwidth: dc.lw; value: paula.dskbytr
+                        }
+                        SiBitViewControl {
+                            checked: paula.mfmprec; l: qsTr("MFMPREC"); lwidth: dc.lw
+                        }
+
+                        SiBitViewControl {
+                            checked: paula.byteready; l: qsTr("BYTEREADY"); lwidth: dc.lw
+                        }
+                        SiBitViewControl {
+                            checked: paula.uartbrk; l: qsTr("UARTBRK"); lwidth: dc.lw
+                        }
+
+                        SiBitViewControl {
+                            checked: paula.dmaon; l: qsTr("DMAON"); lwidth: dc.lw
+                        }
+                        SiBitViewControl {
+                            checked: paula.wordsync; l: qsTr("WORDSYNC"); lwidth: dc.lw
+                        }
+
+                        SiBitViewControl {
+                            checked: paula.diskwrite; l: qsTr("DISKWRITE"); lwidth: dc.lw
+                        }
+                        SiBitViewControl {
+                            checked: paula.msbsync; l: qsTr("MSBSYNC"); lwidth: dc.lw
+                        }
+
+                        SiBitViewControl {
+                            checked: paula.wordequal; l: qsTr("WORDEQUAL"); lwidth: dc.lw
+                        }
+                        SiBitViewControl {
+                            checked: paula.fast; l: qsTr("FAST"); lwidth: dc.lw
                         }
 
                         SiHex16 {
-                            l: qsTr("DSKBYTE"); lwidth: 90; value: paula.dskbytr
+                            l: qsTr("DSKSYNC"); value: paula.dsksync; lwidth: dc.lw
                         }
-                        SiBitViewControl {
-                            readOnly: true; checked: paula.mfmprec; l: qsTr("MFMPREC"); lwidth: 90
-                        }
-
-                        SiBitViewControl {
-                            readOnly: true; checked: paula.byteready; l: qsTr("BYTEREADY"); lwidth: 90
-                        }
-                        SiBitViewControl {
-                            readOnly: true; checked: paula.uartbrk; l: qsTr("UARTBRK"); lwidth: 90
-                        }
-
-                        SiBitViewControl {
-                            readOnly: true; checked: paula.dmaon; l: qsTr("DMAON"); lwidth: 90
-                        }
-                        SiBitViewControl {
-                            readOnly: true; checked: paula.wordsync; l: qsTr("WORDSYNC"); lwidth: 90
-                        }
-
-                        SiBitViewControl {
-                            readOnly: true; checked: paula.diskwrite; l: qsTr("DISKWRITE"); lwidth: 90
-                        }
-                        SiBitViewControl {
-                            readOnly: true; checked: paula.msbsync; l: qsTr("MSBSYNC"); lwidth: 90
-                        }
-
-                        SiBitViewControl {
-                            readOnly: true; checked: paula.wordequal; l: qsTr("WORDEQUAL"); lwidth: 90
-                        }
-                        SiBitViewControl {
-                            readOnly: true; checked: paula.fast; l: qsTr("FAST"); lwidth: 90
-                        }
-                    }
-
-                    RowLayout {
-
-                        Layout.topMargin: Style.smallSpacing
-                        spacing: Style.tinySpacing
-
-                        SiHex16 {
-                            l: qsTr("DSKSYNC"); lwidth: 65; value: paula.dsksync
-                        }
-
                         SiText {
                             visible: paula.dsksyncWarning
                             text: qsTr("(expected 4489)")
@@ -427,23 +402,25 @@ SiAmInspectorWindow {
                         Layout.topMargin: Style.mediumSpacing
                         Layout.fillWidth: true
                         title: qsTr("FIFO Buffer")
-                        color: Palette.control
-                        borderColor: Palette.controlBorder
+                        // color: Palette.control
+                        // borderColor: Palette.controlBorder
 
                         RowLayout {
 
                             Layout.alignment: Qt.AlignHCenter
-                            spacing: Style.smallSpacing
+                            spacing: Style.tinySpacing
 
                             SiText {
                                 text: "→"
+                                DebugRect {}
                             }
 
                             Repeater {
                                 model: 6
-                                FifoCell {
+                                SiHex8 {
                                     required property int index
-                                    value: paula.fifoAt(index)
+                                    hide: index >= paula.fifoCount
+                                    value: paula.fifoValueAt(index)
                                 }
                             }
 
@@ -478,7 +455,7 @@ SiAmInspectorWindow {
 
                         Layout.alignment: Qt.AlignHCenter
                         columns: 5
-                        columnSpacing: Style.tinySpacing
+                        columnSpacing: Style.mediumSpacing
                         rowSpacing: Style.tinySpacing
 
                         // Transposed from the register-per-row layout this
