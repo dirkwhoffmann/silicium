@@ -277,6 +277,13 @@ SiAmInspectorWindow {
             // Disk Controller
             //
 
+            ColumnLayout {
+
+                Layout.preferredWidth: root.columnWidth
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                spacing: Style.largeSpacing
+
             SiBox {
 
                 id: dc
@@ -284,7 +291,6 @@ SiAmInspectorWindow {
                 readonly property int lw: 80
 
                 title: qsTr("Disk Controller")
-                Layout.preferredWidth: root.columnWidth
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 spacing: Style.mediumSpacing
@@ -396,40 +402,42 @@ SiAmInspectorWindow {
                             color: "#E0A030"
                         }
                     }
+                }
+            }
 
-                    SiBox {
+            // A separate SiBox (rather than nested inside Disk Controller,
+            // as it used to be) so it doesn't stretch along with it -- the
+            // Disk Controller box above fills the column's remaining
+            // height, this one stays sized to its own content.
+            SiBox {
 
-                        Layout.topMargin: Style.mediumSpacing
-                        Layout.fillWidth: true
-                        title: qsTr("FIFO Buffer")
-                        // color: Palette.control
-                        // borderColor: Palette.controlBorder
+                Layout.fillWidth: true
+                title: qsTr("FIFO Buffer")
 
-                        RowLayout {
+                RowLayout {
 
-                            Layout.alignment: Qt.AlignHCenter
-                            spacing: Style.tinySpacing
+                    Layout.alignment: Qt.AlignHCenter
+                    spacing: Style.tinySpacing
 
-                            SiText {
-                                text: "→"
-                                DebugRect {}
-                            }
+                    SiText {
+                        text: "→"
+                        DebugRect {}
+                    }
 
-                            Repeater {
-                                model: 6
-                                SiHex8 {
-                                    required property int index
-                                    hide: index >= paula.fifoCount
-                                    value: paula.fifoValueAt(index)
-                                }
-                            }
-
-                            SiText {
-                                text: "→"
-                            }
+                    Repeater {
+                        model: 6
+                        SiHex8 {
+                            required property int index
+                            hide: index >= paula.fifoCount
+                            value: paula.fifoValueAt(index)
                         }
                     }
+
+                    SiText {
+                        text: "→"
+                    }
                 }
+            }
             }
 
             //
