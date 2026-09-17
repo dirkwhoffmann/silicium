@@ -96,15 +96,23 @@ SiAmInspectorWindow {
 
         ColumnLayout {
 
-            // Layout.preferredWidth: 280
+            // A ColumnLayout whose only children are SiBoxes has no
+            // implicit width of its own, and Qt Quick Layouts defaults
+            // Layout.fillWidth to true for exactly that case -- so without
+            // fillWidth:false pinning it down, this column doesn't stay at
+            // its preferredWidth, it grabs a share of the RowLayout's
+            // left-over space instead, growing well past 280px and
+            // squeezing the Preview box (see SiAmCPUPanel.qml's Registers/
+            // Flags column for the same fix, found the same way).
+            Layout.preferredWidth: 280
+            Layout.fillWidth: false
             Layout.fillHeight: true
             spacing: Style.mediumSpacing
 
             SiBox {
 
                 title: qsTr("X-Ray Control")
-                Layout.preferredWidth: 280
-                // Layout.fillWidth: true
+                Layout.fillWidth: true
                 spacing: Style.tinySpacing
 
                 SiComboBoxControl {
@@ -176,8 +184,7 @@ SiAmInspectorWindow {
 
                 title: qsTr("Channels")
                 visible: cc.XRAY_MODE !== xrayNone
-                Layout.preferredWidth: 280
-                // Layout.fillWidth: true
+                Layout.fillWidth: true
                 Layout.fillHeight: true
 
                 ScrollView {
