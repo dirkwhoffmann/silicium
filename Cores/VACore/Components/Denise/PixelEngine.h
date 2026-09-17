@@ -434,16 +434,34 @@ private:
 
 public:
 
-    /* Merges previously computed xray-texture pixels into the emulator
-     * texture wherever an X-Ray effect is present, indicated by a value
-     * other than Texture::black, provided Opt::XRAY_OVERLAY is enabled
-     * (a no-op otherwise). Both XRayMode::XRAY_DMA (DmaDebugger::
-     * computeOverlay) and XRayMode::XRAY_LAYERS (hide) build their own
-     * "ready to merge" effect pixels into the xray texture and then call
-     * this identical function to blend them into the real picture -- the
-     * mode-specific code never writes to the emulator texture itself.
+    /* Merges the active xray texture into the active emulator texture for
+     * the entire frame in one pass, called once from swapBuffers right
+     * before the frame is presented -- now that both XRayMode::XRAY_DMA
+     * (DmaDebugger::computeOverlay) and XRayMode::XRAY_LAYERS (hide) build
+     * their xray texture in full over the course of the frame without
+     * touching the emulator texture themselves, there's no need to merge
+     * line-by-line/chunk-by-chunk as each was computed.
+     *
+     * A no-op unless Opt::XRAY_OVERLAY is enabled. Otherwise, applies the
+     * Opt::XRAY_OVERLAY_OPACITY/XRAY_OVERLAY_STYLE-derived fgWeight/
+     * bgWeight blend uniformly to whichever mode built the xray texture:
+     * wherever it holds an effect pixel (anything other than
+     * Texture::black), mixes it with the corresponding emulator pixel by
+     * fgWeight; everywhere else, shades the emulator pixel by bgWeight
+     * (zero -- a no-op -- unless XRAY_OVERLAY_STYLE is BG_LAYER or
+     * ODD_EVEN_LAYERS). This is exactly the blending DmaDebugger::
+     * computeOverlay used to do internally; moving it here is what makes
+     * XRayMode::XRAY_LAYERS' cutout respect the opacity slider too.
+     *
+     * Dispatches once (per call, not per pixel) to the templated overload
+     * below, matching the host's current HOST_TEX_FORMAT -- see
+     * DmaDebugger::computeOverlay's class comment for why.
      */
-    void mergeXray(Texel *emuPtr, const Texel *xrayPtr, isize count);
+    void mergeXray();
+
+private:
+
+    template <TexelFormat F> void mergeXray();
 
 
     //

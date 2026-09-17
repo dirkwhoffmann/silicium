@@ -469,6 +469,11 @@ PixelEngine::swapBuffers()
 {
     emulator.lockTexture();
 
+    // Merge the xray texture into the just-finished frame before it
+    // becomes the new stable buffer -- see mergeXray for why this now
+    // happens once per frame instead of line-by-line/chunk-by-chunk.
+    mergeXray();
+
     videoPort.buffersWillSwap();
 
     isize oldActiveBuffer = activeBuffer;
@@ -855,12 +860,80 @@ PixelEngine::removeBorderOverSprites(Pixel from, Pixel to)
 }
 
 void
-PixelEngine::mergeXray(Texel *emuPtr, const Texel *xrayPtr, isize count)
+PixelEngine::mergeXray()
 {
-    if (!dmaDebugger.getConfig().overlay) return;
+    // Dispatched once per call (not per pixel) -- see the declaration's
+    // comment in PixelEngine.h.
+    switch (static_cast<TexelFormat>(host.getConfig().texFormat)) {
 
-    for (isize i = 0; i < count; i++) {
-        if (xrayPtr[i] != Texture::black) emuPtr[i] = xrayPtr[i];
+        case TexelFormat::ABGR: mergeXray<TexelFormat::ABGR>(); return;
+        case TexelFormat::ARGB: mergeXray<TexelFormat::ARGB>(); return;
+
+        default: // RGBA
+            mergeXray<TexelFormat::RGBA>(); return;
+    }
+}
+
+template <TexelFormat F>
+void
+PixelEngine::mergeXray()
+{
+    auto &config = dmaDebugger.getConfig();
+    if (!config.overlay) return;
+
+    double opacity = config.opacity / 255.0;
+    double bgWeight = 0;
+    double fgWeight = 0;
+
+    switch (config.displayMode) {
+
+        case DmaDisplayMode::FG_LAYER:
+
+            bgWeight = 0.0;
+            fgWeight = 1.0 - opacity;
+            break;
+
+        case DmaDisplayMode::BG_LAYER:
+
+            bgWeight = 1.0 - opacity;
+            fgWeight = 0.0;
+            break;
+
+        case DmaDisplayMode::ODD_EVEN_LAYERS:
+
+            bgWeight = opacity;
+            fgWeight = 1.0 - opacity;
+            break;
+
+        default:
+            fatalError;
+    }
+
+    auto *emu = getWorkingBuffer().pixels.ptr;
+    auto *xray = getWorkingXrayBuffer().pixels.ptr;
+
+    for (isize i = 0; i < PIXELS; i++) {
+
+        if (xray[i] != Texture::black) {
+
+            // An effect pixel is present here (painted by DmaDebugger::
+            // computeOverlay or hide, whichever mode is active) -- mix it
+            // with the real picture, not with pixels 2 apart -- a plain
+            // off-by-double that made the opacity slider blend against the
+            // wrong existing pixel (bleeding into the next DMA cycle).
+            if (fgWeight != 0.0) {
+                auto col = fromTexel<F>(xray[i]).mix(fromTexel<F>(emu[i]), fgWeight);
+                emu[i] = toTexel<F>(col);
+            } else {
+                emu[i] = xray[i];
+            }
+
+        } else if (bgWeight != 0.0) {
+
+            // Nothing to show here -- dim the real picture instead (only
+            // happens for XRAY_OVERLAY_STYLE::BG_LAYER/ODD_EVEN_LAYERS).
+            emu[i] = toTexel<F>(fromTexel<F>(emu[i]).shade(bgWeight));
+        }
     }
 }
 
@@ -883,7 +956,6 @@ template <TexelFormat F>
 void
 PixelEngine::hide(isize line, u16 layers)
 {
-    auto *emu = workingPtr(line);
     auto &xrayBuf = getWorkingXrayBuffer();
 
     // Resolve the ten possible Opt::XRAY_COLORn values into a light/dark
@@ -941,8 +1013,6 @@ PixelEngine::hide(isize line, u16 layers)
         // ends up blended into the real picture.
         xrayBuf.clear(line, cycle, colA[idx], colB[idx]);
     }
-
-    mergeXray(emu, xrayWorkingPtr(line), HPIXELS);
 }
 
 }

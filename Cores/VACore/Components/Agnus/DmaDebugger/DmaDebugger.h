@@ -180,24 +180,24 @@ public:
 private:
     
     /* Visualizes DMA usage for a certain range of DMA cycles. Paints only
-     * the final, ready-to-merge per-channel colors into 'dmaPtr' (the xray
-     * texture, see PixelEngine::xrayTexture) -- 'emuPtr' (the real picture)
-     * is read for blending but never written here. Finishes by calling
-     * PixelEngine::mergeXray, which blends the xray texture into 'emuPtr'
-     * when config.overlay is enabled; XRayMode::XRAY_LAYERS (PixelEngine::
-     * hide) follows the exact same build-then-merge shape.
+     * the raw per-channel colors into 'dmaPtr' (the xray texture, see
+     * PixelEngine::xrayTexture) -- never touches the emulator texture.
+     * Opacity/display-mode blending no longer happens here: PixelEngine::
+     * mergeXray applies that once for the whole frame, after both this and
+     * XRayMode::XRAY_LAYERS (PixelEngine::hide) have finished building
+     * their xray texture for every line.
      *
      * Dispatches once (per call, not per pixel) to the templated overload
      * below, matching the host's current HOST_TEX_FORMAT. Fixing the format
-     * as a template parameter lets PixelEngine::toTexel<F>/fromTexel<F>
-     * fold their format switch away at compile time, so the per-pixel loop
-     * -- run across every visible pixel of every scanline -- carries no
-     * runtime format branching at all.
+     * as a template parameter lets PixelEngine::toTexel<F> fold its format
+     * switch away at compile time, so the per-pixel loop -- run across
+     * every visible pixel of every scanline -- carries no runtime format
+     * branching at all.
      */
-    void computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val);
+    void computeOverlay(Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val);
 
     template <TexelFormat F>
-    void computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val);
+    void computeOverlay(Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val);
 };
 
 }

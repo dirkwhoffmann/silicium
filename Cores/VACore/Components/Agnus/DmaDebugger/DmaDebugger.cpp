@@ -387,20 +387,18 @@ DmaDebugger::hsyncHandler(isize vpos)
     if (config.mode == XRayMode::XRAY_DMA) {
 
         // Draw first chunk (data from previous DMA line)
-        auto *ptr1 = pixelEngine.workingPtr(vpos);
         auto *dma1 = pixelEngine.xrayWorkingPtr(vpos);
-        computeOverlay(ptr1, dma1, HBLANK_MIN, HPOS_MAX, busOwner, busData);
+        computeOverlay(dma1, HBLANK_MIN, HPOS_MAX, busOwner, busData);
 
         // Draw second chunk (data from current DMA line)
-        // pos.pixel() counts super-hires pixels, ptr1 counts Texels (hires)
-        auto *ptr2 = ptr1 + agnus.pos.pixel(0) / 2;
+        // pos.pixel() counts super-hires pixels, dma1 counts Texels (hires)
         auto *dma2 = dma1 + agnus.pos.pixel(0) / 2;
-        computeOverlay(ptr2, dma2, 0, HBLANK_MIN - 1, agnus.busOwner, agnus.busData);
+        computeOverlay(dma2, 0, HBLANK_MIN - 1, agnus.busOwner, agnus.busData);
     }
 }
 
 void
-DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val)
+DmaDebugger::computeOverlay(Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val)
 {
     // Dispatched once per call (not per pixel) -- see the class comment in
     // DmaDebugger.h. Each branch below calls a separate instantiation of
@@ -408,71 +406,28 @@ DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize las
     // the whole per-pixel loop inside it.
     switch (static_cast<TexelFormat>(host.getConfig().texFormat)) {
 
-        case TexelFormat::ABGR: computeOverlay<TexelFormat::ABGR>(emuPtr, dmaPtr, first, last, own, val); return;
-        case TexelFormat::ARGB: computeOverlay<TexelFormat::ARGB>(emuPtr, dmaPtr, first, last, own, val); return;
+        case TexelFormat::ABGR: computeOverlay<TexelFormat::ABGR>(dmaPtr, first, last, own, val); return;
+        case TexelFormat::ARGB: computeOverlay<TexelFormat::ARGB>(dmaPtr, first, last, own, val); return;
 
         default: // RGBA
-            computeOverlay<TexelFormat::RGBA>(emuPtr, dmaPtr, first, last, own, val); return;
+            computeOverlay<TexelFormat::RGBA>(dmaPtr, first, last, own, val); return;
     }
 }
 
 template <TexelFormat F>
 void
-DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val)
+DmaDebugger::computeOverlay(Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val)
 {
-    Texel *emuStart = emuPtr;
-    Texel *dmaStart = dmaPtr;
-
-    double opacity = config.opacity / 255.0;
-    double bgWeight = 0;
-    double fgWeight = 0;
-
-    switch (config.displayMode) {
-
-        case DmaDisplayMode::FG_LAYER:
-
-            bgWeight = 0.0;
-            fgWeight = 1.0 - opacity;
-            break;
-
-        case DmaDisplayMode::BG_LAYER:
-
-            bgWeight = 1.0 - opacity;
-            fgWeight = 0.0;
-            break;
-
-        case DmaDisplayMode::ODD_EVEN_LAYERS:
-
-            bgWeight = opacity;
-            fgWeight = 1.0 - opacity;
-            break;
-
-        default:
-            fatalError;
-
-    }
-
-    for (isize i = first; i <= last; i++, emuPtr += 4, dmaPtr += 4) {
+    for (isize i = first; i <= last; i++, dmaPtr += 4) {
 
         auto owner = isize(own[i]);
 
         // Handle the easy case first: No foreground pixels
         if (!visualize[owner]) {
 
-            // Nothing to show here, unless the display mode dims the
-            // background (BG_LAYER / ODD_EVEN_LAYERS) -- either way, this
-            // is the final, ready-to-merge pixel; mergeXray below never
-            // does any further blending of its own.
-            if (bgWeight != 0.0) {
-
-                dmaPtr[0] = PixelEngine::toTexel<F>(PixelEngine::fromTexel<F>(emuPtr[0]).shade(bgWeight));
-                dmaPtr[1] = PixelEngine::toTexel<F>(PixelEngine::fromTexel<F>(emuPtr[1]).shade(bgWeight));
-                dmaPtr[2] = PixelEngine::toTexel<F>(PixelEngine::fromTexel<F>(emuPtr[2]).shade(bgWeight));
-                dmaPtr[3] = PixelEngine::toTexel<F>(PixelEngine::fromTexel<F>(emuPtr[3]).shade(bgWeight));
-            } else {
-
-                dmaPtr[0] = dmaPtr[1] = dmaPtr[2] = dmaPtr[3] = Texture::black;
-            }
+            // Nothing to show here -- see PixelEngine::mergeXray for how
+            // (and whether) that ends up dimming the real picture.
+            dmaPtr[0] = dmaPtr[1] = dmaPtr[2] = dmaPtr[3] = Texture::black;
             continue;
         }
 
@@ -482,30 +437,14 @@ DmaDebugger::computeOverlay(Texel *emuPtr, Texel *dmaPtr, isize first, isize las
         GpuColor<F> col2 = debugColor[owner][(val[i] & 0x00C0) >> 6];
         GpuColor<F> col3 = debugColor[owner][(val[i] & 0x000C) >> 2];
 
-        if (fgWeight != 0.0) {
-
-            // Mix each color with the pixel it's about to replace, not with
-            // pixels 2 apart -- a plain off-by-double that made the opacity
-            // slider blend against the wrong existing pixel (bleeding into
-            // the next DMA cycle for col3).
-            col0 = col0.mix(PixelEngine::fromTexel<F>(emuPtr[0]), fgWeight);
-            col1 = col1.mix(PixelEngine::fromTexel<F>(emuPtr[1]), fgWeight);
-            col2 = col2.mix(PixelEngine::fromTexel<F>(emuPtr[2]), fgWeight);
-            col3 = col3.mix(PixelEngine::fromTexel<F>(emuPtr[3]), fgWeight);
-        }
-
-        // Paint the final, already-weighted pixel into the xray texture
-        // alone -- see mergeXray for how (and whether) it ends up blended
+        // Paint the raw channel color into the xray texture alone -- see
+        // PixelEngine::mergeXray for how (and whether) it ends up blended
         // into the real picture.
         dmaPtr[0] = PixelEngine::toTexel<F>(col0);
         dmaPtr[1] = PixelEngine::toTexel<F>(col1);
         dmaPtr[2] = PixelEngine::toTexel<F>(col2);
         dmaPtr[3] = PixelEngine::toTexel<F>(col3);
     }
-
-    // Merge the xray texture into the real picture, if enabled -- the exact
-    // same function PixelEngine::hide (XRayMode::XRAY_LAYERS) calls.
-    pixelEngine.mergeXray(emuStart, dmaStart, (last - first + 1) * 4);
 }
 
 void
