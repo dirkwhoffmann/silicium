@@ -83,11 +83,11 @@ SiAmInspectorWindow {
 
             id: check
             size: Size.small
-            anchors.centerIn: parent
             checked: parent.on
             readOnly: true
             visible: !parent.unused
         }
+        DebugRect {}
     }
 
     // The label underneath a FlagBit (or a group of them). Every cell --
@@ -104,6 +104,7 @@ SiAmInspectorWindow {
         text: unused ? "-" : label
         font.pixelSize: Style.tiny
         color: unused ? Palette.disabled : Palette.primary
+        DebugRect{}
     }
 
     RowLayout {
@@ -214,70 +215,73 @@ SiAmInspectorWindow {
             Layout.fillHeight: true
             spacing: Style.mediumSpacing
 
+            // All CPU registers as a single, flat two-column grid instead of
+            // the previous PC/IRD/IRC row plus a separate 3-column ISP/D/A
+            // block -- simpler to read top to bottom, and scrollable (same
+            // ScrollView-around-a-Layout trick as SiAmXRayPanel's Channels
+            // box) so a 68020's extra MSP/VBR/SFC/DFC/CACR/CAAR rows never
+            // force the window taller than it should be. Stretches to fill
+            // whatever vertical space the Flags box below doesn't need.
             SiBox {
 
                 title: qsTr("Registers")
                 Layout.fillWidth: true
-                spacing: Style.tinySpacing
+                Layout.fillHeight: true
 
-                RowLayout {
+                ScrollView {
 
-                    Layout.fillWidth: true
-                    spacing: Style.mediumSpacing
-
-                    SiHex32 { l: qsTr("PC"); lwidth: 24; value: controller.info.pc }
-                    SiHex16 { l: qsTr("IRD"); lwidth: 30; value: cpu.ird }
-                    SiHex16 { l: qsTr("IRC"); lwidth: 30; value: cpu.irc }
-                }
-
-                // D0..D7 / A0..A7 register file, plus the ISP/USP/MSP/VBR/
-                // SFC/DFC/CACR/CAAR block -- laid out as a single 3-column
-                // grid (address-space block, data registers, address
-                // registers), matching CPUPanel.swift's three-column layout.
-                GridLayout {
+                    id: registersScroll
 
                     Layout.fillWidth: true
-                    columns: 3
-                    columnSpacing: Style.mediumSpacing
-                    rowSpacing: Style.smallSpacing
+                    Layout.fillHeight: true
+                    clip: true
+                    contentWidth: registersContent.width
+                    contentHeight: registersContent.height
 
-                    readonly property int lw: 32
-                    readonly property var info: controller.info
+                    GridLayout {
 
-                    SiHex32 { l: qsTr("ISP"); lwidth: parent.lw; value: cpu.isp }
-                    SiHex32 { l: qsTr("D0"); lwidth: 20; value: parent.info.dReg(0) }
-                    SiHex32 { l: qsTr("A0"); lwidth: 20; value: parent.info.aReg(0) }
+                        id: registersContent
 
-                    SiHex32 { l: qsTr("USP"); lwidth: parent.lw; value: cpu.usp }
-                    SiHex32 { l: qsTr("D1"); lwidth: 20; value: parent.info.dReg(1) }
-                    SiHex32 { l: qsTr("A1"); lwidth: 20; value: parent.info.aReg(1) }
+                        width: Math.max(implicitWidth, registersScroll.availableWidth)
+                        height: Math.max(implicitHeight, registersScroll.availableHeight)
+                        columns: 2
+                        columnSpacing: Style.mediumSpacing
+                        rowSpacing: Style.smallSpacing
 
-                    SiHex32 { l: qsTr("MSP"); lwidth: parent.lw; value: cpu.msp; visible: !root.below20 }
-                    SiHex32 { l: qsTr("D2"); lwidth: 20; value: parent.info.dReg(2) }
-                    SiHex32 { l: qsTr("A2"); lwidth: 20; value: parent.info.aReg(2) }
+                        readonly property int lw: 32
+                        readonly property var info: controller.info
 
-                    SiHex32 { l: qsTr("VBR"); lwidth: parent.lw; value: cpu.vbr; visible: !root.below10 }
-                    SiHex32 { l: qsTr("D3"); lwidth: 20; value: parent.info.dReg(3) }
-                    SiHex32 { l: qsTr("A3"); lwidth: 20; value: parent.info.aReg(3) }
+                        SiHex32 { l: qsTr("PC"); lwidth: parent.lw; value: controller.info.pc }
+                        SiHex16 { l: qsTr("IRD"); lwidth: parent.lw; value: cpu.ird }
+                        SiHex16 { l: qsTr("IRC"); lwidth: parent.lw; value: cpu.irc }
+                        SiHex32 { l: qsTr("ISP"); lwidth: parent.lw; value: cpu.isp }
+                        SiHex32 { l: qsTr("USP"); lwidth: parent.lw; value: cpu.usp }
+                        SiHex32 { l: qsTr("MSP"); lwidth: parent.lw; value: cpu.msp; visible: !root.below20 }
+                        SiHex32 { l: qsTr("VBR"); lwidth: parent.lw; value: cpu.vbr; visible: !root.below10 }
+                        SiHex16 { l: qsTr("SFC"); lwidth: parent.lw; value: cpu.sfc; visible: !root.below10 }
+                        SiHex16 { l: qsTr("DFC"); lwidth: parent.lw; value: cpu.dfc; visible: !root.below10 }
+                        SiHex32 { l: qsTr("CACR"); lwidth: parent.lw; value: cpu.cacr; visible: !root.below20 }
+                        SiHex32 { l: qsTr("CAAR"); lwidth: parent.lw; value: cpu.caar; visible: !root.below20 }
 
-                    SiHex16 { l: qsTr("SFC"); lwidth: parent.lw; value: cpu.sfc; visible: !root.below10 }
-                    SiHex32 { l: qsTr("D4"); lwidth: 20; value: parent.info.dReg(4) }
-                    SiHex32 { l: qsTr("A4"); lwidth: 20; value: parent.info.aReg(4) }
+                        SiHex32 { l: qsTr("D0"); lwidth: parent.lw; value: parent.info.dReg(0) }
+                        SiHex32 { l: qsTr("D1"); lwidth: parent.lw; value: parent.info.dReg(1) }
+                        SiHex32 { l: qsTr("D2"); lwidth: parent.lw; value: parent.info.dReg(2) }
+                        SiHex32 { l: qsTr("D3"); lwidth: parent.lw; value: parent.info.dReg(3) }
+                        SiHex32 { l: qsTr("D4"); lwidth: parent.lw; value: parent.info.dReg(4) }
+                        SiHex32 { l: qsTr("D5"); lwidth: parent.lw; value: parent.info.dReg(5) }
+                        SiHex32 { l: qsTr("D6"); lwidth: parent.lw; value: parent.info.dReg(6) }
+                        SiHex32 { l: qsTr("D7"); lwidth: parent.lw; value: parent.info.dReg(7) }
 
-                    SiHex16 { l: qsTr("DFC"); lwidth: parent.lw; value: cpu.dfc; visible: !root.below10 }
-                    SiHex32 { l: qsTr("D5"); lwidth: 20; value: parent.info.dReg(5) }
-                    SiHex32 { l: qsTr("A5"); lwidth: 20; value: parent.info.aReg(5) }
-
-                    SiHex32 { l: qsTr("CACR"); lwidth: parent.lw; value: cpu.cacr; visible: !root.below20 }
-                    SiHex32 { l: qsTr("D6"); lwidth: 20; value: parent.info.dReg(6) }
-                    SiHex32 { l: qsTr("A6"); lwidth: 20; value: parent.info.aReg(6) }
-
-                    SiHex32 { l: qsTr("CAAR"); lwidth: parent.lw; value: cpu.caar; visible: !root.below20 }
-                    SiHex32 { l: qsTr("D7"); lwidth: 20; value: parent.info.dReg(7) }
-                    SiHex32 { l: qsTr("A7"); lwidth: 20; value: parent.info.aReg(7) }
+                        SiHex32 { l: qsTr("A0"); lwidth: parent.lw; value: parent.info.aReg(0) }
+                        SiHex32 { l: qsTr("A1"); lwidth: parent.lw; value: parent.info.aReg(1) }
+                        SiHex32 { l: qsTr("A2"); lwidth: parent.lw; value: parent.info.aReg(2) }
+                        SiHex32 { l: qsTr("A3"); lwidth: parent.lw; value: parent.info.aReg(3) }
+                        SiHex32 { l: qsTr("A4"); lwidth: parent.lw; value: parent.info.aReg(4) }
+                        SiHex32 { l: qsTr("A5"); lwidth: parent.lw; value: parent.info.aReg(5) }
+                        SiHex32 { l: qsTr("A6"); lwidth: parent.lw; value: parent.info.aReg(6) }
+                        SiHex32 { l: qsTr("A7"); lwidth: parent.lw; value: parent.info.aReg(7) }
+                    }
                 }
-
-                VSpacer { }
             }
 
             //
@@ -372,8 +376,8 @@ SiAmInspectorWindow {
                     FlagBit { on: cpu.fc2 }
                     FlagBit { on: cpu.fc1 }
                     FlagBit { on: cpu.fc0 }
-                    FlagBit { on: controller.info.halt }
                     Item { Layout.preferredWidth: 15 }
+                    FlagBit { on: controller.info.halt }
 
                     Item { Layout.preferredWidth: 15 }
                     Item { Layout.preferredWidth: 15 }
@@ -381,16 +385,12 @@ SiAmInspectorWindow {
                     Item { Layout.preferredWidth: 15 }
                     Item { Layout.preferredWidth: 15 }
                     FlagLabel { Layout.columnSpan: 3; label: "IPL" }
-                    // Item { Layout.preferredWidth: 15 }
-                    // Item { Layout.preferredWidth: 15 }
                     Item { Layout.preferredWidth: 15 }
                     Item { Layout.preferredWidth: 15 }
                     Item { Layout.preferredWidth: 15 }
                     FlagLabel { Layout.columnSpan: 3; label: "FC" }
-                    // Item { Layout.preferredWidth: 15 }
-                    // Item { Layout.preferredWidth: 15 }
-                    FlagLabel { label: "HLT" }
                     Item { Layout.preferredWidth: 15 }
+                    FlagLabel { label: "HLT" }
                 }
 
                 VSpacer { }
