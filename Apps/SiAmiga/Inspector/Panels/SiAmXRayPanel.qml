@@ -94,209 +94,253 @@ SiAmInspectorWindow {
         // X-Ray
         //
 
-        SiBox {
+        ColumnLayout {
 
-            title: qsTr("Controls")
-            Layout.preferredWidth: 280
+            // Layout.preferredWidth: 280
             Layout.fillHeight: true
-            spacing: Style.tinySpacing
+            spacing: Style.mediumSpacing
 
-            SiComboBoxControl {
+            SiBox {
 
-                Layout.fillWidth: true
-                model: [qsTr("Off"), qsTr("DMA Debugger"), qsTr("Layers")]
-                currentIndex: cc.XRAY_MODE
-                onCurrentIndexChanged: cc.XRAY_MODE = currentIndex
+                title: qsTr("Controls")
+                Layout.preferredWidth: 280
+                // Layout.fillWidth: true
+                spacing: Style.tinySpacing
+
+                SiComboBoxControl {
+
+                    Layout.fillWidth: true
+                    model: [qsTr("Off"), qsTr("DMA Debugger"), qsTr("Layers")]
+                    currentIndex: cc.XRAY_MODE
+                    onCurrentIndexChanged: cc.XRAY_MODE = currentIndex
+                }
+
+                //
+                // Overlay settings
+                //
+
+                VSpacer {
+
+                    visible: cc.XRAY_MODE !== xrayNone
+                    size: Style.mediumSpacing
+                }
+
+                SiCheckBoxControl {
+
+                    // indent: tab
+                    visible: cc.XRAY_MODE !== xrayNone
+                    checked: cc.XRAY_OVERLAY
+                    onClicked: cc.XRAY_OVERLAY = checked
+                    r: qsTr("Show as overlay")
+                }
+
+                SiComboBoxControl {
+
+                    indent: tab
+                    Layout.fillWidth: true
+                    visible: cc.XRAY_MODE !== xrayNone
+                    enabled: cc.XRAY_OVERLAY
+                    model: [qsTr("Foreground layer"), qsTr("Background layer"), qsTr("Mixed layers")]
+                    currentIndex: cc.XRAY_OVERLAY_STYLE
+                    onCurrentIndexChanged: cc.XRAY_OVERLAY_STYLE = currentIndex
+                }
+
+                SiSliderControl {
+
+                    visible: cc.XRAY_MODE !== xrayNone
+                    indent: tab
+                    Layout.fillWidth: true
+                    l: qsTr("Opacity")
+                    from: 0
+                    to: 255
+                    value: cc.XRAY_OVERLAY_OPACITY
+                    onMoved: (value) => cc.XRAY_OVERLAY_OPACITY = value
+                }
             }
 
-            VSpacer { size: Style.mediumSpacing }
+            VSpacer {
+
+                visible: cc.XRAY_MODE === xrayNone
+            }
 
             //
-            // Overlay settings
+            // Channels -- the DMA channel rows (DMA Debugger mode) or the
+            // hidden-layer rows (Layers mode), whichever XRAY_MODE selects.
+            // Its own box, below Controls, so a long list of rows scrolls
+            // within its own area instead of stretching (or overflowing)
+            // the whole panel -- same ScrollView-around-a-Layout trick used
+            // by SiAmCIAPanel's main grid.
             //
 
-            SiCheckBoxControl {
+            SiBox {
 
-                // indent: tab
+                title: qsTr("Channels")
                 visible: cc.XRAY_MODE !== xrayNone
-                checked: cc.XRAY_OVERLAY
-                onClicked: cc.XRAY_OVERLAY = checked
-                r: qsTr("Show as overlay")
-            }
+                Layout.preferredWidth: 280
+                // Layout.fillWidth: true
+                Layout.fillHeight: true
+                padding: 0
 
-            SiComboBoxControl {
+                ScrollView {
 
-                indent: tab
-                Layout.fillWidth: true
-                visible: cc.XRAY_MODE !== xrayNone
-                enabled: cc.XRAY_OVERLAY
-                model: [qsTr("Foreground layer"), qsTr("Background layer"), qsTr("Mixed layers")]
-                currentIndex: cc.XRAY_OVERLAY_STYLE
-                onCurrentIndexChanged: cc.XRAY_OVERLAY_STYLE = currentIndex
-            }
+                    id: channelsScroll
 
-            SiSliderControl {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+                    contentWidth: channelsContent.width
+                    contentHeight: channelsContent.height
 
-                visible: cc.XRAY_MODE !== xrayNone
-                indent: tab
-                Layout.fillWidth: true
-                l: qsTr("Opacity")
-                from: 0
-                to: 255
-                value: cc.XRAY_OVERLAY_OPACITY
-                onMoved: (value) => cc.XRAY_OVERLAY_OPACITY = value
-            }
+                    // See SiAmCIAPanel.qml for why both dimensions are
+                    // driven explicitly like this: a Flickable's content
+                    // item only ever sizes to its own implicit size, so
+                    // without this a short list would leave the box's
+                    // bottom half blank instead of the rows simply
+                    // spanning it, and a long one wouldn't scroll at all.
+                    ColumnLayout {
 
-            VSpacer { size: Style.largeSpacing }
+                        id: channelsContent
 
-            //
-            // DMA channels (only shown in DMA Debugger mode) -- laid out
-            // two to a row, same as the layer checkboxes below.
-            //
+                        width: Math.max(implicitWidth, channelsScroll.availableWidth)
+                        height: Math.max(implicitHeight, channelsScroll.availableHeight)
+                        spacing: Style.tinySpacing
 
-            GridLayout {
+                        ChannelRow {
+                            visible: cc.XRAY_MODE === xrayDma
+                            label: qsTr("Copper")
+                            on: cc.XRAY_DMA_CHANNEL0; swatch: cc.XRAY_COLOR0
+                            onToggled: (value) => cc.XRAY_DMA_CHANNEL0 = value
+                            onColorPicked: (value) => cc.XRAY_COLOR0 = value
+                        }
 
-                visible: cc.XRAY_MODE === xrayDma
-                Layout.fillWidth: true
-                columns: 2
-                columnSpacing: Style.mediumSpacing
-                rowSpacing: 0
+                        ChannelRow {
+                            visible: cc.XRAY_MODE === xrayDma
+                            label: qsTr("Blitter")
+                            on: cc.XRAY_DMA_CHANNEL1; swatch: cc.XRAY_COLOR1
+                            onToggled: (value) => cc.XRAY_DMA_CHANNEL1 = value
+                            onColorPicked: (value) => cc.XRAY_COLOR1 = value
+                        }
 
-                ChannelRow {
-                    label: qsTr("Copper")
-                    on: cc.XRAY_DMA_CHANNEL0; swatch: cc.XRAY_COLOR0
-                    onToggled: (value) => cc.XRAY_DMA_CHANNEL0 = value
-                    onColorPicked: (value) => cc.XRAY_COLOR0 = value
-                }
+                        ChannelRow {
+                            visible: cc.XRAY_MODE === xrayDma
+                            label: qsTr("Disk")
+                            on: cc.XRAY_DMA_CHANNEL2; swatch: cc.XRAY_COLOR2
+                            onToggled: (value) => cc.XRAY_DMA_CHANNEL2 = value
+                            onColorPicked: (value) => cc.XRAY_COLOR2 = value
+                        }
 
-                ChannelRow {
-                    label: qsTr("Blitter")
-                    on: cc.XRAY_DMA_CHANNEL1; swatch: cc.XRAY_COLOR1
-                    onToggled: (value) => cc.XRAY_DMA_CHANNEL1 = value
-                    onColorPicked: (value) => cc.XRAY_COLOR1 = value
-                }
+                        ChannelRow {
+                            visible: cc.XRAY_MODE === xrayDma
+                            label: qsTr("Audio")
+                            on: cc.XRAY_DMA_CHANNEL3; swatch: cc.XRAY_COLOR3
+                            onToggled: (value) => cc.XRAY_DMA_CHANNEL3 = value
+                            onColorPicked: (value) => cc.XRAY_COLOR3 = value
+                        }
 
-                ChannelRow {
-                    label: qsTr("Disk")
-                    on: cc.XRAY_DMA_CHANNEL2; swatch: cc.XRAY_COLOR2
-                    onToggled: (value) => cc.XRAY_DMA_CHANNEL2 = value
-                    onColorPicked: (value) => cc.XRAY_COLOR2 = value
-                }
+                        ChannelRow {
+                            visible: cc.XRAY_MODE === xrayDma
+                            label: qsTr("Sprite")
+                            on: cc.XRAY_DMA_CHANNEL4; swatch: cc.XRAY_COLOR4
+                            onToggled: (value) => cc.XRAY_DMA_CHANNEL4 = value
+                            onColorPicked: (value) => cc.XRAY_COLOR4 = value
+                        }
 
-                ChannelRow {
-                    label: qsTr("Audio")
-                    on: cc.XRAY_DMA_CHANNEL3; swatch: cc.XRAY_COLOR3
-                    onToggled: (value) => cc.XRAY_DMA_CHANNEL3 = value
-                    onColorPicked: (value) => cc.XRAY_COLOR3 = value
-                }
+                        ChannelRow {
+                            visible: cc.XRAY_MODE === xrayDma
+                            label: qsTr("Bitplane")
+                            on: cc.XRAY_DMA_CHANNEL5; swatch: cc.XRAY_COLOR5
+                            onToggled: (value) => cc.XRAY_DMA_CHANNEL5 = value
+                            onColorPicked: (value) => cc.XRAY_COLOR5 = value
+                        }
 
-                ChannelRow {
-                    label: qsTr("Sprite")
-                    on: cc.XRAY_DMA_CHANNEL4; swatch: cc.XRAY_COLOR4
-                    onToggled: (value) => cc.XRAY_DMA_CHANNEL4 = value
-                    onColorPicked: (value) => cc.XRAY_COLOR4 = value
-                }
+                        ChannelRow {
+                            visible: cc.XRAY_MODE === xrayDma
+                            label: qsTr("CPU")
+                            on: cc.XRAY_DMA_CHANNEL6; swatch: cc.XRAY_COLOR6
+                            onToggled: (value) => cc.XRAY_DMA_CHANNEL6 = value
+                            onColorPicked: (value) => cc.XRAY_COLOR6 = value
+                        }
 
-                ChannelRow {
-                    label: qsTr("Bitplane")
-                    on: cc.XRAY_DMA_CHANNEL5; swatch: cc.XRAY_COLOR5
-                    onToggled: (value) => cc.XRAY_DMA_CHANNEL5 = value
-                    onColorPicked: (value) => cc.XRAY_COLOR5 = value
-                }
+                        ChannelRow {
+                            visible: cc.XRAY_MODE === xrayDma
+                            label: qsTr("Refresh")
+                            on: cc.XRAY_DMA_CHANNEL7; swatch: cc.XRAY_COLOR7
+                            onToggled: (value) => cc.XRAY_DMA_CHANNEL7 = value
+                            onColorPicked: (value) => cc.XRAY_COLOR7 = value
+                        }
 
-                ChannelRow {
-                    label: qsTr("CPU")
-                    on: cc.XRAY_DMA_CHANNEL6; swatch: cc.XRAY_COLOR6
-                    onToggled: (value) => cc.XRAY_DMA_CHANNEL6 = value
-                    onColorPicked: (value) => cc.XRAY_COLOR6 = value
-                }
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Sprite 0"); bit: 0x01
+                            swatch: cc.XRAY_COLOR0
+                            onColorPicked: (value) => cc.XRAY_COLOR0 = value
+                        }
 
-                ChannelRow {
-                    label: qsTr("Refresh")
-                    on: cc.XRAY_DMA_CHANNEL7; swatch: cc.XRAY_COLOR7
-                    onToggled: (value) => cc.XRAY_DMA_CHANNEL7 = value
-                    onColorPicked: (value) => cc.XRAY_COLOR7 = value
-                }
-            }
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Sprite 1"); bit: 0x02
+                            swatch: cc.XRAY_COLOR1
+                            onColorPicked: (value) => cc.XRAY_COLOR1 = value
+                        }
 
-            //
-            // Hidden layers (only shown in Layers mode) -- share the same
-            // XRAY_COLORn palette as the DMA channels above. Laid out two
-            // to a row (rather than stacked like the DMA channels) since
-            // ten of them would otherwise make the panel unreasonably tall.
-            //
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Sprite 2"); bit: 0x04
+                            swatch: cc.XRAY_COLOR2
+                            onColorPicked: (value) => cc.XRAY_COLOR2 = value
+                        }
 
-            GridLayout {
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Sprite 3"); bit: 0x08
+                            swatch: cc.XRAY_COLOR3
+                            onColorPicked: (value) => cc.XRAY_COLOR3 = value
+                        }
 
-                visible: cc.XRAY_MODE === xrayLayers
-                Layout.fillWidth: true
-                columns: 2
-                columnSpacing: Style.mediumSpacing
-                rowSpacing: 0
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Sprite 4"); bit: 0x10
+                            swatch: cc.XRAY_COLOR4
+                            onColorPicked: (value) => cc.XRAY_COLOR4 = value
+                        }
 
-                LayerRow {
-                    label: qsTr("Sprite 0"); bit: 0x01
-                    swatch: cc.XRAY_COLOR0
-                    onColorPicked: (value) => cc.XRAY_COLOR0 = value
-                }
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Sprite 5"); bit: 0x20
+                            swatch: cc.XRAY_COLOR5
+                            onColorPicked: (value) => cc.XRAY_COLOR5 = value
+                        }
 
-                LayerRow {
-                    label: qsTr("Sprite 1"); bit: 0x02
-                    swatch: cc.XRAY_COLOR1
-                    onColorPicked: (value) => cc.XRAY_COLOR1 = value
-                }
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Sprite 6"); bit: 0x40
+                            swatch: cc.XRAY_COLOR6
+                            onColorPicked: (value) => cc.XRAY_COLOR6 = value
+                        }
 
-                LayerRow {
-                    label: qsTr("Sprite 2"); bit: 0x04
-                    swatch: cc.XRAY_COLOR2
-                    onColorPicked: (value) => cc.XRAY_COLOR2 = value
-                }
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Sprite 7"); bit: 0x80
+                            swatch: cc.XRAY_COLOR7
+                            onColorPicked: (value) => cc.XRAY_COLOR7 = value
+                        }
 
-                LayerRow {
-                    label: qsTr("Sprite 3"); bit: 0x08
-                    swatch: cc.XRAY_COLOR3
-                    onColorPicked: (value) => cc.XRAY_COLOR3 = value
-                }
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Playfield 1"); bit: 0x100
+                            swatch: cc.XRAY_COLOR8
+                            onColorPicked: (value) => cc.XRAY_COLOR8 = value
+                        }
 
-                LayerRow {
-                    label: qsTr("Sprite 4"); bit: 0x10
-                    swatch: cc.XRAY_COLOR4
-                    onColorPicked: (value) => cc.XRAY_COLOR4 = value
-                }
-
-                LayerRow {
-                    label: qsTr("Sprite 5"); bit: 0x20
-                    swatch: cc.XRAY_COLOR5
-                    onColorPicked: (value) => cc.XRAY_COLOR5 = value
-                }
-
-                LayerRow {
-                    label: qsTr("Sprite 6"); bit: 0x40
-                    swatch: cc.XRAY_COLOR6
-                    onColorPicked: (value) => cc.XRAY_COLOR6 = value
-                }
-
-                LayerRow {
-                    label: qsTr("Sprite 7"); bit: 0x80
-                    swatch: cc.XRAY_COLOR7
-                    onColorPicked: (value) => cc.XRAY_COLOR7 = value
-                }
-
-                LayerRow {
-                    label: qsTr("Playfield 1"); bit: 0x100
-                    swatch: cc.XRAY_COLOR8
-                    onColorPicked: (value) => cc.XRAY_COLOR8 = value
-                }
-
-                Item { }
-                LayerRow {
-                    label: qsTr("Playfield 2"); bit: 0x200
-                    swatch: cc.XRAY_COLOR9
-                    onColorPicked: (value) => cc.XRAY_COLOR9 = value
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Playfield 2"); bit: 0x200
+                            swatch: cc.XRAY_COLOR9
+                            onColorPicked: (value) => cc.XRAY_COLOR9 = value
+                        }
+                    }
                 }
             }
-
-            VSpacer { }
         }
 
         //
