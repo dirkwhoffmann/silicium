@@ -97,6 +97,8 @@ SiAmInspectorWindow {
 
         implicitWidth: 150
         implicitHeight: 150
+        Layout.fillWidth: true
+        Layout.fillHeight: true
 
         source: Assets.iconUrl(
             currentState === 0 ? Assets.State0 :
@@ -416,6 +418,8 @@ SiAmInspectorWindow {
                 GridLayout {
 
                     Layout.topMargin: Style.mediumSpacing
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
                     columns: 2
                     columnSpacing: Style.mediumSpacing
                     rowSpacing: Style.mediumSpacing
@@ -424,12 +428,14 @@ SiAmInspectorWindow {
 
                         model: 4
 
-                        ColumnLayout {
+                        SiBox {
 
                             required property int index
-                            spacing: Style.tinySpacing
 
-                            SiLabel { text: qsTr("State machine %1").arg(index); font.weight: 500 }
+                            title: qsTr("State machine %1").arg(index)
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+
                             StateDiagram { currentState: paula.displayState(index) }
                         }
                     }
