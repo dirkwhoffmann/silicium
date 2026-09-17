@@ -25,29 +25,6 @@ SiAmInspectorWindow {
     // Shared label width for a register name
     readonly property int labelWidth: 62
 
-    // 16-bit registers (DMACON, BPLCON0, FMODE, DDFSTRT/STOP, DIWSTRT/STOP,
-    // the four modulo pairs) -- fmt16 in the Swift reference.
-    component SiHex16: SiNumberViewControl {
-
-        size: Size.small
-        font.weight: 500
-        controlWidth: 48
-        bits: 16
-        base: 16
-        padded: true
-    }
-
-    // 24-bit DMA pointer/address registers -- fmt24 in the Swift reference.
-    component SiHex24: SiNumberViewControl {
-
-        size: Size.small
-        font.weight: 500
-        controlWidth: 68
-        bits: 24
-        base: 16
-        padded: true
-    }
-
     // One DMA channel row: a read-only "granted a cycle right now" checkbox
     // carrying the register name as its label, followed by the pointer's
     // current value -- the same shape as SiAmBlitterPanel's Blitter Data
@@ -61,7 +38,7 @@ SiAmInspectorWindow {
         spacing: 0
 
         SiCheckBoxControl { id: box; size: Size.small; readOnly: true; lwidth: root.labelWidth }
-        SiHex24 { id: field }
+        SiWord24ViewControl { id: field }
     }
 
     ScrollView {
@@ -125,8 +102,8 @@ SiAmInspectorWindow {
                         columnSpacing: Style.smallSpacing
                         rowSpacing: Style.tinySpacing
 
-                        SiHex16 { l: qsTr("VPOS:"); lwidth: root.labelWidth; value: agnus.vpos }
-                        SiHex16 { l: qsTr("HPOS:"); lwidth: root.labelWidth; value: agnus.hpos }
+                        SiWordViewControl { l: qsTr("VPOS:"); lwidth: root.labelWidth; value: agnus.vpos }
+                        SiWordViewControl { l: qsTr("HPOS:"); lwidth: root.labelWidth; value: agnus.hpos }
                     }
 
                     // VSpacer {}
@@ -146,19 +123,19 @@ SiAmInspectorWindow {
                         columnSpacing: Style.smallSpacing
                         rowSpacing: Style.tinySpacing
 
-                        SiHex16 { l: qsTr("DMACON:"); lwidth: root.labelWidth; value: agnus.dmacon }
-                        SiHex16 { l: qsTr("BPL0CON:"); lwidth: root.labelWidth; value: agnus.bplcon0 }
+                        SiWordViewControl { l: qsTr("DMACON:"); lwidth: root.labelWidth; value: agnus.dmacon }
+                        SiWordViewControl { l: qsTr("BPL0CON:"); lwidth: root.labelWidth; value: agnus.bplcon0 }
 
-                        SiHex16 { l: qsTr("FMODE:"); lwidth: root.labelWidth; value: agnus.fmode }
+                        SiWordViewControl { l: qsTr("FMODE:"); lwidth: root.labelWidth; value: agnus.fmode }
                         Item { }
 
-                        SiHex16 { l: qsTr("DDFSTRT:"); lwidth: root.labelWidth; value: agnus.ddfstrt }
-                        SiHex16 { l: qsTr("DDFSTOP:"); lwidth: root.labelWidth; value: agnus.ddfstop }
+                        SiWordViewControl { l: qsTr("DDFSTRT:"); lwidth: root.labelWidth; value: agnus.ddfstrt }
+                        SiWordViewControl { l: qsTr("DDFSTOP:"); lwidth: root.labelWidth; value: agnus.ddfstop }
 
-                        SiHex16 { l: qsTr("DIWSTRT:"); lwidth: root.labelWidth; value: agnus.diwstrt }
-                        SiHex16 { l: qsTr("DIWSTOP:"); lwidth: root.labelWidth; value: agnus.diwstop }
+                        SiWordViewControl { l: qsTr("DIWSTRT:"); lwidth: root.labelWidth; value: agnus.diwstrt }
+                        SiWordViewControl { l: qsTr("DIWSTOP:"); lwidth: root.labelWidth; value: agnus.diwstop }
 
-                        SiHex16 { l: qsTr("DIWHIGH:"); lwidth: root.labelWidth; value: agnus.diwhigh }
+                        SiWordViewControl { l: qsTr("DIWHIGH:"); lwidth: root.labelWidth; value: agnus.diwhigh }
                         Item { }
                     }
                 }
@@ -258,16 +235,16 @@ SiAmInspectorWindow {
                     columnSpacing: Style.smallSpacing
                     rowSpacing: Style.tinySpacing
 
-                    SiHex16 { l: qsTr("BLTAMOD:"); lwidth: root.labelWidth; value: agnus.bltamod }
-                    SiHex16 { l: qsTr("BPL1MOD:"); lwidth: root.labelWidth; value: agnus.bpl1mod }
+                    SiWordViewControl { l: qsTr("BLTAMOD:"); lwidth: root.labelWidth; value: agnus.bltamod }
+                    SiWordViewControl { l: qsTr("BPL1MOD:"); lwidth: root.labelWidth; value: agnus.bpl1mod }
 
-                    SiHex16 { l: qsTr("BLTBMOD:"); lwidth: root.labelWidth; value: agnus.bltbmod }
-                    SiHex16 { l: qsTr("BPL2MOD:"); lwidth: root.labelWidth; value: agnus.bpl2mod }
+                    SiWordViewControl { l: qsTr("BLTBMOD:"); lwidth: root.labelWidth; value: agnus.bltbmod }
+                    SiWordViewControl { l: qsTr("BPL2MOD:"); lwidth: root.labelWidth; value: agnus.bpl2mod }
 
-                    SiHex16 { l: qsTr("BLTCMOD:"); lwidth: root.labelWidth; value: agnus.bltcmod }
+                    SiWordViewControl { l: qsTr("BLTCMOD:"); lwidth: root.labelWidth; value: agnus.bltcmod }
                     Item { }
 
-                    SiHex16 { l: qsTr("BLTDMOD:"); lwidth: root.labelWidth; value: agnus.bltdmod }
+                    SiWordViewControl { l: qsTr("BLTDMOD:"); lwidth: root.labelWidth; value: agnus.bltdmod }
                     Item { }
                 }
             }
@@ -309,7 +286,7 @@ SiAmInspectorWindow {
                                     value: agnus.audPt(parent.index)
                                 }
                                 SiLabel { text: qsTr("←") }
-                                SiHex24 { value: agnus.audLc(parent.index); r: qsTr("AUD%1LC").arg(parent.index) }
+                                SiWord24ViewControl { value: agnus.audLc(parent.index); r: qsTr("AUD%1LC").arg(parent.index) }
                             }
                         }
                     }

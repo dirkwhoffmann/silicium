@@ -40,25 +40,17 @@ SiAmInspectorWindow {
     readonly property int numBase: ic.hex ? 16 : 10
     readonly property bool numPadded: ic.padded
 
-    component SiWordViewControl: SiNumberViewControl {
-
-        size: Size.small
-        font.weight: 500
-        controlWidth: 56
-        bits: 16
-        base: root.numBase
-        padded: root.numPadded
-    }
+    // SiWordViewControl (Apps/Shared/QML/Compounds) is used directly below
+    // for COPxINS -- widened per usage rather than via a local alias (which
+    // would collide with the shared component's own name), with base/
+    // padded bound the same way.
 
     // COPPC/COPxLC are 24-bit (a Copper list pointer is a chip-RAM
     // address), unlike CIA's 8/16-bit registers -- see SiAmCIAPanel's own
     // SiTODControl for the same bits:24 pattern.
-    component SiLongViewControl: SiNumberViewControl {
+    component SiLongViewControl: SiWord24ViewControl {
 
-        size: Size.small
-        font.weight: 500
         controlWidth: 72
-        bits: 24
         base: root.numBase
         padded: root.numPadded
     }
@@ -311,8 +303,8 @@ SiAmInspectorWindow {
 
                         spacing: Style.smallSpacing
 
-                        SiWordViewControl { l: qsTr("COPxINS:"); lwidth: 55; value: copper.cop1ins }
-                        SiWordViewControl { value: copper.cop2ins }
+                        SiWordViewControl { controlWidth: 56; base: root.numBase; padded: root.numPadded; l: qsTr("COPxINS:"); lwidth: 55; value: copper.cop1ins }
+                        SiWordViewControl { controlWidth: 56; base: root.numBase; padded: root.numPadded; value: copper.cop2ins }
                     }
 
                     SiCheckBoxControl {

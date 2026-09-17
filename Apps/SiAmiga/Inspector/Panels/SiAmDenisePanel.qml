@@ -28,22 +28,19 @@ SiAmInspectorWindow {
     readonly property int numBase: ic.hex ? 16 : 10
     readonly property bool numPadded: ic.padded
 
-    component SiHex16: SiNumberViewControl {
+    // SiWordViewControl/SiByteViewControl (Apps/Shared/QML/Compounds) hold
+    // the structural bits; this panel only adds the width override and the
+    // hex/decimal toggle binding.
+    component SiHex16: SiWordViewControl {
 
-        size: Size.small
-        font.weight: 500
         controlWidth: 64
-        bits: 16
         base: root.numBase
         padded: root.numPadded
     }
 
-    component SiHex8: SiNumberViewControl {
+    component SiHex8: SiByteViewControl {
 
-        size: Size.small
-        font.weight: 500
         controlWidth: 40
-        bits: 8
         base: root.numBase
         padded: root.numPadded
     }

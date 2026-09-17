@@ -33,12 +33,12 @@ SiAmInspectorWindow {
     // Which serial log the log box shows: 0 = Outgoing, 1 = Incoming.
     property int logPage: 0
 
-    component SiHex16: SiNumberViewControl {
+    // SiWordViewControl (Apps/Shared/QML/Compounds) holds the structural
+    // bits; this panel only adds the width override and the hex/decimal
+    // toggle binding.
+    component SiHex16: SiWordViewControl {
 
-        size: Size.small
-        font.weight: 500
         controlWidth: 64
-        bits: 16
         base: root.numBase
         padded: root.numPadded
     }

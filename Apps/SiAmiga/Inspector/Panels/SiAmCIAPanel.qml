@@ -43,45 +43,21 @@ SiAmInspectorWindow {
     readonly property real columnWidth: Math.max(260,
         (scrollView.availableWidth - Style.largeSpacing * 2) / 3)
 
-    component SiBitViewControl: SiNumberViewControl {
-
-        size: Size.small
-        font.weight: 500
-        controlWidth: 66
-        bits: 8
-        base: 2
-        padded: true
-    }
-
-    component SiByteViewControl: SiNumberViewControl {
-
-        size: Size.small
-        font.weight: 500
-        controlWidth: 32
-        bits: 8
-        base: root.numBase
-        padded: root.numPadded
-    }
-
-    component SiWordViewControl: SiNumberViewControl {
-
-        size: Size.small
-        font.weight: 500
-        controlWidth: 48
-        bits: 16
-        base: root.numBase
-        padded: root.numPadded
-    }
+    // SiBitViewControl/SiByteViewControl/SiWordViewControl now live in
+    // Apps/Shared/QML/Compounds (this panel's own versions were the ones
+    // promoted, being the most complete/up to date) -- used directly below.
+    // SiByteViewControl/SiWordViewControl default to fixed hex, so every
+    // usage that should follow this panel's own hex/decimal toggle binds
+    // base/padded explicitly; SiBitViewControl's binary display doesn't
+    // need to (it never follows the toggle, on any panel).
 
     // A single row of a raw 24-bit CIA TOD counter (value/latch/alarm --
     // there is no BCD hour:min:sec.tenth breakdown on the Amiga, see the
-    // class comment).
-    component SiTODControl: SiNumberViewControl {
+    // class comment) -- narrower than SiWord24ViewControl's own default
+    // width.
+    component SiTODControl: SiWord24ViewControl {
 
-        size: Size.small
-        font.weight: 500
         controlWidth: 64
-        bits: 24
         base: root.numBase
         padded: root.numPadded
     }
@@ -104,10 +80,10 @@ SiAmInspectorWindow {
         columnSpacing: Style.largeSpacing
         rowSpacing: Style.tinySpacing
 
-        SiWordViewControl { l: qsTr("Timer %1:").arg(label); lwidth: 50; value: countValue }
+        SiWordViewControl { base: root.numBase; padded: root.numPadded; l: qsTr("Timer %1:").arg(label); lwidth: 50; value: countValue }
         SiCheckBoxControl { size: Size.small; bitStyle: true; readOnly: true; checked: running; r: qsTr("Running") }
 
-        SiWordViewControl { l: qsTr("Latch %1:").arg(label); lwidth: 50; value: latchValue }
+        SiWordViewControl { base: root.numBase; padded: root.numPadded; l: qsTr("Latch %1:").arg(label); lwidth: 50; value: latchValue }
         SiCheckBoxControl { size: Size.small; bitStyle: true; readOnly: true; checked: toggle; r: qsTr("Toggle") }
 
         Item { }
@@ -158,16 +134,16 @@ SiAmInspectorWindow {
             rowSpacing: Style.tinySpacing
             Layout.alignment: Qt.AlignHCenter
 
-            SiByteViewControl { size: Size.small; lwidth: 60; l: qsTr("Register:"); value: portBox.regValue }
+            SiByteViewControl { base: root.numBase; padded: root.numPadded; lwidth: 60; l: qsTr("Register:"); value: portBox.regValue }
             Bit { bitNr: 7; portValue: portBox.portValue; labels: portBox.labels }
 
-            SiBitViewControl { size: Size.small; indent: 60; value: portBox.regValue }
+            SiBitViewControl { indent: 60; value: portBox.regValue }
             Bit { bitNr: 6; portValue: portBox.portValue; labels: portBox.labels }
 
-            SiByteViewControl { size: Size.small; lwidth: 60; l: qsTr("Direction:"); value: portBox.dirValue }
+            SiByteViewControl { base: root.numBase; padded: root.numPadded; lwidth: 60; l: qsTr("Direction:"); value: portBox.dirValue }
             Bit { bitNr: 5; portValue: portBox.portValue; labels: portBox.labels }
 
-            SiBitViewControl { size: Size.small; indent: 60; value: portBox.dirValue }
+            SiBitViewControl { indent: 60; value: portBox.dirValue }
             Bit { bitNr: 4; portValue: portBox.portValue; labels: portBox.labels }
 
             Item { }
@@ -372,14 +348,14 @@ SiAmInspectorWindow {
 
                         SiByteViewControl {
 
-                            size: Size.small
+                            base: root.numBase
+                            padded: root.numPadded
                             lwidth: 100
                             l: qsTr("Mask Register:")
                             value: cia.imr
 
                             SiBitViewControl {
 
-                                size: Size.small
                                 value: cia.imr
                             }
 
@@ -389,14 +365,14 @@ SiAmInspectorWindow {
 
                         SiByteViewControl {
 
-                            size: Size.small
+                            base: root.numBase
+                            padded: root.numPadded
                             lwidth: 100
                             l: qsTr("Control Register:")
                             value: cia.icr
 
                             SiBitViewControl {
 
-                                size: Size.small
                                 value: cia.icr
                             }
                         }
@@ -470,21 +446,22 @@ SiAmInspectorWindow {
 
                         SiByteViewControl {
 
-                            size: Size.small
+                            base: root.numBase
+                            padded: root.numPadded
                             lwidth: 90
                             l: qsTr("Shift Register:")
                             value: cia.ssr
 
                             SiBitViewControl {
 
-                                size: Size.small
                                 value: cia.ssr
                             }
                         }
 
                         SiByteViewControl {
 
-                            size: Size.small
+                            base: root.numBase
+                            padded: root.numPadded
                             lwidth: 90
                             l: qsTr("Data Register:")
                             value: cia.sdr

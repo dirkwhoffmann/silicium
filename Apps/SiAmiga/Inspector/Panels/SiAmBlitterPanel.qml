@@ -57,26 +57,15 @@ SiAmInspectorWindow {
         padded: true
     }
 
-    component SiHex8: SiNumberViewControl {
-        size: Size.small
-        font.weight: 500
+    // SiByteViewControl's default width (32) is a bit tight for this
+    // panel's sub-byte fields.
+    component SiHex8: SiByteViewControl {
         controlWidth: 44
-        bits: 8
-        base: 16
-        padded: true
     }
 
     // Blitter Data's Hold/Old/New registers -- fmt16 hex in the Swift
-    // reference.
-    component SiHex16: SiNumberViewControl {
-
-        size: Size.small
-        font.weight: 500
-        controlWidth: 48
-        bits: 16
-        base: 16
-        padded: true
-    }
+    // reference. SiWordViewControl's own default width fits, so it's used
+    // directly (no local alias) everywhere below.
 
     // Mask/Shift/Fill Circuitry and Minterm Generator values -- fmt16b
     // binary in the Swift reference.
@@ -206,22 +195,22 @@ SiAmInspectorWindow {
                         SiLabel { size: Size.small; text: qsTr("New"); horizontalAlignment: Text.AlignHCenter; Layout.preferredWidth: 52 }
 
                         SiCheckBoxControl { size: Size.small; readOnly: true; checked: blitter.useA; l: qsTr("Channel A") }
-                        SiHex16 { value: blitter.aHold }
-                        SiHex16 { value: blitter.aOld }
-                        SiHex16 { value: blitter.aNew }
+                        SiWordViewControl { value: blitter.aHold }
+                        SiWordViewControl { value: blitter.aOld }
+                        SiWordViewControl { value: blitter.aNew }
 
                         SiCheckBoxControl { size: Size.small; readOnly: true; checked: blitter.useB; l: qsTr("Channel B") }
-                        SiHex16 { value: blitter.bHold }
-                        SiHex16 { value: blitter.bOld }
-                        SiHex16 { value: blitter.bNew }
+                        SiWordViewControl { value: blitter.bHold }
+                        SiWordViewControl { value: blitter.bOld }
+                        SiWordViewControl { value: blitter.bNew }
 
                         SiCheckBoxControl { size: Size.small; readOnly: true; checked: blitter.useC; l: qsTr("Channel C") }
-                        SiHex16 { value: blitter.cHold }
+                        SiWordViewControl { value: blitter.cHold }
                         Item { }
                         Item { }
 
                         SiCheckBoxControl { size: Size.small; readOnly: true; checked: blitter.useD; l: qsTr("Channel D") }
-                        SiHex16 { value: blitter.dHold }
+                        SiWordViewControl { value: blitter.dHold }
                         Item { }
                         SiCheckBoxControl { size: Size.small; readOnly: true; checked: blitter.bzero; r: qsTr("BZERO") }
                     }
