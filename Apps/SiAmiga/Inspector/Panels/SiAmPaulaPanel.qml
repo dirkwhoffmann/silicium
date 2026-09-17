@@ -39,6 +39,7 @@ SiAmInspectorWindow {
     readonly property bool numPadded: ic.padded
 
     component SiHex8: SiNumberViewControl {
+
         size: Size.small
         font.weight: 500
         controlWidth: 44
@@ -48,6 +49,7 @@ SiAmInspectorWindow {
     }
 
     component SiWordViewControl: SiNumberViewControl {
+
         size: Size.small
         font.weight: 500
         controlWidth: 64
@@ -231,20 +233,15 @@ SiAmInspectorWindow {
                     SiLabel { text: paula.dcStateText; font.weight: 500 }
                 }
 
-                RowLayout {
-                    Layout.topMargin: Style.smallSpacing
-                    spacing: Style.tinySpacing
-                    SiWordViewControl { l: qsTr("DSKLEN"); lwidth: 65; value: paula.dsklen }
-                    SiHex8 { value: paula.adkconHi }
-                    SiLabel { text: qsTr("ADKCON HI") }
-                }
-
                 GridLayout {
 
                     Layout.topMargin: Style.smallSpacing
                     columns: 2
                     columnSpacing: Style.largeSpacing
                     rowSpacing: Style.tinySpacing
+
+                    SiWordViewControl { l: qsTr("DSKLEN"); lwidth: 90; value: paula.dsklen }
+                    SiHex8 { l: qsTr("ADKCON HI"); lwidth: 90; value: paula.adkconHi }
 
                     SiCheckBoxControl { readOnly: true; checked: paula.dmaen; l: qsTr("DMAEN"); lwidth: 90 }
                     SiCheckBoxControl { readOnly: true; checked: paula.precomp1; l: qsTr("PRECOMP1"); lwidth: 90 }
