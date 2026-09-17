@@ -218,12 +218,6 @@ ToolBar {
                         action: root.window.actions.openCPUInspector
                     }
                     SiMenuItem {
-                        action: root.window.actions.openBusInspector
-                    }
-                    SiMenuItem {
-                        action: root.window.actions.openLayersInspector
-                    }
-                    SiMenuItem {
                         action: root.window.actions.openCIAInspector
                     }
                     SiMenuItem {
@@ -249,6 +243,15 @@ ToolBar {
                     }
                     SiMenuItem {
                         action: root.window.actions.openEventsInspector
+                    }
+                    SiMenuSeparator {
+
+                    }
+                    SiMenuItem {
+                        action: root.window.actions.openBusInspector
+                    }
+                    SiMenuItem {
+                        action: root.window.actions.openLayersInspector
                     }
                 }
             }
