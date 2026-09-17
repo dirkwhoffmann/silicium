@@ -956,7 +956,7 @@ template <TexelFormat F>
 void
 PixelEngine::hide(isize line, u16 layers)
 {
-    auto &xrayBuf = getWorkingXrayBuffer();
+    auto *ptr = getWorkingXrayBuffer().pixels.ptr + line * HPIXELS;
 
     // Resolve the ten possible Opt::XRAY_COLORn values into a light/dark
     // checkerboard pair per slot, once per line -- same palette
@@ -972,19 +972,27 @@ PixelEngine::hide(isize line, u16 layers)
         colB[n] = toTexel<F>(GpuColor<F>(base.shade(0.1)));
     }
 
-    // Establish the "nothing hidden" baseline for the whole row
-    xrayBuf.clear(line, Texture::black, Texture::black);
+    // Row half of Texture::clear's checkerboard test ((row>>2)&1 ==
+    // (col>>3)&1 ? col1 : col2) -- constant for the whole line, so it is
+    // hoisted out of the column loop below.
+    bool rowBit = ((line >> 2) & 1) != 0;
 
-    /* Iterate in DMA-cycle-sized steps (4 hires texels each), the same
-     * granularity Texture::clear and DmaDebugger::computeOverlay already
-     * use, rather than the finer superhires resolution the z-buffer is
-     * indexed at (Denise::PIXEL_CNT) -- one representative sub-pixel per
-     * cycle is enough for a checkerboard cutout indicator.
+    /* AGA lets the visible sprite/playfield change on every pixel, not just
+     * every DMA cycle, so this must inspect the z-buffer at its native
+     * (superhires) resolution instead of sampling one representative
+     * sub-pixel per 4-texel cycle as the old, DMA-cycle-grained code did.
+     * Denise::zBuffer runs at twice the resolution of the (hires) xray
+     * texture, so hires column `col` maps to zBuffer index `2*col`.
+     *
+     * xrayBuf.clear() is not called here: with every column now visited
+     * individually anyway, painting the checkerboard directly (using the
+     * same ((row>>2)&1)==((col>>3)&1) test Texture::clear itself uses, so
+     * the squares align identically and differ only in color) avoids a
+     * separate baseline clear plus a second pass through the row.
      */
-    isize cycles = HPIXELS / 4;
-    for (isize cycle = 0; cycle < cycles; cycle++) {
+    for (isize col = 0; col < HPIXELS; col++) {
 
-        u16 z = denise.zBuffer[cycle * 8];
+        u16 z = denise.zBuffer[2 * col];
         isize idx = -1;
 
         // Check for case 1: A sprite is visible
@@ -1006,12 +1014,17 @@ PixelEngine::hide(isize line, u16 layers)
             else if ((Denise::upperPlayfield(z) == 2) && (layers & 0x200)) idx = 9;
         }
 
-        if (idx < 0) continue;
+        if (idx < 0) {
 
-        // Paint this cycle's assigned XRAY_COLOR checkerboard into the
-        // xray texture alone -- see mergeXray for how (and whether) it
+            ptr[col] = Texture::black;
+            continue;
+        }
+
+        // Paint this column's assigned XRAY_COLOR checkerboard pixel into
+        // the xray texture alone -- see mergeXray for how (and whether) it
         // ends up blended into the real picture.
-        xrayBuf.clear(line, cycle, colA[idx], colB[idx]);
+        bool colBit = ((col >> 3) & 1) != 0;
+        ptr[col] = rowBit == colBit ? colA[idx] : colB[idx];
     }
 }
 
