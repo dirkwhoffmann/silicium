@@ -38,6 +38,10 @@ SiAmInspectorWindow {
     readonly property int numBase: ic.hex ? 16 : 10
     readonly property bool numPadded: ic.padded
 
+    // Shared width for every SiBox (see SiAmCIAPanel)
+    readonly property real columnWidth: Math.max(260,
+        (scrollView.availableWidth - Style.largeSpacing * 2) / 3)
+
     component SiHex8: SiNumberViewControl {
 
         size: Size.small
@@ -103,11 +107,41 @@ SiAmInspectorWindow {
             Assets.State0)
     }
 
-    RowLayout {
+    ScrollView {
+
+        id: scrollView
 
         anchors.fill: parent
         anchors.margins: Style.mediumSpacing
-        spacing: Style.mediumSpacing
+
+        clip: true
+        contentWidth: content.width
+        contentHeight: content.height
+
+        // A single 3-column grid holds all three boxes (see SiAmCIAPanel).
+        // GridLayout has no per-column stretch factor, so pin every cell's
+        // width to root.columnWidth instead, so all three columns stay
+        // equal and track window resizes together.
+        //
+        // A Flickable's content item always sizes to its own implicitWidth/
+        // implicitHeight, so a GridLayout inside a ScrollView never grows
+        // past what its children need, even when the window is bigger than
+        // that. To have the grid (and every Layout.fillWidth/fillHeight cell
+        // in it) actually stretch to fill a bigger window, and only fall
+        // back to scrolling once the window gets smaller than the natural
+        // content size, both dimensions have to be driven explicitly: the
+        // larger of the GridLayout's own implicit size and the ScrollView's
+        // available size.
+        GridLayout {
+
+            id: content
+
+            width: Math.max(implicitWidth, scrollView.availableWidth)
+            height: Math.max(implicitHeight, scrollView.availableHeight)
+
+            columns: 3
+            columnSpacing: Style.largeSpacing
+            rowSpacing: Style.largeSpacing
 
         //
         // Interrupts
@@ -116,7 +150,9 @@ SiAmInspectorWindow {
         SiBox {
 
             title: qsTr("Interrupts")
-            Layout.preferredWidth: 260
+            Layout.preferredWidth: root.columnWidth
+            Layout.minimumWidth: 0
+            Layout.fillWidth: true
             Layout.fillHeight: true
             spacing: Style.tinySpacing
 
@@ -204,6 +240,8 @@ SiAmInspectorWindow {
         SiBox {
 
             title: qsTr("Disk Controller")
+            Layout.preferredWidth: root.columnWidth
+            Layout.minimumWidth: 0
             Layout.fillWidth: true
             Layout.fillHeight: true
             spacing: Style.mediumSpacing
@@ -315,6 +353,8 @@ SiAmInspectorWindow {
         SiBox {
 
             title: qsTr("Audio")
+            Layout.preferredWidth: root.columnWidth
+            Layout.minimumWidth: 0
             Layout.fillWidth: true
             Layout.fillHeight: true
             spacing: Style.mediumSpacing
@@ -324,27 +364,53 @@ SiAmInspectorWindow {
                 Layout.alignment: Qt.AlignHCenter
                 spacing: Style.mediumSpacing
 
-                GridLayout {
+                // The 5-column register grid (label + 4 channels) is wider
+                // than a shared column typically allows, so -- same trick
+                // as the CPU panel's Registers box -- it gets its own
+                // ScrollView rather than forcing the whole SiBox (and thus
+                // its two siblings, via the shared columnWidth) wider.
+                // implicitWidth: 0 keeps the ScrollView itself from
+                // propagating that natural width back up as a minimum size
+                // (see SiAmCPUPanel.qml's Layout.fillWidth comment for the
+                // same minimum/implicit-size default heuristic).
+                ScrollView {
 
-                    Layout.alignment: Qt.AlignHCenter
-                    columns: 5
-                    columnSpacing: Style.mediumSpacing
-                    rowSpacing: Style.tinySpacing
+                    id: audioGridScroll
 
-                    Item { Layout.preferredWidth: 80 }
-                    Repeater { model: 4; SiLabel { required property int index; text: index; horizontalAlignment: Text.AlignHCenter; Layout.preferredWidth: 64 } }
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: 0
+                    Layout.preferredHeight: audioGrid.implicitHeight
+                    implicitWidth: 0
 
-                    SiLabel { text: qsTr("AUDxLEN"); Layout.preferredWidth: 80 }
-                    Repeater { model: 4; SiWordViewControl { required property int index; value: paula.audioLen(index) } }
+                    clip: true
+                    contentWidth: audioGrid.width
+                    contentHeight: audioGrid.implicitHeight
 
-                    SiLabel { text: qsTr("AUDxPER"); Layout.preferredWidth: 80 }
-                    Repeater { model: 4; SiWordViewControl { required property int index; value: paula.audioPer(index) } }
+                    GridLayout {
 
-                    SiLabel { text: qsTr("AUDxVOL"); Layout.preferredWidth: 80 }
-                    Repeater { model: 4; SiWordViewControl { required property int index; value: paula.audioVol(index) } }
+                        id: audioGrid
 
-                    SiLabel { text: qsTr("AUDxDAT"); Layout.preferredWidth: 80 }
-                    Repeater { model: 4; SiWordViewControl { required property int index; value: paula.audioDat(index) } }
+                        width: Math.max(implicitWidth, audioGridScroll.availableWidth)
+
+                        columns: 5
+                        columnSpacing: Style.mediumSpacing
+                        rowSpacing: Style.tinySpacing
+
+                        Item { Layout.preferredWidth: 80 }
+                        Repeater { model: 4; SiLabel { required property int index; text: index; horizontalAlignment: Text.AlignHCenter; Layout.preferredWidth: 64 } }
+
+                        SiLabel { text: qsTr("AUDxLEN"); Layout.preferredWidth: 80 }
+                        Repeater { model: 4; SiWordViewControl { required property int index; value: paula.audioLen(index) } }
+
+                        SiLabel { text: qsTr("AUDxPER"); Layout.preferredWidth: 80 }
+                        Repeater { model: 4; SiWordViewControl { required property int index; value: paula.audioPer(index) } }
+
+                        SiLabel { text: qsTr("AUDxVOL"); Layout.preferredWidth: 80 }
+                        Repeater { model: 4; SiWordViewControl { required property int index; value: paula.audioVol(index) } }
+
+                        SiLabel { text: qsTr("AUDxDAT"); Layout.preferredWidth: 80 }
+                        Repeater { model: 4; SiWordViewControl { required property int index; value: paula.audioDat(index) } }
+                    }
                 }
 
                 GridLayout {
@@ -369,6 +435,7 @@ SiAmInspectorWindow {
                     }
                 }
             }
+        }
         }
     }
 }
