@@ -47,7 +47,7 @@ SiAmInspectorWindow {
         padded: root.numPadded
     }
 
-    component SiHex16: SiNumberViewControl {
+    component SiWordViewControl: SiNumberViewControl {
         size: Size.small
         font.weight: 500
         controlWidth: 64
@@ -123,37 +123,74 @@ SiAmInspectorWindow {
                 Layout.alignment: Qt.AlignHCenter
                 spacing: Style.tinySpacing
 
-                RowLayout {
-                    spacing: Style.tinySpacing
-                    SiHex16 { l: qsTr("INTENA"); lwidth: 55; value: paula.intena }
-                    SiHex16 { value: paula.intreq }
-                    SiLabel { text: qsTr("INTREQ") }
-                }
+                // One row per interrupt bit (14 down to 0) -- listed
+                // explicitly rather than via a Repeater, so each row reads
+                // directly off the source (see SiC64VICPanel's Interrupts
+                // box for the same explicit-grid shape). Column 1 (INTENA)
+                // is right-aligned, column 2 (INTREQ) left-aligned.
+                GridLayout {
 
-                Repeater {
+                    columns: 2
+                    columnSpacing: Style.largeSpacing
+                    rowSpacing: Style.tinySpacing
 
-                    model: 15
-
-                    RowLayout {
-
-                        required property int index
-                        readonly property int bit: 14 - index
-                        spacing: Style.largeSpacing
-
-                        SiCheckBoxControl {
-                            readOnly: true
-                            checked: paula.intenaBit(bit)
-                            l: paula.intBitLabel(bit)
-                            lwidth: 55
-                        }
-
-                        SiCheckBoxControl {
-                            readOnly: true
-                            checked: paula.intreqBit(bit)
-                            l: paula.intBitLabel(bit)
-                            lwidth: 55
-                        }
+                    // INTENA/INTREQ header, embedded into a single
+                    // SiWordViewControl the same way SiAmCIAPanel's Mask/
+                    // Control Register rows embed a second value as an
+                    // accessory -- and placed as the grid's own first row
+                    // (spanning both columns) rather than a separate
+                    // RowLayout above it.
+                    SiWordViewControl {
+                        l: qsTr("INTENA"); lwidth: 55; value: paula.intena
                     }
+                    SiWordViewControl {
+                        r: qsTr("INTREQ"); rwidth: 55; value: paula.intreq
+                    }
+
+                    SiCheckBoxControl { readOnly: true; checked: paula.intenaBit(14); l: paula.intBitLabel(14); lwidth: 55; Layout.alignment: Qt.AlignRight }
+                    SiCheckBoxControl { readOnly: true; checked: paula.intreqBit(14); r: paula.intBitLabel(14); rwidth: 55; Layout.alignment: Qt.AlignLeft }
+
+                    SiCheckBoxControl { readOnly: true; checked: paula.intenaBit(13); l: paula.intBitLabel(13); lwidth: 55; Layout.alignment: Qt.AlignRight }
+                    SiCheckBoxControl { readOnly: true; checked: paula.intreqBit(13); r: paula.intBitLabel(13); rwidth: 55; Layout.alignment: Qt.AlignLeft }
+
+                    SiCheckBoxControl { readOnly: true; checked: paula.intenaBit(12); l: paula.intBitLabel(12); lwidth: 55; Layout.alignment: Qt.AlignRight }
+                    SiCheckBoxControl { readOnly: true; checked: paula.intreqBit(12); r: paula.intBitLabel(12); rwidth: 55; Layout.alignment: Qt.AlignLeft }
+
+                    SiCheckBoxControl { readOnly: true; checked: paula.intenaBit(11); l: paula.intBitLabel(11); lwidth: 55; Layout.alignment: Qt.AlignRight }
+                    SiCheckBoxControl { readOnly: true; checked: paula.intreqBit(11); r: paula.intBitLabel(11); rwidth: 55; Layout.alignment: Qt.AlignLeft }
+
+                    SiCheckBoxControl { readOnly: true; checked: paula.intenaBit(10); l: paula.intBitLabel(10); lwidth: 55; Layout.alignment: Qt.AlignRight }
+                    SiCheckBoxControl { readOnly: true; checked: paula.intreqBit(10); r: paula.intBitLabel(10); rwidth: 55; Layout.alignment: Qt.AlignLeft }
+
+                    SiCheckBoxControl { readOnly: true; checked: paula.intenaBit(9); l: paula.intBitLabel(9); lwidth: 55; Layout.alignment: Qt.AlignRight }
+                    SiCheckBoxControl { readOnly: true; checked: paula.intreqBit(9); r: paula.intBitLabel(9); rwidth: 55; Layout.alignment: Qt.AlignLeft }
+
+                    SiCheckBoxControl { readOnly: true; checked: paula.intenaBit(8); l: paula.intBitLabel(8); lwidth: 55; Layout.alignment: Qt.AlignRight }
+                    SiCheckBoxControl { readOnly: true; checked: paula.intreqBit(8); r: paula.intBitLabel(8); rwidth: 55; Layout.alignment: Qt.AlignLeft }
+
+                    SiCheckBoxControl { readOnly: true; checked: paula.intenaBit(7); l: paula.intBitLabel(7); lwidth: 55; Layout.alignment: Qt.AlignRight }
+                    SiCheckBoxControl { readOnly: true; checked: paula.intreqBit(7); r: paula.intBitLabel(7); rwidth: 55; Layout.alignment: Qt.AlignLeft }
+
+                    SiCheckBoxControl { readOnly: true; checked: paula.intenaBit(6); l: paula.intBitLabel(6); lwidth: 55; Layout.alignment: Qt.AlignRight }
+                    SiCheckBoxControl { readOnly: true; checked: paula.intreqBit(6); r: paula.intBitLabel(6); rwidth: 55; Layout.alignment: Qt.AlignLeft }
+
+                    SiCheckBoxControl { readOnly: true; checked: paula.intenaBit(5); l: paula.intBitLabel(5); lwidth: 55; Layout.alignment: Qt.AlignRight }
+                    SiCheckBoxControl { readOnly: true; checked: paula.intreqBit(5); r: paula.intBitLabel(5); rwidth: 55; Layout.alignment: Qt.AlignLeft }
+
+                    SiCheckBoxControl { readOnly: true; checked: paula.intenaBit(4); l: paula.intBitLabel(4); lwidth: 55; Layout.alignment: Qt.AlignRight }
+                    SiCheckBoxControl { readOnly: true; checked: paula.intreqBit(4); r: paula.intBitLabel(4); rwidth: 55; Layout.alignment: Qt.AlignLeft }
+
+                    SiCheckBoxControl { readOnly: true; checked: paula.intenaBit(3); l: paula.intBitLabel(3); lwidth: 55; Layout.alignment: Qt.AlignRight }
+                    SiCheckBoxControl { readOnly: true; checked: paula.intreqBit(3); r: paula.intBitLabel(3); rwidth: 55; Layout.alignment: Qt.AlignLeft }
+
+                    SiCheckBoxControl { readOnly: true; checked: paula.intenaBit(2); l: paula.intBitLabel(2); lwidth: 55; Layout.alignment: Qt.AlignRight }
+                    SiCheckBoxControl { readOnly: true; checked: paula.intreqBit(2); r: paula.intBitLabel(2); rwidth: 55; Layout.alignment: Qt.AlignLeft }
+
+                    SiCheckBoxControl { readOnly: true; checked: paula.intenaBit(1); l: paula.intBitLabel(1); lwidth: 55; Layout.alignment: Qt.AlignRight }
+                    SiCheckBoxControl { readOnly: true; checked: paula.intreqBit(1); r: paula.intBitLabel(1); rwidth: 55; Layout.alignment: Qt.AlignLeft }
+
+                    SiCheckBoxControl { readOnly: true; checked: paula.intenaBit(0); l: paula.intBitLabel(0); lwidth: 55; Layout.alignment: Qt.AlignRight }
+                    SiCheckBoxControl { readOnly: true; checked: paula.intreqBit(0); r: paula.intBitLabel(0); rwidth: 55; Layout.alignment: Qt.AlignLeft }
                 }
             }
         }
@@ -197,7 +234,7 @@ SiAmInspectorWindow {
                 RowLayout {
                     Layout.topMargin: Style.smallSpacing
                     spacing: Style.tinySpacing
-                    SiHex16 { l: qsTr("DSKLEN"); lwidth: 65; value: paula.dsklen }
+                    SiWordViewControl { l: qsTr("DSKLEN"); lwidth: 65; value: paula.dsklen }
                     SiHex8 { value: paula.adkconHi }
                     SiLabel { text: qsTr("ADKCON HI") }
                 }
@@ -215,7 +252,7 @@ SiAmInspectorWindow {
                     SiCheckBoxControl { readOnly: true; checked: paula.write; l: qsTr("WRITE"); lwidth: 90 }
                     SiCheckBoxControl { readOnly: true; checked: paula.precomp0; l: qsTr("PRECOMP0"); lwidth: 90 }
 
-                    SiHex16 { l: qsTr("DSKBYTE"); lwidth: 90; value: paula.dskbytr }
+                    SiWordViewControl { l: qsTr("DSKBYTE"); lwidth: 90; value: paula.dskbytr }
                     SiCheckBoxControl { readOnly: true; checked: paula.mfmprec; l: qsTr("MFMPREC"); lwidth: 90 }
 
                     SiCheckBoxControl { readOnly: true; checked: paula.byteready; l: qsTr("BYTEREADY"); lwidth: 90 }
@@ -236,7 +273,7 @@ SiAmInspectorWindow {
                     Layout.topMargin: Style.smallSpacing
                     spacing: Style.tinySpacing
 
-                    SiHex16 { l: qsTr("DSKSYNC"); lwidth: 65; value: paula.dsksync }
+                    SiWordViewControl { l: qsTr("DSKSYNC"); lwidth: 65; value: paula.dsksync }
 
                     SiText {
                         visible: paula.dsksyncWarning
@@ -301,16 +338,16 @@ SiAmInspectorWindow {
                     Repeater { model: 4; SiLabel { required property int index; text: index; horizontalAlignment: Text.AlignHCenter; Layout.preferredWidth: 64 } }
 
                     SiLabel { text: qsTr("AUDxLEN"); Layout.preferredWidth: 80 }
-                    Repeater { model: 4; SiHex16 { required property int index; value: paula.audioLen(index) } }
+                    Repeater { model: 4; SiWordViewControl { required property int index; value: paula.audioLen(index) } }
 
                     SiLabel { text: qsTr("AUDxPER"); Layout.preferredWidth: 80 }
-                    Repeater { model: 4; SiHex16 { required property int index; value: paula.audioPer(index) } }
+                    Repeater { model: 4; SiWordViewControl { required property int index; value: paula.audioPer(index) } }
 
                     SiLabel { text: qsTr("AUDxVOL"); Layout.preferredWidth: 80 }
-                    Repeater { model: 4; SiHex16 { required property int index; value: paula.audioVol(index) } }
+                    Repeater { model: 4; SiWordViewControl { required property int index; value: paula.audioVol(index) } }
 
                     SiLabel { text: qsTr("AUDxDAT"); Layout.preferredWidth: 80 }
-                    Repeater { model: 4; SiHex16 { required property int index; value: paula.audioDat(index) } }
+                    Repeater { model: 4; SiWordViewControl { required property int index; value: paula.audioDat(index) } }
                 }
 
                 GridLayout {
