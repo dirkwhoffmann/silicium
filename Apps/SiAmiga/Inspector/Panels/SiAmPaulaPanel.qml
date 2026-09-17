@@ -284,132 +284,128 @@ SiAmInspectorWindow {
                 Layout.fillHeight: true
                 spacing: Style.largeSpacing
 
-            SiBox {
+                SiBox {
 
-                id: dc
+                    id: dc
 
-                readonly property int lw: 80
+                    readonly property int lw: 80
 
-                title: qsTr("Disk Controller")
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                spacing: Style.mediumSpacing
+                    title: qsTr("Disk Controller")
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    spacing: Style.mediumSpacing
 
-                ColumnLayout {
+                    ColumnLayout {
 
-                    Layout.alignment: Qt.AlignHCenter
-                    spacing: Style.tinySpacing
+                        Layout.alignment: Qt.AlignHCenter
+                        spacing: Style.tinySpacing
 
-                    RowLayout {
-                        spacing: Style.smallSpacing
-                        SiLabel {
-                            text: qsTr("Selected Drive:")
-                        }
-                        Repeater {
-                            model: 4
-                            RowLayout {
-                                required property int index
-                                spacing: 2
-                                SiLabel {
-                                    text: index
-                                }
-                                SiBitViewControl {
-                                    readOnly: true; checked: paula.selectedDrive === index
+                        RowLayout {
+                            spacing: Style.smallSpacing
+                            SiLabel {
+                                text: qsTr("Selected Drive:")
+                            }
+                            Repeater {
+                                model: 4
+                                RowLayout {
+                                    required property int index
+                                    spacing: 2
+                                    SiLabel {
+                                        text: index
+                                    }
+                                    SiBitViewControl {
+                                        readOnly: true; checked: paula.selectedDrive === index
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    RowLayout {
-                        spacing: Style.smallSpacing
-                        SiLabel {
-                            text: qsTr("State:")
-                        }
-                        SiLabel {
-                            text: paula.dcStateText; font.weight: 500
-                        }
-                    }
-
-                    GridLayout {
-
-                        Layout.topMargin: Style.smallSpacing
-                        columns: 2
-                        columnSpacing: Style.largeSpacing
-                        rowSpacing: Style.tinySpacing
-
-                        SiHex16 {
-                            l: qsTr("DSKLEN"); lwidth: dc.lw; value: paula.dsklen
-                        }
-                        SiHex8 {
-                            l: qsTr("ADKCON HI"); lwidth: dc.lw; value: paula.adkconHi
+                        RowLayout {
+                            spacing: Style.smallSpacing
+                            SiLabel {
+                                text: qsTr("State:")
+                            }
+                            SiLabel {
+                                text: paula.dcStateText; font.weight: 500
+                            }
                         }
 
-                        SiBitViewControl {
-                            checked: paula.dmaen; l: qsTr("DMAEN"); lwidth: dc.lw
-                        }
-                        SiBitViewControl {
-                            checked: paula.precomp1; l: qsTr("PRECOMP1"); lwidth: dc.lw
-                        }
+                        GridLayout {
 
-                        SiBitViewControl {
-                            checked: paula.write; l: qsTr("WRITE"); lwidth: dc.lw
-                        }
-                        SiBitViewControl {
-                            checked: paula.precomp0; l: qsTr("PRECOMP0"); lwidth: dc.lw
-                        }
+                            Layout.topMargin: Style.smallSpacing
+                            columns: 2
+                            columnSpacing: Style.largeSpacing
+                            rowSpacing: Style.tinySpacing
 
-                        SiHex16 {
-                            l: qsTr("DSKBYTE"); lwidth: dc.lw; value: paula.dskbytr
-                        }
-                        SiBitViewControl {
-                            checked: paula.mfmprec; l: qsTr("MFMPREC"); lwidth: dc.lw
-                        }
+                            SiHex16 {
+                                l: qsTr("DSKLEN"); lwidth: dc.lw; value: paula.dsklen
+                            }
+                            SiHex8 {
+                                l: qsTr("ADKCON HI"); lwidth: dc.lw; value: paula.adkconHi
+                            }
 
-                        SiBitViewControl {
-                            checked: paula.byteready; l: qsTr("BYTEREADY"); lwidth: dc.lw
-                        }
-                        SiBitViewControl {
-                            checked: paula.uartbrk; l: qsTr("UARTBRK"); lwidth: dc.lw
-                        }
+                            SiBitViewControl {
+                                checked: paula.dmaen; l: qsTr("DMAEN"); lwidth: dc.lw
+                            }
+                            SiBitViewControl {
+                                checked: paula.precomp1; l: qsTr("PRECOMP1"); lwidth: dc.lw
+                            }
 
-                        SiBitViewControl {
-                            checked: paula.dmaon; l: qsTr("DMAON"); lwidth: dc.lw
-                        }
-                        SiBitViewControl {
-                            checked: paula.wordsync; l: qsTr("WORDSYNC"); lwidth: dc.lw
-                        }
+                            SiBitViewControl {
+                                checked: paula.write; l: qsTr("WRITE"); lwidth: dc.lw
+                            }
+                            SiBitViewControl {
+                                checked: paula.precomp0; l: qsTr("PRECOMP0"); lwidth: dc.lw
+                            }
 
-                        SiBitViewControl {
-                            checked: paula.diskwrite; l: qsTr("DISKWRITE"); lwidth: dc.lw
-                        }
-                        SiBitViewControl {
-                            checked: paula.msbsync; l: qsTr("MSBSYNC"); lwidth: dc.lw
-                        }
+                            SiHex16 {
+                                l: qsTr("DSKBYTE"); lwidth: dc.lw; value: paula.dskbytr
+                            }
+                            SiBitViewControl {
+                                checked: paula.mfmprec; l: qsTr("MFMPREC"); lwidth: dc.lw
+                            }
 
-                        SiBitViewControl {
-                            checked: paula.wordequal; l: qsTr("WORDEQUAL"); lwidth: dc.lw
-                        }
-                        SiBitViewControl {
-                            checked: paula.fast; l: qsTr("FAST"); lwidth: dc.lw
-                        }
+                            SiBitViewControl {
+                                checked: paula.byteready; l: qsTr("BYTEREADY"); lwidth: dc.lw
+                            }
+                            SiBitViewControl {
+                                checked: paula.uartbrk; l: qsTr("UARTBRK"); lwidth: dc.lw
+                            }
 
-                        SiHex16 {
-                            l: qsTr("DSKSYNC"); value: paula.dsksync; lwidth: dc.lw
-                        }
-                        SiText {
-                            visible: paula.dsksyncWarning
-                            text: qsTr("(expected 4489)")
-                            color: "#E0A030"
+                            SiBitViewControl {
+                                checked: paula.dmaon; l: qsTr("DMAON"); lwidth: dc.lw
+                            }
+                            SiBitViewControl {
+                                checked: paula.wordsync; l: qsTr("WORDSYNC"); lwidth: dc.lw
+                            }
+
+                            SiBitViewControl {
+                                checked: paula.diskwrite; l: qsTr("DISKWRITE"); lwidth: dc.lw
+                            }
+                            SiBitViewControl {
+                                checked: paula.msbsync; l: qsTr("MSBSYNC"); lwidth: dc.lw
+                            }
+
+                            SiBitViewControl {
+                                checked: paula.wordequal; l: qsTr("WORDEQUAL"); lwidth: dc.lw
+                            }
+                            SiBitViewControl {
+                                checked: paula.fast; l: qsTr("FAST"); lwidth: dc.lw
+                            }
+
+                            SiHex16 {
+                                l: qsTr("DSKSYNC"); value: paula.dsksync; lwidth: dc.lw
+                            }
+                            SiText {
+                                visible: paula.dsksyncWarning
+                                text: qsTr("(expected 4489)")
+                                color: "#E0A030"
+                            }
                         }
                     }
                 }
-            }
 
-            // A separate SiBox (rather than nested inside Disk Controller,
-            // as it used to be) so it doesn't stretch along with it -- the
-            // Disk Controller box above fills the column's remaining
-            // height, this one stays sized to its own content.
-            SiBox {
+                SiBox {
 
                 Layout.fillWidth: true
                 title: qsTr("FIFO Buffer")
@@ -444,175 +440,171 @@ SiAmInspectorWindow {
             // Audio
             //
 
-            SiBox {
+            ColumnLayout {
 
-                title: qsTr("Audio")
                 Layout.preferredWidth: root.columnWidth
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 spacing: Style.mediumSpacing
 
+                SiBox {
+
+                    title: qsTr("Audio")
+                    Layout.fillWidth: true
+                    spacing: Style.mediumSpacing
+
+                    ColumnLayout {
+
+                        Layout.alignment: Qt.AlignHCenter
+                        Layout.fillWidth: true
+                        spacing: Style.mediumSpacing
+
+                        GridLayout {
+
+                            Layout.alignment: Qt.AlignHCenter
+                            columns: 5
+                            columnSpacing: Style.mediumSpacing
+                            rowSpacing: Style.tinySpacing
+
+                            // Transposed from the register-per-row layout this
+                            // used to have: channel index (0-3) down the first
+                            // column, register name across the header row --
+                            // this way the grid only needs 5 narrow columns
+                            // instead of 5 wide ones, saving horizontal space.
+                            Item {
+                            } // Layout.preferredWidth: 24 }
+                            SiLabel {
+                                size: Size.small; text: qsTr("AUDxLEN"); horizontalAlignment: Text.AlignHCenter
+                            } // ;Layout.preferredWidth: 48 }
+                            SiLabel {
+                                size: Size.small; text: qsTr("AUDxPER"); horizontalAlignment: Text.AlignHCenter
+                            } // ; Layout.preferredWidth: 48 }
+                            SiLabel {
+                                size: Size.small; text: qsTr("AUDxVOL"); horizontalAlignment: Text.AlignHCenter
+                            } // ; Layout.preferredWidth: 48 }
+                            SiLabel {
+                                size: Size.small; text: qsTr("AUDxDAT"); horizontalAlignment: Text.AlignHCenter
+                            } // ; Layout.preferredWidth: 48 }
+
+                            SiLabel {
+                                size: Size.small; text: "0"; horizontalAlignment: Text.AlignHCenter
+                            }
+                            SiHex16 {
+                                value: paula.audioLen(0)
+                            }
+                            SiHex16 {
+                                value: paula.audioPer(0)
+                            }
+                            SiHex16 {
+                                value: paula.audioVol(0)
+                            }
+                            SiHex16 {
+                                value: paula.audioDat(0)
+                            }
+
+                            SiLabel {
+                                size: Size.small; text: "1"; horizontalAlignment: Text.AlignHCenter
+                            }
+                            SiHex16 {
+                                value: paula.audioLen(1)
+                            }
+                            SiHex16 {
+                                value: paula.audioPer(1)
+                            }
+                            SiHex16 {
+                                value: paula.audioVol(1)
+                            }
+                            SiHex16 {
+                                value: paula.audioDat(1)
+                            }
+
+                            SiLabel {
+                                size: Size.small; text: "2"; horizontalAlignment: Text.AlignHCenter
+                            }
+                            SiHex16 {
+                                value: paula.audioLen(2)
+                            }
+                            SiHex16 {
+                                value: paula.audioPer(2)
+                            }
+                            SiHex16 {
+                                value: paula.audioVol(2)
+                            }
+                            SiHex16 {
+                                value: paula.audioDat(2)
+                            }
+
+                            SiLabel {
+                                size: Size.small; text: "3"; horizontalAlignment: Text.AlignHCenter
+                            }
+                            SiHex16 {
+                                value: paula.audioLen(3)
+                            }
+                            SiHex16 {
+                                value: paula.audioPer(3)
+                            }
+                            SiHex16 {
+                                value: paula.audioVol(3)
+                            }
+                            SiHex16 {
+                                value: paula.audioDat(3)
+                            }
+                        }
+                    }
+                }
+
                 ColumnLayout {
 
-                    Layout.alignment: Qt.AlignHCenter
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     spacing: Style.mediumSpacing
 
-                    GridLayout {
+                    RowLayout {
 
-                        Layout.alignment: Qt.AlignHCenter
-                        columns: 5
-                        columnSpacing: Style.mediumSpacing
-                        rowSpacing: Style.tinySpacing
-
-                        // Transposed from the register-per-row layout this
-                        // used to have: channel index (0-3) down the first
-                        // column, register name across the header row --
-                        // this way the grid only needs 5 narrow columns
-                        // instead of 5 wide ones, saving horizontal space.
-                        Item {
-                        } // Layout.preferredWidth: 24 }
-                        SiLabel {
-                            size: Size.small; text: qsTr("AUDxLEN"); horizontalAlignment: Text.AlignHCenter
-                        } // ;Layout.preferredWidth: 48 }
-                        SiLabel {
-                            size: Size.small; text: qsTr("AUDxPER"); horizontalAlignment: Text.AlignHCenter
-                        } // ; Layout.preferredWidth: 48 }
-                        SiLabel {
-                            size: Size.small; text: qsTr("AUDxVOL"); horizontalAlignment: Text.AlignHCenter
-                        } // ; Layout.preferredWidth: 48 }
-                        SiLabel {
-                            size: Size.small; text: qsTr("AUDxDAT"); horizontalAlignment: Text.AlignHCenter
-                        } // ; Layout.preferredWidth: 48 }
-
-                        SiLabel {
-                            size: Size.small; text: "0"; horizontalAlignment: Text.AlignHCenter
-                        }
-                        SiHex16 {
-                            value: paula.audioLen(0)
-                        }
-                        SiHex16 {
-                            value: paula.audioPer(0)
-                        }
-                        SiHex16 {
-                            value: paula.audioVol(0)
-                        }
-                        SiHex16 {
-                            value: paula.audioDat(0)
-                        }
-
-                        SiLabel {
-                            size: Size.small; text: "1"; horizontalAlignment: Text.AlignHCenter
-                        }
-                        SiHex16 {
-                            value: paula.audioLen(1)
-                        }
-                        SiHex16 {
-                            value: paula.audioPer(1)
-                        }
-                        SiHex16 {
-                            value: paula.audioVol(1)
-                        }
-                        SiHex16 {
-                            value: paula.audioDat(1)
-                        }
-
-                        SiLabel {
-                            size: Size.small; text: "2"; horizontalAlignment: Text.AlignHCenter
-                        }
-                        SiHex16 {
-                            value: paula.audioLen(2)
-                        }
-                        SiHex16 {
-                            value: paula.audioPer(2)
-                        }
-                        SiHex16 {
-                            value: paula.audioVol(2)
-                        }
-                        SiHex16 {
-                            value: paula.audioDat(2)
-                        }
-
-                        SiLabel {
-                            size: Size.small; text: "3"; horizontalAlignment: Text.AlignHCenter
-                        }
-                        SiHex16 {
-                            value: paula.audioLen(3)
-                        }
-                        SiHex16 {
-                            value: paula.audioPer(3)
-                        }
-                        SiHex16 {
-                            value: paula.audioVol(3)
-                        }
-                        SiHex16 {
-                            value: paula.audioDat(3)
-                        }
-                    }
-
-                    // A plain ColumnLayout of two RowLayouts instead of a
-                    // 2-column GridLayout: GridLayout only sizes a column/row to
-                    // the largest cell's own preferred size and never redistributes
-                    // extra space to a fillWidth/fillHeight cell beyond that, so
-                    // the four StateDiagram images stayed pinned to their 150x150
-                    // implicit size instead of growing with the box. Row/Column
-                    // Layout does propagate fillWidth/fillHeight down to a child,
-                    // so this stretches properly.
-                    ColumnLayout {
-
-                        Layout.topMargin: Style.mediumSpacing
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         spacing: Style.mediumSpacing
 
-                        RowLayout {
-
+                        SiBox {
+                            title: qsTr("State machine 0")
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            spacing: Style.mediumSpacing
-
-                            SiBox {
-                                title: qsTr("State machine 0")
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                StateDiagram {
-                                    currentState: paula.displayState(0)
-                                }
-                            }
-
-                            SiBox {
-                                title: qsTr("State machine 1")
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                StateDiagram {
-                                    currentState: paula.displayState(1)
-                                }
+                            StateDiagram {
+                                currentState: paula.displayState(0)
                             }
                         }
 
-                        RowLayout {
-
+                        SiBox {
+                            title: qsTr("State machine 1")
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            spacing: Style.mediumSpacing
-
-                            SiBox {
-                                title: qsTr("State machine 2")
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                StateDiagram {
-                                    currentState: paula.displayState(2)
-                                }
+                            StateDiagram {
+                                currentState: paula.displayState(1)
                             }
+                        }
+                    }
 
-                            SiBox {
-                                title: qsTr("State machine 3")
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                StateDiagram {
-                                    currentState: paula.displayState(3)
-                                }
+                    RowLayout {
+
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        spacing: Style.mediumSpacing
+
+                        SiBox {
+                            title: qsTr("State machine 2")
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            StateDiagram {
+                                currentState: paula.displayState(2)
+                            }
+                        }
+
+                        SiBox {
+                            title: qsTr("State machine 3")
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            StateDiagram {
+                                currentState: paula.displayState(3)
                             }
                         }
                     }
