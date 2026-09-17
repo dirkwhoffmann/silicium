@@ -102,6 +102,7 @@ SiAmRenderer::tick()
     controller->getCPUController()->tick();
     controller->getDeniseController()->tick();
     controller->getPortController()->tick();
+    controller->getAgnusController()->tick();
 
     // Grab the current frame
     updateTexture();
