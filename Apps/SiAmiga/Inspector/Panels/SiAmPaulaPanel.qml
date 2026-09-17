@@ -40,7 +40,7 @@ SiAmInspectorWindow {
 
     // Shared width for every SiBox (see SiAmCIAPanel)
     readonly property real columnWidth: Math.max(260,
-        (scrollView.availableWidth - Style.largeSpacing * 2) / 3)
+        (content.width - Style.largeSpacing * 2) / 3)
 
     component SiHex8: SiNumberViewControl {
 
@@ -109,41 +109,23 @@ SiAmInspectorWindow {
             Assets.State0)
     }
 
-    ScrollView {
+    // A plain 3-column grid holds all three boxes, filling the window
+    // directly -- no outer ScrollView any more. Each box now scrolls its
+    // own content independently instead of the whole window scrolling as
+    // one (see the ScrollView inside each SiBox below), so this grid just
+    // needs the three columns to shrink freely: Layout.minimumWidth/
+    // minimumHeight: 0 on every box (set below) stops GridLayout from
+    // ever growing a column/row to that box's own natural content size.
+    GridLayout {
 
-        id: scrollView
+        id: content
 
         anchors.fill: parent
         anchors.margins: Style.mediumSpacing
 
-        clip: true
-        contentWidth: content.width
-        contentHeight: content.height
-
-        // A single 3-column grid holds all three boxes (see SiAmCIAPanel).
-        // GridLayout has no per-column stretch factor, so pin every cell's
-        // width to root.columnWidth instead, so all three columns stay
-        // equal and track window resizes together.
-        //
-        // A Flickable's content item always sizes to its own implicitWidth/
-        // implicitHeight, so a GridLayout inside a ScrollView never grows
-        // past what its children need, even when the window is bigger than
-        // that. To have the grid (and every Layout.fillWidth/fillHeight cell
-        // in it) actually stretch to fill a bigger window, and only fall
-        // back to scrolling once the window gets smaller than the natural
-        // content size, both dimensions have to be driven explicitly: the
-        // larger of the GridLayout's own implicit size and the ScrollView's
-        // available size.
-        GridLayout {
-
-            id: content
-
-            width: Math.max(implicitWidth, scrollView.availableWidth)
-            height: Math.max(implicitHeight, scrollView.availableHeight)
-
-            columns: 3
-            columnSpacing: Style.largeSpacing
-            rowSpacing: Style.largeSpacing
+        columns: 3
+        columnSpacing: Style.largeSpacing
+        rowSpacing: Style.largeSpacing
 
         //
         // Interrupts
@@ -156,12 +138,25 @@ SiAmInspectorWindow {
             Layout.minimumWidth: 0
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.minimumHeight: 0
             spacing: Style.tinySpacing
 
-            ColumnLayout {
+            // Own ScrollView, so this box scrolls its own content once it
+            // gets shorter than its 15 interrupt-bit rows, independently of
+            // its two siblings (see SiAmCPUPanel's Registers box for the
+            // same per-box trick: the GridLayout's width/height are driven
+            // by the larger of its own implicit size and the ScrollView's
+            // available size, so it stretches to fill a bigger box and
+            // only scrolls once the box shrinks below its natural size).
+            ScrollView {
 
-                Layout.alignment: Qt.AlignHCenter
-                spacing: Style.tinySpacing
+                id: interruptsScroll
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                clip: true
+                contentWidth: interruptsGrid.width
+                contentHeight: interruptsGrid.height
 
                 // One row per interrupt bit (14 down to 0) -- listed
                 // explicitly rather than via a Repeater, so each row reads
@@ -169,6 +164,11 @@ SiAmInspectorWindow {
                 // box for the same explicit-grid shape). Column 1 (INTENA)
                 // is right-aligned, column 2 (INTREQ) left-aligned.
                 GridLayout {
+
+                    id: interruptsGrid
+
+                    width: Math.max(implicitWidth, interruptsScroll.availableWidth)
+                    height: Math.max(implicitHeight, interruptsScroll.availableHeight)
 
                     columns: 2
                     columnSpacing: Style.largeSpacing
@@ -246,12 +246,28 @@ SiAmInspectorWindow {
             Layout.minimumWidth: 0
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.minimumHeight: 0
             spacing: Style.mediumSpacing
 
-            ColumnLayout {
+            // Own ScrollView, same trick as the Interrupts box above.
+            ScrollView {
 
-                Layout.alignment: Qt.AlignHCenter
-                spacing: Style.tinySpacing
+                id: diskScroll
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                clip: true
+                contentWidth: diskColumn.width
+                contentHeight: diskColumn.height
+
+                ColumnLayout {
+
+                    id: diskColumn
+
+                    width: Math.max(implicitWidth, diskScroll.availableWidth)
+                    height: Math.max(implicitHeight, diskScroll.availableHeight)
+
+                    spacing: Style.tinySpacing
 
                 RowLayout {
                     spacing: Style.smallSpacing
@@ -345,6 +361,7 @@ SiAmInspectorWindow {
                         SiText { text: "→" }
                     }
                 }
+                }
             }
         }
 
@@ -359,12 +376,30 @@ SiAmInspectorWindow {
             Layout.minimumWidth: 0
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.minimumHeight: 0
             spacing: Style.mediumSpacing
 
-            ColumnLayout {
+            // Own ScrollView, same trick as the Interrupts/Disk Controller
+            // boxes above -- this one scrolls when the box gets too short
+            // for the register grid plus all four state-machine diagrams.
+            ScrollView {
 
-                Layout.alignment: Qt.AlignHCenter
-                spacing: Style.mediumSpacing
+                id: audioScroll
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                clip: true
+                contentWidth: audioColumn.width
+                contentHeight: audioColumn.height
+
+                ColumnLayout {
+
+                    id: audioColumn
+
+                    width: Math.max(implicitWidth, audioScroll.availableWidth)
+                    height: Math.max(implicitHeight, audioScroll.availableHeight)
+
+                    spacing: Style.mediumSpacing
 
                 // The 5-column register grid (label + 4 channels) is wider
                 // than a shared column typically allows, so -- same trick
@@ -440,8 +475,8 @@ SiAmInspectorWindow {
                         }
                     }
                 }
+                }
             }
         }
         }
-    }
 }
