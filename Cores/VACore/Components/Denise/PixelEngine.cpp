@@ -883,22 +883,36 @@ template <TexelFormat F>
 void
 PixelEngine::hide(isize line, u16 layers)
 {
-    // Pixel coordinates address super-hires pixels (see colorize)
     auto *emu = workingPtr(line);
-    auto *xray = xrayWorkingPtr(line);
+    auto &xrayBuf = getWorkingXrayBuffer();
 
-    // Resolve the ten possible Opt::XRAY_COLORn values into GpuColor<F>
-    // once per line (not per pixel) -- same palette DmaDebugger uses for
-    // its own DMA channels 0-7 (see DmaDebuggerTypes::XRAY_COLOR_COUNT).
+    // Resolve the ten possible Opt::XRAY_COLORn values into a light/dark
+    // checkerboard pair per slot, once per line -- same palette
+    // DmaDebugger uses for its own DMA channels 0-7, and the same two
+    // shade levels it precomputes for its channel colors (see
+    // DmaDebugger::setColor and DmaDebuggerTypes::XRAY_COLOR_COUNT).
     auto &debugColor = dmaDebugger.getConfig().debugColor;
-    GpuColor<F> layerColor[XRAY_COLOR_COUNT];
+    Texel colA[XRAY_COLOR_COUNT], colB[XRAY_COLOR_COUNT];
     for (isize n = 0; n < XRAY_COLOR_COUNT; n++) {
-        layerColor[n] = GpuColor<F>(RgbColor(debugColor[n]));
+
+        RgbColor base(debugColor[n]);
+        colA[n] = toTexel<F>(GpuColor<F>(base.shade(0.3)));
+        colB[n] = toTexel<F>(GpuColor<F>(base.shade(0.1)));
     }
 
-    for (Pixel i = 0; i < Denise::PIXEL_CNT; i++) {
+    // Establish the "nothing hidden" baseline for the whole row
+    xrayBuf.clear(line, Texture::black, Texture::black);
 
-        u16 z = denise.zBuffer[i];
+    /* Iterate in DMA-cycle-sized steps (4 hires texels each), the same
+     * granularity Texture::clear and DmaDebugger::computeOverlay already
+     * use, rather than the finer superhires resolution the z-buffer is
+     * indexed at (Denise::PIXEL_CNT) -- one representative sub-pixel per
+     * cycle is enough for a checkerboard cutout indicator.
+     */
+    isize cycles = HPIXELS / 4;
+    for (isize cycle = 0; cycle < cycles; cycle++) {
+
+        u16 z = denise.zBuffer[cycle * 8];
         isize idx = -1;
 
         // Check for case 1: A sprite is visible
@@ -920,21 +934,15 @@ PixelEngine::hide(isize line, u16 layers)
             else if ((Denise::upperPlayfield(z) == 2) && (layers & 0x200)) idx = 9;
         }
 
-        if (idx < 0) {
+        if (idx < 0) continue;
 
-            // Nothing to show at this pixel in the xray texture
-            xray[i] = Texture::black;
-            continue;
-        }
-
-        // Paint the cutout's assigned XRAY_COLOR into the xray texture
-        // alone -- the same channel-coloring pipeline XRayMode::XRAY_DMA
-        // uses. See mergeXray for how (and whether) it ends up blended
-        // into the real picture.
-        xray[i] = toTexel<F>(layerColor[idx]);
+        // Paint this cycle's assigned XRAY_COLOR checkerboard into the
+        // xray texture alone -- see mergeXray for how (and whether) it
+        // ends up blended into the real picture.
+        xrayBuf.clear(line, cycle, colA[idx], colB[idx]);
     }
 
-    mergeXray(emu, xray, Denise::PIXEL_CNT);
+    mergeXray(emu, xrayWorkingPtr(line), HPIXELS);
 }
 
 }

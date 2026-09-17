@@ -453,11 +453,15 @@ public:
 public:
 
     /* Cuts out certain graphics layers (see DENISE_HIDDEN_LAYERS), only
-     * active in XRayMode::XRAY_LAYERS. Mirrors DmaDebugger::computeOverlay:
-     * paints only the raw cutout into the xray texture (see xrayTexture),
-     * so the Layers inspector's preview has something to show, and never
-     * touches the emulator texture directly -- see mergeXray for how (and
-     * whether) that cutout ends up blended into the real picture.
+     * active in XRayMode::XRAY_LAYERS. Draws a checkerboard for each cut
+     * cycle via Texture::clear, using that layer's assigned Opt::XRAY_COLORn
+     * (the same palette slots XRayMode::XRAY_DMA's channels use) instead of
+     * a fixed grey -- e.g. a yellow playfield 1 color makes its cutout a
+     * yellowish checkerboard. Mirrors DmaDebugger::computeOverlay: paints
+     * only into the xray texture (see xrayTexture), so the Layers
+     * inspector's preview has something to show, and never touches the
+     * emulator texture directly -- see mergeXray for how (and whether) that
+     * ends up blended into the real picture.
      *
      * Dispatches once (per call, not per pixel) to the templated overload
      * below, matching the host's current HOST_TEX_FORMAT -- see
