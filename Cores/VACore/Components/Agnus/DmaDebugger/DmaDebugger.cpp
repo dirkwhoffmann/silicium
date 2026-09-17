@@ -145,6 +145,12 @@ DmaDebugger::setOption(Opt option, i64 value)
         case Opt::XRAY_MODE:
 
             config.mode = (XRayMode)value;
+
+            // Avoid showing stale visualization from the previous mode
+            // (or real picture data in the xray texture) until the new
+            // mode has painted its own pixels.
+            pixelEngine.clearAll();
+
             msgQueue.put(Msg::DMA_DEBUG, value);
             return;
 
