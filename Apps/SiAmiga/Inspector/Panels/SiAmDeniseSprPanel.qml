@@ -41,7 +41,18 @@ RowLayout {
     // list beneath it.
     ColumnLayout {
 
+        // preferredWidth alone isn't enough to keep this column at 140:
+        // the Registers SiScrollBox below wants to be much wider (its
+        // ScrollView reports its own natural content width -- 32 Si16 rows
+        // meant to scroll, not to size this column -- as an implicit size
+        // that bubbles up through this ColumnLayout), and Qt Quick Layouts
+        // never shrinks a child below whichever of minimumWidth/implicitWidth
+        // is larger. maximumWidth is what actually clamps it, forcing the
+        // ScrollView to scroll its content instead of stretching the
+        // column -- which is the whole reason it's a *Scroll*Box.
         Layout.preferredWidth: 140
+        Layout.minimumWidth: 0
+        Layout.maximumWidth: 140
         Layout.fillHeight: true
         spacing: Style.mediumSpacing
 
@@ -51,10 +62,17 @@ RowLayout {
             Layout.fillWidth: true
             spacing: Style.tinySpacing
 
-            RowLayout {
+            // 4x2 rather than a single row of 8 -- 8 checkboxes in one row
+            // need more width than this 140px column has to spare (they'd
+            // silently inflate the whole column past its preferredWidth
+            // hint instead, stealing space from the Sprites box next to
+            // it), and this box has the height to spare a second row.
+            GridLayout {
 
-                Layout.fillWidth: true
-                spacing: Style.tinySpacing
+                Layout.alignment: Qt.AlignHCenter
+                columns: 4
+                columnSpacing: Style.tinySpacing
+                rowSpacing: Style.tinySpacing
 
                 Repeater {
                     model: 8
@@ -125,56 +143,74 @@ RowLayout {
         }
     }
 
-    SiBox {
+    // Plain wrapper (not a SiBox itself) so the sprite selector can be
+    // anchored to spritesBox's top edge and straddle its border, the same
+    // "melted into the border" placement SiAmDenisePanel.qml's own
+    // Registers/Colors/Sprites tabControl uses for stackBox -- title left
+    // empty for the same reason that one has none: the segmented control
+    // sitting on the border already identifies this box, a separate title
+    // label would just repeat it.
+    Item {
 
-        title: qsTr("Sprites")
         Layout.fillWidth: true
         Layout.fillHeight: true
-        spacing: Style.tinySpacing
 
-        SiSegmentedControl {
+        SiBox {
 
-            Layout.fillWidth: true
-            model: [0, 1, 2, 3, 4, 5, 6, 7].map(i => i.toString())
-            currentIndex: denise.selectedSprite
-            onActivated: (index) => denise.selectedSprite = index
-        }
+            id: spritesBox
+            anchors.fill: parent
+            anchors.topMargin: spriteSelector.height / 2
+            spacing: Style.tinySpacing
 
-        Rectangle {
+            VSpacer { size: Style.tinySpacing }
 
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.topMargin: Style.tinySpacing
-            color: "black"
-            border.width: 1
-            border.color: Palette.surfaceBorder
-            radius: Style.radius
-            clip: true
+            Rectangle {
 
-            SiAmSpriteView {
-                anchors.fill: parent
-                anchors.margins: Style.radius
-                spriteNr: denise.selectedSprite
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                color: "black"
+                border.width: 1
+                border.color: Palette.surfaceBorder
+                radius: Style.radius
+                clip: true
+
+                SiAmSpriteView {
+
+                    anchors.fill: parent
+                    anchors.margins: Style.radius
+                    spriteNr: denise.selectedSprite
+                }
+            }
+
+            RowLayout {
+
+                Layout.topMargin: Style.tinySpacing
+                spacing: Style.smallSpacing
+
+                SiLabel { text: qsTr("VPOS") }
+                Si16 { controlWidth: 48; value: denise.sprVStart }
+                SiLabel { text: "-" }
+                Si16 { controlWidth: 48; value: denise.sprVStop }
+
+                SiLabel { text: qsTr("HPOS") }
+                Si16 { controlWidth: 48; value: denise.sprHStart }
+
+                HSpacer { }
+
+                SiLabel { text: qsTr("AT") }
+                SiCheckBoxControl { readOnly: true; checked: denise.sprAttach }
             }
         }
 
-        RowLayout {
+        SiSegmentedControl {
 
-            Layout.topMargin: Style.tinySpacing
-            spacing: Style.smallSpacing
+            id: spriteSelector
+            anchors.horizontalCenter: spritesBox.horizontalCenter
+            anchors.verticalCenter: spritesBox.top
 
-            SiLabel { text: qsTr("VPOS") }
-            Si16 { controlWidth: 48; value: denise.sprVStart }
-            SiLabel { text: "-" }
-            Si16 { controlWidth: 48; value: denise.sprVStop }
-
-            SiLabel { text: qsTr("HPOS") }
-            Si16 { controlWidth: 48; value: denise.sprHStart }
-
-            HSpacer { }
-
-            SiLabel { text: qsTr("AT") }
-            SiCheckBoxControl { readOnly: true; checked: denise.sprAttach }
+            model: [0, 1, 2, 3, 4, 5, 6, 7].map(i => i.toString())
+            currentIndex: denise.selectedSprite
+            onActivated: (index) => denise.selectedSprite = index
         }
     }
 }
