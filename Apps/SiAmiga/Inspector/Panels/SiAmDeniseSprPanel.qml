@@ -41,18 +41,22 @@ RowLayout {
     // list beneath it.
     ColumnLayout {
 
-        // preferredWidth alone isn't enough to keep this column at 140:
-        // the Registers SiScrollBox below wants to be much wider (its
-        // ScrollView reports its own natural content width -- 32 Si16 rows
+        // preferredWidth alone isn't enough to keep this column at a fixed
+        // size: the Registers SiScrollBox below wants to be as wide as its
+        // content (its ScrollView reports its own natural content width --
         // meant to scroll, not to size this column -- as an implicit size
         // that bubbles up through this ColumnLayout), and Qt Quick Layouts
         // never shrinks a child below whichever of minimumWidth/implicitWidth
         // is larger. maximumWidth is what actually clamps it, forcing the
         // ScrollView to scroll its content instead of stretching the
-        // column -- which is the whole reason it's a *Scroll*Box.
-        Layout.preferredWidth: 140
+        // column -- which is the whole reason it's a *Scroll*Box. 480 (up
+        // from the original 140) is wide enough for a sprite's four
+        // registers side by side -- see the Repeater below -- and the
+        // Sprites box on the right still has plenty of room since its own
+        // preview was being stretched wider than the sprite itself needs.
+        Layout.preferredWidth: 480
         Layout.minimumWidth: 0
-        Layout.maximumWidth: 140
+        Layout.maximumWidth: 480
         Layout.fillHeight: true
         spacing: Style.mediumSpacing
 
@@ -120,12 +124,12 @@ RowLayout {
 
                     model: 8
 
-                    ColumnLayout {
+                    RowLayout {
 
                         required property int index
 
                         Layout.topMargin: Style.smallSpacing
-                        spacing: -1
+                        spacing: Style.tinySpacing
 
                         // denise.revision is read purely to give each binding
                         // below a dependency to re-evaluate on -- sprData(n)/
