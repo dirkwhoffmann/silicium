@@ -412,10 +412,36 @@ SiAmInspectorWindow {
                                 Si16 { lwidth: root.hlw; l: qsTr("DIWSTRT"); value: denise.diwstrt }
                                 Si16 { lwidth: root.hlw; l: qsTr("DIWSTOP"); value: denise.diwstop }
                                 Si16 { lwidth: root.hlw; l: qsTr("DIWHIGH"); value: denise.diwhigh }
-                                Si16 { lwidth: root.hlw; l: qsTr("HSTRT"); value: denise.hstrt }
-                                Si16 { lwidth: root.hlw; l: qsTr("VSTRT"); value: denise.vstrt }
-                                Si16 { lwidth: root.hlw; l: qsTr("HSTOP"); value: denise.hstop }
-                                Si16 { lwidth: root.hlw; l: qsTr("VSTOP"); value: denise.vstop }
+                            }
+
+                            // HSTRT/HSTOP/VSTRT/VSTOP -- the pixel viewport
+                            // Denise derives from DIWSTRT/DIWSTOP/DIWHIGH --
+                            // laid out as a compact directional pad instead
+                            // of 4 more label/value rows: VSTRT above and
+                            // VSTOP below span all 3 columns (there's only
+                            // one value per row, so no need for 3 separate
+                            // cells there), with HSTRT/an icon/HSTOP sharing
+                            // the middle row.
+                            GridLayout {
+
+                                Layout.alignment: Qt.AlignHCenter
+                                Layout.topMargin: Style.mediumSpacing
+                                columns: 3
+                                columnSpacing: Style.mediumSpacing
+                                rowSpacing: Style.tinySpacing
+
+                                Si16 { Layout.columnSpan: 3; Layout.alignment: Qt.AlignHCenter; value: denise.vstrt }
+
+                                Si16 { Layout.alignment: Qt.AlignHCenter; value: denise.hstrt }
+                                SiSymbol {
+
+                                    Layout.alignment: Qt.AlignHCenter
+                                    phosphor: "arrows-out-cardinal"
+                                    color: Palette.disabled
+                                }
+                                Si16 { Layout.alignment: Qt.AlignHCenter; value: denise.hstop }
+
+                                Si16 { Layout.columnSpan: 3; Layout.alignment: Qt.AlignHCenter; value: denise.vstop }
                             }
 
                             VSpacer { }
