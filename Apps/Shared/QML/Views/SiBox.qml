@@ -12,6 +12,7 @@ Item {
     property alias font: header.font
     property color color: Palette.elevation
     property color borderColor: Palette.surface
+    property alias borderWidth: paneBg.border.width
     property alias spacing: container.spacing
     default property alias content: container.data
 

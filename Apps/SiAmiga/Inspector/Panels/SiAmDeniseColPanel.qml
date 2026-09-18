@@ -173,7 +173,14 @@ RowLayout {
                 id: bankBox
                 required property int index
 
+                // Highlights the bank BPLCON3's BANK field currently maps
+                // to the 32 physical COLORxx registers -- i.e. the bank the
+                // "Registers" column on the left is actually reading from.
+                readonly property bool current: index === root.denise.colorBank
+
                 title: qsTr("Bank %1").arg(index)
+                font.bold: current
+                borderWidth: current ? 2 : 1
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
