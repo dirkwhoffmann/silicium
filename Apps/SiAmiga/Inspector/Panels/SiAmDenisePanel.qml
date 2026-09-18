@@ -38,20 +38,28 @@ SiAmInspectorWindow {
     readonly property var ic: controller.inspectorController
     readonly property int numBase: ic.hex ? 16 : 10
     readonly property bool numPadded: ic.padded
+    readonly property int lw: 64
+    readonly property int indent: 16
 
     // SiWordViewControl/SiByteViewControl (Apps/Shared/QML/Compounds) hold
     // the structural bits; this panel only adds the width override and the
     // hex/decimal toggle binding.
-    component SiHex16: SiWordViewControl {
 
-        controlWidth: 64
+    component Si1: SiBitViewControl {
+
+        size: Size.small
+    }
+
+    component Si16: SiWordViewControl {
+
+        size: Size.small
         base: root.numBase
         padded: root.numPadded
     }
 
-    component SiHex8: SiByteViewControl {
+    component Si8: SiByteViewControl {
 
-        controlWidth: 40
+        size: Size.small
         base: root.numBase
         padded: root.numPadded
     }
@@ -120,30 +128,18 @@ SiAmInspectorWindow {
 
                                 spacing: Style.tinySpacing
 
-                                RowLayout {
-                                    spacing: Style.tinySpacing
-                                    SiHex16 { l: qsTr("BPLCON0"); lwidth: 65; value: denise.bplcon0 }
-                                }
-                                SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.hires; l: qsTr("HIRES"); lwidth: 90 }
-                                SiWordViewControl { indent: 4; l: "BPU"; value: denise.bpu }
-                                    /*
-                                    RowLayout {
-                                        spacing: Style.smallSpacing
-                                        Item { Layout.preferredWidth: 4 }
-                                        SiHex8 { controlWidth: 32; value: denise.bpu }
-                                        SiLabel { text: qsTr("Bitplanes in use")
-                                    }
-
-                                     */
-                                SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.homod; l: qsTr("HAM"); lwidth: 90 }
-                                SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.dbplf; l: qsTr("DPF"); lwidth: 90 }
-                                SiCheckBoxControl { indent: 4; readOnly: true; enabled: denise.shresEnabled; checked: denise.shres; l: qsTr("SHRES"); lwidth: 90 }
-                                SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.lace; l: qsTr("LACE"); lwidth: 90 }
+                                Si16 { l: qsTr("BPLCON0"); lwidth: root.lw; value: denise.bplcon0 }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("HIRES"); checked: denise.hires }
+                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU"); value: denise.bpu }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("HAM"); checked: denise.homod }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("DPF"); checked: denise.dbplf }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("SHRES"); enabled: denise.shresEnabled; checked: denise.shres }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("LACE"); checked: denise.lace }
 
                                 RowLayout {
                                     Layout.topMargin: Style.mediumSpacing
                                     spacing: Style.tinySpacing
-                                    SiHex16 { l: qsTr("CLXDAT"); lwidth: 65; value: denise.clxdat }
+                                    Si16 { l: qsTr("CLXDAT"); lwidth: 65; value: denise.clxdat }
                                 }
                             }
 
@@ -153,16 +149,16 @@ SiAmInspectorWindow {
 
                                 RowLayout {
                                     spacing: Style.tinySpacing
-                                    SiHex16 { l: qsTr("BPLCON1"); lwidth: 65; value: denise.bplcon1 }
+                                    Si16 { l: qsTr("BPLCON1"); lwidth: 65; value: denise.bplcon1 }
                                 }
                                 RowLayout {
                                     spacing: Style.smallSpacing
-                                    SiHex8 { controlWidth: 32; value: denise.p1h }
+                                    Si8 { controlWidth: 32; value: denise.p1h }
                                     SiLabel { text: qsTr("Playfield 1 delay") }
                                 }
                                 RowLayout {
                                     spacing: Style.smallSpacing
-                                    SiHex8 { controlWidth: 32; value: denise.p2h }
+                                    Si8 { controlWidth: 32; value: denise.p2h }
                                     SiLabel { text: qsTr("Playfield 2 delay") }
                                 }
                             }
@@ -173,7 +169,7 @@ SiAmInspectorWindow {
 
                                 RowLayout {
                                     spacing: Style.tinySpacing
-                                    SiHex16 { l: qsTr("BPLCON2"); lwidth: 65; value: denise.bplcon2 }
+                                    Si16 { l: qsTr("BPLCON2"); lwidth: 65; value: denise.bplcon2 }
                                 }
                                 SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.pf2pri; l: qsTr("PF2PRI"); lwidth: 60 }
                                 SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.pf2p2;  l: qsTr("PF2P2");  lwidth: 60 }
@@ -190,18 +186,18 @@ SiAmInspectorWindow {
 
                                 RowLayout {
                                     spacing: Style.tinySpacing
-                                    SiHex16 { l: qsTr("BPLCON3"); lwidth: 65; value: denise.bplcon3 }
+                                    Si16 { l: qsTr("BPLCON3"); lwidth: 65; value: denise.bplcon3 }
                                 }
                                 RowLayout {
                                     spacing: Style.smallSpacing
                                     Item { Layout.preferredWidth: 4 }
-                                    SiHex8 { controlWidth: 32; value: denise.colorBank }
+                                    Si8 { controlWidth: 32; value: denise.colorBank }
                                     SiLabel { text: qsTr("Color bank") }
                                 }
                                 RowLayout {
                                     spacing: Style.smallSpacing
                                     Item { Layout.preferredWidth: 4 }
-                                    SiHex8 { controlWidth: 32; value: denise.pf2of }
+                                    Si8 { controlWidth: 32; value: denise.pf2of }
                                     SiLabel { text: qsTr("PF2 offset") }
                                 }
                                 SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.loct;      l: qsTr("LOCT");      lwidth: 60 }
@@ -236,7 +232,7 @@ SiAmInspectorWindow {
                                 Layout.alignment: Qt.AlignVCenter
                                 spacing: Style.mediumSpacing
 
-                                SiHex16 { value: denise.diwstrt }
+                                Si16 { value: denise.diwstrt }
 
                                 ColumnLayout {
 
@@ -259,7 +255,7 @@ SiAmInspectorWindow {
                                     SiText { Layout.alignment: Qt.AlignRight; text: "(%1,%2)".arg(denise.hstop).arg(denise.vstop); font.pixelSize: Style.small }
                                 }
 
-                                SiHex16 { value: denise.diwstop }
+                                Si16 { value: denise.diwstop }
 
                                 HSpacer { }
                             }
@@ -354,12 +350,12 @@ SiAmInspectorWindow {
                         spacing: Style.smallSpacing
 
                         SiLabel { text: qsTr("VPOS") }
-                        SiHex16 { controlWidth: 48; value: denise.sprVStart }
+                        Si16 { controlWidth: 48; value: denise.sprVStart }
                         SiLabel { text: "-" }
-                        SiHex16 { controlWidth: 48; value: denise.sprVStop }
+                        Si16 { controlWidth: 48; value: denise.sprVStop }
 
                         SiLabel { text: qsTr("HPOS") }
-                        SiHex16 { controlWidth: 48; value: denise.sprHStart }
+                        Si16 { controlWidth: 48; value: denise.sprHStart }
 
                         HSpacer { }
 
