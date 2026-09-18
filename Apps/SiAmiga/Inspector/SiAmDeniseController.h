@@ -129,13 +129,19 @@ class SiAmDeniseController : public SiAmInspectorController {
     // 4 banks of 32 entries each -- see the Colors tab's class comment.
     quint16 m_colorReg[128] = {};
 
-    // Bumped every refreshData() call. colorAt(n) is Q_INVOKABLE, not a
-    // Q_PROPERTY, so QML's binding engine never learns the Swatch grid's
-    // `denise.colorAt(n)` bindings depend on m_colorReg -- calling an
-    // invokable from within a binding registers no dependency, unlike
-    // reading a NOTIFYing property. Referencing this counter alongside the
-    // colorAt(n) call in the binding gives it something to depend on, so
-    // the swatches actually repaint when the palette changes. Same trick as
+    // What CPU/Copper reads of COLOR00..COLOR31 actually see right now --
+    // see DeniseInfo::colorRegPeek's own comment (0 unless AGA + RDRAM).
+    // Shown on the Colors tab's own "Registers" box.
+    quint16 m_colorRegPeek[32] = {};
+
+    // Bumped every refreshData() call. colorAt(n)/colorRegPeek(n) are
+    // Q_INVOKABLE, not Q_PROPERTY, so QML's binding engine never learns the
+    // Colors tab's `denise.colorAt(n)`/`denise.colorRegPeek(n)` bindings
+    // depend on m_colorReg/m_colorRegPeek -- calling an invokable from
+    // within a binding registers no dependency, unlike reading a NOTIFYing
+    // property. Referencing this counter alongside the call in the binding
+    // gives it something to depend on, so the swatches/register column
+    // actually repaint when the palette changes. Same trick as
     // SiC64MemoryController::m_selectRevision.
     int m_colorRevision = 0;
 
@@ -222,8 +228,13 @@ class SiAmDeniseController : public SiAmInspectorController {
     // QColors.
     Q_INVOKABLE QColor colorAt(int nr) const;
 
-    // See m_colorRevision's own comment -- read this alongside colorAt(n) in
-    // a QML binding to make it re-evaluate when the palette changes.
+    // Raw value of COLORnn (0x0RGB) as it currently reads back to the
+    // CPU/Copper -- see m_colorRegPeek's own comment.
+    Q_INVOKABLE int colorRegPeek(int nr) const { return nr >= 0 && nr < 32 ? m_colorRegPeek[nr] : 0; }
+
+    // See m_colorRevision's own comment -- read this alongside colorAt(n)/
+    // colorRegPeek(n) in a QML binding to make it re-evaluate when the
+    // palette changes.
     Q_PROPERTY(int colorRevision READ colorRevision NOTIFY deniseChanged)
     int colorRevision() const { return m_colorRevision; }
 

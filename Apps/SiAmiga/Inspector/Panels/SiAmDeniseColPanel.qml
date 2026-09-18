@@ -15,18 +15,28 @@ import Silicium.Controllers
 import Silicium.Theme
 
 // SiAmDenisePanel's "Colors" tab -- one box per AGA color bank (4 banks of
-// 32 registers each; see SiAmDeniseController's own colorAt(n) comment).
-// Split out of SiAmDenisePanel.qml purely for file size, alongside the
-// Registers/Sprites tabs -- see SiAmDeniseRegPanel.qml's own comment.
-GridLayout {
+// 32 registers each; see SiAmDeniseController's own colorAt(n) comment),
+// plus a "Registers" column on the left showing what the 32 physical
+// COLORxx registers currently read back as (see colorRegPeek(n)'s own
+// comment). Split out of SiAmDenisePanel.qml purely for file size, alongside
+// the Registers/Sprites tabs -- see SiAmDeniseRegPanel.qml's own comment.
+RowLayout {
 
     id: root
 
     required property var denise
+    required property int numBase
+    required property bool numPadded
 
-    columns: 2
-    columnSpacing: Style.mediumSpacing
-    rowSpacing: Style.mediumSpacing
+    spacing: Style.mediumSpacing
+
+    component Si16: SiWordViewControl {
+
+        size: Size.small
+        controlWidth: 44
+        base: root.numBase
+        padded: root.numPadded
+    }
 
     // One color-register swatch -- a plain circle, matching the round
     // NSColorWell style DenisePanel.swift's colorReg wells use.
@@ -110,36 +120,81 @@ GridLayout {
         }
     }
 
-    Repeater {
+    // The 32 physical COLORxx registers -- distinct from the swatch grid on
+    // the right, which always shows every bank's true color regardless of
+    // whether it's currently bank-selected or readable. This column shows
+    // exactly what a CPU/Copper peek of COLORnn returns right now, which is
+    // 0 unless the chipset is AGA and RDRAM is set (see colorRegPeek(n)'s
+    // own comment).
+    SiScrollBox {
 
-        model: 4
+        title: qsTr("Registers")
+        Layout.fillHeight: true
+        spacing: Style.tinySpacing
 
-        SiBox {
+        ColumnLayout {
 
-            id: bankBox
-            required property int index
+            spacing: Style.tinySpacing
 
-            title: qsTr("Bank %1").arg(index)
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+            Repeater {
 
-            GridLayout {
+                model: 32
 
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                columns: 8
-                columnSpacing: Style.tinySpacing
-                rowSpacing: Style.tinySpacing
+                Si16 {
+                    required property int index
+                    l: qsTr("COLOR%1").arg(index.toString().padStart(2, '0'))
+                    lwidth: 60
+                    // denise.colorRevision is read purely to give this
+                    // binding a dependency to re-evaluate on --
+                    // colorRegPeek(n) is Q_INVOKABLE, so calling it alone
+                    // never triggers a re-evaluation when the peeked value
+                    // changes. See SiAmDeniseController::m_colorRevision's
+                    // own comment.
+                    value: { root.denise.colorRevision; return root.denise.colorRegPeek(index) }
+                }
+            }
+        }
+    }
 
-                Repeater {
-                    model: 32
-                    Swatch {
-                        required property int index
-                        // denise.colorRevision is read purely to give this
-                        // binding a dependency to re-evaluate on -- colorAt(n)
-                        // is Q_INVOKABLE, so calling it alone never triggers a
-                        // re-evaluation when the palette changes. See
-                        // SiAmDeniseController::m_colorRevision's own comment.
-                        value: { root.denise.colorRevision; return root.denise.colorAt(bankBox.index * 32 + index) }
+    GridLayout {
+
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        columns: 2
+        columnSpacing: Style.mediumSpacing
+        rowSpacing: Style.mediumSpacing
+
+        Repeater {
+
+            model: 4
+
+            SiBox {
+
+                id: bankBox
+                required property int index
+
+                title: qsTr("Bank %1").arg(index)
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                GridLayout {
+
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    columns: 8
+                    columnSpacing: Style.tinySpacing
+                    rowSpacing: Style.tinySpacing
+
+                    Repeater {
+                        model: 32
+                        Swatch {
+                            required property int index
+                            // denise.colorRevision is read purely to give this
+                            // binding a dependency to re-evaluate on -- colorAt(n)
+                            // is Q_INVOKABLE, so calling it alone never triggers a
+                            // re-evaluation when the palette changes. See
+                            // SiAmDeniseController::m_colorRevision's own comment.
+                            value: { root.denise.colorRevision; return root.denise.colorAt(bankBox.index * 32 + index) }
+                        }
                     }
                 }
             }

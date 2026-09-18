@@ -153,6 +153,7 @@ SiAmDeniseController::refreshData()
     m_clxcon2 = info.clxcon2;
 
     for (int i = 0; i < 128; i++) m_colorReg[i] = info.colorReg[i];
+    for (int i = 0; i < 32; i++) m_colorRegPeek[i] = info.colorRegPeek[i];
     m_colorRevision++;
 
     for (int i = 0; i < 8; i++) m_spriteArmed[i] = info.sprite[i].height != 0;

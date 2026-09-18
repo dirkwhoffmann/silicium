@@ -155,6 +155,15 @@ typedef struct
     // one 32-swatch box per bank.
     u16 colorReg[128];
     u32 color[32];
+
+    // What CPU/Copper reads of COLOR00..COLOR31 (the 32 physical registers,
+    // not the full 128-entry table above) actually see right now --
+    // Denise::spypeekCOLORxx() itself returns 0 unless the chipset is AGA
+    // and RDRAM is set, since OCS/ECS never support reading these back at
+    // all. Shown on the Colors tab's own "Registers" box, separate from the
+    // swatch grid, which always shows every bank's true color regardless of
+    // whether it's currently readable.
+    u16 colorRegPeek[32];
     
     SpriteInfo sprite[8];
 }

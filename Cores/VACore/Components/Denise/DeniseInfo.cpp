@@ -54,6 +54,9 @@ Denise::cacheInfo() const
     for (isize i = 0; i < 128; i++) {
         info.colorReg[i] = pixelEngine.getColor(i);
     }
+    for (isize i = 0; i < 32; i++) {
+        info.colorRegPeek[i] = spypeekCOLORxx(i);
+    }
     for (isize i = 0; i < 8; i++) {
         info.sprite[i] = debugger.latchedSpriteInfo[i];
         info.sprite[i].data = debugger.latchedSpriteData[i];

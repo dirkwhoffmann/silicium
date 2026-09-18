@@ -104,6 +104,8 @@ SiAmInspectorWindow {
                 SiAmDeniseColPanel {
 
                     denise: root.denise
+                    numBase: root.numBase
+                    numPadded: root.numPadded
                 }
 
                 //
