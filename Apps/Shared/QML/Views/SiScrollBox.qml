@@ -107,12 +107,40 @@ Item {
                 // gets smaller than the content's natural size (see
                 // SiAmCPUPanel.qml's Layout.fillWidth comment for the
                 // related default-heuristic pitfall this sidesteps).
+                //
+                // width/height are set imperatively (via the handlers
+                // below) rather than as plain `width: Math.max(implicitWidth,
+                // ...)` bindings. Declaring it as a direct binding makes
+                // QtQuick Layouts report a "Binding loop detected for
+                // property width/height": setting width re-stretches this
+                // ColumnLayout's Layout.fillWidth/fillHeight children,
+                // which re-triggers the internal size-hint recalculation
+                // that implicitWidth/Height is read from, so the binding's
+                // own dependency gets rewritten while it's still being
+                // evaluated. The resulting value is stable (it converges
+                // immediately), but the engine's loop detector flags the
+                // reentrant evaluation regardless. Doing the same
+                // computation from onImplicitWidthChanged/
+                // onImplicitHeightChanged instead is a plain, one-shot
+                // property assignment rather than a tracked binding, so it
+                // isn't subject to that diagnostic (see
+                // SiAmBlitterPanel.qml for the original fix).
                 ColumnLayout {
 
                     id: container
 
-                    width: Math.max(implicitWidth, scrollView.availableWidth)
-                    height: Math.max(implicitHeight, scrollView.availableHeight)
+                    function updateWidth() { width = Math.max(implicitWidth, scrollView.availableWidth) }
+                    function updateHeight() { height = Math.max(implicitHeight, scrollView.availableHeight) }
+
+                    Component.onCompleted: { updateWidth(); updateHeight() }
+                    onImplicitWidthChanged: updateWidth()
+                    onImplicitHeightChanged: updateHeight()
+
+                    Connections {
+                        target: scrollView
+                        function onAvailableWidthChanged() { container.updateWidth() }
+                        function onAvailableHeightChanged() { container.updateHeight() }
+                    }
                 }
             }
         }
