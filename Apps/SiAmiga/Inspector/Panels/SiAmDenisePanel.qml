@@ -30,9 +30,13 @@ SiAmInspectorWindow {
     // root.page below), that page also has to make room for the
     // Program/Trace/Debug-style tab bar's own overlap margin above it, so
     // the same content needs a bit more height than before to avoid
-    // squeezing everything below its natural size.
-    height: 540
-    minimumHeight: 420
+    // squeezing everything below its natural size. Grown again once the
+    // BPLCON0 column's bit list grew from 6 to 13 rows (COLOR/GAUD/UHRES/
+    // BYPASS/LPEN/ERSY/ECSENA added) -- that column, not the fixed-height
+    // Display window/Colors row below it, is now what sets the Registers
+    // box's required height.
+    height: 720
+    minimumHeight: 600
 
     readonly property var denise: controller.deniseController
     readonly property var ic: controller.inspectorController
@@ -126,8 +130,15 @@ SiAmInspectorWindow {
                                 Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU"); value: denise.bpu }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("HAM"); checked: denise.homod }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("DPF"); checked: denise.dbplf }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("COLOR"); checked: denise.color }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("GAUD"); checked: denise.gaud }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("UHRES"); checked: denise.uhres }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("SHRES"); enabled: denise.shresEnabled; checked: denise.shres }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BYPASS"); checked: denise.bypass }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("LPEN"); checked: denise.lpen }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("LACE"); checked: denise.lace }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ERSY"); checked: denise.ersy }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ECSENA"); checked: denise.ecsena }
 
                                 RowLayout {
                                     Layout.topMargin: Style.mediumSpacing
@@ -150,6 +161,12 @@ SiAmInspectorWindow {
                                 spacing: Style.tinySpacing
 
                                 Si16 { l: qsTr("BPLCON2"); lwidth: root.lw; value: denise.bplcon2 }
+                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDBPSEL"); value: denise.zdbpsel }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDBPEN"); checked: denise.zdbpen }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDCTEN"); checked: denise.zdcten }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("KILLEHB"); checked: denise.killehb }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("RDRAM"); checked: denise.rdram }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("SOGEN"); checked: denise.sogen }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2PRI"); checked: denise.pf2pri }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2P2");  checked: denise.pf2p2 }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2P1");  checked: denise.pf2p1 }
@@ -167,8 +184,11 @@ SiAmInspectorWindow {
                                 Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("BANK");     value: denise.colorBank }
                                 Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2OF");    value: denise.pf2of }
                                 Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("LOCT");     checked: denise.loct }
+                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("SPRES");    value: denise.spres }
                                 Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("BRDRBLNK"); checked: denise.brdrblnk }
+                                Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("BRDNTRAN"); checked: denise.brdntran }
                                 Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("BRDSPRT");  checked: denise.brdsprt }
+                                Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("EXTBLKEN"); checked: denise.extblken }
                             }
 
                             ColumnLayout {

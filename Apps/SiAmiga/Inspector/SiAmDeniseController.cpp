@@ -70,6 +70,16 @@ SiAmDeniseController::refreshData()
     m_lace  = bplcon0 & 0b0000000000000100;
     m_shres = bplcon0 & 0b0000000001000000;
 
+    // The remaining BPLCON0 bits -- see SiAmDeniseController's own field
+    // comment for why these have no Denise:: accessor to mirror.
+    m_color  = bplcon0 & 0b0000001000000000;
+    m_gaud   = bplcon0 & 0b0000000100000000;
+    m_uhres  = bplcon0 & 0b0000000010000000;
+    m_bypass = bplcon0 & 0b0000000000100000;
+    m_lpen   = bplcon0 & 0b0000000000001000;
+    m_ersy   = bplcon0 & 0b0000000000000010;
+    m_ecsena = bplcon0 & 0b0000000000000001;
+
     auto rev = DeniseRev(SiAmController::core().get(Opt::DENISE_REVISION));
     m_shresEnabled = rev == DeniseRev::ECS;
 
@@ -83,15 +93,27 @@ SiAmDeniseController::refreshData()
     m_pf1p2  = bplcon2 & 0b0000100;
     m_pf1p1  = bplcon2 & 0b0000010;
     m_pf1p0  = bplcon2 & 0b0000001;
+    m_killehb = bplcon2 & 0b1000000000;
+    m_rdram   = bplcon2 & 0b0100000000;
+    m_sogen   = bplcon2 & 0b0000000010000000;
+
+    // BPLCON2's remaining AGA ZD-pin bits -- see the field comment.
+    m_zdbpsel = (bplcon2 >> 12) & 0b111;
+    m_zdbpen  = bplcon2 & 0b0000100000000000;
+    m_zdcten  = bplcon2 & 0b0000010000000000;
 
     // BPLCON3 (AGA), same bit positions as Denise::colorBank()/pf2of()/
     // loct()/brdrblnk()/brdsprt() -- see SiAmDeniseController's class
-    // comment.
+    // comment. SPRES/BRDNTRAN/EXTBLKEN have no Denise:: accessor to mirror
+    // (see the field comment).
     m_colorBank = (bplcon3 >> 13) & 0b111;
     m_pf2of     = (bplcon3 >> 10) & 0b111;
     m_loct      = bplcon3 & 0b0000001000000000;
     m_brdrblnk  = bplcon3 & 0b0000000000100000;
     m_brdsprt   = bplcon3 & 0b0000000000000010;
+    m_spres     = (bplcon3 >> 6) & 0b11;
+    m_brdntran  = bplcon3 & 0b0000000000010000;
+    m_extblken  = bplcon3 & 0b0000000000000001;
 
     // BPLCON4 (AGA), same bit positions as Denise::bplam()/esprm()/osprm().
     m_bplam = (bplcon4 >> 8) & 0xFF;
