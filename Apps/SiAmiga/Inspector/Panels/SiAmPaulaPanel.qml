@@ -61,12 +61,8 @@ SiAmInspectorWindow {
         padded: root.numPadded
     }
 
-    component SiBitViewControl: SiCheckBoxControl {
-
-        size: Size.small
-        bitStyle: true
-        readOnly: true
-    }
+    // SiBitViewControl (a single read-only bit-style checkbox) now lives in
+    // Apps/Shared/QML/Compounds -- used directly below.
 
     // Five-node DMA state-machine diagram -- one of five pre-rendered
     // template images (see the class comment), picked by currentState (0,

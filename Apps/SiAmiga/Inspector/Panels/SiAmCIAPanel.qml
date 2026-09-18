@@ -81,16 +81,16 @@ SiAmInspectorWindow {
         rowSpacing: Style.tinySpacing
 
         SiWordViewControl { base: root.numBase; padded: root.numPadded; l: qsTr("Timer %1:").arg(label); lwidth: 50; value: countValue }
-        SiCheckBoxControl { size: Size.small; bitStyle: true; readOnly: true; checked: running; r: qsTr("Running") }
+        SiBitViewControl { checked: running; r: qsTr("Running") }
 
         SiWordViewControl { base: root.numBase; padded: root.numPadded; l: qsTr("Latch %1:").arg(label); lwidth: 50; value: latchValue }
-        SiCheckBoxControl { size: Size.small; bitStyle: true; readOnly: true; checked: toggle; r: qsTr("Toggle") }
+        SiBitViewControl { checked: toggle; r: qsTr("Toggle") }
 
         Item { }
-        SiCheckBoxControl { size: Size.small; bitStyle: true; readOnly: true; checked: pbout; r: qsTr("PB out") }
+        SiBitViewControl { checked: pbout; r: qsTr("PB out") }
 
         Item { }
-        SiCheckBoxControl { size: Size.small; bitStyle: true; readOnly: true; checked: oneShot; r: qsTr("One shot") }
+        SiBitViewControl { checked: oneShot; r: qsTr("One shot") }
     }
 
     //
@@ -101,15 +101,12 @@ SiAmInspectorWindow {
     // of the Port grid below. A plain top-level component (QML doesn't allow
     // nesting an inline component inside another one), so portValue/labels
     // are passed in explicitly rather than reached via an enclosing id.
-    component Bit: SiCheckBoxControl {
+    component Bit: SiBitViewControl {
 
         required property int bitNr
         property int portValue: 0
         property var labels: []
 
-        size: Size.small
-        bitStyle: true
-        readOnly: true
         checked: (portValue & (1 << bitNr)) !== 0
         r: labels[bitNr]
     }

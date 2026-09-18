@@ -132,10 +132,10 @@ SiC64InspectorWindow {
 
                 spacing: Style.tinySpacing
 
-                SiCheckBoxControl { size: Size.small; bitStyle: true; readOnly: true; checked: running; r: qsTr("Running") }
-                SiCheckBoxControl { size: Size.small; bitStyle: true; readOnly: true; checked: toggle; r: qsTr("Toggle") }
-                SiCheckBoxControl { size: Size.small; bitStyle: true; readOnly: true; checked: pbout; r: qsTr("PB out") }
-                SiCheckBoxControl { size: Size.small; bitStyle: true; readOnly: true; checked: oneShot; r: qsTr("One shot") }
+                SiBitViewControl { checked: running; r: qsTr("Running") }
+                SiBitViewControl { checked: toggle; r: qsTr("Toggle") }
+                SiBitViewControl { checked: pbout; r: qsTr("PB out") }
+                SiBitViewControl { checked: oneShot; r: qsTr("One shot") }
             }
         }
     }
@@ -203,11 +203,8 @@ SiC64InspectorWindow {
                 Repeater {
 
                     model: 8
-                    delegate: SiCheckBoxControl {
+                    delegate: SiBitViewControl {
 
-                        size: Size.small
-                        bitStyle: true
-                        readOnly: true
                         required property int index
                         readonly property int bitNr: 7 - index
                         checked: (portBox.portValue & (1 << bitNr)) !== 0
