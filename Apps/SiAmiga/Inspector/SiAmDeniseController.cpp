@@ -15,7 +15,19 @@ using namespace vamiga;
 SiAmDeniseController::SiAmDeniseController(SiAmController *parent)
     : SiAmInspectorController(parent)
 {
-
+    // DeniseDebugger only records sprite data while track mode is on -- see
+    // Denise::hsyncHandler()'s "if (emulator.isTracking())
+    // debugger.recordSprites(wasArmed)" guard. Without it, latchedSpriteInfo/
+    // latchedSpriteData stay at their reset value (height 0, no data), so
+    // SiAmSpriteView's cacheData() bails out early and the Sprites tab's
+    // preview renders solid black even for an armed, visible sprite. Mirrors
+    // SiAmCopperController's own tracking connection (see its own comment)
+    // rather than the Swift reference's single shared Inspector window,
+    // which calls emu.trackOn() once for any panel via dialogWillShow().
+    connect(this, &SiAmInspectorController::activeChanged, this, [this]() {
+        if (isActive()) SiAmController::core().trackOn();
+        else SiAmController::core().trackOff();
+    });
 }
 
 void
