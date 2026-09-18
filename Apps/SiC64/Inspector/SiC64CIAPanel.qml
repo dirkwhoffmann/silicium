@@ -28,7 +28,7 @@ SiC64InspectorWindow {
     readonly property real columnWidth: Math.max(260,
         (scrollView.availableWidth - Style.largeSpacing * 2) / 3)
 
-    component SiBitViewControl: SiNumberViewControl {
+    component SiBinaryViewControl: SiNumberViewControl {
 
         size: Size.small
         font.weight: 500
@@ -171,7 +171,7 @@ SiC64InspectorWindow {
                     value: portBox.regValue
                 }
 
-                SiBitViewControl {
+                SiBinaryViewControl {
 
                     size: Size.small
                     indent: 60
@@ -186,7 +186,7 @@ SiC64InspectorWindow {
                     value: portBox.dirValue
                 }
 
-                SiBitViewControl {
+                SiBinaryViewControl {
 
                     size: Size.small
                     indent: 60
@@ -391,7 +391,7 @@ SiC64InspectorWindow {
                                 l: qsTr("Mask Register:")
                                 value: cia.imr
 
-                                SiBitViewControl {
+                                SiBinaryViewControl {
 
                                     size: Size.small
                                     value: cia.imr
@@ -407,7 +407,7 @@ SiC64InspectorWindow {
                                 l: qsTr("Control Register:")
                                 value: cia.icr
 
-                                SiBitViewControl {
+                                SiBinaryViewControl {
 
                                     size: Size.small
                                     value: cia.icr
@@ -487,7 +487,7 @@ SiC64InspectorWindow {
                                 l: qsTr("Shift Register:")
                                 value: cia.ssr
 
-                                SiBitViewControl {
+                                SiBinaryViewControl {
 
                                     size: Size.small
                                     value: cia.ssr

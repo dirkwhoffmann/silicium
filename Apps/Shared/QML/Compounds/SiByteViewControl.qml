@@ -7,7 +7,7 @@ import Silicium.Theme
 // SiByteViewControl. 'base' defaults to hex (16) and 'padded' to true, the
 // common case for every Inspector panel; a panel whose fields follow the
 // user's hex/decimal toggle (controller.inspectorController.hex) binds
-// 'base'/'padded' per instance -- see SiBitViewControl for the fixed-binary
+// 'base'/'padded' per instance -- see SiBinaryViewControl for the fixed-binary
 // counterpart and SiWordViewControl/SiWord24ViewControl/SiWord32ViewControl
 // for the wider ones.
 SiNumberViewControl {

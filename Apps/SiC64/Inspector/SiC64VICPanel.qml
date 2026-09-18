@@ -29,7 +29,7 @@ SiC64InspectorWindow {
     readonly property real columnWidth: Math.max(260,
         (scrollView.availableWidth - Style.largeSpacing * 2) / 3)
 
-    component SiBitViewControl: SiNumberViewControl {
+    component SiBinaryViewControl: SiNumberViewControl {
 
         size: Size.small
         font.bold: true

@@ -43,12 +43,12 @@ SiAmInspectorWindow {
     readonly property real columnWidth: Math.max(260,
         (scrollView.availableWidth - Style.largeSpacing * 2) / 3)
 
-    // SiBitViewControl/SiByteViewControl/SiWordViewControl now live in
+    // SiBinaryViewControl/SiByteViewControl/SiWordViewControl now live in
     // Apps/Shared/QML/Compounds (this panel's own versions were the ones
     // promoted, being the most complete/up to date) -- used directly below.
     // SiByteViewControl/SiWordViewControl default to fixed hex, so every
     // usage that should follow this panel's own hex/decimal toggle binds
-    // base/padded explicitly; SiBitViewControl's binary display doesn't
+    // base/padded explicitly; SiBinaryViewControl's binary display doesn't
     // need to (it never follows the toggle, on any panel).
 
     // A single row of a raw 24-bit CIA TOD counter (value/latch/alarm --
@@ -137,13 +137,13 @@ SiAmInspectorWindow {
             SiByteViewControl { base: root.numBase; padded: root.numPadded; lwidth: 60; l: qsTr("Register:"); value: portBox.regValue }
             Bit { bitNr: 7; portValue: portBox.portValue; labels: portBox.labels }
 
-            SiBitViewControl { indent: 60; value: portBox.regValue }
+            SiBinaryViewControl { indent: 60; value: portBox.regValue }
             Bit { bitNr: 6; portValue: portBox.portValue; labels: portBox.labels }
 
             SiByteViewControl { base: root.numBase; padded: root.numPadded; lwidth: 60; l: qsTr("Direction:"); value: portBox.dirValue }
             Bit { bitNr: 5; portValue: portBox.portValue; labels: portBox.labels }
 
-            SiBitViewControl { indent: 60; value: portBox.dirValue }
+            SiBinaryViewControl { indent: 60; value: portBox.dirValue }
             Bit { bitNr: 4; portValue: portBox.portValue; labels: portBox.labels }
 
             Item { }
@@ -381,7 +381,7 @@ SiAmInspectorWindow {
                             l: qsTr("Mask Register:")
                             value: cia.imr
 
-                            SiBitViewControl {
+                            SiBinaryViewControl {
 
                                 value: cia.imr
                             }
@@ -398,7 +398,7 @@ SiAmInspectorWindow {
                             l: qsTr("Control Register:")
                             value: cia.icr
 
-                            SiBitViewControl {
+                            SiBinaryViewControl {
 
                                 value: cia.icr
                             }
@@ -479,7 +479,7 @@ SiAmInspectorWindow {
                             l: qsTr("Shift Register:")
                             value: cia.ssr
 
-                            SiBitViewControl {
+                            SiBinaryViewControl {
 
                                 value: cia.ssr
                             }
