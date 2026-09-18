@@ -257,7 +257,16 @@ SiAmInspectorWindow {
 
         ColumnLayout {
 
+            // A ColumnLayout whose only children are SiBoxes has no implicit
+            // width of its own, so Qt Quick Layouts defaults its own
+            // Layout.fillWidth to true in that case -- without fillWidth:
+            // false pinning it to preferredWidth, it grabs a share of the
+            // RowLayout's left-over space instead of staying fixed-size,
+            // squeezing the two CopperListBoxes beside it (see
+            // SiAmCPUPanel.qml's own Registers/Flags column for the same
+            // issue).
             Layout.preferredWidth: 260
+            Layout.fillWidth: false
             Layout.fillHeight: true
             spacing: Style.mediumSpacing
 
@@ -319,94 +328,25 @@ SiAmInspectorWindow {
             }
 
             //
-            // Breakpoints
+            // Breakpoints -- reuses SiAmCPUGuardView (Apps/SiAmiga/
+            // Inspector), the same reusable table the CPU panel's own
+            // Breakpoints/Watchpoints boxes use, which adds its own
+            // trailing "Add address..." row (click to type an address, in
+            // whatever base numBase currently is, then Return to add it) --
+            // rather than this panel's previous plain read-only table.
             //
 
-            SiBox {
+            SiAmCPUGuardView {
 
                 title: qsTr("Breakpoints")
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: Style.mediumSpacing
-
-                Rectangle {
-
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    color: Palette.control
-                    border.color: Palette.controlBorder
-                    border.width: 1
-                    radius: Style.radius
-                    clip: true
-
-                    ColumnLayout {
-
-                        anchors.fill: parent
-                        anchors.margins: 1
-                        spacing: 0
-
-                        RowLayout {
-
-                            Layout.fillWidth: true
-                            spacing: Style.smallSpacing
-
-                            HeaderLabel { Layout.preferredWidth: 24 }
-                            HeaderLabel { text: qsTr("Address"); Layout.fillWidth: true }
-                            HeaderLabel { Layout.preferredWidth: 24 }
-                        }
-
-                        Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; color: Palette.surfaceBorder }
-
-                        ListView {
-
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            clip: true
-                            model: copper.breakpoints
-
-                            delegate: Rectangle {
-
-                                width: ListView.view.width
-                                implicitHeight: bpRow.implicitHeight
-                                color: index % 2 === 0 ? Palette.control.lighter(1.025) : Palette.control.darker(1.025)
-
-                                RowLayout {
-
-                                    id: bpRow
-                                    width: parent.width
-                                    spacing: Style.smallSpacing
-
-                                    Item {
-
-                                        Layout.preferredWidth: 24
-                                        Layout.fillHeight: true
-
-                                        BreakDot {
-                                            anchors.centerIn: parent
-                                            breakState: model.enabled ? 1 : 2
-                                        }
-
-                                        TapHandler {
-                                            onTapped: copper.toggleGuardEnabled(index)
-                                        }
-                                    }
-
-                                    Value {
-                                        Layout.fillWidth: true
-                                        text: model.addr
-                                    }
-
-                                    SiSymbolButton {
-
-                                        Layout.preferredWidth: 24
-                                        symbol: "delete"
-                                        onClicked: copper.removeGuard(index)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                numBase: root.numBase
+                model: copper.breakpoints
+                onToggle: (row) => copper.toggleGuardEnabled(row)
+                onRemove: (row) => copper.removeGuard(row)
+                onMove: (row, addr) => copper.moveGuard(row, addr)
+                onAdd: (addr) => copper.addGuard(addr)
             }
         }
     }

@@ -198,6 +198,20 @@ SiAmCopperController::removeGuard(int row)
 }
 
 void
+SiAmCopperController::moveGuard(int row, int addr)
+{
+    SiAmController::core().copperBreakpoints.moveTo(row, (u32)addr);
+    refresh();
+}
+
+void
+SiAmCopperController::addGuard(int addr)
+{
+    SiAmController::core().copperBreakpoints.setAt((u32)addr);
+    refresh();
+}
+
+void
 SiAmCopperController::jumpToPC()
 {
     auto &info = parent->getInfoController()->copperInfo();
