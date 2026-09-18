@@ -35,8 +35,8 @@ SiAmInspectorWindow {
     // BYPASS/LPEN/ERSY/ECSENA added) -- that column, not the fixed-height
     // Display window/Colors row below it, is now what sets the Registers
     // box's required height.
-    height: 720
-    minimumHeight: 600
+    // height: 720
+    // minimumHeight: 600
 
     readonly property var denise: controller.deniseController
     readonly property var ic: controller.inspectorController
@@ -123,7 +123,7 @@ SiAmInspectorWindow {
 
                             ColumnLayout {
 
-                                spacing: Style.tinySpacing
+                                spacing: 0 // Style.tinySpacing
 
                                 Si16 { l: qsTr("BPLCON0"); lwidth: root.lw; value: denise.bplcon0 }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("HIRES"); checked: denise.hires }
@@ -149,7 +149,7 @@ SiAmInspectorWindow {
 
                             ColumnLayout {
 
-                                spacing: Style.tinySpacing
+                                spacing: 0 // Style.tinySpacing
 
                                 Si16 { l: qsTr("BPLCON1"); lwidth: root.lw; value: denise.bplcon1 }
                                 Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1H"); value: denise.p1h }
@@ -158,7 +158,7 @@ SiAmInspectorWindow {
 
                             ColumnLayout {
 
-                                spacing: Style.tinySpacing
+                                spacing: 0 // Style.tinySpacing
 
                                 Si16 { l: qsTr("BPLCON2"); lwidth: root.lw; value: denise.bplcon2 }
                                 Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDBPSEL"); value: denise.zdbpsel }
@@ -178,7 +178,7 @@ SiAmInspectorWindow {
 
                             ColumnLayout {
 
-                                spacing: Style.tinySpacing
+                                spacing: 0 // Style.tinySpacing
 
                                 Si16 { l: qsTr("BPLCON3"); lwidth: root.lw; value: denise.bplcon3 }
                                 Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("BANK");     value: denise.colorBank }
@@ -193,7 +193,7 @@ SiAmInspectorWindow {
 
                             ColumnLayout {
 
-                                spacing: Style.tinySpacing
+                                spacing: 0 // Style.tinySpacing
 
                                 Si16 { l: qsTr("BPLCON4"); lwidth: root.lw; value: denise.bplcon4 }
                                 Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("BPLAM"); value: denise.bplam }
