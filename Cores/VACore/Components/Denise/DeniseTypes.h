@@ -145,7 +145,12 @@ typedef struct
     u16 joydat[2];
     u16 clxdat;
     
-    u16 colorReg[32];
+    // The AGA color table is 256 entries deep (8 banks of 32, selected by
+    // BPLCON3's 3-bit BANK field), but only the first 4 banks (128 entries)
+    // are ever meaningfully addressed in practice, so that's all that's
+    // cached here -- see SiAmDeniseController's Colors tab, which shows
+    // one 32-swatch box per bank.
+    u16 colorReg[128];
     u32 color[32];
     
     SpriteInfo sprite[8];

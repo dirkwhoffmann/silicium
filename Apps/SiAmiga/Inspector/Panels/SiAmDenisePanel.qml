@@ -75,10 +75,12 @@ SiAmInspectorWindow {
         border.color: Palette.controlBorder
     }
 
-    // Which page the stack shows: 0 = Registers, 1 = Sprites -- same
-    // Program/Trace/Debug tab-bar idiom as SiAmCPUPanel.qml, adopted here so
-    // the growing set of AGA-only registers (still to be added) has room of
-    // its own instead of squeezing the Sprites box sideways.
+    // Which page the stack shows: 0 = Registers, 1 = Colors, 2 = Sprites --
+    // same Program/Trace/Debug tab-bar idiom as SiAmCPUPanel.qml, adopted
+    // here so the growing set of AGA-only registers has room of its own
+    // instead of squeezing the Sprites box sideways, and so the Colors tab
+    // (four 32-swatch boxes, one per AGA color bank) has the whole window
+    // to itself rather than sharing the Registers page with Display window.
     property int page: 0
 
     Item {
@@ -184,9 +186,12 @@ SiAmInspectorWindow {
                                 Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("BANK");     value: denise.colorBank }
                                 Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2OF");    value: denise.pf2of }
                                 Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("LOCT");     checked: denise.loct }
+                                Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("-");        checked: denise.bplcon3Res8 }
                                 Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("SPRES");    value: denise.spres }
                                 Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("BRDRBLNK"); checked: denise.brdrblnk }
                                 Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("BRDNTRAN"); checked: denise.brdntran }
+                                Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("-");        checked: denise.bplcon3Res3 }
+                                Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("-");        checked: denise.bplcon3Res2 }
                                 Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("BRDSPRT");  checked: denise.brdsprt }
                                 Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("EXTBLKEN"); checked: denise.extblken }
                             }
@@ -220,7 +225,7 @@ SiAmInspectorWindow {
                         SiBox {
 
                             title: qsTr("Display window")
-                            Layout.preferredWidth: 460
+                            Layout.fillWidth: true
                             Layout.fillHeight: true
 
                             RowLayout {
@@ -256,14 +261,33 @@ SiAmInspectorWindow {
                                 HSpacer { }
                             }
                         }
+                    }
+                }
 
-                        //
-                        // Colors
-                        //
+                //
+                // Colors -- one box per AGA color bank (4 banks of 32
+                // registers each; see SiAmDeniseController's own colorAt(n)
+                // comment), same swatch-grid style as the single Colors box
+                // this replaced, now with its own tab instead of sharing
+                // the Registers page with Display window.
+                //
+
+                GridLayout {
+
+                    columns: 2
+                    columnSpacing: Style.mediumSpacing
+                    rowSpacing: Style.mediumSpacing
+
+                    Repeater {
+
+                        model: 4
 
                         SiBox {
 
-                            title: qsTr("Colors")
+                            id: bankBox
+                            required property int index
+
+                            title: qsTr("Bank %1").arg(index)
                             Layout.fillWidth: true
                             Layout.fillHeight: true
 
@@ -276,7 +300,7 @@ SiAmInspectorWindow {
 
                                 Repeater {
                                     model: 32
-                                    Swatch { required property int index; value: denise.colorAt(index) }
+                                    Swatch { required property int index; value: denise.colorAt(bankBox.index * 32 + index) }
                                 }
                             }
                         }
@@ -368,7 +392,7 @@ SiAmInspectorWindow {
             anchors.horizontalCenter: stackBox.horizontalCenter
             anchors.verticalCenter: stackBox.top
 
-            model: [qsTr("Registers"), qsTr("Sprites")]
+            model: [qsTr("Registers"), qsTr("Colors"), qsTr("Sprites")]
             segmentWidth: 90
             currentIndex: root.page
             onActivated: (index) => root.page = index

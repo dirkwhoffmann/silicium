@@ -34,13 +34,16 @@
 // DeniseInfo didn't carry bplcon4 at all until this controller needed it --
 // see DeniseTypes.h/DeniseInfo.cpp.
 //
-// Color registers are exposed via colorAt(n) rather than 32 named
-// properties, the same Q_INVOKABLE(n) shape SiAmInfoController's own
-// dReg(n)/aReg(n) and SiAmBlitterController's lfEnabled(n)/lfValue(n) use.
-// Decoded straight from the raw 12-bit Amiga register value (colorReg[n],
-// 0x0RGB) rather than DeniseInfo's already-gamma/adjustment-processed
-// color[n] texels -- the inspector should show the register's actual
-// content, not a display-pipeline-adjusted approximation of it.
+// Color registers are exposed via colorAt(n) rather than named properties,
+// the same Q_INVOKABLE(n) shape SiAmInfoController's own dReg(n)/aReg(n) and
+// SiAmBlitterController's lfEnabled(n)/lfValue(n) use. Decoded straight from
+// the raw 12-bit Amiga register value (colorReg[n], 0x0RGB) rather than
+// DeniseInfo's already-gamma/adjustment-processed color[n] texels -- the
+// inspector should show the register's actual content, not a display-
+// pipeline-adjusted approximation of it. n ranges over all 128 entries
+// DeniseInfo now caches (4 AGA color banks of 32 registers each, selected
+// by BPLCON3's BANK field -- see the Colors tab), not just the bank
+// currently selected for rendering.
 //
 
 class SiAmController;
@@ -91,6 +94,12 @@ class SiAmDeniseController : public SiAmInspectorController {
     bool m_loct = false, m_brdrblnk = false, m_brdsprt = false;
     bool m_brdntran = false, m_extblken = false;
 
+    // BPLCON3's three leftover bits (8, 3, 2) carry no assigned function at
+    // all -- not even an unimplemented genlock/ZD-pin role like BPLCON0's
+    // COLOR/GAUD/etc. or BPLCON2's ZDBPSEL/ZDBPEN/ZDCTEN/SOGEN above.
+    // Exposed only so the register's raw bit pattern is complete.
+    bool m_bplcon3Res8 = false, m_bplcon3Res3 = false, m_bplcon3Res2 = false;
+
     // BPLCON4 (AGA), decoded via Denise's own bplam()/esprm()/osprm() (see
     // Denise.h's "BPLCON4" accessor block): bplam is the 8-bit playfield
     // color XOR mask, esprm/osprm the even/odd sprite color-bank selectors.
@@ -101,7 +110,8 @@ class SiAmDeniseController : public SiAmInspectorController {
 
     int m_clxdat = 0;
 
-    quint16 m_colorReg[32] = {};
+    // 4 banks of 32 entries each -- see the Colors tab's class comment.
+    quint16 m_colorReg[128] = {};
 
     bool m_spriteArmed[8] = {};
     int m_selectedSprite = 0;
@@ -125,6 +135,9 @@ class SiAmDeniseController : public SiAmInspectorController {
     Q_PROPERTY(int spres READ spres NOTIFY deniseChanged)
     Q_PROPERTY(bool brdntran READ brdntran NOTIFY deniseChanged)
     Q_PROPERTY(bool extblken READ extblken NOTIFY deniseChanged)
+    Q_PROPERTY(bool bplcon3Res8 READ bplcon3Res8 NOTIFY deniseChanged)
+    Q_PROPERTY(bool bplcon3Res3 READ bplcon3Res3 NOTIFY deniseChanged)
+    Q_PROPERTY(bool bplcon3Res2 READ bplcon3Res2 NOTIFY deniseChanged)
     Q_PROPERTY(int bplam READ bplam NOTIFY deniseChanged)
     Q_PROPERTY(int esprm READ esprm NOTIFY deniseChanged)
     Q_PROPERTY(int osprm READ osprm NOTIFY deniseChanged)
@@ -175,7 +188,8 @@ class SiAmDeniseController : public SiAmInspectorController {
 
     Q_INVOKABLE bool spriteArmed(int nr) const { return nr >= 0 && nr < 8 && m_spriteArmed[nr]; }
 
-    // 32-entry color-register palette, decoded to display QColors.
+    // 128-entry color-register palette (4 banks of 32), decoded to display
+    // QColors.
     Q_INVOKABLE QColor colorAt(int nr) const;
 
   protected:
@@ -197,6 +211,9 @@ class SiAmDeniseController : public SiAmInspectorController {
     int spres() const { return m_spres; }
     bool brdntran() const { return m_brdntran; }
     bool extblken() const { return m_extblken; }
+    bool bplcon3Res8() const { return m_bplcon3Res8; }
+    bool bplcon3Res3() const { return m_bplcon3Res3; }
+    bool bplcon3Res2() const { return m_bplcon3Res2; }
     int bplam() const { return m_bplam; }
     int esprm() const { return m_esprm; }
     int osprm() const { return m_osprm; }

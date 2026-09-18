@@ -30,7 +30,7 @@ SiAmDeniseController::setSelectedSprite(int value)
 QColor
 SiAmDeniseController::colorAt(int nr) const
 {
-    if (nr < 0 || nr >= 32) return QColor();
+    if (nr < 0 || nr >= 128) return QColor();
 
     // Raw Amiga color register: 0x0RGB, 4 bits per channel. Each nibble is
     // replicated into the low bits to fill out an 8-bit channel (the
@@ -115,6 +115,11 @@ SiAmDeniseController::refreshData()
     m_brdntran  = bplcon3 & 0b0000000000010000;
     m_extblken  = bplcon3 & 0b0000000000000001;
 
+    // BPLCON3's three leftover, unassigned bits -- see the field comment.
+    m_bplcon3Res8 = bplcon3 & 0b0000000100000000;
+    m_bplcon3Res3 = bplcon3 & 0b0000000000001000;
+    m_bplcon3Res2 = bplcon3 & 0b0000000000000100;
+
     // BPLCON4 (AGA), same bit positions as Denise::bplam()/esprm()/osprm().
     m_bplam = (bplcon4 >> 8) & 0xFF;
     m_esprm = (bplcon4 >> 4) & 0xF;
@@ -129,7 +134,7 @@ SiAmDeniseController::refreshData()
 
     m_clxdat = info.clxdat;
 
-    for (int i = 0; i < 32; i++) m_colorReg[i] = info.colorReg[i];
+    for (int i = 0; i < 128; i++) m_colorReg[i] = info.colorReg[i];
 
     for (int i = 0; i < 8; i++) m_spriteArmed[i] = info.sprite[i].height != 0;
 
