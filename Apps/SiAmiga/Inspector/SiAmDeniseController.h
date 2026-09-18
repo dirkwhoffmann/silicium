@@ -129,6 +129,16 @@ class SiAmDeniseController : public SiAmInspectorController {
     // 4 banks of 32 entries each -- see the Colors tab's class comment.
     quint16 m_colorReg[128] = {};
 
+    // Bumped every refreshData() call. colorAt(n) is Q_INVOKABLE, not a
+    // Q_PROPERTY, so QML's binding engine never learns the Swatch grid's
+    // `denise.colorAt(n)` bindings depend on m_colorReg -- calling an
+    // invokable from within a binding registers no dependency, unlike
+    // reading a NOTIFYing property. Referencing this counter alongside the
+    // colorAt(n) call in the binding gives it something to depend on, so
+    // the swatches actually repaint when the palette changes. Same trick as
+    // SiC64MemoryController::m_selectRevision.
+    int m_colorRevision = 0;
+
     bool m_spriteArmed[8] = {};
     int m_selectedSprite = 0;
     int m_sprHStart = 0, m_sprVStart = 0, m_sprVStop = 0;
@@ -211,6 +221,11 @@ class SiAmDeniseController : public SiAmInspectorController {
     // 128-entry color-register palette (4 banks of 32), decoded to display
     // QColors.
     Q_INVOKABLE QColor colorAt(int nr) const;
+
+    // See m_colorRevision's own comment -- read this alongside colorAt(n) in
+    // a QML binding to make it re-evaluate when the palette changes.
+    Q_PROPERTY(int colorRevision READ colorRevision NOTIFY deniseChanged)
+    int colorRevision() const { return m_colorRevision; }
 
   protected:
 

@@ -488,7 +488,15 @@ SiAmInspectorWindow {
 
                                 Repeater {
                                     model: 32
-                                    Swatch { required property int index; value: denise.colorAt(bankBox.index * 32 + index) }
+                                    Swatch {
+                                        required property int index
+                                        // denise.colorRevision is read purely to give this
+                                        // binding a dependency to re-evaluate on -- colorAt(n)
+                                        // is Q_INVOKABLE, so calling it alone never triggers a
+                                        // re-evaluation when the palette changes. See
+                                        // SiAmDeniseController::m_colorRevision's own comment.
+                                        value: { denise.colorRevision; return denise.colorAt(bankBox.index * 32 + index) }
+                                    }
                                 }
                             }
                         }
