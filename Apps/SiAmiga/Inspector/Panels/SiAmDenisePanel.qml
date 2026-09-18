@@ -138,147 +138,153 @@ SiAmInspectorWindow {
                         Layout.fillHeight: true
                         spacing: Style.mediumSpacing
 
-                        GridLayout {
+                        RowLayout {
 
                             Layout.fillWidth: true
-                            columns: 2
-                            columnSpacing: Style.mediumSpacing
-                            rowSpacing: Style.mediumSpacing
+                            spacing: Style.largeSpacing
 
+                            // BPLCON0 -- bit 15 down to bit 0, no gaps: even
+                            // BPU's 4 bits (2/1/0 grouped near HIRES, 3 on
+                            // its own at bit 4) and every other multi-bit
+                            // field show up as individual checkboxes at
+                            // their real bit position, exactly like the
+                            // genuinely single-bit flags -- reading straight
+                            // off the raw register value rather than through
+                            // the controller's decoded bpu/hires/etc.
+                            // properties, so the layout can show all 16
+                            // bits uniformly instead of some as bits and
+                            // some as a decoded number.
                             ColumnLayout {
 
                                 spacing: -1
 
                                 Si16 { l: qsTr("BPLCON0"); lwidth: root.lw; value: denise.bplcon0 }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("HIRES"); checked: !!(denise.bplcon0 & 0x8000) }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU2"); checked: !!(denise.bplcon0 & 0x4000) }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU1"); checked: !!(denise.bplcon0 & 0x2000) }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU0"); checked: !!(denise.bplcon0 & 0x1000) }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("HAM"); checked: !!(denise.bplcon0 & 0x0800) }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("DPF"); checked: !!(denise.bplcon0 & 0x0400) }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("COLOR"); checked: !!(denise.bplcon0 & 0x0200) }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("GAUD"); checked: !!(denise.bplcon0 & 0x0100) }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("UHRES"); checked: !!(denise.bplcon0 & 0x0080) }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("SHRES"); enabled: !!(denise.bplcon0 & 0x0040) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("HIRES");  checked: !!(denise.bplcon0 & 0x8000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU2");   checked: !!(denise.bplcon0 & 0x4000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU1");   checked: !!(denise.bplcon0 & 0x2000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU0");   checked: !!(denise.bplcon0 & 0x1000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("HAM");    checked: !!(denise.bplcon0 & 0x0800) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("DPF");    checked: !!(denise.bplcon0 & 0x0400) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("COLOR");  checked: !!(denise.bplcon0 & 0x0200) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("GAUD");   checked: !!(denise.bplcon0 & 0x0100) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("UHRES");  checked: !!(denise.bplcon0 & 0x0080) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("SHRES");  checked: !!(denise.bplcon0 & 0x0040) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BYPASS"); checked: !!(denise.bplcon0 & 0x0020) }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU3"); checked: !!(denise.bplcon0 & 0x0010) }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("LPEN"); checked: !!(denise.bplcon0 & 0x0008) }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("LACE"); checked: !!(denise.bplcon0 & 0x0004) }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ERSY"); checked: !!(denise.bplcon0 & 0x0002) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU3");   checked: !!(denise.bplcon0 & 0x0010) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("LPEN");   checked: !!(denise.bplcon0 & 0x0008) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("LACE");   checked: !!(denise.bplcon0 & 0x0004) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ERSY");   checked: !!(denise.bplcon0 & 0x0002) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ECSENA"); checked: !!(denise.bplcon0 & 0x0001) }
-
-                                /*
-                                GridLayout {
-
-                                    columns: 2
-                                    columnSpacing: Style.mediumSpacing
-                                    rowSpacing: 0
-
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("HIRES"); checked: denise.hires; Layout.alignment: Qt.AlignRight }
-                                    Si16 { indent: root.indent; rwidth: root.lw; r: qsTr("BPU"); value: denise.bpu; Layout.alignment: Qt.AlignLeft }
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("HAM"); checked: denise.homod; Layout.alignment: Qt.AlignRight }
-                                    Si1 { indent: root.indent; rwidth: root.lw; r: qsTr("DPF"); checked: denise.dbplf; Layout.alignment: Qt.AlignLeft }
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("COLOR"); checked: denise.color; Layout.alignment: Qt.AlignRight }
-                                    Si1 { indent: root.indent; rwidth: root.lw; r: qsTr("GAUD"); checked: denise.gaud; Layout.alignment: Qt.AlignLeft }
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("UHRES"); checked: denise.uhres; Layout.alignment: Qt.AlignRight }
-                                    Si1 { indent: root.indent; rwidth: root.lw; r: qsTr("SHRES"); enabled: denise.shresEnabled; checked: denise.shres }
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BYPASS"); checked: denise.bypass; Layout.alignment: Qt.AlignRight }
-                                    Si1 { indent: root.indent; rwidth: root.lw; r: qsTr("LPEN"); checked: denise.lpen; Layout.alignment: Qt.AlignLeft }
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("LACE"); checked: denise.lace; Layout.alignment: Qt.AlignRight }
-                                    Si1 { indent: root.indent; rwidth: root.lw; r: qsTr("ERSY"); checked: denise.ersy; Layout.alignment: Qt.AlignLeft }
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ECSENA"); checked: denise.ecsena; Layout.alignment: Qt.AlignRight }
-                                }
-
-                                 */
                             }
 
+                            // BPLCON1 -- only PF2H (bits 7-4) and PF1H (bits
+                            // 3-0) are ever written; bits 15-8 are unused on
+                            // every chipset revision, shown as "-" rather
+                            // than omitted, same as BPLCON3's own unassigned
+                            // bits below.
                             ColumnLayout {
 
-                                spacing: 0
+                                spacing: -1
 
-                                Si16 { l: qsTr("BPLCON1"); lwidth: root.hlw; value: denise.bplcon1 }
-
-                                GridLayout {
-
-                                    columns: 2
-                                    columnSpacing: Style.mediumSpacing
-                                    rowSpacing: 0
-
-                                    Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1H"); value: denise.p1h }
-                                    Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2H"); value: denise.p2h }
-                                }
+                                Si16 { l: qsTr("BPLCON1"); lwidth: root.lw; value: denise.bplcon1 }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("-");     checked: !!(denise.bplcon1 & 0x8000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("-");     checked: !!(denise.bplcon1 & 0x4000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("-");     checked: !!(denise.bplcon1 & 0x2000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("-");     checked: !!(denise.bplcon1 & 0x1000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("-");     checked: !!(denise.bplcon1 & 0x0800) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("-");     checked: !!(denise.bplcon1 & 0x0400) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("-");     checked: !!(denise.bplcon1 & 0x0200) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("-");     checked: !!(denise.bplcon1 & 0x0100) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2H3"); checked: !!(denise.bplcon1 & 0x0080) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2H2"); checked: !!(denise.bplcon1 & 0x0040) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2H1"); checked: !!(denise.bplcon1 & 0x0020) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2H0"); checked: !!(denise.bplcon1 & 0x0010) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1H3"); checked: !!(denise.bplcon1 & 0x0008) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1H2"); checked: !!(denise.bplcon1 & 0x0004) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1H1"); checked: !!(denise.bplcon1 & 0x0002) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1H0"); checked: !!(denise.bplcon1 & 0x0001) }
                             }
 
+                            // BPLCON2 (AGA) -- all 16 bits are assigned; see
+                            // Denise.h's own "BPLCON2" accessor block for
+                            // pf2pri()/killehb()/rdram(), and the
+                            // SiAmDeniseController field comment for the
+                            // ZDBPSEL/ZDBPEN/ZDCTEN/SOGEN bits it doesn't
+                            // act on.
                             ColumnLayout {
 
-                                spacing: 0
+                                spacing: -1
 
-                                Si16 { l: qsTr("BPLCON2"); lwidth: root.hlw; value: denise.bplcon2 }
-
-                                GridLayout {
-
-                                    columns: 2
-                                    columnSpacing: Style.mediumSpacing
-                                    rowSpacing: 0
-
-                                    Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDBPSEL"); value: denise.zdbpsel }
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDBPEN"); checked: denise.zdbpen }
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDCTEN"); checked: denise.zdcten }
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("KILLEHB"); checked: denise.killehb }
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("RDRAM"); checked: denise.rdram }
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("SOGEN"); checked: denise.sogen }
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2PRI"); checked: denise.pf2pri }
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2P2");  checked: denise.pf2p2 }
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2P1");  checked: denise.pf2p1 }
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2P0");  checked: denise.pf2p0 }
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1P2");  checked: denise.pf1p2 }
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1P1");  checked: denise.pf1p1 }
-                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1P0");  checked: denise.pf1p0 }
-                                }
+                                Si16 { l: qsTr("BPLCON2"); lwidth: root.lw; value: denise.bplcon2 }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("-");       checked: !!(denise.bplcon2 & 0x8000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDBPSEL2"); checked: !!(denise.bplcon2 & 0x4000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDBPSEL1"); checked: !!(denise.bplcon2 & 0x2000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDBPSEL0"); checked: !!(denise.bplcon2 & 0x1000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDBPEN");  checked: !!(denise.bplcon2 & 0x0800) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDCTEN");  checked: !!(denise.bplcon2 & 0x0400) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("KILLEHB"); checked: !!(denise.bplcon2 & 0x0200) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("RDRAM");   checked: !!(denise.bplcon2 & 0x0100) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("SOGEN");   checked: !!(denise.bplcon2 & 0x0080) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2PRI");  checked: !!(denise.bplcon2 & 0x0040) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2P2");   checked: !!(denise.bplcon2 & 0x0020) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2P1");   checked: !!(denise.bplcon2 & 0x0010) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2P0");   checked: !!(denise.bplcon2 & 0x0008) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1P2");   checked: !!(denise.bplcon2 & 0x0004) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1P1");   checked: !!(denise.bplcon2 & 0x0002) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1P0");   checked: !!(denise.bplcon2 & 0x0001) }
                             }
 
+                            // BPLCON3 (AGA) -- bits 8, 3 and 2 carry no
+                            // assigned function at all (see
+                            // SiAmDeniseController's own field comment),
+                            // shown as "-" for completeness.
                             ColumnLayout {
 
-                                spacing: 0
+                                spacing: -1
 
-                                Si16 { l: qsTr("BPLCON3"); lwidth: root.hlw; value: denise.bplcon3 }
-
-                                GridLayout {
-
-                                    columns: 2
-                                    columnSpacing: Style.mediumSpacing
-                                    rowSpacing: 0
-
-                                    Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("BANK");     value: denise.colorBank }
-                                    Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2OF");    value: denise.pf2of }
-                                    Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("LOCT");     checked: denise.loct }
-                                    Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("-");        checked: denise.bplcon3Res8 }
-                                    Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("SPRES");    value: denise.spres }
-                                    Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("BRDRBLNK"); checked: denise.brdrblnk }
-                                    Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("BRDNTRAN"); checked: denise.brdntran }
-                                    Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("-");        checked: denise.bplcon3Res3 }
-                                    Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("-");        checked: denise.bplcon3Res2 }
-                                    Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("BRDSPRT");  checked: denise.brdsprt }
-                                    Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("EXTBLKEN"); checked: denise.extblken }
-                                }
+                                Si16 { l: qsTr("BPLCON3"); lwidth: root.lw; value: denise.bplcon3 }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BANK2");    checked: !!(denise.bplcon3 & 0x8000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BANK1");    checked: !!(denise.bplcon3 & 0x4000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BANK0");    checked: !!(denise.bplcon3 & 0x2000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2OF2");   checked: !!(denise.bplcon3 & 0x1000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2OF1");   checked: !!(denise.bplcon3 & 0x0800) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2OF0");   checked: !!(denise.bplcon3 & 0x0400) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("LOCT");     checked: !!(denise.bplcon3 & 0x0200) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("-");        checked: !!(denise.bplcon3 & 0x0100) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("SPRES1");   checked: !!(denise.bplcon3 & 0x0080) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("SPRES0");   checked: !!(denise.bplcon3 & 0x0040) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BRDRBLNK"); checked: !!(denise.bplcon3 & 0x0020) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BRDNTRAN"); checked: !!(denise.bplcon3 & 0x0010) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("-");        checked: !!(denise.bplcon3 & 0x0008) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("-");        checked: !!(denise.bplcon3 & 0x0004) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BRDSPRT");  checked: !!(denise.bplcon3 & 0x0002) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("EXTBLKEN"); checked: !!(denise.bplcon3 & 0x0001) }
                             }
 
+                            // BPLCON4 (AGA) -- BPLAM (bits 15-8), ESPRM
+                            // (bits 7-4), OSPRM (bits 3-0); all 16 bits
+                            // assigned, no gaps.
                             ColumnLayout {
 
-                                spacing: 0
+                                spacing: -1
 
-                                Si16 { l: qsTr("BPLCON4"); lwidth: root.hlw; value: denise.bplcon4 }
-
-                                GridLayout {
-
-                                    columns: 2
-                                    columnSpacing: Style.mediumSpacing
-                                    rowSpacing: 0
-
-                                    Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("BPLAM"); value: denise.bplam }
-                                    Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("ESPRM"); value: denise.esprm }
-                                    Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("OSPRM"); value: denise.osprm }
-                                }
+                                Si16 { l: qsTr("BPLCON4"); lwidth: root.lw; value: denise.bplcon4 }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPLAM7"); checked: !!(denise.bplcon4 & 0x8000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPLAM6"); checked: !!(denise.bplcon4 & 0x4000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPLAM5"); checked: !!(denise.bplcon4 & 0x2000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPLAM4"); checked: !!(denise.bplcon4 & 0x1000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPLAM3"); checked: !!(denise.bplcon4 & 0x0800) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPLAM2"); checked: !!(denise.bplcon4 & 0x0400) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPLAM1"); checked: !!(denise.bplcon4 & 0x0200) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPLAM0"); checked: !!(denise.bplcon4 & 0x0100) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ESPRM3"); checked: !!(denise.bplcon4 & 0x0080) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ESPRM2"); checked: !!(denise.bplcon4 & 0x0040) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ESPRM1"); checked: !!(denise.bplcon4 & 0x0020) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ESPRM0"); checked: !!(denise.bplcon4 & 0x0010) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("OSPRM3"); checked: !!(denise.bplcon4 & 0x0008) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("OSPRM2"); checked: !!(denise.bplcon4 & 0x0004) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("OSPRM1"); checked: !!(denise.bplcon4 & 0x0002) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("OSPRM0"); checked: !!(denise.bplcon4 & 0x0001) }
                             }
                         }
 
