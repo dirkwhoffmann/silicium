@@ -34,8 +34,8 @@ SiAmInspectorWindow {
     // the fallback for an unusually tall column, not the routine way to
     // see BPU/BANK/etc. on first look -- hence the modest height bump here
     // instead of leaving every inspector's shared default to absorb it.
-    height: 510
-    minimumHeight: 480
+    // height: 510
+    // minimumHeight: 480
 
     readonly property var denise: controller.deniseController
     readonly property var ic: controller.inspectorController
@@ -90,7 +90,7 @@ SiAmInspectorWindow {
         Layout.topMargin: Style.tinySpacing
         Layout.bottomMargin: Style.tinySpacing
         implicitHeight: 1
-        color: Palette.surfaceBorder
+        color: Palette.tertiary
     }
 
     // One color-register swatch -- a plain circle, matching the round
@@ -189,6 +189,7 @@ SiAmInspectorWindow {
                                 spacing: -1
 
                                 Si16 { l: qsTr("BPLCON0"); lwidth: root.lw; value: denise.bplcon0 }
+                                VSpacer { size: Style.smallSpacing }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("HIRES");  checked: !!(denise.bplcon0 & 0x8000) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU2");   checked: !!(denise.bplcon0 & 0x4000) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU1");   checked: !!(denise.bplcon0 & 0x2000) }
@@ -209,6 +210,8 @@ SiAmInspectorWindow {
                                 HRule { }
 
                                 Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU"); value: denise.bpu }
+
+                                VSpacer { }
                             }
 
                             // BPLCON1 -- only PF2H (bits 7-4) and PF1H (bits
@@ -221,6 +224,7 @@ SiAmInspectorWindow {
                                 spacing: -1
 
                                 Si16 { l: qsTr("BPLCON1"); lwidth: root.lw; value: denise.bplcon1 }
+                                VSpacer { size: Style.smallSpacing }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("-");     checked: !!(denise.bplcon1 & 0x8000) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("-");     checked: !!(denise.bplcon1 & 0x4000) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("-");     checked: !!(denise.bplcon1 & 0x2000) }
@@ -242,6 +246,8 @@ SiAmInspectorWindow {
 
                                 Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1H"); value: denise.p1h }
                                 Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2H"); value: denise.p2h }
+
+                                VSpacer { }
                             }
 
                             // BPLCON2 (AGA) -- all 16 bits are assigned; see
@@ -255,6 +261,7 @@ SiAmInspectorWindow {
                                 spacing: -1
 
                                 Si16 { l: qsTr("BPLCON2"); lwidth: root.lw; value: denise.bplcon2 }
+                                VSpacer { size: Style.smallSpacing }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("-");       checked: !!(denise.bplcon2 & 0x8000) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDBPSEL2"); checked: !!(denise.bplcon2 & 0x4000) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDBPSEL1"); checked: !!(denise.bplcon2 & 0x2000) }
@@ -275,6 +282,8 @@ SiAmInspectorWindow {
                                 HRule { }
 
                                 Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDBPSEL"); value: denise.zdbpsel }
+
+                                VSpacer { }
                             }
 
                             // BPLCON3 (AGA) -- bits 8, 3 and 2 carry no
@@ -286,6 +295,7 @@ SiAmInspectorWindow {
                                 spacing: -1
 
                                 Si16 { l: qsTr("BPLCON3"); lwidth: root.lw; value: denise.bplcon3 }
+                                VSpacer { size: Style.smallSpacing }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BANK2");    checked: !!(denise.bplcon3 & 0x8000) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BANK1");    checked: !!(denise.bplcon3 & 0x4000) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BANK0");    checked: !!(denise.bplcon3 & 0x2000) }
@@ -308,6 +318,8 @@ SiAmInspectorWindow {
                                 Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("BANK");  value: denise.colorBank }
                                 Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2OF"); value: denise.pf2of }
                                 Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("SPRES"); value: denise.spres }
+
+                                VSpacer { }
                             }
 
                             // BPLCON4 (AGA) -- BPLAM (bits 15-8), ESPRM
@@ -318,6 +330,7 @@ SiAmInspectorWindow {
                                 spacing: -1
 
                                 Si16 { l: qsTr("BPLCON4"); lwidth: root.lw; value: denise.bplcon4 }
+                                VSpacer { size: Style.smallSpacing }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPLAM7"); checked: !!(denise.bplcon4 & 0x8000) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPLAM6"); checked: !!(denise.bplcon4 & 0x4000) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPLAM5"); checked: !!(denise.bplcon4 & 0x2000) }
@@ -340,6 +353,8 @@ SiAmInspectorWindow {
                                 Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("BPLAM"); value: denise.bplam }
                                 Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("ESPRM"); value: denise.esprm }
                                 Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("OSPRM"); value: denise.osprm }
+
+                                VSpacer { }
                             }
                         }
 
@@ -378,16 +393,17 @@ SiAmInspectorWindow {
 
                             title: qsTr("Display Mode")
                             Layout.fillWidth: true
-                            spacing: Style.tinySpacing
+                            spacing: Style.smallSpacing
+                            padding: Style.largeSpacing
 
                             ColumnLayout {
 
-                                spacing: Style.tinySpacing
+                                spacing: Style.smallSpacing
 
-                                SiText { text: denise.modeText }
-                                SiText { text: denise.resolutionText }
-                                SiText { text: denise.dbplf ? qsTr("Dual Playfield") : qsTr("Single Playfield") }
-                                SiText { text: denise.lace ? qsTr("Interlaced") : qsTr("Non-interlaced") }
+                                SiLabel { size: Size.small; font.bold: true; text: denise.modeText }
+                                SiLabel { size: Size.small; font.bold: true; text: denise.resolutionText }
+                                SiLabel { size: Size.small; font.bold: true; text: denise.dbplf ? qsTr("Dual Playfield") : qsTr("Single Playfield") }
+                                SiLabel { size: Size.small; font.bold: true; text: denise.lace ? qsTr("Interlaced") : qsTr("Non-interlaced") }
                             }
                         }
 
@@ -403,31 +419,16 @@ SiAmInspectorWindow {
                             Layout.fillHeight: true
                             spacing: Style.tinySpacing
 
-                            GridLayout {
+                            Si16 { lwidth: root.hlw; l: qsTr("DIWSTRT"); value: denise.diwstrt }
+                            Si16 { lwidth: root.hlw; l: qsTr("DIWSTOP"); value: denise.diwstop }
+                            Si16 { lwidth: root.hlw; l: qsTr("DIWHIGH"); value: denise.diwhigh }
 
-                                columns: 2
-                                columnSpacing: Style.mediumSpacing
-                                rowSpacing: 0
-
-                                Si16 { lwidth: root.hlw; l: qsTr("DIWSTRT"); value: denise.diwstrt }
-                                Si16 { lwidth: root.hlw; l: qsTr("DIWSTOP"); value: denise.diwstop }
-                                Si16 { lwidth: root.hlw; l: qsTr("DIWHIGH"); value: denise.diwhigh }
-                            }
-
-                            // HSTRT/HSTOP/VSTRT/VSTOP -- the pixel viewport
-                            // Denise derives from DIWSTRT/DIWSTOP/DIWHIGH --
-                            // laid out as a compact directional pad instead
-                            // of 4 more label/value rows: VSTRT above and
-                            // VSTOP below span all 3 columns (there's only
-                            // one value per row, so no need for 3 separate
-                            // cells there), with HSTRT/an icon/HSTOP sharing
-                            // the middle row.
                             GridLayout {
 
                                 Layout.alignment: Qt.AlignHCenter
                                 Layout.topMargin: Style.mediumSpacing
                                 columns: 3
-                                columnSpacing: Style.mediumSpacing
+                                columnSpacing: Style.tinySpacing // Style.mediumSpacing
                                 rowSpacing: Style.tinySpacing
 
                                 Si16 { Layout.columnSpan: 3; Layout.alignment: Qt.AlignHCenter; value: denise.vstrt }
@@ -435,9 +436,11 @@ SiAmInspectorWindow {
                                 Si16 { Layout.alignment: Qt.AlignHCenter; value: denise.hstrt }
                                 SiSymbol {
 
+                                    size: Size.huge
                                     Layout.alignment: Qt.AlignHCenter
                                     phosphor: "arrows-out-cardinal"
                                     color: Palette.disabled
+                                    DebugRect {}
                                 }
                                 Si16 { Layout.alignment: Qt.AlignHCenter; value: denise.hstop }
 
