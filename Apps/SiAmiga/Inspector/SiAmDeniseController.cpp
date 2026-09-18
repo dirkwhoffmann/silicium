@@ -55,11 +55,13 @@ SiAmDeniseController::refreshData()
     int bplcon1 = info.bplcon1;
     int bplcon2 = info.bplcon2;
     int bplcon3 = info.bplcon3;
+    int bplcon4 = info.bplcon4;
 
     m_bplcon0 = bplcon0;
     m_bplcon1 = bplcon1;
     m_bplcon2 = bplcon2;
     m_bplcon3 = bplcon3;
+    m_bplcon4 = bplcon4;
     m_bpu = info.bpu;
 
     m_hires = bplcon0 & 0b1000000000000000;
@@ -90,6 +92,11 @@ SiAmDeniseController::refreshData()
     m_loct      = bplcon3 & 0b0000001000000000;
     m_brdrblnk  = bplcon3 & 0b0000000000100000;
     m_brdsprt   = bplcon3 & 0b0000000000000010;
+
+    // BPLCON4 (AGA), same bit positions as Denise::bplam()/esprm()/osprm().
+    m_bplam = (bplcon4 >> 8) & 0xFF;
+    m_esprm = (bplcon4 >> 4) & 0xF;
+    m_osprm = bplcon4 & 0xF;
 
     m_diwstrt = info.diwstrt;
     m_diwstop = info.diwstop;

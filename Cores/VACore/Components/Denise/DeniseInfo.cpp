@@ -24,6 +24,7 @@ Denise::cacheInfo() const
     info.bplcon1 = bplcon1;
     info.bplcon2 = bplcon2;
     info.bplcon3 = bplcon3;
+    info.bplcon4 = bplcon4;
     info.bpu = bpu();
 
     info.diwstrt = diwstrt;

@@ -57,13 +57,6 @@ SiAmInspectorWindow {
         padded: root.numPadded
     }
 
-    component Si8: SiByteViewControl {
-
-        size: Size.small
-        base: root.numBase
-        padded: root.numPadded
-    }
-
     // One color-register swatch -- a plain circle, matching the round
     // NSColorWell style DenisePanel.swift's colorReg wells use.
     component Swatch: Rectangle {
@@ -147,62 +140,45 @@ SiAmInspectorWindow {
 
                                 spacing: Style.tinySpacing
 
-                                RowLayout {
-                                    spacing: Style.tinySpacing
-                                    Si16 { l: qsTr("BPLCON1"); lwidth: 65; value: denise.bplcon1 }
-                                }
-                                RowLayout {
-                                    spacing: Style.smallSpacing
-                                    Si8 { controlWidth: 32; value: denise.p1h }
-                                    SiLabel { text: qsTr("Playfield 1 delay") }
-                                }
-                                RowLayout {
-                                    spacing: Style.smallSpacing
-                                    Si8 { controlWidth: 32; value: denise.p2h }
-                                    SiLabel { text: qsTr("Playfield 2 delay") }
-                                }
+                                Si16 { l: qsTr("BPLCON1"); lwidth: root.lw; value: denise.bplcon1 }
+                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1H"); value: denise.p1h }
+                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2H"); value: denise.p2h }
                             }
 
                             ColumnLayout {
 
                                 spacing: Style.tinySpacing
 
-                                RowLayout {
-                                    spacing: Style.tinySpacing
-                                    Si16 { l: qsTr("BPLCON2"); lwidth: 65; value: denise.bplcon2 }
-                                }
-                                SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.pf2pri; l: qsTr("PF2PRI"); lwidth: 60 }
-                                SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.pf2p2;  l: qsTr("PF2P2");  lwidth: 60 }
-                                SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.pf2p1;  l: qsTr("PF2P1");  lwidth: 60 }
-                                SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.pf2p0;  l: qsTr("PF2P0");  lwidth: 60 }
-                                SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.pf1p2;  l: qsTr("PF1P2");  lwidth: 60 }
-                                SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.pf1p1;  l: qsTr("PF1P1");  lwidth: 60 }
-                                SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.pf1p0;  l: qsTr("PF1P0");  lwidth: 60 }
+                                Si16 { l: qsTr("BPLCON2"); lwidth: root.lw; value: denise.bplcon2 }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2PRI"); checked: denise.pf2pri }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2P2");  checked: denise.pf2p2 }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2P1");  checked: denise.pf2p1 }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2P0");  checked: denise.pf2p0 }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1P2");  checked: denise.pf1p2 }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1P1");  checked: denise.pf1p1 }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1P0");  checked: denise.pf1p0 }
                             }
 
                             ColumnLayout {
 
                                 spacing: Style.tinySpacing
 
-                                RowLayout {
-                                    spacing: Style.tinySpacing
-                                    Si16 { l: qsTr("BPLCON3"); lwidth: 65; value: denise.bplcon3 }
-                                }
-                                RowLayout {
-                                    spacing: Style.smallSpacing
-                                    Item { Layout.preferredWidth: 4 }
-                                    Si8 { controlWidth: 32; value: denise.colorBank }
-                                    SiLabel { text: qsTr("Color bank") }
-                                }
-                                RowLayout {
-                                    spacing: Style.smallSpacing
-                                    Item { Layout.preferredWidth: 4 }
-                                    Si8 { controlWidth: 32; value: denise.pf2of }
-                                    SiLabel { text: qsTr("PF2 offset") }
-                                }
-                                SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.loct;      l: qsTr("LOCT");      lwidth: 60 }
-                                SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.brdrblnk;  l: qsTr("BRDRBLNK");  lwidth: 60 }
-                                SiCheckBoxControl { indent: 4; readOnly: true; checked: denise.brdsprt;   l: qsTr("BRDSPRT");   lwidth: 60 }
+                                Si16 { l: qsTr("BPLCON3"); lwidth: root.lw; value: denise.bplcon3 }
+                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("BANK");     value: denise.colorBank }
+                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2OF");    value: denise.pf2of }
+                                Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("LOCT");     checked: denise.loct }
+                                Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("BRDRBLNK"); checked: denise.brdrblnk }
+                                Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("BRDSPRT");  checked: denise.brdsprt }
+                            }
+
+                            ColumnLayout {
+
+                                spacing: Style.tinySpacing
+
+                                Si16 { l: qsTr("BPLCON4"); lwidth: root.lw; value: denise.bplcon4 }
+                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("BPLAM"); value: denise.bplam }
+                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("ESPRM"); value: denise.esprm }
+                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("OSPRM"); value: denise.osprm }
                             }
 
                             HSpacer { }

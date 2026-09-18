@@ -26,10 +26,13 @@
 // than querying the core directly -- this controller only decodes it into
 // the individual bit/field properties DenisePanel.swift's outlets expose.
 //
-// BPLCON3 (AGA) is decoded the same way BPLCON0/1/2 already are -- straight
-// bitmasks matching the bit positions Denise's own colorBank()/pf2of()/
-// loct()/brdrblnk()/brdsprt() accessors use (see Denise.h's "BPLCON3"
-// block), which are the only BPLCON3 fields the core actually acts on.
+// BPLCON3/BPLCON4 (AGA) are decoded the same way BPLCON0/1/2 already are --
+// straight bitmasks matching the bit positions Denise's own colorBank()/
+// pf2of()/loct()/brdrblnk()/brdsprt() (BPLCON3) and bplam()/esprm()/osprm()
+// (BPLCON4) accessors use (see Denise.h's "BPLCON3"/"BPLCON4" blocks), which
+// are the only fields of either register the core actually acts on.
+// DeniseInfo didn't carry bplcon4 at all until this controller needed it --
+// see DeniseTypes.h/DeniseInfo.cpp.
 //
 // Color registers are exposed via colorAt(n) rather than 32 named
 // properties, the same Q_INVOKABLE(n) shape SiAmInfoController's own
@@ -46,7 +49,7 @@ class SiAmDeniseController : public SiAmInspectorController {
 
     Q_OBJECT
 
-    int m_bplcon0 = 0, m_bplcon1 = 0, m_bplcon2 = 0, m_bplcon3 = 0;
+    int m_bplcon0 = 0, m_bplcon1 = 0, m_bplcon2 = 0, m_bplcon3 = 0, m_bplcon4 = 0;
     int m_bpu = 0;
     bool m_hires = false, m_homod = false, m_dbplf = false, m_lace = false, m_shres = false;
     bool m_shresEnabled = false;
@@ -59,6 +62,11 @@ class SiAmDeniseController : public SiAmInspectorController {
     // on (see Denise.h's "BPLCON3" accessor block).
     int m_colorBank = 0, m_pf2of = 0;
     bool m_loct = false, m_brdrblnk = false, m_brdsprt = false;
+
+    // BPLCON4 (AGA), decoded via Denise's own bplam()/esprm()/osprm() (see
+    // Denise.h's "BPLCON4" accessor block): bplam is the 8-bit playfield
+    // color XOR mask, esprm/osprm the even/odd sprite color-bank selectors.
+    int m_bplam = 0, m_esprm = 0, m_osprm = 0;
 
     int m_diwstrt = 0, m_diwstop = 0;
     int m_hstrt = 0, m_vstrt = 0, m_hstop = 0, m_vstop = 0;
@@ -80,11 +88,15 @@ class SiAmDeniseController : public SiAmInspectorController {
     Q_PROPERTY(int bplcon1 READ bplcon1 NOTIFY deniseChanged)
     Q_PROPERTY(int bplcon2 READ bplcon2 NOTIFY deniseChanged)
     Q_PROPERTY(int bplcon3 READ bplcon3 NOTIFY deniseChanged)
+    Q_PROPERTY(int bplcon4 READ bplcon4 NOTIFY deniseChanged)
     Q_PROPERTY(int colorBank READ colorBank NOTIFY deniseChanged)
     Q_PROPERTY(int pf2of READ pf2of NOTIFY deniseChanged)
     Q_PROPERTY(bool loct READ loct NOTIFY deniseChanged)
     Q_PROPERTY(bool brdrblnk READ brdrblnk NOTIFY deniseChanged)
     Q_PROPERTY(bool brdsprt READ brdsprt NOTIFY deniseChanged)
+    Q_PROPERTY(int bplam READ bplam NOTIFY deniseChanged)
+    Q_PROPERTY(int esprm READ esprm NOTIFY deniseChanged)
+    Q_PROPERTY(int osprm READ osprm NOTIFY deniseChanged)
     Q_PROPERTY(int bpu READ bpu NOTIFY deniseChanged)
     Q_PROPERTY(bool hires READ hires NOTIFY deniseChanged)
     Q_PROPERTY(bool homod READ homod NOTIFY deniseChanged)
@@ -132,11 +144,15 @@ class SiAmDeniseController : public SiAmInspectorController {
     int bplcon1() const { return m_bplcon1; }
     int bplcon2() const { return m_bplcon2; }
     int bplcon3() const { return m_bplcon3; }
+    int bplcon4() const { return m_bplcon4; }
     int colorBank() const { return m_colorBank; }
     int pf2of() const { return m_pf2of; }
     bool loct() const { return m_loct; }
     bool brdrblnk() const { return m_brdrblnk; }
     bool brdsprt() const { return m_brdsprt; }
+    int bplam() const { return m_bplam; }
+    int esprm() const { return m_esprm; }
+    int osprm() const { return m_osprm; }
     int bpu() const { return m_bpu; }
     bool hires() const { return m_hires; }
     bool homod() const { return m_homod; }
