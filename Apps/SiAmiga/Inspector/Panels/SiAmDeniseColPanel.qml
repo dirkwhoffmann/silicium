@@ -36,15 +36,19 @@ GridLayout {
 
         property color value: "black"
 
-        // #RRGGBB, computed from the QColor's own 0..1 float channels
-        // rather than the raw 12-bit register -- colorAt(n) already expands
-        // that to 8 bits per channel (see its own comment), and the swatch
-        // shows exactly that expanded color, so the tooltip should match
-        // what's on screen rather than the narrower register value.
+        // #RRGGBB and the individual 8-bit channels, computed from the
+        // QColor's own 0..1 float channels rather than the raw 12-bit
+        // register -- colorAt(n) already expands that to 8 bits per
+        // channel (see its own comment), and the swatch shows exactly that
+        // expanded color, so the tooltip should match what's on screen
+        // rather than the narrower register value.
         readonly property string hex: "#" + [value.r, value.g, value.b]
             .map(c => Math.round(c * 255).toString(16).padStart(2, '0'))
             .join('')
             .toUpperCase()
+        readonly property int redValue: Math.round(value.r * 255)
+        readonly property int greenValue: Math.round(value.g * 255)
+        readonly property int blueValue: Math.round(value.b * 255)
 
         implicitWidth: 28
         implicitHeight: 28
@@ -52,13 +56,58 @@ GridLayout {
         Layout.fillHeight: true
         radius: 4 // width / 2
         color: value
-        border.width: 1
+        border.width: hovered ? 2 : 1
         border.color: Palette.tertiary
 
         HoverHandler { id: hoverHandler }
         property alias hovered: hoverHandler.hovered
 
-        SiToolTip { text: swatch.hex }
+        // Multi-line tooltip laid out as a label/colon/value mini table --
+        // SiToolTip only supports a single plain-text string, so this
+        // borrows its look (delay/timeout/padding/colors/background)
+        // rather than using it directly, and builds its own GridLayout
+        // content so the label column can be right-aligned and the value
+        // column left-aligned around a centered ":".
+        ToolTip {
+
+            delay: 500
+            timeout: 3000
+            visible: swatch.hovered
+            topPadding: Style.mediumSpacing
+            bottomPadding: Style.mediumSpacing
+            leftPadding: Style.mediumSpacing
+            rightPadding: Style.mediumSpacing
+
+            contentItem: GridLayout {
+
+                columns: 3
+                rowSpacing: 0
+                columnSpacing: Style.tinySpacing
+
+                SiText { text: qsTr("Hex");   Layout.alignment: Qt.AlignRight;  font.pixelSize: Style.small; color: Palette.primary }
+                SiText { text: ":";           Layout.alignment: Qt.AlignHCenter; font.pixelSize: Style.small; color: Palette.primary }
+                SiText { text: swatch.hex;    Layout.alignment: Qt.AlignLeft;   font.pixelSize: Style.small; color: Palette.primary }
+
+                SiText { text: qsTr("Red");   Layout.alignment: Qt.AlignRight;  font.pixelSize: Style.small; color: Palette.primary }
+                SiText { text: ":";           Layout.alignment: Qt.AlignHCenter; font.pixelSize: Style.small; color: Palette.primary }
+                SiText { text: swatch.redValue;   Layout.alignment: Qt.AlignLeft; font.pixelSize: Style.small; color: Palette.primary }
+
+                SiText { text: qsTr("Green"); Layout.alignment: Qt.AlignRight;  font.pixelSize: Style.small; color: Palette.primary }
+                SiText { text: ":";           Layout.alignment: Qt.AlignHCenter; font.pixelSize: Style.small; color: Palette.primary }
+                SiText { text: swatch.greenValue; Layout.alignment: Qt.AlignLeft; font.pixelSize: Style.small; color: Palette.primary }
+
+                SiText { text: qsTr("Blue");  Layout.alignment: Qt.AlignRight;  font.pixelSize: Style.small; color: Palette.primary }
+                SiText { text: ":";           Layout.alignment: Qt.AlignHCenter; font.pixelSize: Style.small; color: Palette.primary }
+                SiText { text: swatch.blueValue;  Layout.alignment: Qt.AlignLeft; font.pixelSize: Style.small; color: Palette.primary }
+            }
+
+            background: Rectangle {
+
+                color: Palette.background
+                border.color: Palette.backgroundBorder
+                radius: Style.radius
+            }
+        }
     }
 
     Repeater {
