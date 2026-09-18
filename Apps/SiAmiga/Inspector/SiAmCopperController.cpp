@@ -16,7 +16,18 @@ using namespace vamiga;
 SiAmCopperController::SiAmCopperController(SiAmController *parent)
     : SiAmInspectorController(parent), m_list1Model(this), m_list2Model(this), m_breakpointsModel(this)
 {
-
+    // CopperDebugger only records a list's start/end (current1/current2 in
+    // the core) while track mode is on -- see Copper::advance()/jumped(),
+    // which gate debugger.jumped()/advanced() behind emulator.isTracking().
+    // Without it, copList1Start/End etc. stay at their reset value (0) and
+    // both tables render empty. Mirrors the Swift reference's Inspector
+    // window, which calls emu.trackOn() in dialogWillShow() -- here keyed
+    // to this panel's own active flag instead of a single shared window,
+    // same as SiAmCPUController's own Trace-log tracking.
+    connect(this, &SiAmInspectorController::activeChanged, this, [this]() {
+        if (isActive()) SiAmController::core().trackOn();
+        else SiAmController::core().trackOff();
+    });
 }
 
 void
