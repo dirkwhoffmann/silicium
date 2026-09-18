@@ -164,7 +164,17 @@ typedef struct
     // swatch grid, which always shows every bank's true color regardless of
     // whether it's currently readable.
     u16 colorRegPeek[32];
-    
+
+    // Raw hardware sprite registers, one entry per sprite -- distinct from
+    // sprite[] below, which holds the debugger's own latched/decoded view
+    // (armed height, hstrt/vstrt/vstop, attach, colors, pixel data) rather
+    // than these four registers as the chipset itself holds them right now.
+    // Shown on the Sprites tab's own "Registers" box.
+    u16 sprdata[8];
+    u16 sprdatb[8];
+    u16 sprpos[8];
+    u16 sprctl[8];
+
     SpriteInfo sprite[8];
 }
 DeniseInfo;

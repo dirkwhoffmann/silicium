@@ -154,7 +154,13 @@ SiAmDeniseController::refreshData()
 
     for (int i = 0; i < 128; i++) m_colorReg[i] = info.colorReg[i];
     for (int i = 0; i < 32; i++) m_colorRegPeek[i] = info.colorRegPeek[i];
-    m_colorRevision++;
+    for (int i = 0; i < 8; i++) {
+        m_sprData[i] = info.sprdata[i];
+        m_sprDatb[i] = info.sprdatb[i];
+        m_sprPos[i] = info.sprpos[i];
+        m_sprCtl[i] = info.sprctl[i];
+    }
+    m_revision++;
 
     for (int i = 0; i < 8; i++) m_spriteArmed[i] = info.sprite[i].height != 0;
 

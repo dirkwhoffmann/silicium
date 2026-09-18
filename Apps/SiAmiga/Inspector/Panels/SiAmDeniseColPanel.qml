@@ -144,13 +144,13 @@ RowLayout {
                     required property int index
                     l: qsTr("COLOR%1").arg(index.toString().padStart(2, '0'))
                     lwidth: 60
-                    // denise.colorRevision is read purely to give this
+                    // denise.revision is read purely to give this
                     // binding a dependency to re-evaluate on --
                     // colorRegPeek(n) is Q_INVOKABLE, so calling it alone
                     // never triggers a re-evaluation when the peeked value
-                    // changes. See SiAmDeniseController::m_colorRevision's
+                    // changes. See SiAmDeniseController::m_revision's
                     // own comment.
-                    value: { root.denise.colorRevision; return root.denise.colorRegPeek(index) }
+                    value: { root.denise.revision; return root.denise.colorRegPeek(index) }
                 }
             }
         }
@@ -196,12 +196,12 @@ RowLayout {
                         model: 32
                         Swatch {
                             required property int index
-                            // denise.colorRevision is read purely to give this
+                            // denise.revision is read purely to give this
                             // binding a dependency to re-evaluate on -- colorAt(n)
                             // is Q_INVOKABLE, so calling it alone never triggers a
                             // re-evaluation when the palette changes. See
-                            // SiAmDeniseController::m_colorRevision's own comment.
-                            value: { root.denise.colorRevision; return root.denise.colorAt(bankBox.index * 32 + index) }
+                            // SiAmDeniseController::m_revision's own comment.
+                            value: { root.denise.revision; return root.denise.colorAt(bankBox.index * 32 + index) }
                         }
                     }
                 }

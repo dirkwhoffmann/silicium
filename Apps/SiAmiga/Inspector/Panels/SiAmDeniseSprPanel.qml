@@ -35,26 +35,94 @@ RowLayout {
         padded: root.numPadded
     }
 
-    //
-    // Registers -- collision detection (CLXDAT/CLXCON/
-    // CLXCON2) lives here rather than on the Registers
-    // tab's Control box: a collision is inherently a
-    // sprite/playfield overlap, so it's sprite state, not
-    // bitplane state.
-    //
+    // Left column: which sprites are currently armed, and the raw hardware
+    // registers behind them. Two separate boxes (rather than one) so the
+    // fixed-size armed row doesn't get stretched by the scrollable register
+    // list beneath it.
+    ColumnLayout {
 
-    SiBox {
-
-        title: qsTr("Registers")
         Layout.preferredWidth: 140
         Layout.fillHeight: true
-        spacing: Style.tinySpacing
+        spacing: Style.mediumSpacing
 
-        Si16 { l: qsTr("CLXDAT"); lwidth: 65; value: denise.clxdat }
-        Si16 { l: qsTr("CLXCON"); lwidth: 65; value: denise.clxcon }
-        Si16 { l: qsTr("CLXCON2"); lwidth: 65; value: denise.clxcon2 }
+        SiBox {
 
-        VSpacer { }
+            title: qsTr("Armed")
+            Layout.fillWidth: true
+            spacing: Style.tinySpacing
+
+            RowLayout {
+
+                Layout.fillWidth: true
+                spacing: Style.tinySpacing
+
+                Repeater {
+                    model: 8
+                    SiCheckBoxControl {
+                        required property int index
+                        readOnly: true
+                        // denise.revision is read purely to give this binding a
+                        // dependency to re-evaluate on -- spriteArmed(n) is
+                        // Q_INVOKABLE, so calling it alone never triggers a
+                        // re-evaluation when the armed state changes. See
+                        // SiAmDeniseController::m_revision's own comment.
+                        checked: { denise.revision; return denise.spriteArmed(index) }
+                    }
+                }
+            }
+        }
+
+        //
+        // Registers -- collision detection (CLXDAT/CLXCON/CLXCON2) lives
+        // here rather than on the Registers tab's Control box: a collision
+        // is inherently a sprite/playfield overlap, so it's sprite state,
+        // not bitplane state. The raw per-sprite registers below it are
+        // the chipset's own SPRxDATA/SPRxDATB/SPRxPOS/SPRxCTL, not the
+        // decoded hstrt/vstrt/vstop/attach shown to the right -- this is
+        // what's actually in the hardware right now, independent of
+        // whichever sprite happens to be selected there.
+        //
+
+        SiScrollBox {
+
+            title: qsTr("Registers")
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            spacing: Style.tinySpacing
+
+            ColumnLayout {
+
+                spacing: Style.tinySpacing
+
+                Si16 { l: qsTr("CLXDAT"); lwidth: 65; value: denise.clxdat }
+                Si16 { l: qsTr("CLXCON"); lwidth: 65; value: denise.clxcon }
+                Si16 { l: qsTr("CLXCON2"); lwidth: 65; value: denise.clxcon2 }
+
+                Repeater {
+
+                    model: 8
+
+                    ColumnLayout {
+
+                        required property int index
+
+                        Layout.topMargin: Style.smallSpacing
+                        spacing: -1
+
+                        // denise.revision is read purely to give each binding
+                        // below a dependency to re-evaluate on -- sprData(n)/
+                        // sprDatb(n)/sprPos(n)/sprCtl(n) are Q_INVOKABLE, so
+                        // calling one alone never triggers a re-evaluation
+                        // when the register changes. See
+                        // SiAmDeniseController::m_revision's own comment.
+                        Si16 { l: qsTr("SPR%1DATA").arg(index); lwidth: 65; value: { denise.revision; return denise.sprData(index) } }
+                        Si16 { l: qsTr("SPR%1DATB").arg(index); lwidth: 65; value: { denise.revision; return denise.sprDatb(index) } }
+                        Si16 { l: qsTr("SPR%1POS").arg(index);  lwidth: 65; value: { denise.revision; return denise.sprPos(index) } }
+                        Si16 { l: qsTr("SPR%1CTL").arg(index);  lwidth: 65; value: { denise.revision; return denise.sprCtl(index) } }
+                    }
+                }
+            }
+        }
     }
 
     SiBox {
@@ -64,32 +132,12 @@ RowLayout {
         Layout.fillHeight: true
         spacing: Style.tinySpacing
 
-        RowLayout {
+        SiSegmentedControl {
 
             Layout.fillWidth: true
-            spacing: Style.tinySpacing
-
-            Repeater {
-                model: 8
-                SiCheckBoxControl { required property int index; readOnly: true; checked: denise.spriteArmed(index) }
-            }
-        }
-
-        RowLayout {
-
-            Layout.fillWidth: true
-            spacing: Style.tinySpacing
-
-            Repeater {
-                model: 8
-                Button {
-                    required property int index
-                    text: index
-                    checkable: true
-                    checked: denise.selectedSprite === index
-                    onClicked: denise.selectedSprite = index
-                }
-            }
+            model: [0, 1, 2, 3, 4, 5, 6, 7].map(i => i.toString())
+            currentIndex: denise.selectedSprite
+            onActivated: (index) => denise.selectedSprite = index
         }
 
         Rectangle {

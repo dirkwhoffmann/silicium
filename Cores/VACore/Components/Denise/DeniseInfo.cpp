@@ -58,6 +58,12 @@ Denise::cacheInfo() const
         info.colorRegPeek[i] = spypeekCOLORxx(i);
     }
     for (isize i = 0; i < 8; i++) {
+        info.sprdata[i] = sprdata[i];
+        info.sprdatb[i] = sprdatb[i];
+        info.sprpos[i] = sprpos[i];
+        info.sprctl[i] = sprctl[i];
+    }
+    for (isize i = 0; i < 8; i++) {
         info.sprite[i] = debugger.latchedSpriteInfo[i];
         info.sprite[i].data = debugger.latchedSpriteData[i];
     }

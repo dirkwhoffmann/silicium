@@ -134,16 +134,21 @@ class SiAmDeniseController : public SiAmInspectorController {
     // Shown on the Colors tab's own "Registers" box.
     quint16 m_colorRegPeek[32] = {};
 
-    // Bumped every refreshData() call. colorAt(n)/colorRegPeek(n) are
-    // Q_INVOKABLE, not Q_PROPERTY, so QML's binding engine never learns the
-    // Colors tab's `denise.colorAt(n)`/`denise.colorRegPeek(n)` bindings
-    // depend on m_colorReg/m_colorRegPeek -- calling an invokable from
-    // within a binding registers no dependency, unlike reading a NOTIFYing
-    // property. Referencing this counter alongside the call in the binding
-    // gives it something to depend on, so the swatches/register column
-    // actually repaint when the palette changes. Same trick as
+    // Raw hardware sprite registers -- see DeniseInfo::sprdata's own
+    // comment. Shown on the Sprites tab's own "Registers" box.
+    quint16 m_sprData[8] = {}, m_sprDatb[8] = {}, m_sprPos[8] = {}, m_sprCtl[8] = {};
+
+    // Bumped every refreshData() call. colorAt(n)/colorRegPeek(n)/
+    // spriteArmed(n)/sprData(n)/sprDatb(n)/sprPos(n)/sprCtl(n) are all
+    // Q_INVOKABLE, not Q_PROPERTY, so QML's binding engine never learns
+    // that a binding calling one of them (e.g. `denise.colorAt(n)`)
+    // depends on the backing array -- calling an invokable from within a
+    // binding registers no dependency, unlike reading a NOTIFYing
+    // property. Referencing this counter alongside the call in the
+    // binding gives it something to depend on, so those bindings actually
+    // re-evaluate when the underlying data changes. Same trick as
     // SiC64MemoryController::m_selectRevision.
-    int m_colorRevision = 0;
+    int m_revision = 0;
 
     bool m_spriteArmed[8] = {};
     int m_selectedSprite = 0;
@@ -232,11 +237,17 @@ class SiAmDeniseController : public SiAmInspectorController {
     // CPU/Copper -- see m_colorRegPeek's own comment.
     Q_INVOKABLE int colorRegPeek(int nr) const { return nr >= 0 && nr < 32 ? m_colorRegPeek[nr] : 0; }
 
-    // See m_colorRevision's own comment -- read this alongside colorAt(n)/
-    // colorRegPeek(n) in a QML binding to make it re-evaluate when the
-    // palette changes.
-    Q_PROPERTY(int colorRevision READ colorRevision NOTIFY deniseChanged)
-    int colorRevision() const { return m_colorRevision; }
+    // Raw hardware sprite registers -- see m_sprData's own comment.
+    Q_INVOKABLE int sprData(int nr) const { return nr >= 0 && nr < 8 ? m_sprData[nr] : 0; }
+    Q_INVOKABLE int sprDatb(int nr) const { return nr >= 0 && nr < 8 ? m_sprDatb[nr] : 0; }
+    Q_INVOKABLE int sprPos(int nr) const { return nr >= 0 && nr < 8 ? m_sprPos[nr] : 0; }
+    Q_INVOKABLE int sprCtl(int nr) const { return nr >= 0 && nr < 8 ? m_sprCtl[nr] : 0; }
+
+    // See m_revision's own comment -- read this alongside any of the
+    // Q_INVOKABLEs above in a QML binding to make it re-evaluate when the
+    // underlying data changes.
+    Q_PROPERTY(int revision READ revision NOTIFY deniseChanged)
+    int revision() const { return m_revision; }
 
   protected:
 
