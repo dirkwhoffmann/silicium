@@ -36,10 +36,12 @@ GridLayout {
 
         implicitWidth: 28
         implicitHeight: 28
-        radius: width / 2
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        radius: 4 // width / 2
         color: value
         border.width: 1
-        border.color: Palette.controlBorder
+        border.color: Palette.tertiary
     }
 
     Repeater {
@@ -59,8 +61,8 @@ GridLayout {
 
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 columns: 8
-                columnSpacing: Style.smallSpacing
-                rowSpacing: Style.smallSpacing
+                columnSpacing: Style.tinySpacing
+                rowSpacing: Style.tinySpacing
 
                 Repeater {
                     model: 32
