@@ -57,13 +57,16 @@ class SiAmDeniseController : public SiAmInspectorController {
     int m_bpu = 0;
     bool m_hires = false, m_homod = false, m_dbplf = false, m_lace = false, m_shres = false;
 
-    // "Mode:" on the Display Mode box -- e.g. "Hires 4 planes" or "Lores
-    // HAM8". Mirrors Denise's own resolution()/hamMode6()/hamMode8()
-    // formulas (see Denise.h's "Derived values" block) rather than calling
-    // them directly: those are private methods on the live Denise object,
-    // and this controller otherwise only ever decodes the cached raw
-    // register values, never reaches into the core mid-frame.
-    QString m_displayMode;
+    // Display Mode box -- resolutionText is "Lores"/"Hires"/"SHRES";
+    // modeText is "N Bitplane(s)" or "HAM6"/"HAM8". Mirrors Denise's own
+    // resolution()/hamMode6()/hamMode8() formulas (see Denise.h's "Derived
+    // values" block) rather than calling them directly: those are private
+    // methods on the live Denise object, and this controller otherwise
+    // only ever decodes the cached raw register values, never reaches into
+    // the core mid-frame. Single/dual playfield and interlace on/off reuse
+    // the existing dbplf/lace bit properties directly, no separate field
+    // needed for those.
+    QString m_resolutionText, m_modeText;
 
     // The remaining BPLCON0 bits -- COLOR/GAUD/LPEN/ERSY are genlock/light-
     // pen pins the core doesn't act on (nothing drives or reads them), and
@@ -160,7 +163,8 @@ class SiAmDeniseController : public SiAmInspectorController {
     Q_PROPERTY(bool dbplf READ dbplf NOTIFY deniseChanged)
     Q_PROPERTY(bool lace READ lace NOTIFY deniseChanged)
     Q_PROPERTY(bool shres READ shres NOTIFY deniseChanged)
-    Q_PROPERTY(QString displayMode READ displayMode NOTIFY deniseChanged)
+    Q_PROPERTY(QString resolutionText READ resolutionText NOTIFY deniseChanged)
+    Q_PROPERTY(QString modeText READ modeText NOTIFY deniseChanged)
     Q_PROPERTY(bool color READ color NOTIFY deniseChanged)
     Q_PROPERTY(bool gaud READ gaud NOTIFY deniseChanged)
     Q_PROPERTY(bool uhres READ uhres NOTIFY deniseChanged)
@@ -239,7 +243,8 @@ class SiAmDeniseController : public SiAmInspectorController {
     bool dbplf() const { return m_dbplf; }
     bool lace() const { return m_lace; }
     bool shres() const { return m_shres; }
-    QString displayMode() const { return m_displayMode; }
+    QString resolutionText() const { return m_resolutionText; }
+    QString modeText() const { return m_modeText; }
     bool color() const { return m_color; }
     bool gaud() const { return m_gaud; }
     bool uhres() const { return m_uhres; }

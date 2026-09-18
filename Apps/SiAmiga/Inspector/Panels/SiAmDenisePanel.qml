@@ -23,12 +23,19 @@ SiAmInspectorWindow {
     title: qsTr("Denise Inspector")
     currentController: controller.deniseController
 
-    // Deliberately no width/height override here -- every inspector shares
-    // SiAmInspectorWindow.qml's 880x440 default, so the Registers page
-    // (Control/Display Window/Data, below) is laid out to fit inside that
-    // rather than growing the window: each BPLCONx group's bit list runs in
-    // 2 columns instead of 1 (13 rows -> 7 for BPLCON0, the tallest), and
-    // every field on this tab uses Size.tiny.
+    // Every inspector otherwise shares SiAmInspectorWindow.qml's 880x440
+    // default, and the Registers page's Control box (each BPLCONx column
+    // packed into a 16-row, single-column bit list at Size.tiny) fit
+    // exactly within that -- until each column grew a separator plus its
+    // own decoded sub-field(s) below (BPU under BPLCON0, BANK/PF2OF/SPRES
+    // under BPLCON3, ...), pushing the tallest column (BPLCON3, now 20
+    // rows) past what 440 has room for. Control is wrapped in a
+    // SiScrollBox so nothing is ever unreachable, but scrolling should be
+    // the fallback for an unusually tall column, not the routine way to
+    // see BPU/BANK/etc. on first look -- hence the modest height bump here
+    // instead of leaving every inspector's shared default to absorb it.
+    height: 510
+    minimumHeight: 480
 
     readonly property var denise: controller.deniseController
     readonly property var ic: controller.inspectorController
@@ -61,6 +68,29 @@ SiAmInspectorWindow {
         controlWidth: 44
         base: root.numBase
         padded: root.numPadded
+    }
+
+    // For the small (<=8-bit) decoded sub-fields shown below each BPLCONx
+    // column's separator line (BPU, PF1H/PF2H, ZDBPSEL, BANK/PF2OF/SPRES,
+    // BPLAM/ESPRM/OSPRM) -- Si16 would zero-pad these to 4 hex digits,
+    // overstating their actual width.
+    component Si8: SiByteViewControl {
+
+        size: Size.small
+        controlWidth: 36
+        base: root.numBase
+        padded: root.numPadded
+    }
+
+    // Horizontal rule under a BPLCONx column's last bit row, separating it
+    // from the decoded sub-field(s) below (e.g. BPU under BPLCON0).
+    component HRule: Rectangle {
+
+        Layout.fillWidth: true
+        Layout.topMargin: Style.tinySpacing
+        Layout.bottomMargin: Style.tinySpacing
+        implicitHeight: 1
+        color: Palette.surfaceBorder
     }
 
     // One color-register swatch -- a plain circle, matching the round
@@ -175,6 +205,10 @@ SiAmInspectorWindow {
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("LACE");   checked: !!(denise.bplcon0 & 0x0004) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ERSY");   checked: !!(denise.bplcon0 & 0x0002) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ECSENA"); checked: !!(denise.bplcon0 & 0x0001) }
+
+                                HRule { }
+
+                                Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU"); value: denise.bpu }
                             }
 
                             // BPLCON1 -- only PF2H (bits 7-4) and PF1H (bits
@@ -203,6 +237,11 @@ SiAmInspectorWindow {
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1H2"); checked: !!(denise.bplcon1 & 0x0004) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1H1"); checked: !!(denise.bplcon1 & 0x0002) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1H0"); checked: !!(denise.bplcon1 & 0x0001) }
+
+                                HRule { }
+
+                                Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1H"); value: denise.p1h }
+                                Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2H"); value: denise.p2h }
                             }
 
                             // BPLCON2 (AGA) -- all 16 bits are assigned; see
@@ -232,6 +271,10 @@ SiAmInspectorWindow {
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1P2");   checked: !!(denise.bplcon2 & 0x0004) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1P1");   checked: !!(denise.bplcon2 & 0x0002) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1P0");   checked: !!(denise.bplcon2 & 0x0001) }
+
+                                HRule { }
+
+                                Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDBPSEL"); value: denise.zdbpsel }
                             }
 
                             // BPLCON3 (AGA) -- bits 8, 3 and 2 carry no
@@ -259,6 +302,12 @@ SiAmInspectorWindow {
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("-");        checked: !!(denise.bplcon3 & 0x0004) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BRDSPRT");  checked: !!(denise.bplcon3 & 0x0002) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("EXTBLKEN"); checked: !!(denise.bplcon3 & 0x0001) }
+
+                                HRule { }
+
+                                Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("BANK");  value: denise.colorBank }
+                                Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2OF"); value: denise.pf2of }
+                                Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("SPRES"); value: denise.spres }
                             }
 
                             // BPLCON4 (AGA) -- BPLAM (bits 15-8), ESPRM
@@ -285,6 +334,12 @@ SiAmInspectorWindow {
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("OSPRM2"); checked: !!(denise.bplcon4 & 0x0004) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("OSPRM1"); checked: !!(denise.bplcon4 & 0x0002) }
                                 Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("OSPRM0"); checked: !!(denise.bplcon4 & 0x0001) }
+
+                                HRule { }
+
+                                Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("BPLAM"); value: denise.bplam }
+                                Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("ESPRM"); value: denise.esprm }
+                                Si8 { indent: root.indent; lwidth: root.lw; l: qsTr("OSPRM"); value: denise.osprm }
                             }
                         }
 
@@ -307,39 +362,32 @@ SiAmInspectorWindow {
 
                         // Meta-information about the display mode the
                         // BPLCON registers currently add up to -- not a
-                        // register dump (that's what the Control box is
-                        // for), just the derived, human-readable summary
-                        // (see Denise.h's "Derived values" block and
-                        // SiAmDeniseController's own displayMode comment).
+                        // register dump (the Control box's job), just the
+                        // derived, human-readable summary a plain-language
+                        // reading of the register bits (see Denise.h's
+                        // "Derived values" block and SiAmDeniseController's
+                        // own resolutionText/modeText comment). A single
+                        // column of plain sentences rather than a label/
+                        // value grid, e.g.:
+                        //
+                        //   4 Bitplanes
+                        //   Lores
+                        //   Single Playfield
+                        //   Non-interlaced
                         SiBox {
 
                             title: qsTr("Display Mode")
                             Layout.fillWidth: true
                             spacing: Style.tinySpacing
 
-                            GridLayout {
+                            ColumnLayout {
 
-                                columns: 2
-                                columnSpacing: Style.mediumSpacing
-                                rowSpacing: Style.tinySpacing
+                                spacing: Style.tinySpacing
 
-                                SiLabel { text: qsTr("Mode:"); horizontalAlignment: Text.AlignRight }
-                                SiText { text: denise.displayMode }
-
-                                SiLabel { text: qsTr("PF1 Scroll:"); horizontalAlignment: Text.AlignRight }
-                                SiText { text: denise.p1h }
-
-                                SiLabel { text: qsTr("PF2 Scroll:"); horizontalAlignment: Text.AlignRight }
-                                SiText { text: denise.p2h }
-
-                                SiLabel { text: qsTr("Color Bank:"); horizontalAlignment: Text.AlignRight }
-                                SiText { text: denise.colorBank }
-
-                                SiLabel { text: qsTr("PF2 Offset:"); horizontalAlignment: Text.AlignRight }
-                                SiText { text: denise.pf2of }
-
-                                SiLabel { text: qsTr("BPLAM:"); horizontalAlignment: Text.AlignRight }
-                                SiText { text: denise.bplam }
+                                SiText { text: denise.modeText }
+                                SiText { text: denise.resolutionText }
+                                SiText { text: denise.dbplf ? qsTr("Dual Playfield") : qsTr("Single Playfield") }
+                                SiText { text: denise.lace ? qsTr("Interlaced") : qsTr("Non-interlaced") }
                             }
                         }
 

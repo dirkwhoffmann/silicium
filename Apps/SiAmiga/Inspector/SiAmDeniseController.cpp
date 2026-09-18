@@ -80,7 +80,7 @@ SiAmDeniseController::refreshData()
     m_ersy   = bplcon0 & 0b0000000000000010;
     m_ecsena = bplcon0 & 0b0000000000000001;
 
-    // "Mode:" -- same formulas as Denise::resolution()/hamMode6()/
+    // Display Mode box -- same formulas as Denise::resolution()/hamMode6()/
     // hamMode8() (see the field comment). isOCS/isAGA come from the same
     // DENISE_REVISION option Denise::isOCS()/isAGA() read internally.
     auto rev = DeniseRev(SiAmController::core().get(Opt::DENISE_REVISION));
@@ -88,14 +88,15 @@ SiAmDeniseController::refreshData()
     bool isAGA = rev == DeniseRev::AGA;
     bool lores = !m_hires;
 
-    QString resName = (m_shres && !isOCS) ? QStringLiteral("SHRES")
-                     : m_hires ? QStringLiteral("Hires") : QStringLiteral("Lores");
+    m_resolutionText = (m_shres && !isOCS) ? QStringLiteral("SHRES")
+                      : m_hires ? QStringLiteral("Hires") : QStringLiteral("Lores");
+
     bool ham6 = m_homod && (lores || isAGA) && m_bpu < 7;
     bool ham8 = m_homod && (lores || isAGA) && m_bpu >= 7;
 
-    if (ham8) m_displayMode = QString("%1 HAM8").arg(resName);
-    else if (ham6) m_displayMode = QString("%1 HAM6").arg(resName);
-    else m_displayMode = QString("%1 %2 plane%3").arg(resName).arg(m_bpu).arg(m_bpu == 1 ? "" : "s");
+    if (ham8) m_modeText = QStringLiteral("HAM8");
+    else if (ham6) m_modeText = QStringLiteral("HAM6");
+    else m_modeText = QString("%1 Bitplane%2").arg(m_bpu).arg(m_bpu == 1 ? "" : "s");
 
     m_p1h = bplcon1 & 0b00001111;
     m_p2h = (bplcon1 & 0b11110000) >> 4;
