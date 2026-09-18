@@ -180,7 +180,8 @@ RowLayout {
 
                 title: qsTr("Bank %1").arg(index)
                 font.bold: current
-                borderWidth: current ? 2 : 1
+                borderColor: current ? Palette.tertiary : Palette.surface
+                // borderWidth: current ? 2 : 1
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
