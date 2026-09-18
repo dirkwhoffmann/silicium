@@ -32,7 +32,19 @@ GridLayout {
     // NSColorWell style DenisePanel.swift's colorReg wells use.
     component Swatch: Rectangle {
 
+        id: swatch
+
         property color value: "black"
+
+        // #RRGGBB, computed from the QColor's own 0..1 float channels
+        // rather than the raw 12-bit register -- colorAt(n) already expands
+        // that to 8 bits per channel (see its own comment), and the swatch
+        // shows exactly that expanded color, so the tooltip should match
+        // what's on screen rather than the narrower register value.
+        readonly property string hex: "#" + [value.r, value.g, value.b]
+            .map(c => Math.round(c * 255).toString(16).padStart(2, '0'))
+            .join('')
+            .toUpperCase()
 
         implicitWidth: 28
         implicitHeight: 28
@@ -42,6 +54,11 @@ GridLayout {
         color: value
         border.width: 1
         border.color: Palette.tertiary
+
+        HoverHandler { id: hoverHandler }
+        property alias hovered: hoverHandler.hovered
+
+        SiToolTip { text: swatch.hex }
     }
 
     Repeater {
