@@ -23,40 +23,42 @@ SiAmInspectorWindow {
     title: qsTr("Denise Inspector")
     currentController: controller.deniseController
 
-    // The default 880x440 (SiAmInspectorWindow.qml) was sized for the old
-    // flat layout, where the register grid and the fixed-height Display
-    // window/Colors row sat in separate, independently-sized top-level
-    // rows. Now that both live stacked inside one StackLayout page (see
-    // root.page below), that page also has to make room for the
-    // Program/Trace/Debug-style tab bar's own overlap margin above it, so
-    // the same content needs a bit more height than before to avoid
-    // squeezing everything below its natural size. Grown again once the
-    // BPLCON0 column's bit list grew from 6 to 13 rows (COLOR/GAUD/UHRES/
-    // BYPASS/LPEN/ERSY/ECSENA added) -- that column, not the fixed-height
-    // Display window/Colors row below it, is now what sets the Registers
-    // box's required height.
-    // height: 720
-    // minimumHeight: 600
+    // Deliberately no width/height override here -- every inspector shares
+    // SiAmInspectorWindow.qml's 880x440 default, so the Registers page
+    // (Control/Display Window/Data, below) is laid out to fit inside that
+    // rather than growing the window: each BPLCONx group's bit list runs in
+    // 2 columns instead of 1 (13 rows -> 7 for BPLCON0, the tallest), and
+    // every field on this tab uses Size.tiny.
 
     readonly property var denise: controller.deniseController
     readonly property var ic: controller.inspectorController
     readonly property int numBase: ic.hex ? 16 : 10
     readonly property bool numPadded: ic.padded
     readonly property int lw: 64
-    readonly property int indent: 16
+    readonly property int hlw: 62
+    readonly property int indent: 0
 
     // SiWordViewControl/SiByteViewControl (Apps/Shared/QML/Compounds) hold
     // the structural bits; this panel only adds the width override and the
     // hex/decimal toggle binding.
 
+    // Size.tiny rather than the more common Size.small, and a narrower
+    // controlWidth than SiWordViewControl's own 48px default -- the
+    // Registers page's Control box packs 5 BPLCONx groups (42 fields
+    // total) into a 2-column grid, so every bit of horizontal/vertical
+    // slack here counts. root.lw sizes the indented per-bit labels
+    // ("HIRES", "BPU", ...); root.hlw is wider, for the un-indented
+    // register-name header row of each group ("BPLCON0", "DIWSTRT", ...),
+    // which needs more characters than fit in root.lw.
     component Si1: SiBitViewControl {
 
-        size: Size.small
+        size: Size.tiny
     }
 
     component Si16: SiWordViewControl {
 
         size: Size.small
+        controlWidth: 44
         base: root.numBase
         padded: root.numPadded
     }
@@ -107,153 +109,246 @@ SiAmInspectorWindow {
                 // Registers
                 //
 
-                ColumnLayout {
+                RowLayout {
 
                     spacing: Style.mediumSpacing
 
-                    SiBox {
+                    //
+                    // Control -- BPLCON0..4, two groups per row (BPLCON0/1,
+                    // then 2/3, then 4 alone) via a 2-column outer grid --
+                    // GridLayout's default left-to-right/top-to-bottom flow
+                    // lands each in the right cell with no explicit
+                    // Layout.row/column. Each group's own bit list is
+                    // itself a 2-column grid, so a 13-entry group (BPLCON0,
+                    // the tallest) only needs 7 rows. Wrapped in a
+                    // SiScrollBox (rather than depending on getting the
+                    // fixed sizing exactly right) so if this ever doesn't
+                    // quite fit some window size, it scrolls instead of
+                    // overflowing into Display Window/Data beside it --
+                    // SiBox's own Pane never clips its content. root.lw/
+                    // indent and Si16's controlWidth are all trimmed down
+                    // from their usual defaults too, purely to keep the box
+                    // itself compact.
+                    //
 
-                        title: qsTr("Registers")
+                    SiScrollBox {
+
+                        title: qsTr("Control")
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         spacing: Style.mediumSpacing
 
-                        RowLayout {
+                        GridLayout {
 
                             Layout.fillWidth: true
-                            spacing: Style.largeSpacing * 2
+                            columns: 2
+                            columnSpacing: Style.mediumSpacing
+                            rowSpacing: Style.mediumSpacing
 
                             ColumnLayout {
 
-                                spacing: 0 // Style.tinySpacing
+                                spacing: -1
 
                                 Si16 { l: qsTr("BPLCON0"); lwidth: root.lw; value: denise.bplcon0 }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("HIRES"); checked: denise.hires }
-                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU"); value: denise.bpu }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("HAM"); checked: denise.homod }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("DPF"); checked: denise.dbplf }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("COLOR"); checked: denise.color }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("GAUD"); checked: denise.gaud }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("UHRES"); checked: denise.uhres }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("SHRES"); enabled: denise.shresEnabled; checked: denise.shres }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BYPASS"); checked: denise.bypass }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("LPEN"); checked: denise.lpen }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("LACE"); checked: denise.lace }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ERSY"); checked: denise.ersy }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ECSENA"); checked: denise.ecsena }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("HIRES"); checked: !!(denise.bplcon0 & 0x8000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU2"); checked: !!(denise.bplcon0 & 0x4000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU1"); checked: !!(denise.bplcon0 & 0x2000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU0"); checked: !!(denise.bplcon0 & 0x1000) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("HAM"); checked: !!(denise.bplcon0 & 0x0800) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("DPF"); checked: !!(denise.bplcon0 & 0x0400) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("COLOR"); checked: !!(denise.bplcon0 & 0x0200) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("GAUD"); checked: !!(denise.bplcon0 & 0x0100) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("UHRES"); checked: !!(denise.bplcon0 & 0x0080) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("SHRES"); enabled: !!(denise.bplcon0 & 0x0040) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BYPASS"); checked: !!(denise.bplcon0 & 0x0020) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BPU3"); checked: !!(denise.bplcon0 & 0x0010) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("LPEN"); checked: !!(denise.bplcon0 & 0x0008) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("LACE"); checked: !!(denise.bplcon0 & 0x0004) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ERSY"); checked: !!(denise.bplcon0 & 0x0002) }
+                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ECSENA"); checked: !!(denise.bplcon0 & 0x0001) }
+
+                                /*
+                                GridLayout {
+
+                                    columns: 2
+                                    columnSpacing: Style.mediumSpacing
+                                    rowSpacing: 0
+
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("HIRES"); checked: denise.hires; Layout.alignment: Qt.AlignRight }
+                                    Si16 { indent: root.indent; rwidth: root.lw; r: qsTr("BPU"); value: denise.bpu; Layout.alignment: Qt.AlignLeft }
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("HAM"); checked: denise.homod; Layout.alignment: Qt.AlignRight }
+                                    Si1 { indent: root.indent; rwidth: root.lw; r: qsTr("DPF"); checked: denise.dbplf; Layout.alignment: Qt.AlignLeft }
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("COLOR"); checked: denise.color; Layout.alignment: Qt.AlignRight }
+                                    Si1 { indent: root.indent; rwidth: root.lw; r: qsTr("GAUD"); checked: denise.gaud; Layout.alignment: Qt.AlignLeft }
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("UHRES"); checked: denise.uhres; Layout.alignment: Qt.AlignRight }
+                                    Si1 { indent: root.indent; rwidth: root.lw; r: qsTr("SHRES"); enabled: denise.shresEnabled; checked: denise.shres }
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("BYPASS"); checked: denise.bypass; Layout.alignment: Qt.AlignRight }
+                                    Si1 { indent: root.indent; rwidth: root.lw; r: qsTr("LPEN"); checked: denise.lpen; Layout.alignment: Qt.AlignLeft }
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("LACE"); checked: denise.lace; Layout.alignment: Qt.AlignRight }
+                                    Si1 { indent: root.indent; rwidth: root.lw; r: qsTr("ERSY"); checked: denise.ersy; Layout.alignment: Qt.AlignLeft }
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ECSENA"); checked: denise.ecsena; Layout.alignment: Qt.AlignRight }
+                                }
+
+                                 */
                             }
 
                             ColumnLayout {
 
-                                spacing: 0 // Style.tinySpacing
+                                spacing: 0
 
-                                Si16 { l: qsTr("BPLCON1"); lwidth: root.lw; value: denise.bplcon1 }
-                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1H"); value: denise.p1h }
-                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2H"); value: denise.p2h }
+                                Si16 { l: qsTr("BPLCON1"); lwidth: root.hlw; value: denise.bplcon1 }
+
+                                GridLayout {
+
+                                    columns: 2
+                                    columnSpacing: Style.mediumSpacing
+                                    rowSpacing: 0
+
+                                    Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1H"); value: denise.p1h }
+                                    Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2H"); value: denise.p2h }
+                                }
                             }
 
                             ColumnLayout {
 
-                                spacing: 0 // Style.tinySpacing
+                                spacing: 0
 
-                                Si16 { l: qsTr("BPLCON2"); lwidth: root.lw; value: denise.bplcon2 }
-                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDBPSEL"); value: denise.zdbpsel }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDBPEN"); checked: denise.zdbpen }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDCTEN"); checked: denise.zdcten }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("KILLEHB"); checked: denise.killehb }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("RDRAM"); checked: denise.rdram }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("SOGEN"); checked: denise.sogen }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2PRI"); checked: denise.pf2pri }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2P2");  checked: denise.pf2p2 }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2P1");  checked: denise.pf2p1 }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2P0");  checked: denise.pf2p0 }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1P2");  checked: denise.pf1p2 }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1P1");  checked: denise.pf1p1 }
-                                Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1P0");  checked: denise.pf1p0 }
+                                Si16 { l: qsTr("BPLCON2"); lwidth: root.hlw; value: denise.bplcon2 }
+
+                                GridLayout {
+
+                                    columns: 2
+                                    columnSpacing: Style.mediumSpacing
+                                    rowSpacing: 0
+
+                                    Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDBPSEL"); value: denise.zdbpsel }
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDBPEN"); checked: denise.zdbpen }
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("ZDCTEN"); checked: denise.zdcten }
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("KILLEHB"); checked: denise.killehb }
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("RDRAM"); checked: denise.rdram }
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("SOGEN"); checked: denise.sogen }
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2PRI"); checked: denise.pf2pri }
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2P2");  checked: denise.pf2p2 }
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2P1");  checked: denise.pf2p1 }
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2P0");  checked: denise.pf2p0 }
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1P2");  checked: denise.pf1p2 }
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1P1");  checked: denise.pf1p1 }
+                                    Si1 { indent: root.indent; lwidth: root.lw; l: qsTr("PF1P0");  checked: denise.pf1p0 }
+                                }
                             }
 
                             ColumnLayout {
 
-                                spacing: 0 // Style.tinySpacing
+                                spacing: 0
 
-                                Si16 { l: qsTr("BPLCON3"); lwidth: root.lw; value: denise.bplcon3 }
-                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("BANK");     value: denise.colorBank }
-                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2OF");    value: denise.pf2of }
-                                Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("LOCT");     checked: denise.loct }
-                                Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("-");        checked: denise.bplcon3Res8 }
-                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("SPRES");    value: denise.spres }
-                                Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("BRDRBLNK"); checked: denise.brdrblnk }
-                                Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("BRDNTRAN"); checked: denise.brdntran }
-                                Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("-");        checked: denise.bplcon3Res3 }
-                                Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("-");        checked: denise.bplcon3Res2 }
-                                Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("BRDSPRT");  checked: denise.brdsprt }
-                                Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("EXTBLKEN"); checked: denise.extblken }
+                                Si16 { l: qsTr("BPLCON3"); lwidth: root.hlw; value: denise.bplcon3 }
+
+                                GridLayout {
+
+                                    columns: 2
+                                    columnSpacing: Style.mediumSpacing
+                                    rowSpacing: 0
+
+                                    Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("BANK");     value: denise.colorBank }
+                                    Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("PF2OF");    value: denise.pf2of }
+                                    Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("LOCT");     checked: denise.loct }
+                                    Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("-");        checked: denise.bplcon3Res8 }
+                                    Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("SPRES");    value: denise.spres }
+                                    Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("BRDRBLNK"); checked: denise.brdrblnk }
+                                    Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("BRDNTRAN"); checked: denise.brdntran }
+                                    Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("-");        checked: denise.bplcon3Res3 }
+                                    Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("-");        checked: denise.bplcon3Res2 }
+                                    Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("BRDSPRT");  checked: denise.brdsprt }
+                                    Si1  { indent: root.indent; lwidth: root.lw; l: qsTr("EXTBLKEN"); checked: denise.extblken }
+                                }
                             }
 
                             ColumnLayout {
 
-                                spacing: 0 // Style.tinySpacing
+                                spacing: 0
 
-                                Si16 { l: qsTr("BPLCON4"); lwidth: root.lw; value: denise.bplcon4 }
-                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("BPLAM"); value: denise.bplam }
-                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("ESPRM"); value: denise.esprm }
-                                Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("OSPRM"); value: denise.osprm }
+                                Si16 { l: qsTr("BPLCON4"); lwidth: root.hlw; value: denise.bplcon4 }
+
+                                GridLayout {
+
+                                    columns: 2
+                                    columnSpacing: Style.mediumSpacing
+                                    rowSpacing: 0
+
+                                    Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("BPLAM"); value: denise.bplam }
+                                    Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("ESPRM"); value: denise.esprm }
+                                    Si16 { indent: root.indent; lwidth: root.lw; l: qsTr("OSPRM"); value: denise.osprm }
+                                }
                             }
-
-                            HSpacer { }
                         }
 
                         VSpacer { }
                     }
 
-                    RowLayout {
+                    //
+                    // Display Window / Data -- stacked in one column on the
+                    // right rather than sitting beside Control, so Control
+                    // keeps the full remaining height for its own 2-column
+                    // BPLCON grid instead of being squeezed to whatever a
+                    // third side-by-side box leaves over.
+                    //
 
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 200
+                    ColumnLayout {
+
+                        Layout.preferredWidth: 180
+                        Layout.fillHeight: true
                         spacing: Style.mediumSpacing
 
-                        //
-                        // Display window
-                        //
-
+                        // DIWSTRT/DIWSTOP/DIWHIGH and the pixel coordinates
+                        // Denise derives from them. The Swift reference's
+                        // little start/stop diagram is dropped: it added
+                        // height this tab can't spare and the same
+                        // information is already right there as numbers.
                         SiBox {
 
-                            title: qsTr("Display window")
+                            title: qsTr("Display Window")
+                            Layout.fillWidth: true
+                            spacing: Style.tinySpacing
+
+                            GridLayout {
+
+                                columns: 2
+                                columnSpacing: Style.mediumSpacing
+                                rowSpacing: 0
+
+                                Si16 { lwidth: root.hlw; l: qsTr("DIWSTRT"); value: denise.diwstrt }
+                                Si16 { lwidth: root.hlw; l: qsTr("DIWSTOP"); value: denise.diwstop }
+                                Si16 { lwidth: root.hlw; l: qsTr("DIWHIGH"); value: denise.diwhigh }
+                                Si16 { lwidth: root.hlw; l: qsTr("HSTRT"); value: denise.hstrt }
+                                Si16 { lwidth: root.hlw; l: qsTr("VSTRT"); value: denise.vstrt }
+                                Si16 { lwidth: root.hlw; l: qsTr("HSTOP"); value: denise.hstop }
+                                Si16 { lwidth: root.hlw; l: qsTr("VSTOP"); value: denise.vstop }
+                            }
+                        }
+
+                        // BPLDAT0..7, the latched bitplane data words (all
+                        // 8 exist on every model; see SiAmDeniseController's
+                        // bplData(n) comment).
+                        SiBox {
+
+                            title: qsTr("Data")
                             Layout.fillWidth: true
                             Layout.fillHeight: true
+                            spacing: Style.tinySpacing
 
-                            RowLayout {
+                            GridLayout {
 
-                                Layout.alignment: Qt.AlignVCenter
-                                spacing: Style.mediumSpacing
+                                columns: 2
+                                columnSpacing: Style.mediumSpacing
+                                rowSpacing: 0
 
-                                Si16 { value: denise.diwstrt }
-
-                                ColumnLayout {
-
-                                    spacing: 2
-
-                                    SiText { Layout.alignment: Qt.AlignLeft; text: "(%1,%2)".arg(denise.hstrt).arg(denise.vstrt); font.pixelSize: Style.small }
-
-                                    Rectangle {
-
-                                        Layout.preferredWidth: 100
-                                        Layout.preferredHeight: 70
-                                        color: "transparent"
-                                        border.width: 1
-                                        border.color: Palette.primary
-
-                                        Rectangle { anchors.horizontalCenter: parent.horizontalCenter; width: 1; height: parent.height + 16; y: -8; color: Palette.controlBorder }
-                                        Rectangle { anchors.verticalCenter: parent.verticalCenter; height: 1; width: parent.width + 16; x: -8; color: Palette.controlBorder }
-                                    }
-
-                                    SiText { Layout.alignment: Qt.AlignRight; text: "(%1,%2)".arg(denise.hstop).arg(denise.vstop); font.pixelSize: Style.small }
+                                Repeater {
+                                    model: 8
+                                    Si16 { required property int index; lwidth: root.hlw; l: qsTr("BPLDAT%1").arg(index); value: denise.bplData(index) }
                                 }
-
-                                Si16 { value: denise.diwstop }
-
-                                HSpacer { }
                             }
+
+                            VSpacer { }
                         }
                     }
                 }
@@ -310,10 +405,11 @@ SiAmInspectorWindow {
                     spacing: Style.mediumSpacing
 
                     //
-                    // Registers -- CLXDAT lives here rather than on the
-                    // Registers tab's BPLCON0 column: it latches sprite/
-                    // playfield collision bits, so it's (mostly) sprite
-                    // state, not bitplane state.
+                    // Registers -- collision detection (CLXDAT/CLXCON/
+                    // CLXCON2) lives here rather than on the Registers
+                    // tab's Control box: a collision is inherently a
+                    // sprite/playfield overlap, so it's sprite state, not
+                    // bitplane state.
                     //
 
                     SiBox {
@@ -324,6 +420,8 @@ SiAmInspectorWindow {
                         spacing: Style.tinySpacing
 
                         Si16 { l: qsTr("CLXDAT"); lwidth: 65; value: denise.clxdat }
+                        Si16 { l: qsTr("CLXCON"); lwidth: 65; value: denise.clxcon }
+                        Si16 { l: qsTr("CLXCON2"); lwidth: 65; value: denise.clxcon2 }
 
                         VSpacer { }
                     }

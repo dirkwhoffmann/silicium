@@ -105,10 +105,18 @@ class SiAmDeniseController : public SiAmInspectorController {
     // color XOR mask, esprm/osprm the even/odd sprite color-bank selectors.
     int m_bplam = 0, m_esprm = 0, m_osprm = 0;
 
-    int m_diwstrt = 0, m_diwstop = 0;
+    int m_diwstrt = 0, m_diwstop = 0, m_diwhigh = 0;
     int m_hstrt = 0, m_vstrt = 0, m_hstop = 0, m_vstop = 0;
 
-    int m_clxdat = 0;
+    // Collision detection: CLXDAT (latched result, cleared on read on real
+    // hardware -- see DeniseInfo::clxdat's own comment) and its two enable
+    // masks CLXCON/CLXCON2. All three live on the Sprites tab, not here --
+    // a collision is inherently a sprite/playfield overlap, so it's sprite
+    // state the same way CLXDAT already was.
+    int m_clxdat = 0, m_clxcon = 0, m_clxcon2 = 0;
+
+    // Latched bitplane data, BPLDAT0..7 -- see the Data box's own comment.
+    quint16 m_bpldat[8] = {};
 
     // 4 banks of 32 entries each -- see the Colors tab's class comment.
     quint16 m_colorReg[128] = {};
@@ -173,12 +181,15 @@ class SiAmDeniseController : public SiAmInspectorController {
 
     Q_PROPERTY(int diwstrt READ diwstrt NOTIFY deniseChanged)
     Q_PROPERTY(int diwstop READ diwstop NOTIFY deniseChanged)
+    Q_PROPERTY(int diwhigh READ diwhigh NOTIFY deniseChanged)
     Q_PROPERTY(int hstrt READ hstrt NOTIFY deniseChanged)
     Q_PROPERTY(int vstrt READ vstrt NOTIFY deniseChanged)
     Q_PROPERTY(int hstop READ hstop NOTIFY deniseChanged)
     Q_PROPERTY(int vstop READ vstop NOTIFY deniseChanged)
 
     Q_PROPERTY(int clxdat READ clxdat NOTIFY deniseChanged)
+    Q_PROPERTY(int clxcon READ clxcon NOTIFY deniseChanged)
+    Q_PROPERTY(int clxcon2 READ clxcon2 NOTIFY deniseChanged)
 
     Q_PROPERTY(int selectedSprite READ selectedSprite WRITE setSelectedSprite NOTIFY deniseChanged)
     Q_PROPERTY(int sprHStart READ sprHStart NOTIFY deniseChanged)
@@ -187,6 +198,12 @@ class SiAmDeniseController : public SiAmInspectorController {
     Q_PROPERTY(bool sprAttach READ sprAttach NOTIFY deniseChanged)
 
     Q_INVOKABLE bool spriteArmed(int nr) const { return nr >= 0 && nr < 8 && m_spriteArmed[nr]; }
+
+    // BPLDAT0..7 -- latched bitplane data, one word per bitplane (all 8
+    // exist on every model; how many are actually driven by DMA depends on
+    // bpu, but the Data box shows all of them, same as CPU/Registers panels
+    // show every register regardless of what the current program uses).
+    Q_INVOKABLE int bplData(int nr) const { return nr >= 0 && nr < 8 ? m_bpldat[nr] : 0; }
 
     // 128-entry color-register palette (4 banks of 32), decoded to display
     // QColors.
@@ -249,12 +266,15 @@ class SiAmDeniseController : public SiAmInspectorController {
 
     int diwstrt() const { return m_diwstrt; }
     int diwstop() const { return m_diwstop; }
+    int diwhigh() const { return m_diwhigh; }
     int hstrt() const { return m_hstrt; }
     int vstrt() const { return m_vstrt; }
     int hstop() const { return m_hstop; }
     int vstop() const { return m_vstop; }
 
     int clxdat() const { return m_clxdat; }
+    int clxcon() const { return m_clxcon; }
+    int clxcon2() const { return m_clxcon2; }
 
     int selectedSprite() const { return m_selectedSprite; }
     void setSelectedSprite(int value);

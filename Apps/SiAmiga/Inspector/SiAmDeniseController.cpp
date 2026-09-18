@@ -127,12 +127,17 @@ SiAmDeniseController::refreshData()
 
     m_diwstrt = info.diwstrt;
     m_diwstop = info.diwstop;
+    m_diwhigh = info.diwhigh;
     m_hstrt = (int)info.viewport.hstrt;
     m_vstrt = (int)info.viewport.vstrt;
     m_hstop = (int)info.viewport.hstop;
     m_vstop = (int)info.viewport.vstop;
 
     m_clxdat = info.clxdat;
+    m_clxcon = info.clxcon;
+    m_clxcon2 = info.clxcon2;
+
+    for (int i = 0; i < 8; i++) m_bpldat[i] = info.bpldat[i];
 
     for (int i = 0; i < 128; i++) m_colorReg[i] = info.colorReg[i];
 

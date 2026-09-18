@@ -140,10 +140,13 @@ typedef struct
     
     u16 diwstrt;
     u16 diwstop;
+    u16 diwhigh;
     ViewPortInfo viewport;
-    
+
     u16 joydat[2];
     u16 clxdat;
+    u16 clxcon;
+    u16 clxcon2;
     
     // The AGA color table is 256 entries deep (8 banks of 32, selected by
     // BPLCON3's 3-bit BANK field), but only the first 4 banks (128 entries)

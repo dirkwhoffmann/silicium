@@ -29,6 +29,7 @@ Denise::cacheInfo() const
 
     info.diwstrt = diwstrt;
     info.diwstop = diwstop;
+    info.diwhigh = diwhigh;
     info.viewport.hstrt = hstrt;
     info.viewport.hstop = hstop;
     info.viewport.vstrt = agnus.sequencer.vstrt;
@@ -36,9 +37,15 @@ Denise::cacheInfo() const
 
     info.joydat[0] = controlPort1.joydat();
     info.joydat[1] = controlPort2.joydat();
+    // Deliberately not clxdat itself -- peekCLXDAT() clears the register as
+    // a side effect of reading it on real hardware, and cacheInfo() must
+    // stay a pure snapshot the inspector can poll freely without disturbing
+    // emulation state.
     info.clxdat = 0;
+    info.clxcon = clxcon;
+    info.clxcon2 = clxcon2;
 
-    for (isize i = 0; i < 6; i++) {
+    for (isize i = 0; i < 8; i++) {
         info.bpldat[i] = bpldat[i];
     }
     for (isize i = 0; i < 32; i++) {
