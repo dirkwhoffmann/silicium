@@ -292,11 +292,11 @@ SiAmInspectorWindow {
                     }
 
                     //
-                    // Display Window / Data -- stacked in one column on the
-                    // right rather than sitting beside Control, so Control
-                    // keeps the full remaining height for its own 2-column
-                    // BPLCON grid instead of being squeezed to whatever a
-                    // third side-by-side box leaves over.
+                    // Display Mode / Display Window -- stacked in one
+                    // column on the right rather than sitting beside
+                    // Control, so Control keeps the full remaining height
+                    // for its own BPLCON row instead of being squeezed to
+                    // whatever a third side-by-side box leaves over.
                     //
 
                     ColumnLayout {
@@ -304,6 +304,44 @@ SiAmInspectorWindow {
                         Layout.preferredWidth: 180
                         Layout.fillHeight: true
                         spacing: Style.mediumSpacing
+
+                        // Meta-information about the display mode the
+                        // BPLCON registers currently add up to -- not a
+                        // register dump (that's what the Control box is
+                        // for), just the derived, human-readable summary
+                        // (see Denise.h's "Derived values" block and
+                        // SiAmDeniseController's own displayMode comment).
+                        SiBox {
+
+                            title: qsTr("Display Mode")
+                            Layout.fillWidth: true
+                            spacing: Style.tinySpacing
+
+                            GridLayout {
+
+                                columns: 2
+                                columnSpacing: Style.mediumSpacing
+                                rowSpacing: Style.tinySpacing
+
+                                SiLabel { text: qsTr("Mode:"); horizontalAlignment: Text.AlignRight }
+                                SiText { text: denise.displayMode }
+
+                                SiLabel { text: qsTr("PF1 Scroll:"); horizontalAlignment: Text.AlignRight }
+                                SiText { text: denise.p1h }
+
+                                SiLabel { text: qsTr("PF2 Scroll:"); horizontalAlignment: Text.AlignRight }
+                                SiText { text: denise.p2h }
+
+                                SiLabel { text: qsTr("Color Bank:"); horizontalAlignment: Text.AlignRight }
+                                SiText { text: denise.colorBank }
+
+                                SiLabel { text: qsTr("PF2 Offset:"); horizontalAlignment: Text.AlignRight }
+                                SiText { text: denise.pf2of }
+
+                                SiLabel { text: qsTr("BPLAM:"); horizontalAlignment: Text.AlignRight }
+                                SiText { text: denise.bplam }
+                            }
+                        }
 
                         // DIWSTRT/DIWSTOP/DIWHIGH and the pixel coordinates
                         // Denise derives from them. The Swift reference's
@@ -314,6 +352,7 @@ SiAmInspectorWindow {
 
                             title: qsTr("Display Window")
                             Layout.fillWidth: true
+                            Layout.fillHeight: true
                             spacing: Style.tinySpacing
 
                             GridLayout {
@@ -329,29 +368,6 @@ SiAmInspectorWindow {
                                 Si16 { lwidth: root.hlw; l: qsTr("VSTRT"); value: denise.vstrt }
                                 Si16 { lwidth: root.hlw; l: qsTr("HSTOP"); value: denise.hstop }
                                 Si16 { lwidth: root.hlw; l: qsTr("VSTOP"); value: denise.vstop }
-                            }
-                        }
-
-                        // BPLDAT0..7, the latched bitplane data words (all
-                        // 8 exist on every model; see SiAmDeniseController's
-                        // bplData(n) comment).
-                        SiBox {
-
-                            title: qsTr("Data")
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            spacing: Style.tinySpacing
-
-                            GridLayout {
-
-                                columns: 2
-                                columnSpacing: Style.mediumSpacing
-                                rowSpacing: 0
-
-                                Repeater {
-                                    model: 8
-                                    Si16 { required property int index; lwidth: root.hlw; l: qsTr("BPLDAT%1").arg(index); value: denise.bplData(index) }
-                                }
                             }
 
                             VSpacer { }

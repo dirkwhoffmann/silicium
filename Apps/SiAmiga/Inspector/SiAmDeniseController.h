@@ -12,6 +12,7 @@
 #include "SiAmInspectorController.h"
 #include "VAmiga.h"
 #include <QColor>
+#include <QString>
 
 //
 // Denise inspector controller -- port of vAmiga's own GUI/Inspector/
@@ -55,7 +56,14 @@ class SiAmDeniseController : public SiAmInspectorController {
     int m_bplcon0 = 0, m_bplcon1 = 0, m_bplcon2 = 0, m_bplcon3 = 0, m_bplcon4 = 0;
     int m_bpu = 0;
     bool m_hires = false, m_homod = false, m_dbplf = false, m_lace = false, m_shres = false;
-    bool m_shresEnabled = false;
+
+    // "Mode:" on the Display Mode box -- e.g. "Hires 4 planes" or "Lores
+    // HAM8". Mirrors Denise's own resolution()/hamMode6()/hamMode8()
+    // formulas (see Denise.h's "Derived values" block) rather than calling
+    // them directly: those are private methods on the live Denise object,
+    // and this controller otherwise only ever decodes the cached raw
+    // register values, never reaches into the core mid-frame.
+    QString m_displayMode;
 
     // The remaining BPLCON0 bits -- COLOR/GAUD/LPEN/ERSY are genlock/light-
     // pen pins the core doesn't act on (nothing drives or reads them), and
@@ -115,9 +123,6 @@ class SiAmDeniseController : public SiAmInspectorController {
     // state the same way CLXDAT already was.
     int m_clxdat = 0, m_clxcon = 0, m_clxcon2 = 0;
 
-    // Latched bitplane data, BPLDAT0..7 -- see the Data box's own comment.
-    quint16 m_bpldat[8] = {};
-
     // 4 banks of 32 entries each -- see the Colors tab's class comment.
     quint16 m_colorReg[128] = {};
 
@@ -155,7 +160,7 @@ class SiAmDeniseController : public SiAmInspectorController {
     Q_PROPERTY(bool dbplf READ dbplf NOTIFY deniseChanged)
     Q_PROPERTY(bool lace READ lace NOTIFY deniseChanged)
     Q_PROPERTY(bool shres READ shres NOTIFY deniseChanged)
-    Q_PROPERTY(bool shresEnabled READ shresEnabled NOTIFY deniseChanged)
+    Q_PROPERTY(QString displayMode READ displayMode NOTIFY deniseChanged)
     Q_PROPERTY(bool color READ color NOTIFY deniseChanged)
     Q_PROPERTY(bool gaud READ gaud NOTIFY deniseChanged)
     Q_PROPERTY(bool uhres READ uhres NOTIFY deniseChanged)
@@ -199,12 +204,6 @@ class SiAmDeniseController : public SiAmInspectorController {
 
     Q_INVOKABLE bool spriteArmed(int nr) const { return nr >= 0 && nr < 8 && m_spriteArmed[nr]; }
 
-    // BPLDAT0..7 -- latched bitplane data, one word per bitplane (all 8
-    // exist on every model; how many are actually driven by DMA depends on
-    // bpu, but the Data box shows all of them, same as CPU/Registers panels
-    // show every register regardless of what the current program uses).
-    Q_INVOKABLE int bplData(int nr) const { return nr >= 0 && nr < 8 ? m_bpldat[nr] : 0; }
-
     // 128-entry color-register palette (4 banks of 32), decoded to display
     // QColors.
     Q_INVOKABLE QColor colorAt(int nr) const;
@@ -240,7 +239,7 @@ class SiAmDeniseController : public SiAmInspectorController {
     bool dbplf() const { return m_dbplf; }
     bool lace() const { return m_lace; }
     bool shres() const { return m_shres; }
-    bool shresEnabled() const { return m_shresEnabled; }
+    QString displayMode() const { return m_displayMode; }
     bool color() const { return m_color; }
     bool gaud() const { return m_gaud; }
     bool uhres() const { return m_uhres; }
