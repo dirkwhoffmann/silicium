@@ -33,6 +33,32 @@ SiAmInspectorWindow {
     // Which serial log the log box shows: 0 = Outgoing, 1 = Incoming.
     property int logPage: 0
 
+    //
+    // Subcomponents
+    //
+
+    component Si1: SiBitViewControl {
+
+        size: Size.tiny
+    }
+
+    component Si8: SiByteViewControl {
+
+        size: Size.small
+        controlWidth: 36
+        base: root.numBase
+        padded: root.numPadded
+    }
+
+    component Si16: SiWordViewControl {
+
+        size: Size.small
+        controlWidth: 44
+        base: root.numBase
+        padded: root.numPadded
+    }
+
+
     // SiWordViewControl (Apps/Shared/QML/Compounds) holds the structural
     // bits; this panel only adds the width override and the hex/decimal
     // toggle binding.
@@ -65,94 +91,132 @@ SiAmInspectorWindow {
         SiBox {
 
             title: qsTr("Control Ports")
-            Layout.preferredWidth: 340
+            // Layout.preferredWidth: 340
             Layout.fillHeight: true
             spacing: Style.mediumSpacing
-
-            RowLayout {
-
-                Layout.fillWidth: true
-                spacing: Style.largeSpacing
-
-                Repeater {
-
-                    model: 2
-
-                    ColumnLayout {
-
-                        required property int index
-                        spacing: Style.tinySpacing
-
-                        SiHex16 { l: qsTr("JOY%1DAT").arg(parent.index); lwidth: 64; value: po.joydat(parent.index) }
-
-                        SiCheckBoxControl { readOnly: true; checked: po.m0v(parent.index); l: qsTr("M0V"); lwidth: 34 }
-                        SiCheckBoxControl { readOnly: true; checked: po.m1v(parent.index); l: qsTr("M1V"); lwidth: 34 }
-                        SiCheckBoxControl { readOnly: true; checked: po.m0h(parent.index); l: qsTr("M0H"); lwidth: 34 }
-                        SiCheckBoxControl { readOnly: true; checked: po.m1h(parent.index); l: qsTr("M1H"); lwidth: 34 }
-                    }
-                }
-
-                HSpacer { }
-            }
-
-            VSpacer { size: Style.mediumSpacing }
-
-            RowLayout {
-
-                Layout.fillWidth: true
-                spacing: Style.tinySpacing
-                SiHex16 { l: qsTr("POTGO"); lwidth: 55; value: po.potgo }
-                SiHex16 { l: qsTr("POTGOR"); lwidth: 60; value: po.potgor }
-            }
 
             GridLayout {
 
                 Layout.topMargin: Style.smallSpacing
-                columns: 6
-                columnSpacing: Style.smallSpacing
-                rowSpacing: Style.tinySpacing
+                columns: 2
+                columnSpacing: Style.largeSpacing
+                rowSpacing: Style.largeSpacing
 
-                SiLabel { text: qsTr("OUTRY") }
-                Bit { checked: po.outry }
-                Bit { checked: po.datry }
-                SiLabel { text: qsTr("DATRY") }
-                Bit { checked: po.datryr }
-                Item { }
+                //
+                // JOY0DAT
+                //
 
-                SiLabel { text: qsTr("OUTRX") }
-                Bit { checked: po.outrx }
-                Bit { checked: po.datrx }
-                SiLabel { text: qsTr("DATRX") }
-                Bit { checked: po.datrxr }
-                Item { }
+                ColumnLayout {
 
-                SiLabel { text: qsTr("OUTLY") }
-                Bit { checked: po.outly }
-                Bit { checked: po.datly }
-                SiLabel { text: qsTr("DATLY") }
-                Bit { checked: po.datlyr }
-                Item { }
+                    Si16 {
+                        l: qsTr("JOY0DAT"); lwidth: 64; value: po.joydat(parent.index)
+                    }
+                    Si1 {
+                        checked: po.m0v(0); l: qsTr("M0V"); lwidth: 34
+                    }
+                    Si1 {
+                        checked: po.m1v(0); l: qsTr("M1V"); lwidth: 34
+                    }
+                    Si1 {
+                        checked: po.m0h(0); l: qsTr("M0H"); lwidth: 34
+                    }
+                    Si1 {
+                        checked: po.m1h(0); l: qsTr("M1H"); lwidth: 34
+                    }
+                }
 
-                SiLabel { text: qsTr("OUTLX") }
-                Bit { checked: po.outlx }
-                Bit { checked: po.datlx }
-                SiLabel { text: qsTr("DATLX") }
-                Bit { checked: po.datlxr }
-                Item { }
+                //
+                // JOY1DAT
+                //
+
+                ColumnLayout {
+
+                    Si16 {
+                        l: qsTr("JOY1DAT"); lwidth: 64; value: po.joydat(parent.index)
+                    }
+                    Si1 {
+                        checked: po.m0v(1); l: qsTr("M0V"); lwidth: 34
+                    }
+                    Si1 {
+                        checked: po.m1v(1); l: qsTr("M1V"); lwidth: 34
+                    }
+                    Si1 {
+                        checked: po.m0h(1); l: qsTr("M0H"); lwidth: 34
+                    }
+                    Si1 {
+                        checked: po.m1h(1); l: qsTr("M1H"); lwidth: 34
+                    }
+                }
+
+                //
+                // POTGO
+                //
+
+                ColumnLayout {
+
+                    Si16 {
+                        l: qsTr("POTGO"); lwidth: 55; value: po.potgo
+                    }
+                    Si1 {
+                        l: qsTr("OUTRY"); lwidth: 55; checked: po.outry
+                        Si1 {
+                            r: qsTr("DATRY"); checked: po.outry
+                        }
+                    }
+                    Si1 {
+                        l: qsTr("OUTRX"); lwidth: 55; checked: po.outrx
+                        Si1 {
+                            r: qsTr("DATRX"); checked: po.outrx
+                        }
+                    }
+                    Si1 {
+                        l: qsTr("OUTLY"); lwidth: 55; checked: po.outly
+                        Si1 {
+                            r: qsTr("DATLY"); checked: po.outly
+                        }
+                    }
+                    Si1 {
+                        l: qsTr("OUTLX"); lwidth: 55; checked: po.outlx
+                        Si1 {
+                            r: qsTr("DATLX"); checked: po.outlx
+                        }
+                    }
+                }
+
+                //
+                // POTGOR
+                //
+
+                ColumnLayout {
+
+                    Si16 {
+                        l: qsTr("POTGOR"); lwidth: 55; value: po.potgor
+                    }
+                    Si1 {
+                        l: qsTr("DATRY"); lwidth: 55; checked: po.outry
+                    }
+                    Si1 {
+                        l: qsTr("DATRX"); lwidth: 55; checked: po.outrx
+                    }
+                    Si1 {
+                        l: qsTr("DATLY"); lwidth: 55; checked: po.outly
+                    }
+                    Si1 {
+                        l: qsTr("DATLX"); lwidth: 55; checked: po.outlx
+                    }
+                }
+
+                //
+                // POT0DAT, POT1DAT
+                //
+
+                Si16 {
+                    l: qsTr("POT0DAT"); lwidth: 60; value: po.potdat(0)
+                }
+                Si16 {
+                    l: qsTr("POT1DAT"); lwidth: 60; value: po.potdat(1)
+                }
             }
-
-            VSpacer { size: Style.mediumSpacing }
-
-            RowLayout {
-
-                Layout.fillWidth: true
-                spacing: Style.largeSpacing
-
-                SiHex16 { l: qsTr("POT0DAT"); lwidth: 60; value: po.potdat(0) }
-                SiHex16 { l: qsTr("POT1DAT"); lwidth: 60; value: po.potdat(1) }
-            }
-
-            VSpacer { }
         }
 
         //

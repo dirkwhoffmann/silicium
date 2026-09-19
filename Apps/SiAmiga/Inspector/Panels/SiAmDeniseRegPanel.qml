@@ -34,9 +34,21 @@ RowLayout {
 
     spacing: Style.mediumSpacing
 
+    //
+    // Subcomponents
+    //
+
     component Si1: SiBitViewControl {
 
         size: Size.tiny
+    }
+
+    component Si8: SiByteViewControl {
+
+        size: Size.small
+        controlWidth: 36
+        base: root.numBase
+        padded: root.numPadded
     }
 
     component Si16: SiWordViewControl {
@@ -47,20 +59,6 @@ RowLayout {
         padded: root.numPadded
     }
 
-    // For the small (<=8-bit) decoded sub-fields shown below each BPLCONx
-    // column's separator line (BPU, PF1H/PF2H, ZDBPSEL, BANK/PF2OF/SPRES,
-    // BPLAM/ESPRM/OSPRM) -- Si16 would zero-pad these to 4 hex digits,
-    // overstating their actual width.
-    component Si8: SiByteViewControl {
-
-        size: Size.small
-        controlWidth: 36
-        base: root.numBase
-        padded: root.numPadded
-    }
-
-    // Horizontal rule under a BPLCONx column's last bit row, separating it
-    // from the decoded sub-field(s) below (e.g. BPU under BPLCON0).
     component HRule: Rectangle {
 
         Layout.fillWidth: true
