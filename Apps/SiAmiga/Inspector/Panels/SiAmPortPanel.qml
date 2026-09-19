@@ -355,64 +355,48 @@ SiAmInspectorWindow {
             }
             */
 
-            // Plain wrapper (not a SiBox itself) so the Outgoing/Incoming
-            // selector can be anchored to logBox's top edge and straddle
-            // its border, the same "melted into the border" placement
-            // SiAmDenisePanel.qml's own tab control and
-            // SiAmDeniseSprPanel.qml's sprite selector use for their
-            // respective boxes.
-            Item {
+            SiSegmentedControl {
 
                 Layout.topMargin: Style.smallSpacing
+                Layout.alignment: Qt.AlignLeft
+                model: [qsTr("Outgoing"), qsTr("Incoming")]
+                segmentWidth: 110
+                currentIndex: root.logPage
+                onActivated: (index) => root.logPage = index
+            }
+
+            Rectangle {
+
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                color: Palette.control
+                border.width: 1
+                border.color: Palette.controlBorder
+                radius: Style.radius
+                clip: true
 
-                Rectangle {
+                ScrollView {
 
-                    id: logBox
                     anchors.fill: parent
-                    anchors.topMargin: logSelector.height / 2
-                    color: Palette.control
-                    border.width: 1
-                    border.color: Palette.controlBorder
-                    radius: Style.radius
+                    anchors.topMargin: Style.largeSpacing
+                    anchors.leftMargin: Style.tinySpacing
+                    anchors.rightMargin: Style.tinySpacing
+                    anchors.bottomMargin: Style.tinySpacing
+
                     clip: true
 
-                    ScrollView {
+                    TextArea {
 
-                        anchors.fill: parent
-                        anchors.topMargin: Style.largeSpacing
-                        anchors.leftMargin: Style.tinySpacing
-                        anchors.rightMargin: Style.tinySpacing
-                        anchors.bottomMargin: Style.tinySpacing
+                        readOnly: true
+                        wrapMode: TextArea.Wrap
+                        text: root.logPage === 0 ? po.serialOut : po.serialIn
+                        font.family: Fonts.mono
+                        color: Palette.primary
+                        selectByMouse: true
+                        background: null
 
-                        clip: true
-
-                        TextArea {
-
-                            readOnly: true
-                            wrapMode: TextArea.Wrap
-                            text: root.logPage === 0 ? po.serialOut : po.serialIn
-                            font.family: Fonts.mono
-                            color: Palette.primary
-                            selectByMouse: true
-                            background: null
-
-                            onTextChanged: cursorPosition = length
-                        }
+                        onTextChanged: cursorPosition = length
                     }
-                }
-
-                SiSegmentedControl {
-
-                    id: logSelector
-                    anchors.horizontalCenter: logBox.horizontalCenter
-                    anchors.verticalCenter: logBox.top
-
-                    model: [qsTr("Outgoing"), qsTr("Incoming")]
-                    segmentWidth: 110
-                    currentIndex: root.logPage
-                    onActivated: (index) => root.logPage = index
                 }
             }
         }
