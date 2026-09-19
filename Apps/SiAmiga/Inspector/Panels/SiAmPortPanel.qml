@@ -217,6 +217,8 @@ SiAmInspectorWindow {
                     l: qsTr("POT1DAT"); lwidth: 60; value: po.potdat(1)
                 }
             }
+
+            VSpacer { }
         }
 
         //
@@ -230,8 +232,76 @@ SiAmInspectorWindow {
             Layout.fillHeight: true
             spacing: Style.mediumSpacing
 
-            RowLayout {
+            ColumnLayout {
 
+                Layout.fillWidth: true
+                spacing: Style.smallSpacing
+
+                RowLayout {
+
+                    Si16 {
+                        size: Size.small; l: qsTr("SERDAT"); lwidth: 128; value: po.serper
+                    }
+                    SiText {
+                        text: ""; Layout.preferredWidth: 32
+                    }
+                    SiCheckBoxControl {
+                        size: Size.small; readOnly: true; checked: po.long_; r: qsTr("LONG, %1 Baud").arg(po.baudRate)
+                    }
+                    HSpacer {
+                    }
+                    Si1 {
+                        size: Size.small; checked: po.txd; lwidth: 48; l: qsTr("TXD")
+                    }
+                    Si1 {
+                        size: Size.small; checked: po.dsr; lwidth: 48; l: qsTr("DSR")
+                    }
+                }
+
+                RowLayout {
+
+                    Si16 {
+                        size: Size.small; l: qsTr("Receive shift register"); lwidth: 128; value: po.receiveShiftReg
+                    }
+                    SiText {
+                        text: "→"; Layout.preferredWidth: 32
+                    }
+                    Si16 {
+                        size: Size.small; r: qsTr("Receive buffer"); value: po.receiveBuffer
+                    }
+                    HSpacer {
+                    }
+                    Si1 {
+                        size: Size.small; checked: po.rxd; lwidth: 48; l: qsTr("RXD")
+                    }
+                    Si1 {
+                        size: Size.small; checked: po.cd; lwidth: 48; l: qsTr("CD")
+                    }
+                }
+
+                RowLayout {
+
+                    Si16 {
+                        size: Size.small; l: qsTr("Transmit shift register"); lwidth: 128; value: po.transmitShiftReg
+                    }
+                    SiText {
+                        text: "→"; Layout.preferredWidth: 32
+                    }
+                    Si16 {
+                        size: Size.small; r: qsTr("Transmit buffer"); value: po.transmitBuffer
+                    }
+                    HSpacer {
+                    }
+                    Si1 {
+                        size: Size.small; checked: po.cts; lwidth: 48; l: qsTr("CTS")
+                    }
+                    Si1 {
+                        size: Size.small; checked: po.dtr; lwidth: 48; l: qsTr("DTR")
+                    }
+                }
+            }
+
+        /*
                 Layout.fillWidth: true
                 spacing: Style.largeSpacing
 
@@ -283,45 +353,66 @@ SiAmInspectorWindow {
                 SiHex16 { value: po.transmitShiftReg }
                 SiLabel { text: qsTr("Transmit shift register") }
             }
+            */
 
-            SiSegmentedControl {
+            // Plain wrapper (not a SiBox itself) so the Outgoing/Incoming
+            // selector can be anchored to logBox's top edge and straddle
+            // its border, the same "melted into the border" placement
+            // SiAmDenisePanel.qml's own tab control and
+            // SiAmDeniseSprPanel.qml's sprite selector use for their
+            // respective boxes.
+            Item {
 
                 Layout.topMargin: Style.smallSpacing
-                Layout.alignment: Qt.AlignLeft
-                model: [qsTr("Outgoing"), qsTr("Incoming")]
-                segmentWidth: 110
-                currentIndex: root.logPage
-                onActivated: (index) => root.logPage = index
-            }
-
-            Rectangle {
-
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                color: Palette.control
-                border.width: 1
-                border.color: Palette.controlBorder
-                radius: Style.radius
-                clip: true
 
-                ScrollView {
+                Rectangle {
 
+                    id: logBox
                     anchors.fill: parent
-                    anchors.margins: 1
+                    anchors.topMargin: logSelector.height / 2
+                    color: Palette.control
+                    border.width: 1
+                    border.color: Palette.controlBorder
+                    radius: Style.radius
                     clip: true
 
-                    TextArea {
+                    ScrollView {
 
-                        readOnly: true
-                        wrapMode: TextArea.Wrap
-                        text: root.logPage === 0 ? po.serialOut : po.serialIn
-                        font.family: Fonts.mono
-                        color: Palette.primary
-                        selectByMouse: true
-                        background: null
+                        anchors.fill: parent
+                        anchors.topMargin: Style.largeSpacing
+                        anchors.leftMargin: Style.tinySpacing
+                        anchors.rightMargin: Style.tinySpacing
+                        anchors.bottomMargin: Style.tinySpacing
 
-                        onTextChanged: cursorPosition = length
+                        clip: true
+
+                        TextArea {
+
+                            readOnly: true
+                            wrapMode: TextArea.Wrap
+                            text: root.logPage === 0 ? po.serialOut : po.serialIn
+                            font.family: Fonts.mono
+                            color: Palette.primary
+                            selectByMouse: true
+                            background: null
+
+                            onTextChanged: cursorPosition = length
+                        }
                     }
+                }
+
+                SiSegmentedControl {
+
+                    id: logSelector
+                    anchors.horizontalCenter: logBox.horizontalCenter
+                    anchors.verticalCenter: logBox.top
+
+                    model: [qsTr("Outgoing"), qsTr("Incoming")]
+                    segmentWidth: 110
+                    currentIndex: root.logPage
+                    onActivated: (index) => root.logPage = index
                 }
             }
         }
