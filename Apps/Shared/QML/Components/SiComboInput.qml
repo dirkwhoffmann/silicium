@@ -42,6 +42,14 @@ ComboBox {
     // a typed-but-not-submitted edit is still observable.
     signal editingFinished()
 
+    // A click within this control's bounds can leave activeFocus on the
+    // ComboBox itself rather than its contentItem (Control's own StrongFocus
+    // click-handling can reclaim it even though the TextField still gets the
+    // mouse-drag for selection, which is why selecting/copying text works
+    // but typing doesn't) -- redirect it down to the actual text field
+    // whenever that happens.
+    onActiveFocusChanged: if (activeFocus) input.forceActiveFocus()
+
     //
     // Background (Pill)
     //
@@ -136,6 +144,7 @@ ComboBox {
         selectByMouse: true
         background: null
 
+        onTextEdited: root.editText = text
         onEditingFinished: root.editingFinished()
     }
 
