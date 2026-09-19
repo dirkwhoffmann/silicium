@@ -47,74 +47,50 @@ SiAmInspectorWindow {
         function onConfigChanged() { root.configVersion++ }
     }
 
-    // One "Connect..." probe selector: a button showing the current
-    // selection (probeLabel()) that opens a menu of presets, plus a small
-    // text field for typing a custom hex address -- the two ways
-    // BusPanel.swift's NSComboButton accepts input (menu pick or the
-    // embedded free-text field).
-    component ProbeSelector: RowLayout {
+    // One probe selector: a single macOS-style combo box that both shows the
+    // current selection (probeLabel()) and accepts input the two ways
+    // BusPanel.swift's NSComboButton did -- picking a preset from the
+    // dropdown, or typing a custom hex address directly into the field.
+    component ProbeSelector: SiComboInputControl {
 
         id: sel
 
         required property int channel
 
-        spacing: Style.smallSpacing
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        Layout.alignment: Qt.AlignVCenter
 
-        SiLabel { text: qsTr("Channel %1:").arg(sel.channel); Layout.preferredWidth: 70 }
+        model: root.logicAnalyzer.presetModel()
+        textRole: "name"
+        placeholderText: qsTr("Address")
 
-        Button {
+        // Plain property assignment (not a binding) is what ComboBox itself
+        // does to editText on every keystroke/selection, which breaks a
+        // declarative binding here the same way -- so it's restored with
+        // Qt.binding() after each accepted edit instead of written once.
+        editText: (root.configVersion, root.logicAnalyzer.probeLabel(channel))
 
-            id: presetButton
-            Layout.preferredWidth: 110
-            text: (root.configVersion, root.logicAnalyzer.probeLabel(sel.channel))
-
-            onClicked: presetMenu.popup()
-
-            Menu {
-
-                id: presetMenu
-
-                Instantiator {
-
-                    model: root.logicAnalyzer.presetModel()
-
-                    delegate: Loader {
-
-                        required property var modelData
-                        required property int index
-
-                        sourceComponent: modelData.separator ? separatorComp : itemComp
-
-                        Component {
-                            id: separatorComp
-                            MenuSeparator { }
-                        }
-
-                        Component {
-                            id: itemComp
-                            MenuItem {
-                                text: modelData.name
-                                onTriggered: root.logicAnalyzer.selectPreset(sel.channel, index)
-                            }
-                        }
-                    }
-
-                    onObjectAdded: (index, object) => presetMenu.insertItem(index, object)
-                    onObjectRemoved: (index, object) => presetMenu.removeItem(object)
-                }
-            }
+        onActivated: (index) => {
+            root.logicAnalyzer.selectPreset(channel, index)
+            editText = Qt.binding(function() { return (root.configVersion, root.logicAnalyzer.probeLabel(channel)) })
         }
 
-        TextField {
-
-            Layout.preferredWidth: 70
-            placeholderText: qsTr("Address")
-            selectByMouse: true
-
-            onAccepted: {
-                if (root.logicAnalyzer.selectAddress(sel.channel, text)) text = ""
+        onAccepted: {
+            if (root.logicAnalyzer.selectAddress(channel, editText)) {
+                editText = Qt.binding(function() { return (root.configVersion, root.logicAnalyzer.probeLabel(channel)) })
             }
         }
+    }
+
+    // Plain row label for the left column, matching SiAmLogicView's own
+    // Address Bus / Data Bus rows (which carry no selector of their own).
+    component RowLabel: SiLabel {
+
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        horizontalAlignment: Text.AlignRight
+        verticalAlignment: Text.AlignVCenter
     }
 
     SiBox {
@@ -131,47 +107,68 @@ SiAmInspectorWindow {
             Layout.fillHeight: true
             spacing: Style.smallSpacing
 
-            GridLayout {
-
-                Layout.fillWidth: true
-                columns: 2
-                columnSpacing: Style.largeSpacing
-                rowSpacing: Style.tinySpacing
-
-                ProbeSelector { channel: 0 }
-                ProbeSelector { channel: 1 }
-                ProbeSelector { channel: 2 }
-                ProbeSelector { channel: 3 }
-            }
-
-            Rectangle {
+            RowLayout {
 
                 Layout.fillWidth: true
                 Layout.preferredHeight: 240
-                color: Palette.control
-                border.width: 1
-                border.color: Palette.controlBorder
-                radius: Style.radius
-                clip: true
+                spacing: Style.smallSpacing
 
-                Flickable {
+                // Left column: one row per SiAmLogicView row -- header (DMA
+                // Cycle), Address Bus, Data Bus, then the four probe
+                // channels -- all equal height, matching how
+                // SiAmLogicView::paint() lays its own rows out (headerHeight
+                // = h/(numSignals+1) and dy = (h-headerHeight)/numSignals
+                // reduce to the same h/7 for every row when numSignals is
+                // 6). rowHeight is computed the same way here so each label/
+                // selector lines up with its row in the view beside it.
+                ColumnLayout {
 
-                    id: flick
-                    anchors.fill: parent
-                    anchors.margins: 1
-                    contentWidth: width * root.zoom
-                    contentHeight: height
-                    boundsBehavior: Flickable.StopAtBounds
-                    ScrollBar.horizontal: ScrollBar { }
+                    id: leftColumn
+                    Layout.preferredWidth: 220
+                    Layout.fillHeight: true
+                    spacing: 0
 
-                    SiAmLogicView {
+                    readonly property real rowHeight: height / 7
 
-                        width: flick.contentWidth
-                        height: flick.height
-                        hex: root.ic.hex
-                        symbolic: symbolicBox.checked
-                        textColor: Palette.primary
-                        hairlineColor: Palette.controlBorder
+                    RowLabel { text: qsTr("DMA Cycle"); Layout.preferredHeight: leftColumn.rowHeight }
+                    RowLabel { text: qsTr("Address Bus"); Layout.preferredHeight: leftColumn.rowHeight }
+                    RowLabel { text: qsTr("Data Bus"); Layout.preferredHeight: leftColumn.rowHeight }
+
+                    ProbeSelector { channel: 0; Layout.preferredHeight: leftColumn.rowHeight }
+                    ProbeSelector { channel: 1; Layout.preferredHeight: leftColumn.rowHeight }
+                    ProbeSelector { channel: 2; Layout.preferredHeight: leftColumn.rowHeight }
+                    ProbeSelector { channel: 3; Layout.preferredHeight: leftColumn.rowHeight }
+                }
+
+                Rectangle {
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    color: Palette.control
+                    border.width: 1
+                    border.color: Palette.controlBorder
+                    radius: Style.radius
+                    clip: true
+
+                    Flickable {
+
+                        id: flick
+                        anchors.fill: parent
+                        anchors.margins: 1
+                        contentWidth: width * root.zoom
+                        contentHeight: height
+                        boundsBehavior: Flickable.StopAtBounds
+                        ScrollBar.horizontal: ScrollBar { }
+
+                        SiAmLogicView {
+
+                            width: flick.contentWidth
+                            height: flick.height
+                            hex: root.ic.hex
+                            symbolic: symbolicBox.checked
+                            textColor: Palette.primary
+                            hairlineColor: Palette.controlBorder
+                        }
                     }
                 }
             }

@@ -175,19 +175,42 @@ ComboBox {
 
         id: item
 
+        // A model entry of the shape {separator: true} (see e.g.
+        // SiAmLogicAnalyzerController::presetModel()) renders as an inert
+        // divider line instead of a selectable row, mirroring an NSMenu's
+        // own separator items.
+        readonly property bool isSeparator: typeof modelData === "object" && modelData !== null && modelData.separator === true
+
         width: root.width - 8
-        height: 28
-        highlighted: root.highlightedIndex === index
+        height: isSeparator ? 9 : 28
+        enabled: !isSeparator
+        hoverEnabled: !isSeparator
+        highlighted: !isSeparator && root.highlightedIndex === index
 
         readonly property color foreground: highlighted ? "white" : root.primary
 
-        contentItem: SiText {
+        contentItem: Item {
 
-            text: root.textRole !== "" ? modelData[root.textRole] : modelData
-            color: item.foreground
-            font: root.font
-            verticalAlignment: Text.AlignVCenter
-            elide: Text.ElideRight
+            Rectangle {
+
+                visible: item.isSeparator
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                height: 1
+                color: root.controlBorder
+            }
+
+            SiText {
+
+                visible: !item.isSeparator
+                anchors.fill: parent
+                text: root.textRole !== "" ? modelData[root.textRole] : modelData
+                color: item.foreground
+                font: root.font
+                verticalAlignment: Text.AlignVCenter
+                elide: Text.ElideRight
+            }
         }
 
         background: Rectangle {
