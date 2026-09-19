@@ -74,8 +74,8 @@ RowLayout {
             GridLayout {
 
                 Layout.alignment: Qt.AlignHCenter
-                columns: 4
-                columnSpacing: Style.tinySpacing
+                columns: 8
+                columnSpacing: Style.smallSpacing
                 rowSpacing: Style.tinySpacing
 
                 Repeater {
@@ -83,6 +83,7 @@ RowLayout {
                     SiCheckBoxControl {
                         required property int index
                         readOnly: true
+                        l: qsTr("%1:").arg(index)
                         // denise.revision is read purely to give this binding a
                         // dependency to re-evaluate on -- spriteArmed(n) is
                         // Q_INVOKABLE, so calling it alone never triggers a
@@ -172,7 +173,7 @@ RowLayout {
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                color: "black"
+                color: "transparent"
                 border.width: 1
                 border.color: Palette.surfaceBorder
                 radius: Style.radius
