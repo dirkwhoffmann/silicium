@@ -301,64 +301,10 @@ SiAmInspectorWindow {
                 }
             }
 
-        /*
-                Layout.fillWidth: true
-                spacing: Style.largeSpacing
-
-                RowLayout {
-                    spacing: Style.tinySpacing
-                    SiHex16 { l: qsTr("SERDAT"); lwidth: 55; value: po.serper }
-                    SiCheckBoxControl { readOnly: true; checked: po.long_ }
-                    SiLabel { text: qsTr("LONG, %1 Baud").arg(po.baudRate) }
-                }
-
-                HSpacer { }
-
-                GridLayout {
-                    columns: 4
-                    columnSpacing: Style.mediumSpacing
-                    rowSpacing: Style.tinySpacing
-                    SiCheckBoxControl { readOnly: true; checked: po.txd; r: qsTr("TXD") }
-                    SiCheckBoxControl { readOnly: true; checked: po.dsr; r: qsTr("DSR") }
-                    SiCheckBoxControl { readOnly: true; checked: po.rxd; r: qsTr("RXD") }
-                    SiCheckBoxControl { readOnly: true; checked: po.cd;  r: qsTr("CD") }
-                    SiCheckBoxControl { readOnly: true; checked: po.cts; r: qsTr("CTS") }
-                    SiCheckBoxControl { readOnly: true; checked: po.dtr; r: qsTr("DTR") }
-                }
-            }
-
-            RowLayout {
-
-                Layout.fillWidth: true
-                spacing: Style.largeSpacing
-
-                RowLayout {
-                    spacing: Style.tinySpacing
-                    SiLabel { text: qsTr("Receive shift register") }
-                    SiHex16 { value: po.receiveShiftReg }
-                    SiText { text: "→" }
-                    SiHex16 { value: po.receiveBuffer }
-                    SiLabel { text: qsTr("Receive buffer") }
-                }
-            }
-
-            RowLayout {
-
-                Layout.fillWidth: true
-                spacing: Style.tinySpacing
-
-                SiLabel { text: qsTr("Transmit buffer") }
-                SiHex16 { value: po.transmitBuffer }
-                SiText { text: "→" }
-                SiHex16 { value: po.transmitShiftReg }
-                SiLabel { text: qsTr("Transmit shift register") }
-            }
-            */
-
             SiSegmentedControl {
 
                 Layout.topMargin: Style.smallSpacing
-                Layout.alignment: Qt.AlignLeft
+                Layout.alignment: Qt.AlignHCenter // Left
                 model: [qsTr("Outgoing"), qsTr("Incoming")]
                 segmentWidth: 110
                 currentIndex: root.logPage
@@ -378,7 +324,7 @@ SiAmInspectorWindow {
                 ScrollView {
 
                     anchors.fill: parent
-                    anchors.topMargin: Style.largeSpacing
+                    anchors.topMargin: Style.tinySpacing
                     anchors.leftMargin: Style.tinySpacing
                     anchors.rightMargin: Style.tinySpacing
                     anchors.bottomMargin: Style.tinySpacing

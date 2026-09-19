@@ -111,16 +111,25 @@ RowLayout {
             title: qsTr("Registers")
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: Style.tinySpacing
+            spacing: Style.smallSpacing
 
             ColumnLayout {
 
                 spacing: Style.tinySpacing
 
-                Si16 { l: qsTr("CLXDAT"); lwidth: 65; value: denise.clxdat }
-                Si16 { l: qsTr("CLXCON"); lwidth: 65; value: denise.clxcon }
-                Si16 { l: qsTr("CLXCON2"); lwidth: 65; value: denise.clxcon2 }
+                RowLayout {
 
+                    spacing: Style.tinySpacing
+                    Si16 {
+                        l: qsTr("CLXDAT"); lwidth: 65; value: denise.clxdat
+                    }
+                    Si16 {
+                        l: qsTr("CLXCON"); lwidth: 65; value: denise.clxcon
+                    }
+                    Si16 {
+                        l: qsTr("CLXCON2"); lwidth: 65; value: denise.clxcon2
+                    }
+                }
                 Repeater {
 
                     model: 8
