@@ -116,24 +116,44 @@ SiAmSpriteView::cacheData()
 void
 SiAmSpriteView::paint(QPainter *painter)
 {
-    qreal w = width();
-    qreal h = height();
-    if (w <= 0 || h <= 0 || m_rows.empty()) return;
+    // No sprite armed -- leave the item fully transparent (there's nothing
+    // to draw, not a black square) rather than falling through to the
+    // wrapping Rectangle's own black backdrop as if it were part of this
+    // view's own content.
+    if (m_rows.empty()) return;
 
-    qreal cw = w / columns;
-    qreal ch = h / (qreal)m_rows.size();
+    qreal w = width();
+    if (w <= 0) return;
+
+    // Square cells sized to fit 'columns' across the available width, with
+    // a gapPx-wide transparent seam between neighbours -- not stretched to
+    // fill the item's height the way a single row used to be blown up to
+    // the full box height. The loop below only ever visits m_rows.size()
+    // rows, so a short sprite (or the leftover strip below it once it no
+    // longer stretches) stays untouched -- transparent -- instead of
+    // painted over.
+    constexpr qreal gapPx = 2.0;
+    constexpr qreal borderPx = 1.0;
+
+    qreal cell = (w - (columns - 1) * gapPx) / columns;
+    if (cell <= 0) return;
 
     painter->setRenderHint(QPainter::Antialiasing, false);
+    painter->setBrush(Qt::NoBrush);
+    painter->setPen(QPen(QColor(120, 120, 120), borderPx));
 
     for (size_t r = 0; r < m_rows.size(); r++) {
 
+        qreal y = r * (cell + gapPx);
+
         for (int c = 0; c < columns; c++) {
 
-            int idx = m_rows[r][c];
-            if (idx == 0) continue; // transparent
+            QRectF rect(c * (cell + gapPx), y, cell, cell);
 
-            QRectF cell(c * cw, r * ch, cw, ch);
-            painter->fillRect(cell, m_colors[idx]);
+            int idx = m_rows[r][c];
+            if (idx != 0) painter->fillRect(rect, m_colors[idx]);
+
+            painter->drawRect(rect);
         }
     }
 }
