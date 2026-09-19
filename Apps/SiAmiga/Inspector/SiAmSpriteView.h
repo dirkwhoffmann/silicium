@@ -43,6 +43,8 @@ class SiAmSpriteView : public QQuickPaintedItem {
     Q_PROPERTY(int spriteNr READ spriteNr WRITE setSpriteNr NOTIFY spriteNrChanged)
 
     static constexpr int columns = 16;
+    static constexpr qreal gapPx = 2.0;
+    static constexpr qreal borderPx = 1.0;
 
     int m_spriteNr = 0;
 
@@ -65,12 +67,23 @@ class SiAmSpriteView : public QQuickPaintedItem {
   protected:
 
     void itemChange(ItemChange change, const ItemChangeData &value) override;
+    void geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry) override;
 
   private:
 
     void connectToWindow(class QQuickWindow *win);
     void disconnectFromWindow();
     void cacheData();
+
+    // Side length of one square cell for the current item width -- shared
+    // by paint() and updateImplicitSize() so they never disagree.
+    qreal cellSize() const;
+
+    // The item's natural height is driven by content (m_rows.size() cells
+    // stacked at cellSize() + gapPx each), not by whatever the enclosing
+    // ScrollView's viewport happens to be -- that's what lets a sprite
+    // taller than the viewport become scrollable instead of clipped.
+    void updateImplicitSize();
 
   signals:
 

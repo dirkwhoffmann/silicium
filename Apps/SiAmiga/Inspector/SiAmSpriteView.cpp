@@ -29,7 +29,10 @@ decodeAmigaColor(u16 reg)
 SiAmSpriteView::SiAmSpriteView(QQuickItem *parent)
     : QQuickPaintedItem(parent)
 {
-
+    // Explicit rather than relying on QQuickPaintedItem's own default
+    // (already Qt::transparent) -- makes the "untouched area stays
+    // see-through, not black" intent readable here instead of implicit.
+    setFillColor(Qt::transparent);
 }
 
 void
@@ -51,6 +54,17 @@ SiAmSpriteView::itemChange(ItemChange change, const ItemChangeData &value)
     }
 
     QQuickPaintedItem::itemChange(change, value);
+}
+
+void
+SiAmSpriteView::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
+{
+    QQuickPaintedItem::geometryChange(newGeometry, oldGeometry);
+
+    // Cell size is derived from width (see cellSize()), so a width change
+    // (the enclosing ScrollView's viewport resizing) changes the height
+    // this item needs too.
+    if (newGeometry.width() != oldGeometry.width()) updateImplicitSize();
 }
 
 void
@@ -111,6 +125,26 @@ SiAmSpriteView::cacheData()
         }
         m_rows.push_back(row);
     }
+
+    updateImplicitSize();
+}
+
+qreal
+SiAmSpriteView::cellSize() const
+{
+    qreal w = width();
+    if (w <= 0) return 0;
+
+    return (w - (columns - 1) * gapPx) / columns;
+}
+
+void
+SiAmSpriteView::updateImplicitSize()
+{
+    qreal cell = cellSize();
+
+    setImplicitHeight(m_rows.empty() || cell <= 0
+        ? 0 : m_rows.size() * (cell + gapPx) - gapPx);
 }
 
 void
@@ -122,20 +156,16 @@ SiAmSpriteView::paint(QPainter *painter)
     // view's own content.
     if (m_rows.empty()) return;
 
-    qreal w = width();
-    if (w <= 0) return;
-
     // Square cells sized to fit 'columns' across the available width, with
     // a gapPx-wide transparent seam between neighbours -- not stretched to
     // fill the item's height the way a single row used to be blown up to
     // the full box height. The loop below only ever visits m_rows.size()
-    // rows, so a short sprite (or the leftover strip below it once it no
-    // longer stretches) stays untouched -- transparent -- instead of
-    // painted over.
-    constexpr qreal gapPx = 2.0;
-    constexpr qreal borderPx = 1.0;
-
-    qreal cell = (w - (columns - 1) * gapPx) / columns;
+    // rows, so a short sprite stays untouched -- transparent -- below its
+    // own content instead of painted over. A sprite taller than the
+    // enclosing ScrollView's viewport now scrolls instead of being clipped,
+    // since this item's own height (see updateImplicitSize()) grows to fit
+    // every row rather than being stretched/squeezed to match the viewport.
+    qreal cell = cellSize();
     if (cell <= 0) return;
 
     painter->setRenderHint(QPainter::Antialiasing, false);

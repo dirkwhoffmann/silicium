@@ -178,11 +178,26 @@ RowLayout {
                 radius: Style.radius
                 clip: true
 
-                SiAmSpriteView {
+                // SiAmSpriteView's own height now tracks its actual content
+                // (rows * cell size, see its updateImplicitSize()) rather
+                // than being stretched or clipped to whatever this
+                // Rectangle happens to be -- so a sprite taller than the
+                // available space scrolls into view instead of being cut
+                // off. width is bound to the viewport, not left implicit,
+                // so cell size (derived from width) tracks this box's own
+                // size as it resizes.
+                ScrollView {
 
+                    id: spriteScrollView
                     anchors.fill: parent
                     anchors.margins: Style.radius
-                    spriteNr: denise.selectedSprite
+                    clip: true
+
+                    SiAmSpriteView {
+
+                        width: spriteScrollView.availableWidth
+                        spriteNr: denise.selectedSprite
+                    }
                 }
             }
 
