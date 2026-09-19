@@ -124,7 +124,15 @@ SiAmInspectorWindow {
                 ColumnLayout {
 
                     id: leftColumn
+                    // maximumWidth is what actually clamps this column --
+                    // preferredWidth alone doesn't stop it from growing past
+                    // 220, since each ProbeSelector below is a flexible,
+                    // fillWidth-seeking control (see SiAmDeniseSprPanel.qml's
+                    // own leftColumn for the same fix, needed there for the
+                    // same reason).
                     Layout.preferredWidth: 220
+                    Layout.minimumWidth: 0
+                    Layout.maximumWidth: 220
                     Layout.fillHeight: true
                     spacing: 0
 
