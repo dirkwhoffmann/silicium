@@ -763,6 +763,27 @@ InputManager::start()
         // Install event filter
         QGuiApplication::instance()->installEventFilter(this);
 
+        /* Hand the mouse back when the app is sent to the background.
+         *
+         * Capturing the mouse is an arrangement with the window system, and
+         * the window system ends it on its own when the app deactivates: on
+         * macOS the CGDisplayHideCursor() hide count only takes effect while
+         * the app is frontmost, so Cmd+Tab puts the pointer back on screen
+         * no matter what we think. Without this, m_captureMouse stays true
+         * behind the app's back: the pointer is visible and owned by whatever
+         * the user switched to, while the event filter still warps it to the
+         * window center and swallows the clicks meant for that other app.
+         *
+         * Releasing here also rebalances the hide count (setCaptureMouse()
+         * calls CGDisplayShowCursor()), so the cursor does not vanish again
+         * the moment the user comes back.
+         */
+        connect(qGuiApp, &QGuiApplication::applicationStateChanged,
+                this, [this](Qt::ApplicationState state) {
+
+            if (state != Qt::ApplicationActive) setCaptureMouse(false);
+        });
+
         // Initial population
         updateDevices();
 
