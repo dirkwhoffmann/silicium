@@ -573,6 +573,36 @@ HubController::addVM(const QUrl &url)
     return QString::fromStdString(UUID().toString());
 }
 
+void
+HubController::openVM(const QUrl &url)
+{
+    LogTask task("Opening a virtual machine by location...");
+
+    const auto path = fs::path(url.toLocalFile().toStdString());
+
+    /* A machine handed to us from outside -- by Finder, say -- may or may not
+     * be one the library already holds, and addVM() refuses a path it knows
+     * (VirtualMachineLibrary::addVirtualMachine throws VM_EXISTS). So look
+     * first and register only what is genuinely new; adding blind would turn
+     * reopening a known machine into an error about a duplicate.
+     */
+    QString quuid;
+
+    if (const auto *vm = library.lookupVirtualMachine(path)) {
+
+        quuid = QString::fromStdString(vm->getManifest().uuid.toString());
+
+    } else {
+
+        // addVM() reports its own failures and answers the null UUID
+        quuid = addVM(url);
+        if (!UUID::fromString(quuid.toStdString())) return;
+    }
+
+    select(quuid);
+    open(quuid);
+}
+
 QString
 HubController::cloneVM(const QString &quuid, const QUrl &cloneUrl)
 {

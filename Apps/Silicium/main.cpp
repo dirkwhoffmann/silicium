@@ -24,7 +24,66 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
+#include <QFileOpenEvent>
 #include <QIcon>
+
+/* Opens virtual machines that Finder hands to the app.
+ *
+ * A document opened from Finder does not arrive on the command line: macOS
+ * sends a QFileOpenEvent instead, both for a machine double-clicked while the
+ * Hub is already up and for the one that launched it. The launch case is the
+ * awkward one -- the event is delivered while the QML engine is still loading,
+ * so before HubWindow.qml's Component.onCompleted has called
+ * HubController::start() and before there is a library to add anything to.
+ *
+ * Anything that lands that early is held here and replayed from flush(), which
+ * the engine's objectCreated handler calls. That handler is a queued
+ * connection, so it runs after engine.load() has returned and start() with it.
+ */
+class FileOpenFilter : public QObject {
+
+    // Documents that arrived before the hub was ready for them
+    QList<QUrl> pending;
+
+    // Whether the QML engine has produced its root object
+    bool ready = false;
+
+  public:
+
+    void flush()
+    {
+        ready = true;
+
+        const auto queued = pending;
+        pending.clear();
+
+        for (const auto &url : queued) openVM(url);
+    }
+
+  protected:
+
+    bool eventFilter(QObject *object, QEvent *event) override
+    {
+        if (event->type() != QEvent::FileOpen) {
+            return QObject::eventFilter(object, event);
+        }
+
+        const auto url = static_cast<QFileOpenEvent *>(event)->url();
+
+        qCDebug(siLog) << "FileOpen:" << url.toString() << (ready ? "" : "(queued)");
+
+        ready ? openVM(url) : pending.append(url);
+        return true;
+    }
+
+  private:
+
+    static void openVM(const QUrl &url)
+    {
+        // The Hub owns the library, so the add-or-look-up lives there
+        HubController::instance().openVM(url);
+    }
+};
 
 void
 startLogger(int argc, char *argv[])
@@ -47,6 +106,11 @@ main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
+    FileOpenFilter fileOpenFilter;
+
+    // Installed before anything else: on a launch-by-document, the event is
+    // already on its way while the rest of this function is still running.
+    app.installEventFilter(&fileOpenFilter);
 
     // Enable logging support
     startLogger(argc, argv);
@@ -91,8 +155,11 @@ main(int argc, char *argv[])
         &engine,
         &QQmlApplicationEngine::objectCreated,
         &app,
-        [url](QObject *obj, const QUrl &objUrl) {
+        [url, &fileOpenFilter](QObject *obj, const QUrl &objUrl) {
             if (!obj && url == objUrl) QCoreApplication::exit(-1);
+
+            // The hub is up: hand it whatever Finder asked for at launch
+            if (obj && url == objUrl) fileOpenFilter.flush();
         },
         Qt::QueuedConnection);
     engine.load(url);

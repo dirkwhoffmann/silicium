@@ -192,6 +192,9 @@ class HubController : public Controller {
     // Adds a virtual machine to the library
     Q_INVOKABLE QString addVM(const QUrl &url);
 
+    // Opens the machine stored at the given location, adding it if it is new
+    Q_INVOKABLE void openVM(const QUrl &url);
+
     // Duplicates the virtual machine before adding
     Q_INVOKABLE QString cloneVM(const QString &quuid, const QUrl &cloneUrl);
 
