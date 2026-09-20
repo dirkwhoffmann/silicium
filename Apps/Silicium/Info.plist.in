@@ -86,23 +86,6 @@
 				</array>
 			</dict>
 		</dict>
-		<dict>
-			<key>UTTypeIdentifier</key>
-			<string>${SI_BUNDLE_PREFIX}.silicium.svmz</string>
-			<key>UTTypeDescription</key>
-			<string>Silicium Virtual Machine (compressed)</string>
-			<key>UTTypeConformsTo</key>
-			<array>
-				<string>public.zip-archive</string>
-			</array>
-			<key>UTTypeTagSpecification</key>
-			<dict>
-				<key>public.filename-extension</key>
-				<array>
-					<string>svmz</string>
-				</array>
-			</dict>
-		</dict>
 	</array>
 
 	<key>CFBundleDocumentTypes</key>
@@ -117,7 +100,6 @@
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>${SI_BUNDLE_PREFIX}.silicium.svm</string>
-				<string>${SI_BUNDLE_PREFIX}.silicium.svmz</string>
 			</array>
 		</dict>
 	</array>

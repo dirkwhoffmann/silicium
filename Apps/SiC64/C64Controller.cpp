@@ -530,11 +530,9 @@ C64Controller::windowDidOpen()
     core().setListener(this, ::process);
     core().c64.installOpenRoms();
 
-    // A corrupted SVM archive can throw here (e.g. while unpacking it into
-    // its temp-space root on first access). This runs inside a Qt signal
-    // handler (see attachWindow()), and Qt does not tolerate an exception
-    // escaping one, so the failure must be caught here rather than left to
-    // propagate.
+    // A corrupted SVM can throw here. This runs inside a Qt signal handler
+    // (see attachWindow()), and Qt does not tolerate an exception escaping
+    // one, so the failure must be caught here rather than left to propagate.
     try {
 
         core().c64.loadWorkspace(svm->root() / SVMFile::workspaceDir);
@@ -1040,17 +1038,17 @@ C64Controller::notifySvmChanged(const QString &kind, const QString &uuid)
 void
 C64Controller::notifyPersist()
 {
-    /* Ask the Hub to pack the archive.
+    /* Tell the Hub the machine changed under it.
      *
-     * Our own persist() has already written the manifest and the assets into
-     * the root folder, but when the Hub launched us that root is a directory
-     * it unpacked from a .svm file we know nothing about. Only it can zip the
-     * tree back up. It reloads before doing so, because the manifest it holds
-     * is now older than the one we just wrote (see Manifest::generation).
+     * Our own persist() has already written the manifest and the assets, so
+     * the tree on disk is complete. But when the Hub launched us it opened
+     * the same machine, and the manifest it holds is now older than the one
+     * we just wrote (see Manifest::generation) -- it has to reload before it
+     * describes the machine to anyone.
      *
-     * Sent unconditionally: when SiC64 was started directly on an archive
-     * there is no Hub listening and the packet goes nowhere, which is exactly
-     * right -- in that case our own persist() already updated the ZIP.
+     * Sent unconditionally: started standalone there is no Hub listening and
+     * the packet goes nowhere, which is exactly right -- nobody else is
+     * holding a stale view of this machine.
      */
     const QJsonObject rpc {
         { "jsonrpc", "2.0" },

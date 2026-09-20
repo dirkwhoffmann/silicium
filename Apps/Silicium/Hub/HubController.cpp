@@ -87,26 +87,17 @@ HubController::stop()
     LogTask task("Stopping HubController...");
     writeVmList();
 
-    /* Release the machines, which is what deletes their root folders (see
-     * ~SVMFile). It has to happen here rather than being left to the process
-     * exit: instance() hands out a leaked 'new', so this object's members are
-     * never destroyed. Strictly after writeVmList(), which reads the library.
+    /* Release the machines. It has to happen here rather than being left to
+     * the process exit: instance() hands out a leaked 'new', so this object's
+     * members are never destroyed. Strictly after writeVmList(), which reads
+     * the library.
      *
-     * Skipped while instances are still up. Since launch() hands them our
-     * unpacked root rather than the archive, dropping the library now would
-     * delete the tree a running emulator is working on. Leaving those roots
-     * behind is the lesser evil -- they are temp directories, and the machines
-     * still hold unsaved state we have no business destroying underneath them.
+     * Unconditional, unlike when a machine could be ZIP-backed: releasing one
+     * then deleted the temp tree it had been unpacked into, which a running
+     * emulator might still be working on. An SVM is now the folder itself, so
+     * this drops in-memory state and touches nothing on disk.
      */
-    if (m_sic64Processes.empty()) {
-
-        library.clear();
-
-    } else {
-
-        qCWarning(siLog) << "Keeping" << m_sic64Processes.size()
-                         << "root folder(s): instances are still running";
-    }
+    library.clear();
 }
 
 void
@@ -156,7 +147,7 @@ HubController::setupShowcases()
     // Register all showcases
     for (const auto &entry : fs::directory_iterator(m_showcases)) {
 
-        if (entry.is_directory() && entry.path().extension() == SVMFile::folderSuffix) {
+        if (entry.is_directory() && entry.path().extension() == SVMFile::suffix) {
 
             /* The showcases are unpacked from Qt resources, which carry no
              * extended attributes, so the package flag has to be reapplied
@@ -814,7 +805,6 @@ HubController::launch(UUID vUUID, UUID sUUID)
         auto &manifest = vm->getManifest();
         const QString exePath = AppController::locateExecutable(manifest.platform);
 
-        // Hand over the root folder, not the archive
         const QString svmPath = QString::fromStdString(vm->root().string());
 
         // Create a new process
@@ -860,15 +850,16 @@ HubController::processRpcPacket(QProcess *process, UUID vUUID, const QJsonObject
 
     if (method == "persist") {
 
-        /* The instance saved into the root folder we handed it. The tree on
-         * disk is already correct -- its persist() wrote the manifest in place
-         * -- but only we know where the archive is, so packing it up is ours
-         * to do.
+        /* The instance saved into the machine we handed it, so the tree on
+         * disk is already correct and there is nothing here to write: this
+         * exists to stop *us* describing the machine wrongly. Our in-memory
+         * manifest predates their write, and every panel in the Hub is drawn
+         * from it. Manifest::generation is what makes that staleness
+         * detectable rather than assumed.
          *
-         * reload() first, and it is not optional: our in-memory manifest
-         * predates their write, and persist() would save it straight over
-         * theirs, dropping the snapshot they just took. Manifest::generation
-         * is what makes the staleness detectable rather than assumed.
+         * Back when a machine could be ZIP-backed this also packed the
+         * archive, since only the Hub knew where it was. Writing from both
+         * sides is now just a way to race the emulator for its own manifest.
          */
         for (auto &sic64 : m_sic64Processes) {
 
@@ -877,7 +868,6 @@ HubController::processRpcPacket(QProcess *process, UUID vUUID, const QJsonObject
             if (auto *vm = library.resolve(sic64.vUUID).first) {
 
                 if (vm->isOutdated()) vm->reload();
-                if (!vm->isReadOnly()) vm->persist();
 
                 m_sidebarController.rebuild();
                 if (sic64.vUUID == m_vUUID) select(m_vUUID);

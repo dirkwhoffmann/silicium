@@ -12,7 +12,7 @@ Item {
     id: root
     required property OnboardingController controller
     readonly property string name: controller.name
-    readonly property string svmName: name !== "" ? name + ".svmz" : "Untitled.svmz"
+    readonly property string svmName: name !== "" ? name + ".svm" : "Untitled.svm"
 
     Component.onCompleted: {
 
@@ -27,8 +27,7 @@ Item {
         currentFolder: StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
         fileMode: FileDialog.SaveFile
 
-        // New machines are written compressed (OnboardingController::create)
-        defaultSuffix: "svmz"
+        defaultSuffix: "svm"
 
         onAccepted: {
 
@@ -55,7 +54,7 @@ Item {
             Layout.fillWidth: true
             image: controller.platformIcon
             title: "Almost Done!"
-            description: "Name your virtual machine and click Save to create the machine as an .svmz file on disk."
+            description: "Name your virtual machine and click Save to create the machine as an .svm file on disk."
         }
 
         VSpacer {}

@@ -438,9 +438,9 @@ private:
     // Reports that the SVM file was just written to disk through the RPC server
     void notifySvmChanged(const QString &kind, const QString &uuid = {});
 
-    /* Tells the Hub to pack the archive after we persisted into the root
-     * folder it gave us. A no-op when nothing is listening, which is the
-     * standalone case -- see the definition.
+    /* Tells the Hub that we wrote to the machine it gave us, so it can
+     * refresh the manifest it holds. A no-op when nothing is listening,
+     * which is the standalone case -- see the definition.
      */
     void notifyPersist();
 

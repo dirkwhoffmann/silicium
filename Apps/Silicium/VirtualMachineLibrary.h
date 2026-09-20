@@ -28,9 +28,9 @@ class VirtualMachineLibrary : public SiObject {
 
     /* Drops every machine, releasing the SVM files they own.
      *
-     * Called on shutdown so the SVMFile destructors run and take their working
-     * folders with them. HubController is a deliberately leaked singleton, so
-     * nothing else ever destroys this.
+     * In-memory only: an SVM is the tree on disk, so letting go of it writes
+     * nothing and deletes nothing. Called on shutdown because HubController is
+     * a deliberately leaked singleton and nothing else ever destroys this.
      */
     void clear() { vms.clear(); }
 

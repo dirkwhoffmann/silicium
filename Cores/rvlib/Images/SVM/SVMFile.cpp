@@ -15,7 +15,6 @@
 #include "utl/chrono.h"
 #include "utl/io.h"
 #include "utl/support.h"
-#include "utl/storage/ZipArchive.h"
 #include <format>
 #include <set>
 
@@ -24,47 +23,21 @@ namespace retro::vault {
     namespace fs = std::filesystem;
     using utl::IOError;
 
-    const char *
-    SVMFile::suffixOf(SVMType type)
-    {
-        return type == SVMType::Folder ? folderSuffix : archiveSuffix;
-    }
-
-    /* Both backings are identified the same way: by the suffix. A folder-backed
-     * SVM is a directory named *.svm -- the preinstalled showcases are exactly
-     * that -- and a ZIP-backed one is a file named *.svmz, so this never has to
-     * look inside and never has to stat.
+    /* An SVM is identified by its suffix alone: a directory named *.svm.
+     * This never has to look inside and never has to stat.
      *
      * A directory carrying an extension is valid on every platform we build
      * for: it is the macOS bundle convention (.app, .rtfd), and Win32 forbids
      * only a *trailing* period, not an interior one.
-     */
-    optional<SVMType>
-    SVMFile::typeOf(const fs::path &path)
-    {
-        const auto ext = utl::uppercased(path.extension().string());
-
-        if (ext == ".SVM")  return SVMType::Folder;
-        if (ext == ".SVMZ") return SVMType::ZipFile;
-
-        return {};
-    }
-
-    fs::path
-    SVMFile::withSuffixOf(const fs::path &path, SVMType type)
-    {
-        return utl::ensureExtension(path, suffixOf(type));
-    }
-
-    /* As with any other format here, this classifies without validating. An
-     * SVM suffix on something holding no manifest is reported as an SVM and
-     * then fails to open with VM_NO_MANIFEST, which says more than "unknown
-     * file type" would.
+     *
+     * As with any other format here, this classifies without validating. A
+     * '.svm' holding no manifest is reported as an SVM and then fails to open
+     * with VM_NO_MANIFEST, which says more than "unknown file type" would.
      */
     optional<ImageInfo>
     SVMFile::about(const fs::path &path)
     {
-        if (typeOf(path)) {
+        if (utl::uppercased(path.extension().string()) == ".SVM") {
             return {{ ImageType::VM, ImageFormat::SVM }};
         }
 
@@ -89,64 +62,40 @@ namespace retro::vault {
         return Hashable::hash((const u8 *)id.data(), isize(id.size()), algorithm);
     }
 
-    SVMFile::SVMFile(CreateTag, const fs::path &path, SVMType type) {
-        init(Create, path, type);
+    SVMFile::SVMFile(CreateTag, const fs::path &path) {
+        init(Create, path);
     }
 
     SVMFile::SVMFile(OpenTag, const fs::path &path) {
         init(Open, path);
     }
 
-    SVMFile::SVMFile(CloneTag, const fs::path &path, const fs::path &clone, SVMType type) {
-        init(Clone, path, clone, type);
-    }
-
-    SVMFile::~SVMFile() {
-        // Wipe out anything we've created inside the tmp folder
-
-        std::error_code ec;
-        const auto tmp = fs::temp_directory_path(ec);
-
-        if (!ec && fs::equivalent(rootFolder.parent_path(), tmp, ec) && !ec)
-            fs::remove_all(rootFolder, ec);
+    SVMFile::SVMFile(CloneTag, const fs::path &path, const fs::path &clone) {
+        init(Clone, path, clone);
     }
 
     void
-    SVMFile::init(SVMFile::CreateTag, const fs::path &path, SVMType type) {
+    SVMFile::init(SVMFile::CreateTag, const fs::path &path) {
 
-        /* The suffix is not the caller's to get wrong: it is what every later
-         * reader classifies this machine by, so the requested storage format
-         * picks it. A caller that hands us 'Foo' or 'Foo.svm' for a ZIP-backed
-         * machine gets 'Foo.svmz', not an archive wearing a folder's name.
-         */
-        this->path = withSuffixOf(path, type);
-        this->svmType = type;
+        // The suffix is what every later reader classifies this machine by,
+        // so it is not the caller's to get wrong
+        this->path = utl::ensureExtension(path, suffix);
 
         std::error_code ec;
 
         // If the item exists, delete it before proceeding
         utl::remove(this->path);
 
-        // See if we can create the source item
-        if (type == SVMType::Folder) {
+        // Create empty directory
+        fs::create_directories(this->path, ec);
+        if (ec) throw utl::IOError(utl::IOError::DIR_CANT_CREATE, this->path);
 
-            // Create empty directory
-            fs::create_directories(this->path, ec);
-            if (ec) throw utl::IOError(utl::IOError::DIR_CANT_CREATE, this->path);
-
-            /* Ask Finder to show the tree as a single file. The exported UTI
-             * in Silicium's Info.plist says the same thing, but only to Macs
-             * where Silicium is installed; the flag is carried by the folder
-             * itself and survives the copy to a machine that has never seen it.
-             */
-            utl::setPackageBit(this->path);
-
-        } else {
-
-            // Create empty ZIP archive
-            printf("Creating empty archive %s\n", this->path.string().c_str());
-            utl::ZipArchive archive(this->path, 'w');
-        }
+        /* Ask Finder to show the tree as a single file. The exported UTI in
+         * Silicium's Info.plist says the same thing, but only to Macs where
+         * Silicium is installed; the flag is carried by the folder itself and
+         * survives the copy to a machine that has never seen it.
+         */
+        utl::setPackageBit(this->path);
 
         // Prepare the manifest
         manifest.uuid = utl::UUID::v4();
@@ -180,40 +129,30 @@ namespace retro::vault {
             throw ImageError(ImageError::VM_CANT_OPEN);
         }
 
-        /* What is on disk outranks what the name claims.
+        /* An SVM is a directory, and only a directory.
          *
-         * The suffix is the contract for everything we *write* (see
-         * init(CreateTag)) and it is what about() classifies by, but a tree
-         * cannot be unzipped and an archive cannot be walked, so opening the
-         * wrong way fails outright. Machines created before .svmz existed are
-         * ZIP archives named '.svm', and they still open here. The mismatch is
-         * worth saying out loud, though -- it is how a machine ends up filed
-         * under a name that misdescribes it.
+         * about() classifies by the suffix alone, so anything at all can
+         * arrive here wearing a '.svm'. The one case worth naming is a ZIP
+         * archive: that was a supported backing until the format was reduced
+         * to folders, and a machine left over from then is a file, not a
+         * tree. Every path below assumes it can walk the root, so this is
+         * caught once, here, rather than as a puzzling failure later.
          */
-        const bool isFolder = fs::is_directory(path, ec);
-        if (ec) throw ImageError(ImageError::VM_CANT_OPEN);
-
-        svmType = isFolder ? SVMType::Folder : SVMType::ZipFile;
-
-        if (const auto named = typeOf(path); named && *named != svmType) {
-
-            logmsg(LOG_WARN, "'%s' is %s-backed, but its suffix says %s.\n",
-                   path.filename().string().c_str(),
-                   isFolder ? "folder" : "archive", suffixOf(*named));
+        if (!fs::is_directory(path, ec) || ec) {
+            throw ImageError(ImageError::VM_CORRUPTED, "not a folder");
         }
 
         readManifest();
     }
 
     void
-    SVMFile::init(CloneTag, const fs::path &path, const fs::path &clonePath, SVMType type) {
+    SVMFile::init(CloneTag, const fs::path &path, const fs::path &clonePath) {
         // Open the source SVM
         SVMFile src(path);
 
-        // Create this SVM. init(Create) settles the clone's suffix from the
-        // storage format, so getSourcePath() -- not clonePath -- is the name
-        // it ends up under.
-        init(Create, clonePath, type);
+        // Create this SVM. init(Create) settles the clone's suffix, so
+        // getSourcePath() -- not clonePath -- is the name it ends up under.
+        init(Create, clonePath);
 
         // Copy the source machine's tree into ours
         fs::copy(src.root(), root(),
@@ -225,19 +164,12 @@ namespace retro::vault {
         // Assign a new UUID to distinguish the clone from the source
         manifest.uuid = utl::UUID::v4();
 
-        // Drop any metadata and make the archive writable
+        // Drop any metadata and make the clone writable
         manifest.meta.reset();
         manifest.readOnly = false;
 
         // Write changes back to the SVM
         persist();
-    }
-
-    const fs::path &
-    SVMFile::root()
-    {
-        if (rootFolder.empty()) createRoot();
-        return rootFolder;
     }
 
     void
@@ -246,75 +178,33 @@ namespace retro::vault {
         // Only proceed if we have write permission
         if (isReadOnly()) throw ImageError(ImageError::VM_READ_ONLY);
 
-        // Make sure that a consitent archive is written
+        // Make sure that a consistent machine is written
         tidyUp();
 
         // Update the modification date and the generation counter
         manifest.modified = time(nullptr);
         manifest.generation++;
 
-        // Save the manifest
+        /* Save the manifest. The rest of the tree is already where it
+         * belongs -- callers write their assets straight into root() -- so
+         * this is the whole of it.
+         */
         manifest.save(root() / "manifest.json");
-
-        // Create the compressed archive if the SVM is ZIP-backed
-        if (svmType == SVMType::ZipFile) packArchive();
     }
 
     void
     SVMFile::readManifest()
     {
-        // If a live-tree exists, it is the source of truth
-        if (!rootFolder.empty()) {
-
-            manifest = Manifest(rootFolder / "manifest.json");
-            return;
-        }
-
-        // For folder-backed SMVs, read the manifest from the source folder
-        if (svmType == SVMType::Folder) {
-
-            manifest = Manifest(path / "manifest.json");
-            return;
-        }
-
-        // For ZIP-backed SMVs, extract the manifest from the source archive
-        utl::ZipArchive archive(path);
-        for (auto &item: archive.listFiles()) {
-
-            if (item != "manifest.json") continue;
-
-            manifest = Manifest(archive.uncompress(item));
-            return;
-        }
-
-        throw ImageError(ImageError::VM_NO_MANIFEST);
+        manifest = Manifest(root() / "manifest.json");
     }
 
     bool
     SVMFile::isOutdated() const
     {
         try {
-            return Manifest(rootFolder / "manifest.json").generation > manifest.generation;
+            return Manifest(root() / "manifest.json").generation > manifest.generation;
         } catch (const std::exception &) {
             return false;
-        }
-    }
-
-    void
-    SVMFile::createRoot()
-    {
-        // A folder-backed SVM is a tree on disk; it becomes its own root
-        if (svmType == SVMType::Folder) {
-
-            rootFolder = path;
-        }
-
-        // For a ZIP-backed SVM, create the root in the temp space
-        if (svmType == SVMType::ZipFile) {
-
-            rootFolder = utl::makeUniquePath(fs::temp_directory_path() / "svm");
-            fs::create_directories(rootFolder);
-            unpackArchive();
         }
     }
 
@@ -393,21 +283,5 @@ namespace retro::vault {
                     orphan.filename().string().c_str());
             fs::remove(orphan, ec);
         }
-    }
-
-    void
-    SVMFile::unpackArchive()
-    {
-        utl::ZipArchive archive(path);
-        archive.uncompressAll(rootFolder);
-    }
-
-    void
-    SVMFile::packArchive()
-    {
-        auto files = utl::files(root());
-
-        utl::ZipArchive archive(path, 'w');
-        archive.write(files, root());
     }
 }
