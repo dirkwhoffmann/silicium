@@ -25,6 +25,7 @@
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 #include <QFileOpenEvent>
+#include <QQuickWindow>
 #include <QIcon>
 
 /* Opens virtual machines that Finder hands to the app.
@@ -48,11 +49,19 @@ class FileOpenFilter : public QObject {
     // Whether the QML engine has produced its root object
     bool ready = false;
 
+    /* The Hub's window, for bringing it forward. Kept apart from `ready`
+     * rather than standing in for it: the two look like the same fact but
+     * are not, and a root object that failed to cast would otherwise leave
+     * the filter queueing documents forever instead of merely not raising.
+     */
+    QQuickWindow *window = nullptr;
+
   public:
 
-    void flush()
+    void flush(QObject *root)
     {
         ready = true;
+        window = qobject_cast<QQuickWindow *>(root);
 
         const auto queued = pending;
         pending.clear();
@@ -78,10 +87,32 @@ class FileOpenFilter : public QObject {
 
   private:
 
-    static void openVM(const QUrl &url)
+    void openVM(const QUrl &url)
     {
+        raiseHub();
+
         // The Hub owns the library, so the add-or-look-up lives there
         HubController::instance().openVM(url);
+    }
+
+    /* Brings the Hub forward.
+     *
+     * Opening a document is the one case where the app acts on a request it
+     * did not have the focus for: macOS delivers the event to whichever app
+     * owns the type, without necessarily putting it in front. Deminiaturising
+     * is done by clearing the one state bit rather than by showNormal(),
+     * which would also undo a maximised window the user left that way.
+     */
+    void raiseHub()
+    {
+        if (!window) return;
+
+        if (window->windowStates() & Qt::WindowMinimized) {
+            window->setWindowStates(window->windowStates() & ~Qt::WindowMinimized);
+        }
+
+        window->raise();
+        window->requestActivate();
     }
 };
 
@@ -159,7 +190,7 @@ main(int argc, char *argv[])
             if (!obj && url == objUrl) QCoreApplication::exit(-1);
 
             // The hub is up: hand it whatever Finder asked for at launch
-            if (obj && url == objUrl) fileOpenFilter.flush();
+            if (obj && url == objUrl) fileOpenFilter.flush(obj);
         },
         Qt::QueuedConnection);
     engine.load(url);
