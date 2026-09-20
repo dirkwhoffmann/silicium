@@ -158,6 +158,12 @@ HubController::setupShowcases()
 
         if (entry.is_directory() && entry.path().extension() == SVMFile::folderSuffix) {
 
+            /* The showcases are unpacked from Qt resources, which carry no
+             * extended attributes, so the package flag has to be reapplied
+             * to each fresh extraction (see utl::setPackageBit).
+             */
+            utl::setPackageBit(entry.path());
+
             try {
 
                 library.addVirtualMachine(entry.path());

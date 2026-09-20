@@ -134,6 +134,13 @@ namespace retro::vault {
             fs::create_directories(this->path, ec);
             if (ec) throw utl::IOError(utl::IOError::DIR_CANT_CREATE, this->path);
 
+            /* Ask Finder to show the tree as a single file. The exported UTI
+             * in Silicium's Info.plist says the same thing, but only to Macs
+             * where Silicium is installed; the flag is carried by the folder
+             * itself and survives the copy to a machine that has never seen it.
+             */
+            utl::setPackageBit(this->path);
+
         } else {
 
             // Create empty ZIP archive
