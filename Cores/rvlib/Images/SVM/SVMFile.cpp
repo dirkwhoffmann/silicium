@@ -24,22 +24,47 @@ namespace retro::vault {
     namespace fs = std::filesystem;
     using utl::IOError;
 
+    const char *
+    SVMFile::suffixOf(SVMType type)
+    {
+        return type == SVMType::Folder ? folderSuffix : archiveSuffix;
+    }
+
     /* Both backings are identified the same way: by the suffix. A folder-backed
      * SVM is a directory named *.svm -- the preinstalled showcases are exactly
-     * that -- so this never has to look inside and never has to stat.
+     * that -- and a ZIP-backed one is a file named *.svmz, so this never has to
+     * look inside and never has to stat.
      *
      * A directory carrying an extension is valid on every platform we build
      * for: it is the macOS bundle convention (.app, .rtfd), and Win32 forbids
      * only a *trailing* period, not an interior one.
-     *
-     * As with any other format here, this classifies without validating. A
-     * '.svm' holding no manifest is reported as an SVM and then fails to open
-     * with VM_NO_MANIFEST, which says more than "unknown file type" would.
+     */
+    optional<SVMType>
+    SVMFile::typeOf(const fs::path &path)
+    {
+        const auto ext = utl::uppercased(path.extension().string());
+
+        if (ext == ".SVM")  return SVMType::Folder;
+        if (ext == ".SVMZ") return SVMType::ZipFile;
+
+        return {};
+    }
+
+    fs::path
+    SVMFile::withSuffixOf(const fs::path &path, SVMType type)
+    {
+        return utl::ensureExtension(path, suffixOf(type));
+    }
+
+    /* As with any other format here, this classifies without validating. An
+     * SVM suffix on something holding no manifest is reported as an SVM and
+     * then fails to open with VM_NO_MANIFEST, which says more than "unknown
+     * file type" would.
      */
     optional<ImageInfo>
     SVMFile::about(const fs::path &path)
     {
-        if (utl::uppercased(path.extension().string()) == ".SVM") {
+        if (typeOf(path)) {
             return {{ ImageType::VM, ImageFormat::SVM }};
         }
 
@@ -88,26 +113,32 @@ namespace retro::vault {
 
     void
     SVMFile::init(SVMFile::CreateTag, const fs::path &path, SVMType type) {
-        this->path = path;
+
+        /* The suffix is not the caller's to get wrong: it is what every later
+         * reader classifies this machine by, so the requested storage format
+         * picks it. A caller that hands us 'Foo' or 'Foo.svm' for a ZIP-backed
+         * machine gets 'Foo.svmz', not an archive wearing a folder's name.
+         */
+        this->path = withSuffixOf(path, type);
         this->svmType = type;
 
         std::error_code ec;
 
         // If the item exists, delete it before proceeding
-        utl::remove(path);
+        utl::remove(this->path);
 
         // See if we can create the source item
         if (type == SVMType::Folder) {
 
             // Create empty directory
-            fs::create_directories(path, ec);
-            if (ec) throw utl::IOError(utl::IOError::DIR_CANT_CREATE, path);
+            fs::create_directories(this->path, ec);
+            if (ec) throw utl::IOError(utl::IOError::DIR_CANT_CREATE, this->path);
 
         } else {
 
             // Create empty ZIP archive
-            printf("Creating empty archive %s\n", path.string().c_str());
-            utl::ZipArchive archive(path, 'w');
+            printf("Creating empty archive %s\n", this->path.string().c_str());
+            utl::ZipArchive archive(this->path, 'w');
         }
 
         // Prepare the manifest
@@ -142,8 +173,27 @@ namespace retro::vault {
             throw ImageError(ImageError::VM_CANT_OPEN);
         }
 
-        svmType = fs::is_directory(path, ec) ? SVMType::Folder : SVMType::ZipFile;
+        /* What is on disk outranks what the name claims.
+         *
+         * The suffix is the contract for everything we *write* (see
+         * init(CreateTag)) and it is what about() classifies by, but a tree
+         * cannot be unzipped and an archive cannot be walked, so opening the
+         * wrong way fails outright. Machines created before .svmz existed are
+         * ZIP archives named '.svm', and they still open here. The mismatch is
+         * worth saying out loud, though -- it is how a machine ends up filed
+         * under a name that misdescribes it.
+         */
+        const bool isFolder = fs::is_directory(path, ec);
         if (ec) throw ImageError(ImageError::VM_CANT_OPEN);
+
+        svmType = isFolder ? SVMType::Folder : SVMType::ZipFile;
+
+        if (const auto named = typeOf(path); named && *named != svmType) {
+
+            logmsg(LOG_WARN, "'%s' is %s-backed, but its suffix says %s.\n",
+                   path.filename().string().c_str(),
+                   isFolder ? "folder" : "archive", suffixOf(*named));
+        }
 
         readManifest();
     }
@@ -153,7 +203,9 @@ namespace retro::vault {
         // Open the source SVM
         SVMFile src(path);
 
-        // Create this SVM
+        // Create this SVM. init(Create) settles the clone's suffix from the
+        // storage format, so getSourcePath() -- not clonePath -- is the name
+        // it ends up under.
         init(Create, clonePath, type);
 
         // Copy the source machine's tree into ours

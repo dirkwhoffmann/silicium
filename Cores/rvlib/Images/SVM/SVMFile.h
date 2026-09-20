@@ -32,21 +32,21 @@ namespace retro::vault {
  * inside is addressed relative to that root, so callers never need to know
  * which of the two formats they are working with:
  *
- *   ZipFile   The standard format: the machine is a single .svm archive with a
- *             small footprint. root() is a temporary directory, unpacked from
+ *   ZipFile   The standard format: the machine is a single .svmz archive with
+ *             a small footprint. root() is a temporary directory, unpacked from
  *             the archive when it is first asked for and packed back up by
  *             persist(). Nothing is unpacked for a caller that only reads the
  *             manifest, which is what keeps listing a library of machines cheap.
  *
- *   Folder    An ordinary directory, useful for manual editing. It is already a
- *             tree, so it *is* its own root: there is no copy, opening it costs
- *             nothing, and persist() writes the manifest in place without
- *             packing anything.
+ *   Folder    An ordinary .svm directory, useful for manual editing. It is
+ *             already a tree, so it *is* its own root: there is no copy, opening
+ *             it costs nothing, and persist() writes the manifest in place
+ *             without packing anything.
  *
- * Both carry the .svm suffix.
+ * The suffix names the format: '.svm' is the folder, '.svmz' the archive.
  */
 
-// An SVM is a .svm ZIP archive or a .svm directory -- the suffix is the same
+// An SVM is a .svmz ZIP archive or a .svm directory -- the suffix says which
 enum class SVMType { ZipFile, Folder };
 
 class SVMFile : public AnyImage {
@@ -55,6 +55,10 @@ class SVMFile : public AnyImage {
 
     static constexpr auto workspaceDir = "workspace";
     static constexpr auto snapshotDir = "snapshots";
+
+    // The suffix each storage format is named by
+    static constexpr auto folderSuffix = ".svm";
+    static constexpr auto archiveSuffix = ".svmz";
 
   private:
 
@@ -77,6 +81,15 @@ class SVMFile : public AnyImage {
 
     struct CloneTag {};
     static constexpr CloneTag Clone {};
+
+    // Returns the suffix naming the given storage format
+    static const char *suffixOf(SVMType type);
+
+    // Returns the storage format the path's suffix names, if it names one
+    static optional<SVMType> typeOf(const fs::path &path);
+
+    // Returns the path, with its suffix made to match the storage format
+    static fs::path withSuffixOf(const fs::path &path, SVMType type);
 
     // Analyzes the type of the provided file
     static optional<ImageInfo> about(const fs::path &path);

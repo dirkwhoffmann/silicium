@@ -163,8 +163,11 @@ VirtualMachineLibrary::cloneVirtualMachine(const fs::path &path, const fs::path 
     // Create a clone on disk
     SVMFile svm(SVMFile::Clone, path, clonePath);
 
-    // Add the clone
-    return addVirtualMachine(clonePath);
+    /* Add the clone under the name it was actually written to. SVMFile makes
+     * the suffix match the storage format, so the path it ended up with is not
+     * necessarily the one we asked for.
+     */
+    return addVirtualMachine(svm.getSourcePath());
 }
 
 VirtualMachine *

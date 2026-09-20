@@ -209,7 +209,7 @@ OnboardingController::create(const fs::path &path)
     LogTask task("Creating new virtual machine...");
 
     // Create the full file name of the SVM
-    fs::path svmPath = utl::makeUniquePath(utl::ensureExtension(path, ".svm"));
+    fs::path svmPath = utl::makeUniquePath(utl::ensureExtension(path, SVMFile::archiveSuffix));
 
     try {
 

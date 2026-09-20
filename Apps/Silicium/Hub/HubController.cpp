@@ -156,7 +156,7 @@ HubController::setupShowcases()
     // Register all showcases
     for (const auto &entry : fs::directory_iterator(m_showcases)) {
 
-        if (entry.is_directory() && entry.path().extension() == ".svm") {
+        if (entry.is_directory() && entry.path().extension() == SVMFile::folderSuffix) {
 
             try {
 

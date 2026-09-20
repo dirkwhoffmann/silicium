@@ -26,8 +26,10 @@ Item {
     FileDialog {
 
         id: openSvmFileDialog
-        title: "Select an .svm File"
-        nameFilters: ["Virtual machines (*.svm)"]
+        title: "Select a Virtual Machine"
+
+        // Compressed machines are .svmz, folder-backed ones .svm
+        nameFilters: ["Virtual machines (*.svm *.svmz)"]
 
         onAccepted: {
             try {
@@ -46,7 +48,10 @@ Item {
 
         title: "Save As"
         fileMode: FileDialog.SaveFile
-        nameFilters: ["Virtual machines (*.svm)"]
+
+        // A clone is written compressed, so it is named accordingly
+        nameFilters: ["Virtual machines (*.svmz)"]
+        defaultSuffix: "svmz"
 
         function openWithUUID(uuid) {
 
