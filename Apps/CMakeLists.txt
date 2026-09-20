@@ -91,8 +91,11 @@ qt_add_executable(silicium
         "Silicium/main.cpp"
         ${ICON_FILE})
 
+# Silicium carries a plist of its own because it is the app that declares the
+# .svm/.svmz document types; SiC64 and SiAmiga stay on Qt's stock template.
 set_target_properties(silicium PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Apps/bin"
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Silicium/Info.plist.in"
         MACOSX_BUNDLE_ICON_FILE AppIcon.icns
         MACOSX_BUNDLE_BUNDLE_NAME "Silicium"
         MACOSX_BUNDLE_GUI_IDENTIFIER "${SI_BUNDLE_PREFIX}.silicium"

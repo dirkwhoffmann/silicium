@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Silicium's bundle description.
+
+  This is Qt's own Info.plist.app.in (qtbase/lib/cmake/Qt6/macos) with the
+  document types appended. Qt uses its template only when the target names no
+  plist of its own, so anything it ships has to be carried here by hand -- and
+  dropping one of its keys is not harmless: without NSPrincipalClass the app
+  launches without an NSApplication and never draws a window.
+
+  The ${MACOSX_BUNDLE_*} placeholders are filled from the target properties in
+  Apps/CMakeLists.txt; ${SI_BUNDLE_PREFIX} comes from the same file.
+-->
+<plist version="1.0">
+<dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+
+	<key>CFBundleName</key>
+	<string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
+	<key>CFBundleIdentifier</key>
+	<string>${MACOSX_BUNDLE_GUI_IDENTIFIER}</string>
+	<key>CFBundleExecutable</key>
+	<string>${MACOSX_BUNDLE_EXECUTABLE_NAME}</string>
+
+	<key>CFBundleVersion</key>
+	<string>${MACOSX_BUNDLE_BUNDLE_VERSION}</string>
+	<key>CFBundleShortVersionString</key>
+	<string>${MACOSX_BUNDLE_SHORT_VERSION_STRING}</string>
+
+	<key>LSMinimumSystemVersion</key>
+	<string>${CMAKE_OSX_DEPLOYMENT_TARGET}</string>
+
+	<key>NSHumanReadableCopyright</key>
+	<string>${MACOSX_BUNDLE_COPYRIGHT}</string>
+
+	<key>CFBundleIconFile</key>
+	<string>${MACOSX_BUNDLE_ICON_FILE}</string>
+
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<true/>
+
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+
+	<key>NSSupportsAutomaticGraphicsSwitching</key>
+	<true/>
+
+	<!--
+	  Document types.
+
+	  A folder-backed machine appears in Finder as a single file because the
+	  UTI below conforms to com.apple.package. That conformance is the entire
+	  mechanism: Finder collapses a directory when Launch Services reports its
+	  type as a package, and Launch Services only learns the type from a
+	  registered app. So this takes effect once Silicium has been registered
+	  (installed in /Applications, or passed to lsregister by hand), and on a
+	  Mac without Silicium an SVM stays an ordinary folder.
+
+	  Only Silicium declares these. SiC64 and SiAmiga never open a machine
+	  through Finder -- the Hub spawns them with a path on the command line,
+	  see HubController::createProcess() -- and three apps exporting the same
+	  UTI just gives Launch Services three claimants to choose between.
+	-->
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>${SI_BUNDLE_PREFIX}.silicium.svm</string>
+			<key>UTTypeDescription</key>
+			<string>Silicium Virtual Machine</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>com.apple.package</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>svm</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>${SI_BUNDLE_PREFIX}.silicium.svmz</string>
+			<key>UTTypeDescription</key>
+			<string>Silicium Virtual Machine (compressed)</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.zip-archive</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>svmz</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
+
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Silicium Virtual Machine</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>${SI_BUNDLE_PREFIX}.silicium.svm</string>
+				<string>${SI_BUNDLE_PREFIX}.silicium.svmz</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>
