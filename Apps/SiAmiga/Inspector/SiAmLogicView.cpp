@@ -288,6 +288,14 @@ SiAmLogicView::paint(QPainter *painter)
     qreal h = height();
     if (w <= 0 || h <= 0) return;
 
+    /* Off by default, and deliberately.
+     *
+     * Almost everything here is axis-aligned -- 228 vertical hairlines, the
+     * flat top and bottom of each hexagon, the mid-line of an empty cell --
+     * and antialiasing those spreads a one-pixel line across two columns of
+     * half-grey instead of drawing it. Only the hexagon's diagonal notches
+     * gain from it, so drawDataSegment() turns it on just for those.
+     */
     painter->setRenderHint(QPainter::Antialiasing, false);
     setupValueFont();
 
@@ -431,6 +439,7 @@ SiAmLogicView::drawDataSegment(QPainter *p, const QRectF &r, int prev, int curr,
 
     if (!currValid) {
 
+        // Horizontal: nothing to smooth, and smoothing would only blur it
         p->drawLine(QPointF(x1, r.center().y()), QPointF(x2, r.center().y()));
         return;
     }
@@ -457,6 +466,15 @@ SiAmLogicView::drawDataSegment(QPainter *p, const QRectF &r, int prev, int curr,
     QPainterPath bottom;
     bottom.moveTo(p5); bottom.lineTo(p6); bottom.lineTo(p7); bottom.lineTo(p8);
 
+    /* The notches at either end are the only diagonals in the view, and
+     * without smoothing they are what reads as a staircase. CoreGraphics
+     * antialiases them by default, which is why vAmiga's look cleaner --
+     * not, as it appears, because it renders at a higher resolution: a
+     * QQuickPaintedItem already paints into a device scaled by the window's
+     * pixel ratio, so both are drawing at 2x on a 2x display.
+     */
+    p->setRenderHint(QPainter::Antialiasing, true);
     p->drawPath(top);
     p->drawPath(bottom);
+    p->setRenderHint(QPainter::Antialiasing, false);
 }
