@@ -10,6 +10,8 @@
 #include "SiAmLogicAnalyzerController.h"
 #include "SiAmController.h"
 
+#include <iterator>
+
 using namespace vamiga;
 
 // Mirrors Inspector.presets (BusPanel.swift), separators marked by a null
@@ -37,6 +39,11 @@ const SiAmLogicAnalyzerController::Preset SiAmLogicAnalyzerController::presets[]
     { nullptr,    Probe::NONE,   false, 0 },
     { "IPL",      Probe::IPL,    false, 0 },
 };
+
+// Derived from the table above, never stated alongside it. Constant-
+// initialised: std::size() of a complete array is a constant expression,
+// so there is no static-initialisation order to worry about.
+const int SiAmLogicAnalyzerController::numPresets = std::size(presets);
 
 SiAmLogicAnalyzerController::SiAmLogicAnalyzerController(SiAmController *parent)
     : SiAmInspectorController(parent)

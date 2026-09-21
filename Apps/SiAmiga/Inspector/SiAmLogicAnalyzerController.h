@@ -74,7 +74,14 @@ class SiAmLogicAnalyzerController : public SiAmInspectorController {
 
   private:
 
+    /* The preset table lives in the .cpp, and so does its length: a count
+     * written out by hand here went stale the moment a preset was appended,
+     * and silently hid the last one (IPL) from every menu built off
+     * presetModel(). std::size() of the table cannot drift from it.
+     */
     struct Preset { const char *name; vamiga::Probe probe; bool hasAddr; unsigned addr; };
     static const Preset presets[];
-    static constexpr int numPresets = 19;
+
+    // Defined next to the table, as std::size() of it
+    static const int numPresets;
 };
