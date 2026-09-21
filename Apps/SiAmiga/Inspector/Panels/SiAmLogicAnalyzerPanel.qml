@@ -187,7 +187,16 @@ SiAmInspectorWindow {
                         contentWidth: width * root.zoom
                         contentHeight: height
                         boundsBehavior: Flickable.StopAtBounds
-                        ScrollBar.horizontal: ScrollBar { }
+                        clip: true
+
+                        /* Always shown, not just while flicking. The view is
+                         * several screens wide at any useful zoom, so the bar
+                         * is the only indication of where in the recording
+                         * the visible window sits.
+                         */
+                        ScrollBar.horizontal: ScrollBar {
+                            policy: ScrollBar.AlwaysOn
+                        }
 
                         SiAmLogicView {
 
@@ -203,22 +212,27 @@ SiAmInspectorWindow {
 
                             /* The view paints every cell itself, so there is
                              * no per-cell item for a ToolTip to hang off.
-                             * It tracks the pointer instead and publishes
-                             * the cycle underneath it; this binds to that.
+                             * A HoverHandler reports the pointer without
+                             * taking the mouse away from the Flickable --
+                             * a MouseArea here would stop it being dragged
+                             * -- and the view answers what sits under it.
                              */
+                            HoverHandler { id: cellHover }
+
                             SiToolTip {
 
-                                parent: logicView
-                                visible: logicView.hoverValid
-                                delay: 400
+                                readonly property real hx: cellHover.point.position.x
+                                readonly property int vpos: logicView.vposAt(hx)
+                                readonly property int hpos: logicView.hposAt(hx)
+
+                                visible: cellHover.hovered && hpos >= 0
+                                delay: 0
                                 timeout: -1
 
-                                x: logicView.hoverX + Style.mediumSpacing
-                                y: logicView.hoverY + Style.mediumSpacing
+                                x: hx + Style.mediumSpacing
+                                y: cellHover.point.position.y + Style.mediumSpacing
 
-                                text: qsTr("VPOS: %1\nHPOS: %2")
-                                        .arg(logicView.hoverVpos)
-                                        .arg(logicView.hoverHpos)
+                                text: qsTr("VPOS: %1\nHPOS: %2").arg(vpos).arg(hpos)
                             }
                         }
                     }

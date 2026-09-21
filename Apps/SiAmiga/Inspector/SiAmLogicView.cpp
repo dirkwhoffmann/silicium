@@ -11,7 +11,6 @@
 #include "SiAmController.h"
 #include "VAmiga.h"
 
-#include <QHoverEvent>
 #include <QPainter>
 #include <QPainterPath>
 #include <QQuickWindow>
@@ -29,43 +28,30 @@ SiAmLogicView::SiAmLogicView(QQuickItem *parent)
     for (auto &row : m_data) row.fill(NoValue);
     m_hpos.fill(-1);
     m_vpos.fill(-1);
-
-    // The view draws every cell itself, so hover tracking is the only way to
-    // know which recorded cycle the pointer is over
-    setAcceptHoverEvents(true);
 }
 
-void
-SiAmLogicView::hoverMoveEvent(QHoverEvent *event)
+int
+SiAmLogicView::columnAt(qreal x) const
 {
-    const QPointF p = event->position();
+    if (m_columns <= 0 || width() <= 0) return -1;
 
-    const int column = m_columns > 0 ? int(p.x() / (width() / m_columns)) : -1;
-    const bool valid = column >= 0 && column < m_columns && m_hpos[column] >= 0;
+    const int column = int(x / (width() / m_columns));
 
-    m_hoverX = p.x();
-    m_hoverY = p.y();
-
-    const int hovered = valid ? column : -1;
-
-    // Emitted on every move while valid, so the tooltip follows the pointer
-    if (hovered != m_hoverColumn || valid) {
-
-        m_hoverColumn = hovered;
-        emit hoverChanged();
-    }
+    return column >= 0 && column < m_columns && m_hpos[column] >= 0 ? column : -1;
 }
 
-void
-SiAmLogicView::hoverLeaveEvent(QHoverEvent *event)
+int
+SiAmLogicView::vposAt(qreal x) const
 {
-    Q_UNUSED(event)
+    const int column = columnAt(x);
+    return column < 0 ? -1 : m_vpos[column];
+}
 
-    if (m_hoverColumn >= 0) {
-
-        m_hoverColumn = -1;
-        emit hoverChanged();
-    }
+int
+SiAmLogicView::hposAt(qreal x) const
+{
+    const int column = columnAt(x);
+    return column < 0 ? -1 : m_hpos[column];
 }
 
 void
@@ -161,6 +147,50 @@ SiAmLogicView::cacheData()
 {
     auto &core = SiAmController::core();
 
+    /* Re-sample only when the recording has actually moved on.
+     *
+     * Two API calls answer that: how many cycles are held, and which cycle
+     * the newest of them is. While the machine runs they change constantly;
+     * while it is paused they change only when the user steps, which is
+     * precisely when the view must update. Returning before the arrays are
+     * cleared is what leaves the previous picture on screen in between.
+     */
+    isize count = 0;
+    int newestVpos = -1, newestHpos = -1;
+
+    try {
+
+        count = core.agnus.logicAnalyzer.getTraceCount();
+
+        if (count > 0) {
+
+            const auto newest = core.agnus.logicAnalyzer.getTrace(count - 1);
+            newestVpos = int(newest.vpos);
+            newestHpos = int(newest.hpos);
+        }
+
+    } catch (...) { return; }
+
+    if (count == m_lastCount && newestVpos == m_lastVpos && newestHpos == m_lastHpos) return;
+
+    m_lastCount = count;
+    m_lastVpos = newestVpos;
+    m_lastHpos = newestHpos;
+
+    /* Nothing is drawn unless a probe is attached.
+     *
+     * The bus rows would otherwise keep filling -- Agnus produces bus data
+     * whether or not anyone probes anything -- and a panel showing traffic
+     * on channels the user never connected reads as a fault rather than as
+     * a feature.
+     */
+    bool probed = false;
+    try {
+        for (int i = 0; i < 4 && !probed; i++) {
+            probed = core.get(Opt(int(Opt::LA_PROBE0) + i)) != i64(Probe::NONE);
+        }
+    } catch (...) { }
+
     for (int i = 0; i < segments; i++) {
 
         m_labels[i].clear();
@@ -172,8 +202,7 @@ SiAmLogicView::cacheData()
     for (auto &row : m_data) row.fill(NoValue);
     m_columns = 0;
 
-    isize count = 0;
-    try { count = core.agnus.logicAnalyzer.getTraceCount(); } catch (...) { return; }
+    if (!probed) return;
 
     /* The whole ring, oldest cycle leftmost.
      *

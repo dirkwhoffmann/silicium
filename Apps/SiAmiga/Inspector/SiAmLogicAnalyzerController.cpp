@@ -48,24 +48,7 @@ const int SiAmLogicAnalyzerController::numPresets = std::size(presets);
 SiAmLogicAnalyzerController::SiAmLogicAnalyzerController(SiAmController *parent)
     : SiAmInspectorController(parent)
 {
-    // Stop recording once the window goes away. refreshData() handles the
-    // other direction, and keeps handling it for as long as we are visible.
-    connect(this, &SiAmInspectorController::activeChanged, this, [this]() {
-        setCoreRecording(isActive());
-    });
-}
 
-void
-SiAmLogicAnalyzerController::refreshData()
-{
-    setCoreRecording(true);
-}
-
-void
-SiAmLogicAnalyzerController::setCoreRecording(bool value)
-{
-    try { SiAmController::core().agnus.logicAnalyzer.setEnabled(value); }
-    catch (...) { }
 }
 
 QVariantList

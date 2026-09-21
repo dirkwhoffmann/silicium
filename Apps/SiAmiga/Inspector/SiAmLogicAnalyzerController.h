@@ -70,23 +70,9 @@ class SiAmLogicAnalyzerController : public SiAmInspectorController {
 
   protected:
 
-    /* Keeps core recording switched on while the panel is up.
-     *
-     * The ring only fills while the analyzer runs, and the analyzer only
-     * runs on its own once a probe is attached -- every probe starts out
-     * NONE, so the panel would otherwise have nothing to draw.
-     *
-     * Done here rather than only on the activeChanged edge because the base
-     * class calls this on every tick while active: if the flag ever gets out
-     * of step, the next tick puts it back. setEnabled() returns immediately
-     * when nothing changes, so the repetition costs nothing.
-     */
-    void refreshData() override;
+    void refreshData() override { }
 
   private:
-
-    // Switches the core's recording on or off, swallowing any core error
-    void setCoreRecording(bool value);
 
     /* The preset table lives in the .cpp, and so does its length: a count
      * written out by hand here went stale the moment a preset was appended,

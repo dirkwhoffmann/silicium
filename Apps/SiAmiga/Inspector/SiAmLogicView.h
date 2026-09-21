@@ -44,18 +44,6 @@ class SiAmLogicView : public QQuickPaintedItem {
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY optionsChanged)
     Q_PROPERTY(QVariantList rowColors READ rowColors WRITE setRowColors NOTIFY optionsChanged)
 
-    /* What the pointer is currently over, for the tooltip in QML.
-     *
-     * The view draws itself, so there is no child item per cell for a
-     * ToolTip to attach to. Instead the hovered cycle is published here and
-     * the panel binds a SiToolTip to it -- hoverValid gates the tooltip's
-     * visibility, hoverX/hoverY place it.
-     */
-    Q_PROPERTY(bool hoverValid READ hoverValid NOTIFY hoverChanged)
-    Q_PROPERTY(int hoverVpos READ hoverVpos NOTIFY hoverChanged)
-    Q_PROPERTY(int hoverHpos READ hoverHpos NOTIFY hoverChanged)
-    Q_PROPERTY(qreal hoverX READ hoverX NOTIFY hoverChanged)
-    Q_PROPERTY(qreal hoverY READ hoverY NOTIFY hoverChanged)
     Q_PROPERTY(QColor hairlineColor READ hairlineColor WRITE setHairlineColor NOTIFY optionsChanged)
 
     /* Columns the view can hold.
@@ -108,10 +96,18 @@ class SiAmLogicView : public QQuickPaintedItem {
     // Columns actually holding a recorded cycle, left-aligned
     int m_columns = 0;
 
-    // Column the pointer is over, or -1
-    int m_hoverColumn = -1;
-    qreal m_hoverX = 0;
-    qreal m_hoverY = 0;
+    /* What the view last drew, as the recording's own identity.
+     *
+     * Re-sampling is skipped while these still match, which is what keeps a
+     * paused emulator from being re-read on every rendered frame. It cannot
+     * simply test "is the machine running", because single-stepping is
+     * exactly the case where the machine is paused and the recording has
+     * nonetheless grown.
+     */
+    qint64 m_lastCount = -1;
+    int m_lastVpos = -2;
+    int m_lastHpos = -2;
+
 
     bool m_hex = true;
     bool m_symbolic = false;
@@ -176,17 +172,26 @@ class SiAmLogicView : public QQuickPaintedItem {
     QColor hairlineColor() const { return m_hairlineColor; }
     void setHairlineColor(const QColor &value);
 
-    bool hoverValid() const { return m_hoverColumn >= 0; }
-    int hoverVpos() const { return hoverValid() ? m_vpos[m_hoverColumn] : -1; }
-    int hoverHpos() const { return hoverValid() ? m_hpos[m_hoverColumn] : -1; }
-    qreal hoverX() const { return m_hoverX; }
-    qreal hoverY() const { return m_hoverY; }
+    /* Which recorded cycle sits under an x coordinate, or -1.
+     *
+     * The view paints every cell itself, so there is no child item a
+     * ToolTip could hang off. QML hovers it with a HoverHandler and asks
+     * these instead -- doing the hit test here keeps the column geometry in
+     * one place rather than duplicating dx into the panel.
+     */
+    Q_INVOKABLE int vposAt(qreal x) const;
+    Q_INVOKABLE int hposAt(qreal x) const;
+
+  private:
+
+    // The column an x coordinate falls in, or -1 if it holds no cycle
+    int columnAt(qreal x) const;
+
+  public:
 
   protected:
 
     void itemChange(ItemChange change, const ItemChangeData &value) override;
-    void hoverMoveEvent(QHoverEvent *event) override;
-    void hoverLeaveEvent(QHoverEvent *event) override;
 
   private:
 
@@ -232,5 +237,4 @@ class SiAmLogicView : public QQuickPaintedItem {
   signals:
 
     void optionsChanged();
-    void hoverChanged();
 };
