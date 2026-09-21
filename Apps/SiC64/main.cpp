@@ -96,6 +96,33 @@ main(int argc, char *argv[])
     // Launch the emulator core
     C64Controller::instance().initialize();
 
+    /* Detach the core before Qt goes away.
+     *
+     * 'app' is a stack object in this function, so QGuiApplication is
+     * destroyed as soon as main() returns -- while the emulator, reached
+     * through two function-local statics (C64Controller::instance() and
+     * C64Controller::core()), is not destroyed until afterwards. The core
+     * keeps posting messages throughout its own shutdown, and every one of
+     * them lands in process(), which marshals onto a Qt event loop that no
+     * longer exists.
+     *
+     * Order matters: detach first, then halt. halt() only queues a command
+     * for the emulator thread, which answers it by posting Msg::SHUTDOWN --
+     * so halting first would emit exactly the message this is meant to
+     * avoid. Detaching is synchronised against delivery inside MsgQueue, so
+     * it is safe to do while that thread is running.
+     *
+     * Without this the app segfaults on quit whenever nothing else halted
+     * the core first, which is the case when it opens the About dialog
+     * instead of a machine window (no SVM, or one that failed to load) --
+     * that path never calls attachWindow(), so windowDidClose() never runs.
+     */
+    QObject::connect(&app, &QCoreApplication::aboutToQuit, &app, [] {
+
+        C64Controller::core().removeListener();
+        C64Controller::core().halt();
+    });
+
     // Load the main window, or an alert window if the SVM file couldn't be opened
     const QUrl url(ok
         ? QStringLiteral("qrc:/qt/qml/sic64UI/SiC64/SiC64Window.qml")

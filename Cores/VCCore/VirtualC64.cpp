@@ -399,6 +399,13 @@ VirtualC64::setListener(const void *listener, Callback *func)
     emu->main.msgQueue.setListener(listener, func);
 }
 
+void
+VirtualC64::removeListener()
+{
+    VC64_PUBLIC
+    emu->main.msgQueue.setListener(nullptr, nullptr);
+}
+
 bool
 VirtualC64::isLaunched() const
 {
