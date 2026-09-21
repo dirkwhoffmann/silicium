@@ -34,6 +34,17 @@ using retro::vault::Platform;
 static void
 process(const void *listener, const Message msg)
 {
+    /* Nothing to marshal onto once the application is gone.
+     *
+     * main() detaches the core on aboutToQuit, so this should not be
+     * reached -- but the cost of being wrong is a crash report on the
+     * user's screen, and the check is one comparison on a path that is
+     * already crossing a thread boundary. QMetaObject::invokeMethod()
+     * reads the receiver's thread data, which does not survive
+     * ~QCoreApplication.
+     */
+    if (!QCoreApplication::instance()) return;
+
     auto *con = static_cast<SiAmController *>(const_cast<void *>(listener));
 
     QMetaObject::invokeMethod(con, [con, msg, att = std::string(msg.str ? msg.str : "")] {

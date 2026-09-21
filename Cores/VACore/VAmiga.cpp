@@ -2302,6 +2302,13 @@ VAmiga::launch(const void *listener, Callback *func)
     emu->launch(listener, func);
 }
 
+void
+VAmiga::removeListener()
+{
+    VAMIGA_PUBLIC
+    emu->main.msgQueue.setListener(nullptr, nullptr);
+}
+
 bool
 VAmiga::isLaunched() const
 {
