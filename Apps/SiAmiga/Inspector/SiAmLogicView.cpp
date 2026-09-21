@@ -11,6 +11,7 @@
 #include "SiAmController.h"
 #include "VAmiga.h"
 
+#include <QHoverEvent>
 #include <QPainter>
 #include <QPainterPath>
 #include <QQuickWindow>
@@ -26,6 +27,45 @@ SiAmLogicView::SiAmLogicView(QQuickItem *parent)
     : QQuickPaintedItem(parent)
 {
     for (auto &row : m_data) row.fill(NoValue);
+    m_hpos.fill(-1);
+    m_vpos.fill(-1);
+
+    // The view draws every cell itself, so hover tracking is the only way to
+    // know which recorded cycle the pointer is over
+    setAcceptHoverEvents(true);
+}
+
+void
+SiAmLogicView::hoverMoveEvent(QHoverEvent *event)
+{
+    const QPointF p = event->position();
+
+    const int column = m_columns > 0 ? int(p.x() / (width() / m_columns)) : -1;
+    const bool valid = column >= 0 && column < m_columns && m_hpos[column] >= 0;
+
+    m_hoverX = p.x();
+    m_hoverY = p.y();
+
+    const int hovered = valid ? column : -1;
+
+    // Emitted on every move while valid, so the tooltip follows the pointer
+    if (hovered != m_hoverColumn || valid) {
+
+        m_hoverColumn = hovered;
+        emit hoverChanged();
+    }
+}
+
+void
+SiAmLogicView::hoverLeaveEvent(QHoverEvent *event)
+{
+    Q_UNUSED(event)
+
+    if (m_hoverColumn >= 0) {
+
+        m_hoverColumn = -1;
+        emit hoverChanged();
+    }
 }
 
 void
@@ -121,17 +161,29 @@ SiAmLogicView::cacheData()
 {
     auto &core = SiAmController::core();
 
-    long hpos = 0;
-    try { hpos = core.amiga.getInfo().hpos; } catch (...) { return; }
-    if (hpos < 0) hpos = 0;
-    if (hpos > segments) hpos = segments;
+    for (int i = 0; i < segments; i++) {
 
-    for (int i = 0; i < segments; i++) { m_labels[i].clear(); m_colors[i] = QColor(); m_symbols[i].clear(); }
+        m_labels[i].clear();
+        m_colors[i] = QColor();
+        m_symbols[i].clear();
+        m_hpos[i] = -1;
+        m_vpos[i] = -1;
+    }
     for (auto &row : m_data) row.fill(NoValue);
+    m_columns = 0;
 
-    LogicAnalyzerInfo laInfo {};
-    try { laInfo = core.agnus.logicAnalyzer.getInfo(); } catch (...) { return; }
-    if (!laInfo.busOwner || !laInfo.addrBus || !laInfo.dataBus) return;
+    isize count = 0;
+    try { count = core.agnus.logicAnalyzer.getTraceCount(); } catch (...) { return; }
+
+    /* The whole ring, oldest cycle leftmost.
+     *
+     * Not the current scanline: the window spans every cycle the core still
+     * holds, so it runs straight through line and frame boundaries. Each
+     * column is labelled from its own entry rather than from its index,
+     * which is what lets it do that without the labels going wrong.
+     */
+    if (count > segments) count = segments;
+    if (count <= 0) return;
 
     // Owner-tint colors, decoded from the packed XRAY_DMA_COLORx options
     // the same way SiAmConfigController::dmaColor() does (r<<24|g<<16|b<<8
@@ -151,13 +203,21 @@ SiAmLogicView::cacheData()
     const QColor colCPU = ownerColor(Opt::XRAY_COLOR6);
     const QColor colRefresh = ownerColor(Opt::XRAY_COLOR7);
 
-    for (long i = 0; i < hpos; i++) {
+    for (isize i = 0; i < count; i++) {
 
-        BusOwner owner = laInfo.busOwner[i];
+        LogicAnalyzerTrace trace;
+        try { trace = core.agnus.logicAnalyzer.getTrace(i); } catch (...) { break; }
+
+        const int col = int(i);
+
+        m_hpos[col] = int(trace.hpos);
+        m_vpos[col] = int(trace.vpos);
+        m_columns = col + 1;
+
         QString label;
         QColor color;
 
-        switch (owner) {
+        switch (trace.busOwner) {
 
             case BusOwner::CPU:     label = "CPU";  color = colCPU; break;
             case BusOwner::REFRESH: label = "REF";  color = colRefresh; break;
@@ -183,39 +243,29 @@ SiAmLogicView::cacheData()
             case BusOwner::COPPER:  label = "COP";  color = colCopper; break;
             case BusOwner::BLITTER: label = "BLT";  color = colBlitter; break;
             case BusOwner::BLOCKED: label = "BLK";  color = QColor(Qt::red); break;
-            default: continue; // NONE, BPL7, BPL8 -- unlabeled, matching Swift
+
+            default:
+                // Unowned: the address and data lines hold nothing of theirs
+                break;
         }
 
-        m_labels[i] = label;
-        m_colors[i] = color;
+        if (!label.isEmpty()) {
 
-        m_data[0][i] = (int)laInfo.addrBus[i];
-        m_data[1][i] = (int)laInfo.dataBus[i];
-    }
+            m_labels[col] = label;
+            m_colors[col] = color;
 
-    for (int c = 2; c < numSignals; c++) {
-
-        const isize *values = laInfo.channel[c - 2];
-        if (!values) continue;
-
-        for (long i = 0; i < hpos; i++) {
-
-            isize value = values[i];
-            m_data[c][i] = value >= 0 ? (int)value : NoValue;
+            m_data[0][col] = (int)trace.addrBus;
+            m_data[1][col] = (int)trace.dataBus;
         }
-    }
 
-    /* Name what the address bus points at, for symbolic mode.
-     *
-     * Only the address bus: a data-bus word or a probe sample is a value,
-     * not a location, so there is nothing to look up. LogicView.swift makes
-     * the same restriction, with `channel == 0` at its own draw site.
-     */
-    if (m_symbolic) {
+        for (int c = 2; c < numSignals; c++) {
 
-        for (long i = 0; i < hpos; i++) {
+            const isize value = trace.channel[c - 2];
+            m_data[c][col] = value >= 0 ? (int)value : NoValue;
+        }
 
-            if (m_data[0][i] != NoValue) m_symbols[i] = symbolize((unsigned)m_data[0][i]);
+        if (m_symbolic && m_data[0][col] != NoValue) {
+            m_symbols[col] = symbolize((unsigned)m_data[0][col]);
         }
     }
 }
@@ -341,8 +391,11 @@ SiAmLogicView::paint(QPainter *painter)
     painter->setRenderHint(QPainter::Antialiasing, false);
     setupValueFont();
 
+    // Nothing recorded yet -- the grid would be meaningless and dx infinite
+    if (m_columns <= 0) return;
+
     qreal headerHeight = h / (numSignals + 1);
-    qreal dx = w / segments;
+    qreal dx = w / m_columns;
     qreal dy = (h - headerHeight) / numSignals;
 
     // Under everything else: the tints are a backdrop, not an overlay
@@ -378,7 +431,7 @@ SiAmLogicView::drawHairlines(QPainter *p, qreal w, qreal h, qreal dx) const
     pen.setWidthF(0.5);
     p->setPen(pen);
 
-    for (int i = 1; i < segments; i++) {
+    for (int i = 1; i < m_columns; i++) {
 
         qreal x = i * dx;
         p->drawLine(QPointF(x, 0), QPointF(x, h));
@@ -394,14 +447,22 @@ SiAmLogicView::drawLabels(QPainter *p, qreal w, qreal headerHeight, qreal dx) co
     p->setFont(font);
     QFontMetricsF fm(font);
 
-    for (int i = 0; i < segments; i++) {
+    for (int i = 0; i < m_columns; i++) {
 
         qreal x = i * dx;
 
-        // Cycle number, upper half of the header row.
+        /* The DMA cycle number, upper half of the header row.
+         *
+         * Taken from the column's own entry, not from its index: the window
+         * spans several scanlines, so the numbering restarts partway along
+         * and the two stopped agreeing once the view began showing the whole
+         * ring rather than a single line.
+         */
+        if (m_hpos[i] < 0) continue;
+
         QRectF numRect(x, 0, dx, 0.5 * headerHeight);
-        QString numText = m_hex ? QString("%1").arg((unsigned)i, 2, 16, QChar('0')).toUpper()
-                                 : QString::number(i);
+        QString numText = m_hex ? QString("%1").arg((unsigned)m_hpos[i], 2, 16, QChar('0')).toUpper()
+                                 : QString::number(m_hpos[i]);
         p->setPen(m_textColor);
         if (fm.horizontalAdvance(numText) <= numRect.width()) {
             p->drawText(numRect, Qt::AlignCenter, numText);
@@ -449,16 +510,16 @@ SiAmLogicView::drawSignal(QPainter *p, int channel, qreal w, qreal headerHeight,
     // is the same length, so this is usually set once for the whole row
     qreal appliedSize = 0.0;
 
-    for (int i = 0; i < segments; i++) {
+    for (int i = 0; i < m_columns; i++) {
 
         QRectF r(i * dx, rowY + margin, dx, cell.height());
 
         int prev = i > 0 ? m_data[channel][i - 1] : NoValue;
         int curr = m_data[channel][i];
-        int next = i + 1 < segments ? m_data[channel][i + 1] : NoValue;
+        int next = i + 1 < m_columns ? m_data[channel][i + 1] : NoValue;
 
         drawDataSegment(p, r, prev, curr, next,
-                         i > 0 && prev != NoValue, curr != NoValue, i + 1 < segments && next != NoValue,
+                         i > 0 && prev != NoValue, curr != NoValue, i + 1 < m_columns && next != NoValue,
                          ink);
 
         if (curr == NoValue) continue;

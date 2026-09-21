@@ -196,6 +196,27 @@ public:
      */
     const LogicAnalyzerInfo &getInfo() const;
     const LogicAnalyzerInfo &getCachedInfo() const;
+
+    /** @brief  Switches recording on independently of the probe setup.
+     *
+     *  The analyzer otherwise runs only while a probe is attached, which
+     *  leaves the ring empty for a caller that wants the bus rows alone.
+     *  Raise it while the data is being displayed and drop it after, since
+     *  recording costs a hook on every DMA cycle.
+     */
+    void setEnabled(bool value);
+
+    /** @brief  Returns how many recorded DMA cycles are available.
+     */
+    isize getTraceCount() const;
+
+    /** @brief  Returns one recorded DMA cycle, 0 being the oldest held.
+     */
+    LogicAnalyzerTrace getTrace(isize i) const;
+
+    /** @brief  Returns how many cycles the ring can hold.
+     */
+    isize getTraceCapacity() const;
 };
 
 class BlitterAPI : public API {

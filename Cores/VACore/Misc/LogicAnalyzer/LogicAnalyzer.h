@@ -42,12 +42,26 @@ class LogicAnalyzer final : public SubComponent {
     // The current configuration
     LogicAnalyzerConfig config = {};
 
+    /* Records even when no probe is attached.
+     *
+     * The bus rows -- owner, address, data -- are worth watching on their
+     * own, and Agnus produces them either way. But nothing reaches the ring
+     * unless the analyzer actually runs, and the probe configuration says
+     * nothing about whether anyone is looking. Every probe starts out NONE,
+     * so without this a viewer reading the ring would find it empty.
+     */
+    bool enabled = false;
+
 public:
 
     // Result of the latest inspection
     utl::Backed<LogicAnalyzerInfo> info;
 
 public:
+
+    // Whether recording runs regardless of the probe configuration
+    bool isEnabled() const { return enabled; }
+    void setEnabled(bool value);
 
     // How many scanlines the ring spans
     static constexpr isize traceLines = 3;

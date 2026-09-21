@@ -191,6 +191,8 @@ SiAmInspectorWindow {
 
                         SiAmLogicView {
 
+                            id: logicView
+
                             width: flick.contentWidth
                             height: flick.height
                             hex: root.ic.hex
@@ -198,6 +200,26 @@ SiAmInspectorWindow {
                             textColor: Palette.primary
                             hairlineColor: Palette.controlBorder
                             rowColors: root.rowColors
+
+                            /* The view paints every cell itself, so there is
+                             * no per-cell item for a ToolTip to hang off.
+                             * It tracks the pointer instead and publishes
+                             * the cycle underneath it; this binds to that.
+                             */
+                            SiToolTip {
+
+                                parent: logicView
+                                visible: logicView.hoverValid
+                                delay: 400
+                                timeout: -1
+
+                                x: logicView.hoverX + Style.mediumSpacing
+                                y: logicView.hoverY + Style.mediumSpacing
+
+                                text: qsTr("VPOS: %1\nHPOS: %2")
+                                        .arg(logicView.hoverVpos)
+                                        .arg(logicView.hoverHpos)
+                            }
                         }
                     }
                 }
@@ -215,8 +237,14 @@ SiAmInspectorWindow {
                 SiSliderControl {
 
                     Layout.fillWidth: true
+
+                    /* The view now shows the core's whole ring -- three
+                     * scanlines, ~684 DMA cycles -- rather than one line of
+                     * 228, so it takes about three times the width before a
+                     * column is wide enough to read anything in.
+                     */
                     from: 1
-                    to: 21
+                    to: 63
                     value: root.zoom
                     onMoved: (value) => root.zoom = value
                 }

@@ -43,9 +43,29 @@ class SiAmLogicView : public QQuickPaintedItem {
     Q_PROPERTY(bool symbolic READ symbolic WRITE setSymbolic NOTIFY optionsChanged)
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY optionsChanged)
     Q_PROPERTY(QVariantList rowColors READ rowColors WRITE setRowColors NOTIFY optionsChanged)
+
+    /* What the pointer is currently over, for the tooltip in QML.
+     *
+     * The view draws itself, so there is no child item per cell for a
+     * ToolTip to attach to. Instead the hovered cycle is published here and
+     * the panel binds a SiToolTip to it -- hoverValid gates the tooltip's
+     * visibility, hoverX/hoverY place it.
+     */
+    Q_PROPERTY(bool hoverValid READ hoverValid NOTIFY hoverChanged)
+    Q_PROPERTY(int hoverVpos READ hoverVpos NOTIFY hoverChanged)
+    Q_PROPERTY(int hoverHpos READ hoverHpos NOTIFY hoverChanged)
+    Q_PROPERTY(qreal hoverX READ hoverX NOTIFY hoverChanged)
+    Q_PROPERTY(qreal hoverY READ hoverY NOTIFY hoverChanged)
     Q_PROPERTY(QColor hairlineColor READ hairlineColor WRITE setHairlineColor NOTIFY optionsChanged)
 
-    static constexpr int segments = 228;
+    /* Columns the view can hold.
+     *
+     * One per recorded DMA cycle, so this has to match the core's ring --
+     * LogicAnalyzer::traceLines * HPOS_CNT. It cannot be taken from there
+     * directly (the app sees only the API, not the class), so the count is
+     * checked against getTraceCapacity() at sampling time and clamped.
+     */
+    static constexpr int segments = 3 * 228;
     static constexpr int numSignals = 6;
 
     // Bit width of each signal, for hex-digit-count/decimal-width purposes.
@@ -74,6 +94,24 @@ class SiAmLogicView : public QQuickPaintedItem {
      * matching Swift's `if let symbolic`.
      */
     std::array<QString, segments> m_symbols {};
+
+    /* Which DMA cycle each column holds.
+     *
+     * A column's index is its position in the ring, not its cycle number:
+     * the window spans several scanlines, so hpos restarts partway along and
+     * vpos changes with it. Both are carried per column -- hpos labels the
+     * column, vpos answers the tooltip. -1 marks a column with no entry.
+     */
+    std::array<int, segments> m_hpos {};
+    std::array<int, segments> m_vpos {};
+
+    // Columns actually holding a recorded cycle, left-aligned
+    int m_columns = 0;
+
+    // Column the pointer is over, or -1
+    int m_hoverColumn = -1;
+    qreal m_hoverX = 0;
+    qreal m_hoverY = 0;
 
     bool m_hex = true;
     bool m_symbolic = false;
@@ -138,9 +176,17 @@ class SiAmLogicView : public QQuickPaintedItem {
     QColor hairlineColor() const { return m_hairlineColor; }
     void setHairlineColor(const QColor &value);
 
+    bool hoverValid() const { return m_hoverColumn >= 0; }
+    int hoverVpos() const { return hoverValid() ? m_vpos[m_hoverColumn] : -1; }
+    int hoverHpos() const { return hoverValid() ? m_hpos[m_hoverColumn] : -1; }
+    qreal hoverX() const { return m_hoverX; }
+    qreal hoverY() const { return m_hoverY; }
+
   protected:
 
     void itemChange(ItemChange change, const ItemChangeData &value) override;
+    void hoverMoveEvent(QHoverEvent *event) override;
+    void hoverLeaveEvent(QHoverEvent *event) override;
 
   private:
 
@@ -186,4 +232,5 @@ class SiAmLogicView : public QQuickPaintedItem {
   signals:
 
     void optionsChanged();
+    void hoverChanged();
 };

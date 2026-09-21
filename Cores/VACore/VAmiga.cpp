@@ -103,6 +103,38 @@ AmigaAPI::dump(Category category, std::ostream &os) const
 // Components (Agnus)
 //
 
+void
+LogicAnalyzerAPI::setEnabled(bool value)
+{
+    VAMIGA_PUBLIC_SUSPEND
+    
+    logicAnalyzer->setEnabled(value);
+}
+
+isize
+LogicAnalyzerAPI::getTraceCount() const
+{
+    VAMIGA_PUBLIC
+    
+    return logicAnalyzer->getTraceCount();
+}
+
+LogicAnalyzerTrace
+LogicAnalyzerAPI::getTrace(isize i) const
+{
+    VAMIGA_PUBLIC
+    
+    return logicAnalyzer->getTrace(i);
+}
+
+isize
+LogicAnalyzerAPI::getTraceCapacity() const
+{
+    VAMIGA_PUBLIC
+    
+    return LogicAnalyzer::traceHistory;
+}
+
 const LogicAnalyzerConfig &
 LogicAnalyzerAPI::getConfig() const
 {

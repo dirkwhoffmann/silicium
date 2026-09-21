@@ -159,9 +159,19 @@ LogicAnalyzer::setOption(Opt option, i64 value)
 }
 
 void
+LogicAnalyzer::setEnabled(bool value)
+{
+    if (enabled == value) return;
+
+    enabled = value;
+    checkEnable();
+}
+
+void
 LogicAnalyzer::checkEnable()
 {
     bool enable =
+    enabled ||
     config.channel[0] != Probe::NONE ||
     config.channel[1] != Probe::NONE ||
     config.channel[2] != Probe::NONE ||
