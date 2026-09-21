@@ -14,6 +14,7 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QQuickWindow>
+#include <QFontDatabase>
 #include <QFontMetricsF>
 #include <climits>
 
@@ -83,7 +84,7 @@ SiAmLogicView::cacheData()
     if (hpos < 0) hpos = 0;
     if (hpos > segments) hpos = segments;
 
-    for (int i = 0; i < segments; i++) { m_labels[i].clear(); m_colors[i] = QColor(); }
+    for (int i = 0; i < segments; i++) { m_labels[i].clear(); m_colors[i] = QColor(); m_symbols[i].clear(); }
     for (auto &row : m_data) row.fill(NoValue);
 
     LogicAnalyzerInfo laInfo {};
@@ -161,6 +162,58 @@ SiAmLogicView::cacheData()
             m_data[c][i] = value >= 0 ? (int)value : NoValue;
         }
     }
+
+    /* Name what the address bus points at, for symbolic mode.
+     *
+     * Only the address bus: a data-bus word or a probe sample is a value,
+     * not a location, so there is nothing to look up. LogicView.swift makes
+     * the same restriction, with `channel == 0` at its own draw site.
+     */
+    if (m_symbolic) {
+
+        for (long i = 0; i < hpos; i++) {
+
+            if (m_data[0][i] != NoValue) m_symbols[i] = symbolize((unsigned)m_data[0][i]);
+        }
+    }
+}
+
+QString
+SiAmLogicView::symbolize(unsigned addr) const
+{
+    auto &core = SiAmController::core();
+
+    MemSrc src = MemSrc::NONE;
+    try { src = core.mem.debugger.getMemSrc(Accessor::CPU, addr); } catch (...) { return {}; }
+
+    switch (src) {
+
+        case MemSrc::NONE:              return "-";
+        case MemSrc::CHIP:
+        case MemSrc::CHIP_MIRROR:       return "CHIP";
+        case MemSrc::SLOW:
+        case MemSrc::SLOW_MIRROR:       return "SLOW";
+        case MemSrc::FAST:              return "FAST";
+        case MemSrc::CIA:
+        case MemSrc::CIA_MIRROR:        return "CIA";
+        case MemSrc::RTC:               return "RTC";
+        case MemSrc::AUTOCONF:          return "ACONF";
+        case MemSrc::ZOR:               return "ZORRO";
+        case MemSrc::ROM:
+        case MemSrc::ROM_MIRROR:        return "ROM";
+        case MemSrc::WOM:               return "WOM";
+        case MemSrc::EXT:               return "ROM";
+
+        case MemSrc::CUSTOM:
+        case MemSrc::CUSTOM_MIRROR:
+
+            // The one source that names the individual address rather than
+            // the region it falls in -- DMACON, BPLCON0, and so on
+            try { return QString::fromLatin1(core.mem.debugger.regName(addr)); } catch (...) { }
+            return {};
+    }
+
+    return {};
 }
 
 QString
@@ -178,6 +231,57 @@ SiAmLogicView::formatValue(int value, int bits) const
 }
 
 void
+SiAmLogicView::setupValueFont()
+{
+    /* Monospaced, like LogicView.swift's own `mono`. Not only for looks:
+     * every cell in a row is the same width, so a fixed advance makes the
+     * fitted size a function of the string's length alone -- see
+     * fittedFontSize(), and drawSignal()'s per-row table built on it.
+     */
+    m_valueFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    m_valueFont.setStyleHint(QFont::Monospace);
+    m_valueFont.setPointSizeF(refFontSize);
+
+    const QFontMetricsF fm(m_valueFont);
+
+    /* The widest glyph we might draw, not a representative one.
+     *
+     * On macOS the request above resolves to Menlo and every character
+     * below has the same advance, so the maximum simply is that advance.
+     * Elsewhere a fixed-pitch request can fall back to a proportional face
+     * -- measured, that makes sizing by length underestimate a string by up
+     * to a third, and the value spills out of its cell. Taking the widest
+     * glyph errs the other way: the text comes out slightly small, which is
+     * the harmless direction to be wrong in.
+     */
+    static const QString alphabet = QStringLiteral("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-");
+
+    m_charAdvance = 0.0;
+    for (const QChar c : alphabet) m_charAdvance = qMax(m_charAdvance, fm.horizontalAdvance(c));
+
+    m_lineHeight = fm.height();
+}
+
+qreal
+SiAmLogicView::fittedFontSize(int length, const QRectF &cell) const
+{
+    if (length <= 0 || m_charAdvance <= 0.0 || m_lineHeight <= 0.0) return 0.0;
+
+    const qreal usableWidth = cell.width() - 2 * textPadding;
+    if (usableWidth <= 0.0) return 0.0;
+
+    // Both measurements scale linearly with point size, so the size that
+    // just fits is a ratio against the reference rather than a search
+    const qreal byWidth = refFontSize * usableWidth / (length * m_charAdvance);
+    const qreal byHeight = refFontSize * cell.height() / m_lineHeight;
+
+    const qreal size = qMin(qMin(byWidth, byHeight), maxFontSize);
+
+    // Below the floor the cell is left empty rather than shrunk further
+    return size >= minFontSize ? size : 0.0;
+}
+
+void
 SiAmLogicView::paint(QPainter *painter)
 {
     qreal w = width();
@@ -185,6 +289,7 @@ SiAmLogicView::paint(QPainter *painter)
     if (w <= 0 || h <= 0) return;
 
     painter->setRenderHint(QPainter::Antialiasing, false);
+    setupValueFont();
 
     qreal headerHeight = h / (numSignals + 1);
     qreal dx = w / segments;
@@ -252,15 +357,31 @@ SiAmLogicView::drawLabels(QPainter *p, qreal w, qreal headerHeight, qreal dx) co
 void
 SiAmLogicView::drawSignal(QPainter *p, int channel, qreal w, qreal headerHeight, qreal dx, qreal dy) const
 {
-    int bits = bitWidth[channel];
-    qreal rowY = headerHeight + channel * dy;
-    qreal margin = qMax(0.0, (dy - 24.0) / 2.0);
+    Q_UNUSED(w)
 
-    QFontMetricsF fm(p->font());
+    const int bits = bitWidth[channel];
+    const qreal rowY = headerHeight + channel * dy;
+    const qreal margin = qMax(0.0, (dy - 24.0) / 2.0);
+    const QRectF cell(0, 0, dx, dy - 2 * margin);
+
+    /* Every cell in this row is the same size, and a string is sized from
+     * its length alone (see setupValueFont), so there are only as many
+     * answers as there are lengths. They are worked out once here and
+     * looked up per cell, which keeps the inner loop free of both the
+     * arithmetic and any font measurement.
+     *
+     * Index 0 stays 0: an empty string has nothing to draw.
+     */
+    std::array<qreal, maxLabelLength + 1> sizeFor {};
+    for (int n = 1; n <= maxLabelLength; n++) sizeFor[n] = fittedFontSize(n, cell);
+
+    // Only reapplied when it actually changes -- in hex every value in a row
+    // is the same length, so this is usually set once for the whole row
+    qreal appliedSize = 0.0;
 
     for (int i = 0; i < segments; i++) {
 
-        QRectF r(i * dx, rowY + margin, dx, dy - 2 * margin);
+        QRectF r(i * dx, rowY + margin, dx, cell.height());
 
         int prev = i > 0 ? m_data[channel][i - 1] : NoValue;
         int curr = m_data[channel][i];
@@ -269,26 +390,33 @@ SiAmLogicView::drawSignal(QPainter *p, int channel, qreal w, qreal headerHeight,
         drawDataSegment(p, r, prev, curr, next,
                          i > 0 && prev != NoValue, curr != NoValue, i + 1 < segments && next != NoValue);
 
-        if (curr != NoValue) {
+        if (curr == NoValue) continue;
 
-            QString label = formatValue(curr, bits);
-            p->setPen(m_textColor);
+        /* In symbolic mode the address bus names its target instead of
+         * showing the number. Only when the lookup produced something:
+         * an address in no mapped region keeps its hex value, which is
+         * Swift's `if let symbolic` fallthrough.
+         */
+        const bool named = channel == 0 && m_symbolic && !m_symbols[i].isEmpty();
+        const QString label = named ? m_symbols[i] : formatValue(curr, bits);
 
-            if (fm.horizontalAdvance(label) <= r.width()) {
+        const int length = int(qMin<qsizetype>(label.size(), maxLabelLength));
+        const qreal size = sizeFor[length];
 
-                p->drawText(r, Qt::AlignCenter, label);
+        // Too small to read at any size we are willing to use: leave it empty
+        if (size <= 0.0) continue;
 
-            } else {
+        if (size != appliedSize) {
 
-                p->save();
-                p->setClipRect(r);
-                p->drawText(QRectF(r.left(), r.top(), fm.horizontalAdvance(label) + 4, r.height()),
-                             Qt::AlignVCenter | Qt::AlignLeft, label);
-                p->restore();
-            }
+            QFont font = m_valueFont;
+            font.setPointSizeF(size);
+            p->setFont(font);
+            appliedSize = size;
         }
+
+        p->setPen(m_textColor);
+        p->drawText(r, Qt::AlignCenter, label);
     }
-    Q_UNUSED(w)
 }
 
 void

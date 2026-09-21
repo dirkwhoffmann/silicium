@@ -11,6 +11,7 @@
 
 #include <QQuickPaintedItem>
 #include <QColor>
+#include <QFont>
 #include <QString>
 #include <array>
 #include <vector>
@@ -61,8 +62,50 @@ class SiAmLogicView : public QQuickPaintedItem {
     std::array<QString, segments> m_labels {};
     std::array<QColor, segments> m_colors {};
 
+    /* What the address bus is pointing at, per cycle, for symbolic mode.
+     *
+     * Resolved in cacheData() rather than while drawing, which is where
+     * LogicView.swift does it: naming an address is a core lookup, and the
+     * paint path runs over every one of the 228 cycles. Sampling it with
+     * the rest of the frame's data keeps paint() free of core calls. Empty
+     * means "not resolved" -- the cell then falls back to its hex value,
+     * matching Swift's `if let symbolic`.
+     */
+    std::array<QString, segments> m_symbols {};
+
     bool m_hex = true;
     bool m_symbolic = false;
+
+    /* Sizing for the value text.
+     *
+     * The font shrinks until a value fits its cell, and the cell is left
+     * empty once even minFontSize would not -- below that the text is not
+     * readable anyway, and a row of clipped stubs reads as noise rather
+     * than as data. maxFontSize is vAmiga's own 10pt mono: a cell is at
+     * most 24px tall, so without a cap the height alone would allow ~20pt.
+     */
+    static constexpr qreal refFontSize = 100.0;
+    static constexpr qreal maxFontSize = 10.0;
+    static constexpr qreal minFontSize = 6.0;
+    static constexpr qreal textPadding = 1.0;
+
+    /* Longest value string the size table covers. A 24-bit hex value is 6
+     * digits and a decimal one 8; the register names symbolic mode draws
+     * are the long case. Anything longer is sized as if it were this long,
+     * so it overflows its cell slightly rather than being mis-sized.
+     */
+    static constexpr int maxLabelLength = 12;
+
+    /* The value font, measured once per paint() at refFontSize.
+     *
+     * It is monospaced, so a string's width is exactly its length times
+     * charAdvance. That turns "which size fits this cell" into a division
+     * instead of a QFontMetrics call -- worth having when the alternative
+     * is measuring 228 cells in each of 6 rows on every frame.
+     */
+    QFont m_valueFont;
+    qreal m_charAdvance = 0.0;
+    qreal m_lineHeight = 0.0;
     QColor m_textColor = QColor(Qt::black);
     QColor m_hairlineColor = QColor(Qt::gray);
 
@@ -98,6 +141,18 @@ class SiAmLogicView : public QQuickPaintedItem {
     // from the packed XRAY_DMA_COLORx option, decoded the same way
     // SiAmConfigController::dmaColor() does).
     void cacheData();
+
+    // Names what sits at the given address, for symbolic mode. Port of
+    // vAmiga's ProxyExtensions.swift symbolize(addr:).
+    QString symbolize(unsigned addr) const;
+
+    // Measures the value font, which paint() does once per frame
+    void setupValueFont();
+
+    /* Returns the point size at which a string of the given length fits a
+     * cell, or 0 when no size down to minFontSize does.
+     */
+    qreal fittedFontSize(int length, const QRectF &cell) const;
 
     void drawHairlines(QPainter *p, qreal w, qreal h, qreal dx) const;
     void drawLabels(QPainter *p, qreal w, qreal headerHeight, qreal dx) const;

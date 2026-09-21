@@ -501,6 +501,13 @@ public:
      */
     MemSrc getMemSrc(Accessor acc, u32 addr) const;
     
+    /** @brief  Returns the name of the custom chip register an address selects
+     *
+     *  The address is decoded whether or not it names a register, so this is
+     *  only meaningful for an address getMemSrc() reports as CUSTOM.
+     */
+    const char *regName(u32 addr) const;
+
     /** @brief  Reads a value from memory without causing side effects.
      */
     u8 spypeek8(Accessor acc, u32 addr) const;

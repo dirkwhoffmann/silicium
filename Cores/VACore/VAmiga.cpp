@@ -540,6 +540,14 @@ MemoryDebuggerAPI::getMemSrc(Accessor acc, u32 addr) const
     }
 }
 
+const char *
+MemoryDebuggerAPI::regName(u32 addr) const
+{
+    VAMIGA_PUBLIC
+    
+    return MemoryDebugger::regName(addr);
+}
+
 u8
 MemoryDebuggerAPI::spypeek8(Accessor acc, u32 addr) const
 {
