@@ -37,6 +37,48 @@ SiAmLogicView::setSymbolic(bool value) { if (m_symbolic != value) { m_symbolic =
 void
 SiAmLogicView::setTextColor(const QColor &value) { if (m_textColor != value) { m_textColor = value; emit optionsChanged(); update(); } }
 
+QVariantList
+SiAmLogicView::rowColors() const
+{
+    QVariantList list;
+    for (const auto &color : m_rowColors) list.append(color);
+    return list;
+}
+
+void
+SiAmLogicView::setRowColors(const QVariantList &value)
+{
+    std::array<QColor, numSignals> colors {};
+
+    // Extra entries are ignored and missing ones stay invalid, so a caller
+    // can hand over a short list and tint only the rows it cares about
+    for (int i = 0; i < numSignals && i < value.size(); i++) {
+        colors[i] = value[i].value<QColor>();
+    }
+
+    if (colors == m_rowColors) return;
+
+    m_rowColors = colors;
+    emit optionsChanged();
+    update();
+}
+
+QColor
+SiAmLogicView::inkFor(int channel) const
+{
+    const QColor &background = m_rowColors[channel];
+
+    if (!background.isValid()) return m_textColor;
+
+    /* lightnessF() rather than a fixed dark: a caller is free to tint a row
+     * with something dark, and the ink has to follow it rather than assume
+     * the pastels this was built for. The two shades are near-black and
+     * near-white instead of pure, which is what keeps the antialiased
+     * diagonals from looking harsh against the tint.
+     */
+    return background.lightnessF() > 0.5 ? QColor(0x1E, 0x1E, 0x1E) : QColor(0xEC, 0xEC, 0xEC);
+}
+
 void
 SiAmLogicView::setHairlineColor(const QColor &value) { if (m_hairlineColor != value) { m_hairlineColor = value; emit optionsChanged(); update(); } }
 
@@ -303,9 +345,28 @@ SiAmLogicView::paint(QPainter *painter)
     qreal dx = w / segments;
     qreal dy = (h - headerHeight) / numSignals;
 
+    // Under everything else: the tints are a backdrop, not an overlay
+    drawRowBackgrounds(painter, w, headerHeight, dy);
+
     drawHairlines(painter, w, h, dx);
     drawLabels(painter, w, headerHeight, dx);
     for (int c = 0; c < numSignals; c++) drawSignal(painter, c, w, headerHeight, dx, dy);
+}
+
+void
+SiAmLogicView::drawRowBackgrounds(QPainter *p, qreal w, qreal headerHeight, qreal dy) const
+{
+    for (int c = 0; c < numSignals; c++) {
+
+        const QColor &color = m_rowColors[c];
+        if (!color.isValid()) continue;
+
+        /* The full row height, not the inset the signal is drawn in: the
+         * bands are meant to read as one continuous stripe per row, the way
+         * a track lane does, so they meet with no gap between them.
+         */
+        p->fillRect(QRectF(0, headerHeight + c * dy, w, dy), color);
+    }
 }
 
 void
@@ -368,6 +429,7 @@ SiAmLogicView::drawSignal(QPainter *p, int channel, qreal w, qreal headerHeight,
     Q_UNUSED(w)
 
     const int bits = bitWidth[channel];
+    const QColor ink = inkFor(channel);
     const qreal rowY = headerHeight + channel * dy;
     const qreal margin = qMax(0.0, (dy - 24.0) / 2.0);
     const QRectF cell(0, 0, dx, dy - 2 * margin);
@@ -396,7 +458,8 @@ SiAmLogicView::drawSignal(QPainter *p, int channel, qreal w, qreal headerHeight,
         int next = i + 1 < segments ? m_data[channel][i + 1] : NoValue;
 
         drawDataSegment(p, r, prev, curr, next,
-                         i > 0 && prev != NoValue, curr != NoValue, i + 1 < segments && next != NoValue);
+                         i > 0 && prev != NoValue, curr != NoValue, i + 1 < segments && next != NoValue,
+                         ink);
 
         if (curr == NoValue) continue;
 
@@ -422,16 +485,16 @@ SiAmLogicView::drawSignal(QPainter *p, int channel, qreal w, qreal headerHeight,
             appliedSize = size;
         }
 
-        p->setPen(m_textColor);
+        p->setPen(ink);
         p->drawText(r, Qt::AlignCenter, label);
     }
 }
 
 void
 SiAmLogicView::drawDataSegment(QPainter *p, const QRectF &r, int prev, int curr, int next,
-                                bool prevValid, bool currValid, bool nextValid) const
+                                bool prevValid, bool currValid, bool nextValid, const QColor &ink) const
 {
-    QPen pen(m_textColor);
+    QPen pen(ink);
     pen.setWidthF(1.5);
     p->setPen(pen);
 

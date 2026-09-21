@@ -35,6 +35,27 @@ SiAmInspectorWindow {
 
     property real zoom: 1
 
+    /* Row tints for the timing diagram, in row order: Address Bus, Data
+     * Bus, then probe channels 0..3.
+     *
+     * The first four are the pastels of the reference layout, taken in the
+     * same top-to-bottom order it uses; the last two continue the set so
+     * that every row is covered. Shortening this list leaves the remaining
+     * rows untinted rather than breaking -- SiAmLogicView treats it as a
+     * preference per row, not a fixed-length table.
+     *
+     * The view picks the ink for a row's signal and values from the tint's
+     * own lightness, so a colour swapped here needs nothing else changed.
+     */
+    readonly property var rowColors: [
+        "#A9C9F5",  // Address Bus -- blue
+        "#C6B6F0",  // Data Bus    -- magenta
+        "#F2B4C6",  // Probe 0     -- light red
+        "#A6E3C1",  // Probe 1     -- green
+        "#F3D9A4",  // Probe 2     -- amber
+        "#A9DCE3"   // Probe 3     -- teal
+    ]
+
     // probeLabel() is a plain Q_INVOKABLE (LA_PROBE/LA_ADDR live on
     // SiAmConfigController, read fresh on every call), so it carries no
     // property-change notification of its own to bind against. This counter
@@ -176,6 +197,7 @@ SiAmInspectorWindow {
                             symbolic: symbolicBox.checked
                             textColor: Palette.primary
                             hairlineColor: Palette.controlBorder
+                            rowColors: root.rowColors
                         }
                     }
                 }

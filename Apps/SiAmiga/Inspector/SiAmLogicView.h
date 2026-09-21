@@ -13,6 +13,7 @@
 #include <QColor>
 #include <QFont>
 #include <QString>
+#include <QVariantList>
 #include <array>
 #include <vector>
 
@@ -41,6 +42,7 @@ class SiAmLogicView : public QQuickPaintedItem {
     Q_PROPERTY(bool hex READ hex WRITE setHex NOTIFY optionsChanged)
     Q_PROPERTY(bool symbolic READ symbolic WRITE setSymbolic NOTIFY optionsChanged)
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY optionsChanged)
+    Q_PROPERTY(QVariantList rowColors READ rowColors WRITE setRowColors NOTIFY optionsChanged)
     Q_PROPERTY(QColor hairlineColor READ hairlineColor WRITE setHairlineColor NOTIFY optionsChanged)
 
     static constexpr int segments = 228;
@@ -75,6 +77,14 @@ class SiAmLogicView : public QQuickPaintedItem {
 
     bool m_hex = true;
     bool m_symbolic = false;
+
+    /* Background tint per signal row, in row order -- Address Bus, Data
+     * Bus, then the four probe channels. An invalid entry, or a row past
+     * the end of the list, keeps the view's own background: the list is a
+     * preference, not a requirement, so a caller may colour some rows and
+     * leave the rest alone.
+     */
+    std::array<QColor, numSignals> m_rowColors {};
 
     /* Sizing for the value text.
      *
@@ -123,6 +133,8 @@ class SiAmLogicView : public QQuickPaintedItem {
     void setSymbolic(bool value);
     QColor textColor() const { return m_textColor; }
     void setTextColor(const QColor &value);
+    QVariantList rowColors() const;
+    void setRowColors(const QVariantList &value);
     QColor hairlineColor() const { return m_hairlineColor; }
     void setHairlineColor(const QColor &value);
 
@@ -142,6 +154,16 @@ class SiAmLogicView : public QQuickPaintedItem {
     // SiAmConfigController::dmaColor() does).
     void cacheData();
 
+    /* The colour to draw a row's signal and values in.
+     *
+     * Derived from that row's background rather than configured next to it:
+     * the two have to agree or the row is unreadable, and a second property
+     * would only be a way for them to disagree. A tinted row is light, so
+     * it takes dark ink; an untinted one keeps textColor, which is set from
+     * the palette and already contrasts with the view's own background.
+     */
+    QColor inkFor(int channel) const;
+
     // Names what sits at the given address, for symbolic mode. Port of
     // vAmiga's ProxyExtensions.swift symbolize(addr:).
     QString symbolize(unsigned addr) const;
@@ -156,8 +178,9 @@ class SiAmLogicView : public QQuickPaintedItem {
 
     void drawHairlines(QPainter *p, qreal w, qreal h, qreal dx) const;
     void drawLabels(QPainter *p, qreal w, qreal headerHeight, qreal dx) const;
+    void drawRowBackgrounds(QPainter *p, qreal w, qreal headerHeight, qreal dy) const;
     void drawSignal(QPainter *p, int channel, qreal w, qreal headerHeight, qreal dx, qreal dy) const;
-    void drawDataSegment(QPainter *p, const QRectF &r, int prev, int curr, int next, bool prevValid, bool currValid, bool nextValid) const;
+    void drawDataSegment(QPainter *p, const QRectF &r, int prev, int curr, int next, bool prevValid, bool currValid, bool nextValid, const QColor &ink) const;
     QString formatValue(int value, int bits) const;
 
   signals:
