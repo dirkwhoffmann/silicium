@@ -378,6 +378,19 @@ template <class T, isize capacity> struct RingBuffer
         w = next(w);
     }
 
+    /* Writes an element, dropping the oldest one when the buffer is full.
+     *
+     * The counterpart to write(), which asserts instead: use this where the
+     * buffer is a sliding window over a stream that outlives it, and write()
+     * where overrunning it would mean losing something the reader still owes
+     * an answer for. Identical to ResizableRingBuffer::put().
+     */
+    void put(T element)
+    {
+        elements[w] = element;
+        if ((w = next(w)) == r) r = next(r);
+    }
+
     void skip()
     {
         r = next(r);

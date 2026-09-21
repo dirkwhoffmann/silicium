@@ -16,6 +16,14 @@ namespace vamiga {
 LogicAnalyzer::LogicAnalyzer(Amiga& ref) : SubComponent(ref)
 {
     info.bind([this] { return cacheInfo(); } );
+
+    /* -1, not 0: a cycle nothing was probed on is not a cycle that read
+     * zero, and both the view and the ring rely on the distinction. The
+     * array was previously left uninitialised until the first probe change
+     * wiped it, so a channel read before then held whatever was on the
+     * stack.
+     */
+    for (isize i = 0; i < 4; i++) std::fill_n(record[i], HPOS_CNT, -1);
 };
 
 void
@@ -27,6 +35,9 @@ LogicAnalyzer::_pause()
 void
 LogicAnalyzer::_didReset(bool hard)
 {
+    // Recorded history describes a machine that no longer exists
+    traces.clear();
+
     checkEnable();
 }
 
@@ -130,8 +141,18 @@ LogicAnalyzer::setOption(Opt option, i64 value)
             fatalError;
     }
 
-    // Wipe out prerecorded data if necessary
-    if (invalidate) std::fill_n(record[c], HPOS_CNT, -1);
+    /* Wipe out prerecorded data if necessary.
+     *
+     * The ring goes with it. An entry is only meaningful next to the probe
+     * configuration it was taken under and does not carry that
+     * configuration, so keeping it across a probe change would leave a
+     * reader mixing old and new readings with no way to tell them apart.
+     */
+    if (invalidate) {
+
+        std::fill_n(record[c], HPOS_CNT, -1);
+        traces.clear();
+    }
  
     // Enable or disable the logic analyzer
     checkEnable();
@@ -179,6 +200,51 @@ LogicAnalyzer::recordSignals()
     
     recordCurrent(agnus.pos.h);
     recordDelayed(agnus.pos.hPrev());
+
+    recordTrace();
+}
+
+void
+LogicAnalyzer::recordTrace()
+{
+    /* The cycle that has just finished, not the one now starting.
+     *
+     * Nothing about the current cycle is settled yet: SLOT_REG is serviced
+     * ahead of the DMA slots, so no owner has claimed it, and getIPL()
+     * reports what the CPU saw a cycle ago. One cycle back, all of it is
+     * final -- and recordCurrent() wrote that cycle's probe values into
+     * record[] on the previous call, so they are still there to be copied.
+     */
+    const isize hpos = agnus.pos.hPrev();
+
+    /* Its line, which is not always the line the beam is on now.
+     *
+     * At h == 0 the beam has already left the line we are recording:
+     * Beam::eol() resets h and advances v from inside the very REG event
+     * that calls us, so pos.v names the new line while pos.hPrev() names the
+     * old one's last cycle. vPrev() resolves that, and falls back to
+     * vLatched at a frame boundary, where v has wrapped to 0 as well.
+     */
+    const isize vpos = agnus.pos.h ? agnus.pos.v : agnus.pos.vPrev();
+
+    if (hpos < 0 || hpos >= HPOS_CNT) return;
+
+    LogicAnalyzerTrace trace {};
+
+    trace.vpos = vpos;
+    trace.hpos = hpos;
+
+    trace.busOwner = agnus.busOwner[hpos];
+    trace.addrBus = agnus.busAddr[hpos];
+    trace.dataBus = agnus.busData[hpos];
+
+    for (isize i = 0; i < 4; i++) trace.channel[i] = record[i][hpos];
+
+    /* put(), not write(): the ring is a sliding window over a signal that
+     * runs for as long as the emulator does, so the oldest cycle is meant to
+     * fall off the end rather than to stop the newest being recorded.
+     */
+    traces.put(trace);
 }
 
 void
