@@ -74,7 +74,7 @@ SiAmInspectorWindow {
     // current selection (probeLabel()) and accepts input the two ways
     // BusPanel.swift's NSComboButton did -- picking a preset from the
     // dropdown, or typing a custom hex address directly into the field.
-    component ProbeSelector: SiComboInputControl {
+    component ProbeSelector : SiComboInputControl {
 
         id: sel
 

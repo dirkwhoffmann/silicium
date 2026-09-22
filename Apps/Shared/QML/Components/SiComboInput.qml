@@ -156,8 +156,24 @@ ComboBox {
 
         y: root.height + 2
         width: root.width
-        implicitHeight: contentItem.implicitHeight + 10
         padding: 4
+
+        /* Keeps a long list inside the window instead of letting its last
+         * entries fall off the bottom edge.
+         *
+         * Two halves, and both are needed. Non-negative margins are what
+         * make Popup push itself back within the window's bounds, so the
+         * dropdown slides up rather than overflowing. That alone would only
+         * move the overflow to the top edge, so the height is capped to what
+         * the window can hold as well -- past that the ListView below scrolls
+         * (it already clips and carries a scroll indicator).
+         *
+         * Long enough to matter with the Logic Analyzer's probe selectors,
+         * whose preset list runs to about twenty entries.
+         */
+        margins: 8
+        implicitHeight: Math.min(contentItem.implicitHeight + 10,
+                                 root.Window.height - 2 * margins)
 
         contentItem: ListView {
 

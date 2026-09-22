@@ -138,8 +138,19 @@ LogicAnalyzer::setOption(Opt option, i64 value)
             fatalError;
     }
 
-    // Wipe out prerecorded data if necessary
-    if (invalidate) trace.clear();
+    /* Wipe out prerecorded data if necessary.
+     *
+     * Only the affected channel's samples: the trace also carries the bus
+     * activity and the three other probes, none of which this option touched,
+     * and clearing the whole buffer would throw that recorded history away
+     * every time a probe is re-pointed.
+     */
+    if (invalidate) {
+
+        for (auto i = trace.begin(); i != trace.end(); i = trace.next(i)) {
+            trace.elements[i].values[c] = -1;
+        }
+    }
 
     // Enable or disable the logic analyzer
     checkEnable();
