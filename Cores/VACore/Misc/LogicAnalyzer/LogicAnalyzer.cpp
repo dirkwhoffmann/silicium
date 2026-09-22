@@ -112,7 +112,16 @@ LogicAnalyzer::setOption(Opt option, i64 value)
     switch (option) {
             
         case Opt::LA_CONNECT:
-            
+
+            /* Drop the whole trace when the analyzer is switched off.
+             *
+             * Recording stops here, so whatever the buffer still holds is
+             * frozen history. Leaving it in place would have the panel keep
+             * displaying it as though it were live, and it would sit in front
+             * of the first samples taken after reconnecting.
+             */
+            if (!value) trace.clear();
+
             config.connect = (bool)value;
             break;
             
