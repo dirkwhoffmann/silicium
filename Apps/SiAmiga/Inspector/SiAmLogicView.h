@@ -47,6 +47,7 @@ class SiAmLogicView : public QQuickPaintedItem {
     Q_OBJECT
 
     Q_PROPERTY(bool hex READ hex WRITE setHex NOTIFY optionsChanged)
+    Q_PROPERTY(bool padded READ padded WRITE setPadded NOTIFY optionsChanged)
     Q_PROPERTY(bool symbolic READ symbolic WRITE setSymbolic NOTIFY optionsChanged)
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY optionsChanged)
     Q_PROPERTY(QVariantList rowColors READ rowColors WRITE setRowColors NOTIFY optionsChanged)
@@ -90,6 +91,7 @@ class SiAmLogicView : public QQuickPaintedItem {
     std::array<QString, segments> m_symbols {};
 
     bool m_hex = true;
+    bool m_padded = false;
     bool m_symbolic = false;
 
     /* Background tint per signal row, in row order -- Address Bus, Data
@@ -141,14 +143,21 @@ class SiAmLogicView : public QQuickPaintedItem {
 
     void paint(QPainter *painter) override;
 
-    /* Describes the sample drawn at the given x coordinate, for the hover
-     * tooltip: { frame, vpos, hpos }, or an empty map where the column
-     * carries no sample or x falls outside the view.
+    /* Describes the sample drawn at the given point, for the hover tooltip:
+     * { frame, vpos, hpos }, or an empty map where the column carries no
+     * sample or x falls outside the view.
+     *
+     * When y falls on a signal row that has a value there, the map also
+     * carries 'value' -- that one cell, already formatted per the panel's
+     * hex/padded setting. Rows without a value at this column, and the
+     * header row, leave the key out rather than reporting a placeholder.
      */
-    Q_INVOKABLE QVariantMap sampleAt(qreal x) const;
+    Q_INVOKABLE QVariantMap sampleAt(qreal x, qreal y) const;
 
     bool hex() const { return m_hex; }
     void setHex(bool value);
+    bool padded() const { return m_padded; }
+    void setPadded(bool value);
     bool symbolic() const { return m_symbolic; }
     void setSymbolic(bool value);
     QColor textColor() const { return m_textColor; }

@@ -17,6 +17,7 @@
 #include <QFontDatabase>
 #include <QFontMetricsF>
 #include <climits>
+#include <cmath>
 
 using namespace vamiga;
 
@@ -30,23 +31,40 @@ SiAmLogicView::SiAmLogicView(QQuickItem *parent)
 }
 
 QVariantMap
-SiAmLogicView::sampleAt(qreal x) const
+SiAmLogicView::sampleAt(qreal x, qreal y) const
 {
     const qreal w = width();
-    if (w <= 0 || x < 0 || x >= w) return {};
+    const qreal h = height();
+    if (w <= 0 || h <= 0 || x < 0 || x >= w) return {};
 
     const int i = (int)(x / (w / segments));
     if (i < 0 || i >= segments || m_positions[i] == NoValue) return {};
 
-    return QVariantMap {
+    QVariantMap result {
         { "frame", QVariant::fromValue(m_frames[i]) },
         { "vpos", m_lines[i] },
         { "hpos", m_positions[i] }
     };
+
+    // The one cell under the pointer, laid out exactly as paint() does
+    const qreal headerHeight = h / (numSignals + 1);
+    const qreal dy = (h - headerHeight) / numSignals;
+    const int channel = (int)((y - headerHeight) / dy);
+
+    if (y >= headerHeight && channel >= 0 && channel < numSignals) {
+
+        const int value = m_data[channel][i];
+        if (value != NoValue) result.insert("value", formatValue(value, bitWidth[channel]));
+    }
+
+    return result;
 }
 
 void
 SiAmLogicView::setHex(bool value) { if (m_hex != value) { m_hex = value; emit optionsChanged(); update(); } }
+
+void
+SiAmLogicView::setPadded(bool value) { if (m_padded != value) { m_padded = value; emit optionsChanged(); update(); } }
 
 void
 SiAmLogicView::setSymbolic(bool value) { if (m_symbolic != value) { m_symbolic = value; emit optionsChanged(); update(); } }
@@ -282,15 +300,26 @@ SiAmLogicView::symbolize(unsigned addr) const
 QString
 SiAmLogicView::formatValue(int value, int bits) const
 {
-    if (m_hex) {
+    QString s = QString::number((unsigned)value, m_hex ? 16 : 10);
+    if (m_hex) s = s.toUpper();
 
-        int digits = (bits + 3) / 4;
-        return QString("%1").arg((unsigned)value, digits, 16, QChar('0')).toUpper();
+    /* Zero padding follows the panel's own setting rather than the base.
+     *
+     * Hex used to be padded unconditionally here, which made the grid
+     * disagree with the format the toolbar was showing. The width is the
+     * natural one for a 'bits'-wide value in this base -- the same
+     * derivation SiNumberView.qml's padWidth uses, so a value reads the
+     * same here as in every other panel.
+     */
+    if (m_padded) {
 
-    } else {
+        const int width = m_hex ? (bits + 3) / 4
+                                : int(std::floor(bits * std::log10(2.0))) + 1;
 
-        return QString::number(value);
+        while (s.length() < width) s.prepend(QChar('0'));
     }
+
+    return s;
 }
 
 void
@@ -423,10 +452,10 @@ SiAmLogicView::drawLabels(QPainter *p, qreal w, qreal headerHeight, qreal dx) co
         // Blank where the trace does not reach back this far.
         if (m_positions[i] != NoValue) {
 
-            unsigned hpos = (unsigned)m_positions[i];
             QRectF numRect(x, 0, dx, 0.5 * headerHeight);
-            QString numText = m_hex ? QString("%1").arg(hpos, 2, 16, QChar('0')).toUpper()
-                                    : QString::number(hpos);
+            // 8 bits: the natural width of an hpos, so padding gives 2 hex
+            // digits or 3 decimal ones
+            QString numText = formatValue(m_positions[i], 8);
             p->setPen(m_textColor);
             if (fm.horizontalAdvance(numText) <= numRect.width()) {
                 p->drawText(numRect, Qt::AlignCenter, numText);

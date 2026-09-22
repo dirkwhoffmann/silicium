@@ -219,6 +219,7 @@ SiAmInspectorWindow {
                             width: flick.contentWidth
                             height: flick.height
                             hex: root.ic.hex
+                            padded: root.ic.padded
                             symbolic: symbolicBox.checked
                             textColor: Palette.primary
                             hairlineColor: Palette.controlBorder
@@ -265,7 +266,7 @@ SiAmInspectorWindow {
 
                                 id: hoverHandler
 
-                                onPointChanged: logicView.hovered = logicView.sampleAt(point.position.x)
+                                onPointChanged: logicView.hovered = logicView.sampleAt(point.position.x, point.position.y)
 
                                 onHoveredChanged: {
 
@@ -312,6 +313,22 @@ SiAmInspectorWindow {
 
                                     TipKey { text: qsTr("hpos:") }
                                     TipValue { text: logicView.hovered.hpos !== undefined ? logicView.hovered.hpos : "" }
+
+                                    /* Only while the pointer is on a signal
+                                     * row that has a value there -- both
+                                     * cells drop out together, and GridLayout
+                                     * closes the row rather than leaving a
+                                     * gap.
+                                     */
+                                    TipKey {
+                                        text: qsTr("Value:")
+                                        visible: logicView.hovered.value !== undefined
+                                    }
+
+                                    TipValue {
+                                        text: logicView.hovered.value !== undefined ? logicView.hovered.value : ""
+                                        visible: logicView.hovered.value !== undefined
+                                    }
                                 }
                             }
                         }
