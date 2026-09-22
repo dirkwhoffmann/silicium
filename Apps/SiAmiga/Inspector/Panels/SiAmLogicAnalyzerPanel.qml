@@ -35,7 +35,7 @@ SiAmInspectorWindow {
     readonly property var ic: controller.inspectorController
     readonly property var cc: controller.configController
 
-    property real zoom: 1
+    property real zoom: 16
 
     /* Row tints for the timing diagram, in row order: Address Bus, Data
      * Bus, then probe channels 0..3.
@@ -151,26 +151,16 @@ SiAmInspectorWindow {
             Layout.fillHeight: true
             spacing: Style.smallSpacing
 
+            //
+            // Control elements
+            //
+
             RowLayout {
 
                 Layout.fillWidth: true
-                spacing: Style.mediumSpacing
-
-                /* Indented to start where the timing diagram does, so this
-                 * row spans the grid rather than the whole panel.
-                 *
-                 * Taken from leftColumn's live width plus the grid row's own
-                 * spacing rather than from the literal 220 that column is
-                 * clamped to: the clamp is a maximum, and the column is free
-                 * to come out narrower in a cramped window, which would leave
-                 * this row misaligned if the number were repeated here.
-                 */
                 Layout.leftMargin: leftColumn.width + Style.smallSpacing
+                spacing: Style.smallSpacing
 
-                // Gates the core's recording (Opt::LA_CONNECT). With it off
-                // the ring buffer stops filling, so the grid freezes on
-                // whatever it last held rather than clearing -- same as
-                // BusPanel.swift's own Enable switch.
                 SiCheckBoxControl {
 
                     checked: root.cc.LA_CONNECT
@@ -178,19 +168,44 @@ SiAmInspectorWindow {
                     r: qsTr("Connect")
                 }
 
-                SiCheckBoxControl { id: symbolicBox; r: qsTr("Symbolic") }
+                HSpacer { size: Style.largeSpacing }
 
-                SiLabel { text: qsTr("Zoom") }
+                SiSymbol {
+                    size: Size.small
+                    phosphor: "minus-symbol"
+                    // phosphor: "minus-circle"
+                }
 
                 SiSliderControl {
 
+                    // l: qsTr("Zoom")
+                    // l: "-"
+                    // r: "+"
                     Layout.fillWidth: true
                     from: 1
                     to: 32
                     value: root.zoom
                     onMoved: (value) => root.zoom = value
                 }
+
+                SiSymbol {
+                    size: Size.small
+                    phosphor: "plus-symbol"
+                    // phosphor: "plus-circle"
+                }
+
+                HSpacer { size: Style.largeSpacing }
+
+                SiCheckBoxControl {
+
+                    id: symbolicBox
+                    r: qsTr("Symbolic")
+                }
             }
+
+            //
+            // Traces section
+            //
 
             RowLayout {
 
