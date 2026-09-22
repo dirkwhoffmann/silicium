@@ -14,6 +14,7 @@
 #include <QFont>
 #include <QString>
 #include <QVariantList>
+#include <QVariantMap>
 #include <array>
 #include <vector>
 
@@ -64,9 +65,12 @@ class SiAmLogicView : public QQuickPaintedItem {
     // enough to fill, or a probe channel that reported no sample.
     std::array<std::array<int, segments>, numSignals> m_data {};
 
-    // The hpos each column's sample was recorded at, for the header row.
-    // INT_MIN marks a column with no sample behind it.
+    // Where each column's sample was recorded, for the header row (hpos)
+    // and the hover tooltip (all three). INT_MIN in m_positions marks a
+    // column with no sample behind it, and the other two are then unset.
     std::array<int, segments> m_positions {};
+    std::array<int, segments> m_lines {};
+    std::array<qint64, segments> m_frames {};
 
     // Owning bus-cycle label/color for each column (only the first two
     // signal rows -- Address/Data Bus -- key off these; the empty string /
@@ -136,6 +140,12 @@ class SiAmLogicView : public QQuickPaintedItem {
     explicit SiAmLogicView(QQuickItem *parent = nullptr);
 
     void paint(QPainter *painter) override;
+
+    /* Describes the sample drawn at the given x coordinate, for the hover
+     * tooltip: { frame, vpos, hpos }, or an empty map where the column
+     * carries no sample or x falls outside the view.
+     */
+    Q_INVOKABLE QVariantMap sampleAt(qreal x) const;
 
     bool hex() const { return m_hex; }
     void setHex(bool value);

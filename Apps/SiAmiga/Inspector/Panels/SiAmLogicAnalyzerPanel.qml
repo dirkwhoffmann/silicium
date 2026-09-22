@@ -106,6 +106,27 @@ SiAmInspectorWindow {
         }
     }
 
+    /* The two cell kinds of the hover tooltip's grid.
+     *
+     * The colon belongs to the key, and the keys are right-aligned while the
+     * values are left-aligned, so the three colons line up in one column with
+     * the block centred on them -- which is the whole point of laying this
+     * out as a grid rather than as one newline-separated string.
+     */
+    component TipKey: SiText {
+
+        font.pixelSize: Style.small
+        horizontalAlignment: Text.AlignRight
+        Layout.alignment: Qt.AlignRight
+    }
+
+    component TipValue: SiText {
+
+        font.pixelSize: Style.small
+        leftPadding: 4
+        Layout.alignment: Qt.AlignLeft
+    }
+
     // Plain row label for the left column, matching SiAmLogicView's own
     // Address Bus / Data Bus rows (which carry no selector of their own).
     component RowLabel: SiLabel {
@@ -193,6 +214,8 @@ SiAmInspectorWindow {
 
                         SiAmLogicView {
 
+                            id: logicView
+
                             width: flick.contentWidth
                             height: flick.height
                             hex: root.ic.hex
@@ -200,6 +223,97 @@ SiAmInspectorWindow {
                             textColor: Palette.primary
                             hairlineColor: Palette.controlBorder
                             rowColors: root.rowColors
+
+                            /* Where the column under the pointer was
+                             * recorded: { frame, vpos, hpos }, or empty for
+                             * a column the trace does not reach back to.
+                             *
+                             * Re-read on every pointer move rather than
+                             * latched when a column is entered: the grid
+                             * re-samples itself once per rendered frame, so
+                             * the sample a given column shows is not the one
+                             * it showed a moment ago.
+                             */
+                            property var hovered: ({})
+
+                            /* The dwell before the tooltip appears.
+                             *
+                             * ToolTip has a `delay` of its own, but it does
+                             * nothing when `visible` is driven by a binding
+                             * rather than by ToolTip.show(): the delayed open
+                             * re-enters setVisible(), which starts the delay
+                             * over, so the popup never actually opens. The
+                             * wait is therefore kept here and the ToolTip is
+                             * told to show immediately (delay: 0).
+                             *
+                             * Only the first appearance waits. Once the
+                             * tooltip is up it stays up and tracks the
+                             * pointer, so sweeping along the grid reads
+                             * continuously instead of re-arming per column.
+                             */
+                            Timer {
+
+                                id: dwell
+
+                                property bool elapsed: false
+
+                                interval: 500
+                                onTriggered: elapsed = true
+                            }
+
+                            HoverHandler {
+
+                                id: hoverHandler
+
+                                onPointChanged: logicView.hovered = logicView.sampleAt(point.position.x)
+
+                                onHoveredChanged: {
+
+                                    if (hovered) {
+
+                                        dwell.elapsed = false
+                                        dwell.restart()
+
+                                    } else {
+
+                                        dwell.stop()
+                                        dwell.elapsed = false
+                                        logicView.hovered = ({})
+                                    }
+                                }
+                            }
+
+                            SiToolTip {
+
+                                id: sampleTip
+
+                                // No timeout: this is a readout to compare
+                                // columns against, not a hint that has been
+                                // read once and is then in the way
+                                timeout: -1
+                                delay: 0
+
+                                visible: dwell.elapsed && hoverHandler.hovered
+                                         && logicView.hovered.hpos !== undefined
+                                x: hoverHandler.point.position.x + 16
+                                y: hoverHandler.point.position.y + 16
+
+                                contentItem: GridLayout {
+
+                                    columns: 2
+                                    columnSpacing: 0
+                                    rowSpacing: 1
+
+                                    TipKey { text: qsTr("Frame:") }
+                                    TipValue { text: logicView.hovered.frame !== undefined ? logicView.hovered.frame : "" }
+
+                                    TipKey { text: qsTr("vpos:") }
+                                    TipValue { text: logicView.hovered.vpos !== undefined ? logicView.hovered.vpos : "" }
+
+                                    TipKey { text: qsTr("hpos:") }
+                                    TipValue { text: logicView.hovered.hpos !== undefined ? logicView.hovered.hpos : "" }
+                                }
+                            }
                         }
                     }
                 }

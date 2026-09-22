@@ -29,6 +29,22 @@ SiAmLogicView::SiAmLogicView(QQuickItem *parent)
     m_positions.fill(NoValue);
 }
 
+QVariantMap
+SiAmLogicView::sampleAt(qreal x) const
+{
+    const qreal w = width();
+    if (w <= 0 || x < 0 || x >= w) return {};
+
+    const int i = (int)(x / (w / segments));
+    if (i < 0 || i >= segments || m_positions[i] == NoValue) return {};
+
+    return QVariantMap {
+        { "frame", QVariant::fromValue(m_frames[i]) },
+        { "vpos", m_lines[i] },
+        { "hpos", m_positions[i] }
+    };
+}
+
 void
 SiAmLogicView::setHex(bool value) { if (m_hex != value) { m_hex = value; emit optionsChanged(); update(); } }
 
@@ -160,6 +176,8 @@ SiAmLogicView::cacheData()
         const int i = segments - 1 - (int)nr;
 
         m_positions[i] = (int)sample.hpos;
+        m_lines[i] = (int)sample.vpos;
+        m_frames[i] = (qint64)sample.frame;
 
         // The last four rows show the probed signals
         for (int c = 2; c < numSignals; c++) {
