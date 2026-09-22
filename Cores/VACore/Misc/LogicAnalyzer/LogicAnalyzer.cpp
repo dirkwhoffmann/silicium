@@ -194,6 +194,7 @@ LogicAnalyzer::recordSignals()
     // Open a new sample for the current DMA cycle
     trace.put(LogicAnalyzerSample {
 
+        .frame = agnus.pos.frame,
         .vpos = agnus.pos.v,
         .hpos = agnus.pos.h,
         .values = { -1, -1, -1, -1 }

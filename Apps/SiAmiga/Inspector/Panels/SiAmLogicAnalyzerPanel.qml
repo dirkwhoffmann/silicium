@@ -229,7 +229,7 @@ SiAmInspectorWindow {
 
                     Layout.fillWidth: true
                     from: 1
-                    to: 21
+                    to: 32
                     value: root.zoom
                     onMoved: (value) => root.zoom = value
                 }
