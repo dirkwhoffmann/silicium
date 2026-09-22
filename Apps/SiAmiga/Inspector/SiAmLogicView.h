@@ -19,8 +19,14 @@
 
 //
 // Port of vAmiga's own GUI/Inspector/LogicView.swift: the Logic Analyzer's
-// DMA-cycle timing-diagram grid (228 cycles wide, six signal rows -- Address
+// DMA-cycle timing-diagram grid (256 samples wide, six signal rows -- Address
 // Bus, Data Bus, and the four user-selectable probe channels).
+//
+// A column is one entry of the core's logic-analyzer ring buffer, not a fixed
+// horizontal position: the view shows the most recent 'segments' samples, the
+// newest in the rightmost column, and a window that long spans more than one
+// rasterline. Each column therefore carries the hpos it was recorded at
+// (m_positions), which is what the header row prints.
 //
 // Shaped like SiC64DmaView (self-drives off its window's frameSwapped signal
 // while on screen, so it's naturally idle whenever the Bus inspector is
@@ -45,22 +51,26 @@ class SiAmLogicView : public QQuickPaintedItem {
     Q_PROPERTY(QVariantList rowColors READ rowColors WRITE setRowColors NOTIFY optionsChanged)
     Q_PROPERTY(QColor hairlineColor READ hairlineColor WRITE setHairlineColor NOTIFY optionsChanged)
 
-    static constexpr int segments = 228;
+    static constexpr int segments = 256;
     static constexpr int numSignals = 6;
 
     // Bit width of each signal, for hex-digit-count/decimal-width purposes.
     // [ addr bus, data bus, probe0, probe1, probe2, probe3 ]
     static constexpr int bitWidth[numSignals] = { 24, 16, 16, 16, 16, 16 };
 
-    // Recorded data for the current scanline, re-sampled once per rendered
-    // frame by cacheData(). INT_MIN marks "no value" (Swift's data[c][i] ==
-    // nil), e.g. a cycle not yet reached this line, or a probe channel that
-    // reported no sample.
+    // Recorded data for the displayed sample window, re-sampled once per
+    // rendered frame by cacheData(). INT_MIN marks "no value" (Swift's
+    // data[c][i] == nil), e.g. a column the trace does not reach back far
+    // enough to fill, or a probe channel that reported no sample.
     std::array<std::array<int, segments>, numSignals> m_data {};
 
-    // Owning bus-cycle label/color for each of the 228 cycles (only the
-    // first two signal rows -- Address/Data Bus -- key off these; the empty
-    // string / invalid QColor mean "unowned", matching Swift's nil).
+    // The hpos each column's sample was recorded at, for the header row.
+    // INT_MIN marks a column with no sample behind it.
+    std::array<int, segments> m_positions {};
+
+    // Owning bus-cycle label/color for each column (only the first two
+    // signal rows -- Address/Data Bus -- key off these; the empty string /
+    // invalid QColor mean "unowned", matching Swift's nil).
     std::array<QString, segments> m_labels {};
     std::array<QColor, segments> m_colors {};
 
@@ -68,7 +78,7 @@ class SiAmLogicView : public QQuickPaintedItem {
      *
      * Resolved in cacheData() rather than while drawing, which is where
      * LogicView.swift does it: naming an address is a core lookup, and the
-     * paint path runs over every one of the 228 cycles. Sampling it with
+     * paint path runs over every column. Sampling it with
      * the rest of the frame's data keeps paint() free of core calls. Empty
      * means "not resolved" -- the cell then falls back to its hex value,
      * matching Swift's `if let symbolic`.
@@ -111,7 +121,7 @@ class SiAmLogicView : public QQuickPaintedItem {
      * It is monospaced, so a string's width is exactly its length times
      * charAdvance. That turns "which size fits this cell" into a division
      * instead of a QFontMetrics call -- worth having when the alternative
-     * is measuring 228 cells in each of 6 rows on every frame.
+     * is measuring every cell in each of 6 rows on every frame.
      */
     QFont m_valueFont;
     qreal m_charAdvance = 0.0;
@@ -147,11 +157,12 @@ class SiAmLogicView : public QQuickPaintedItem {
     void connectToWindow(class QQuickWindow *win);
     void disconnectFromWindow();
 
-    // Re-samples the current scanline's bus-owner/address/data/probe data
-    // from the core (see LogicView.cacheData()'s owner->label/color switch,
-    // reproduced here) and the DMA Debugger's channel colors (read straight
-    // from the packed XRAY_DMA_COLORx option, decoded the same way
-    // SiAmConfigController::dmaColor() does).
+    // Re-samples the most recent 'segments' entries of the core's logic
+    // analyzer ring buffer -- bus owner, address/data bus and the four probe
+    // values all come out of the sample itself (see LogicView.cacheData()'s
+    // owner->label/color switch, reproduced here) -- plus the DMA Debugger's
+    // channel colors (read straight from the packed XRAY_DMA_COLORx option,
+    // decoded the same way SiAmConfigController::dmaColor() does).
     void cacheData();
 
     /* The colour to draw a row's signal and values in.

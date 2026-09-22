@@ -108,6 +108,7 @@ enum class Opt : long
     XRAY_COLOR9,
 
     // Logic analyzer
+    LA_CONNECT,             ///< Enable switch
     LA_PROBE0,              ///< Probe on channel 0
     LA_PROBE1,              ///< Probe on channel 1
     LA_PROBE2,              ///< Probe on channel 2
@@ -319,6 +320,7 @@ struct OptEnum : Reflectable<OptEnum, Opt>
             case Opt::XRAY_COLOR8:          return "XRAY.COLOR8";
             case Opt::XRAY_COLOR9:          return "XRAY.COLOR9";
                 
+            case Opt::LA_CONNECT:                return "LA.CONNECT";
             case Opt::LA_PROBE0:                 return "LA.PROBE0";
             case Opt::LA_PROBE1:                 return "LA.PROBE1";
             case Opt::LA_PROBE2:                 return "LA.PROBE2";
@@ -509,6 +511,7 @@ struct OptEnum : Reflectable<OptEnum, Opt>
             case Opt::XRAY_COLOR8:          return "Playfield 1 color";
             case Opt::XRAY_COLOR9:          return "Playfield 2 color";
 
+            case Opt::LA_CONNECT:                return "On / Off switch";
             case Opt::LA_PROBE0:                 return "Probe on channel 0";
             case Opt::LA_PROBE1:                 return "Probe on channel 1";
             case Opt::LA_PROBE2:                 return "Probe on channel 2";

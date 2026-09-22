@@ -856,6 +856,7 @@ class SiAmConfigController : public Controller {
     // Logic Analyzer
     //
 
+    Q_PROPERTY(bool LA_CONNECT READ laConnect WRITE setLaConnect NOTIFY configChanged)
     Q_PROPERTY(int LA_PROBE0 READ laProbe0 WRITE setLaProbe0 NOTIFY configChanged)
     Q_PROPERTY(int LA_PROBE1 READ laProbe1 WRITE setLaProbe1 NOTIFY configChanged)
     Q_PROPERTY(int LA_PROBE2 READ laProbe2 WRITE setLaProbe2 NOTIFY configChanged)
@@ -865,6 +866,8 @@ class SiAmConfigController : public Controller {
     Q_PROPERTY(int LA_ADDR2 READ laAddr2 WRITE setLaAddr2 NOTIFY configChanged)
     Q_PROPERTY(int LA_ADDR3 READ laAddr3 WRITE setLaAddr3 NOTIFY configChanged)
 
+    bool laConnect() const { return (bool)get(vamiga::Opt::LA_CONNECT); }
+    void setLaConnect(bool value) { set(vamiga::Opt::LA_CONNECT, (i64)value); }
     int laProbe0() const { return (int)get(vamiga::Opt::LA_PROBE0); }
     void setLaProbe0(int value) { set(vamiga::Opt::LA_PROBE0, (i64)value); }
     int laProbe1() const { return (int)get(vamiga::Opt::LA_PROBE1); }

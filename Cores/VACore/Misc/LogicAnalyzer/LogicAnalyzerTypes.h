@@ -49,8 +49,27 @@ struct ProbeEnum : Reflectable<ProbeEnum, Probe>
 // Structures
 //
 
+typedef struct {
+    
+    // Position
+    isize vpos;
+    isize hpos;
+
+    // Bus usage
+    BusOwner owner;
+    u16 dataBus;
+    u32 addrBus;
+    
+    // Probe values
+    isize values[4];
+    
+} LogicAnalyzerSample;
+
 typedef struct
 {
+    // Enable switch
+    bool connect;
+    
     // The logic analyzer channels
     Probe channel[4];
     
@@ -65,7 +84,6 @@ typedef struct
     const BusOwner *busOwner;
     const u32 *addrBus;
     const u16 *dataBus;
-    const isize *channel[4];
 }
 LogicAnalyzerInfo;
 

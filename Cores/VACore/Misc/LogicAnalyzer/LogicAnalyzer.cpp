@@ -21,12 +21,14 @@ LogicAnalyzer::LogicAnalyzer(Amiga& ref) : SubComponent(ref)
 void
 LogicAnalyzer::_pause()
 {
-    recordDelayed(agnus.pos.h);
+    // Complement the missing signal values of the most recent sample
+    if (!trace.isEmpty()) recordDelayed(*trace.latestAddr());
 }
 
 void
 LogicAnalyzer::_didReset(bool hard)
 {
+    trace.clear();
     checkEnable();
 }
 
@@ -48,10 +50,6 @@ LogicAnalyzer::cacheInfo() const
     info.addrBus = agnus.busAddr;
     info.dataBus = agnus.busData;
 
-    for (isize i = 0; i < 4; i++) {
-        info.channel[i] = record[i];
-    }
-
     return info;
 }
 
@@ -60,6 +58,7 @@ LogicAnalyzer::getOption(Opt option) const
 {
     switch (option) {
             
+        case Opt::LA_CONNECT: return (i64)config.connect;
         case Opt::LA_PROBE0: return (i64)config.channel[0];
         case Opt::LA_PROBE1: return (i64)config.channel[1];
         case Opt::LA_PROBE2: return (i64)config.channel[2];
@@ -79,6 +78,10 @@ LogicAnalyzer::checkOption(Opt opt, i64 value)
 {
     switch (opt) {
 
+        case Opt::LA_CONNECT:
+            
+            return;
+            
         case Opt::LA_PROBE0:
         case Opt::LA_PROBE1:
         case Opt::LA_PROBE2:
@@ -108,6 +111,11 @@ LogicAnalyzer::setOption(Opt option, i64 value)
     
     switch (option) {
             
+        case Opt::LA_CONNECT:
+            
+            config.connect = (bool)value;
+            break;
+            
         case Opt::LA_PROBE3: c++; [[fallthrough]];
         case Opt::LA_PROBE2: c++; [[fallthrough]];
         case Opt::LA_PROBE1: c++; [[fallthrough]];
@@ -131,8 +139,8 @@ LogicAnalyzer::setOption(Opt option, i64 value)
     }
 
     // Wipe out prerecorded data if necessary
-    if (invalidate) std::fill_n(record[c], HPOS_CNT, -1);
- 
+    if (invalidate) trace.clear();
+
     // Enable or disable the logic analyzer
     checkEnable();
 }
@@ -140,11 +148,14 @@ LogicAnalyzer::setOption(Opt option, i64 value)
 void
 LogicAnalyzer::checkEnable()
 {
+    /*
     bool enable =
     config.channel[0] != Probe::NONE ||
     config.channel[1] != Probe::NONE ||
     config.channel[2] != Probe::NONE ||
     config.channel[3] != Probe::NONE ;
+    */
+    bool enable = config.connect;
     
     enable ? agnus.syncEvent |= EVFL::PROBE : agnus.syncEvent &= ~EVFL::PROBE;
 }
@@ -176,13 +187,22 @@ LogicAnalyzer::recordSignals()
      The second function is also called when the emulator pauses to complement
      the missing signal values.
      */
-    
-    recordCurrent(agnus.pos.h);
-    recordDelayed(agnus.pos.hPrev());
+
+    // Complete the sample that was opened in the previous DMA cycle
+    if (!trace.isEmpty()) recordDelayed(*trace.latestAddr());
+
+    // Open a new sample for the current DMA cycle
+    trace.put(LogicAnalyzerSample {
+
+        .vpos = agnus.pos.v,
+        .hpos = agnus.pos.h,
+        .values = { -1, -1, -1, -1 }
+    });
+    recordCurrent(*trace.latestAddr());
 }
 
 void
-LogicAnalyzer::recordCurrent(isize hpos)
+LogicAnalyzer::recordCurrent(LogicAnalyzerSample &sample)
 {
     for (isize i = 0; i < 4; i++) {
         
@@ -190,7 +210,7 @@ LogicAnalyzer::recordCurrent(isize hpos)
 
             case Probe::MEMORY:
                 
-                record[i][hpos] = isize(mem.spypeek16<Accessor::CPU>(config.addr[i]));
+                sample.values[i] = isize(mem.spypeek16<Accessor::CPU>(config.addr[i]));
                 break;
                 
             default:
@@ -200,17 +220,33 @@ LogicAnalyzer::recordCurrent(isize hpos)
 }
 
 void
-LogicAnalyzer::recordDelayed(isize hpos)
+LogicAnalyzer::recordDelayed(LogicAnalyzerSample &sample)
 {
+    auto hpos = agnus.pos.h;
+    
+    if (hpos == 0) {
+        
+        // The previous cycle was a refresh cycle
+        sample.owner = BusOwner::REFRESH;
+        sample.dataBus = 0;
+        sample.addrBus = 0;
+        
+    } else {
+        
+        sample.owner = agnus.busOwner[hpos - 1];
+        sample.dataBus = agnus.busData[hpos - 1];
+        sample.addrBus = agnus.busAddr[hpos - 1];
+    }
+    
     for (isize i = 0; i < 4; i++) {
         
         switch (config.channel[i]) {
-                
+
             case Probe::IPL:
-
-                record[i][hpos] = cpu.getIPL();
+                
+                sample.values[i] = cpu.getIPL();
                 break;
-
+                
             default:
                 break;
         }

@@ -16,10 +16,11 @@ import Silicium.Theme
 
 // Port of vAmiga's own GUI/Inspector/BusPanel.swift + LogicView.swift. Its
 // own top-level window (see SiAmInspectorWindow.qml). A single "Logic
-// Analyzer" box, spanning the whole panel: the 228-cycle DMA timing-diagram
-// grid (SiAmLogicView, a QQuickPaintedItem port of LogicView.swift's
-// drawHairlines/drawLabels/drawSignal) plus its four probe selectors, a zoom
-// slider and the Symbolic checkbox. The DMA Debugger box that used to sit
+// Analyzer" box, spanning the whole panel: the DMA timing-diagram grid
+// (SiAmLogicView, a QQuickPaintedItem port of LogicView.swift's
+// drawHairlines/drawLabels/drawSignal), showing the most recent 256 entries
+// of the core's logic-analyzer ring buffer, plus its four probe selectors, a
+// zoom slider and the Connect and Symbolic checkboxes. The DMA Debugger box that used to sit
 // next to it (the eight visualize-channel checkboxes/colors plus the
 // display-mode combo and opacity slider) moved to its own window,
 // SiAmXRayPanel.qml, paired there with a live preview.
@@ -32,6 +33,7 @@ SiAmInspectorWindow {
 
     readonly property var logicAnalyzer: controller.logicAnalyzerController
     readonly property var ic: controller.inspectorController
+    readonly property var cc: controller.configController
 
     property real zoom: 1
 
@@ -135,7 +137,7 @@ SiAmInspectorWindow {
                 spacing: Style.smallSpacing
 
                 // Left column: one row per SiAmLogicView row -- header (DMA
-                // Cycle), Address Bus, Data Bus, then the four probe
+                // cycle position), Address Bus, Data Bus, then the four probe
                 // channels -- all equal height, matching how
                 // SiAmLogicView::paint() lays its own rows out (headerHeight
                 // = h/(numSignals+1) and dy = (h-headerHeight)/numSignals
@@ -207,6 +209,17 @@ SiAmInspectorWindow {
 
                 Layout.fillWidth: true
                 spacing: Style.mediumSpacing
+
+                // Gates the core's recording (Opt::LA_CONNECT). With it off
+                // the ring buffer stops filling, so the grid freezes on
+                // whatever it last held rather than clearing -- same as
+                // BusPanel.swift's own Enable switch.
+                SiCheckBoxControl {
+
+                    checked: root.cc.LA_CONNECT
+                    onClicked: root.cc.LA_CONNECT = checked
+                    r: qsTr("Connect")
+                }
 
                 SiCheckBoxControl { id: symbolicBox; r: qsTr("Symbolic") }
 

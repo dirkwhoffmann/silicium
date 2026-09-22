@@ -26,6 +26,7 @@ SiAmLogicView::SiAmLogicView(QQuickItem *parent)
     : QQuickPaintedItem(parent)
 {
     for (auto &row : m_data) row.fill(NoValue);
+    m_positions.fill(NoValue);
 }
 
 void
@@ -97,7 +98,7 @@ SiAmLogicView::itemChange(ItemChange change, const ItemChangeData &value)
 void
 SiAmLogicView::connectToWindow(QQuickWindow *win)
 {
-    // Re-sample the current scanline and repaint once per rendered frame,
+    // Re-sample the trace and repaint once per rendered frame,
     // exactly like SiC64DmaView's texture grab -- naturally idle while the
     // Bus inspector window is hidden, since a hidden window emits no frames.
     m_frameConnection = connect(win, &QQuickWindow::frameSwapped, this, [this]() {
@@ -121,17 +122,13 @@ SiAmLogicView::cacheData()
 {
     auto &core = SiAmController::core();
 
-    long hpos = 0;
-    try { hpos = core.amiga.getInfo().hpos; } catch (...) { return; }
-    if (hpos < 0) hpos = 0;
-    if (hpos > segments) hpos = segments;
-
     for (int i = 0; i < segments; i++) { m_labels[i].clear(); m_colors[i] = QColor(); m_symbols[i].clear(); }
     for (auto &row : m_data) row.fill(NoValue);
+    m_positions.fill(NoValue);
 
-    LogicAnalyzerInfo laInfo {};
-    try { laInfo = core.agnus.logicAnalyzer.getInfo(); } catch (...) { return; }
-    if (!laInfo.busOwner || !laInfo.addrBus || !laInfo.dataBus) return;
+    isize count = 0;
+    try { count = core.agnus.logicAnalyzer.getTraceCount(); } catch (...) { return; }
+    if (count > segments) count = segments;
 
     // Owner-tint colors, decoded from the packed XRAY_DMA_COLORx options
     // the same way SiAmConfigController::dmaColor() does (r<<24|g<<16|b<<8
@@ -151,9 +148,27 @@ SiAmLogicView::cacheData()
     const QColor colCPU = ownerColor(Opt::XRAY_COLOR6);
     const QColor colRefresh = ownerColor(Opt::XRAY_COLOR7);
 
-    for (long i = 0; i < hpos; i++) {
+    /* The most recent samples of the trace, newest first -- so the columns
+     * fill from right to left, and a trace shorter than the view leaves the
+     * leftmost columns empty rather than shifting everything over.
+     */
+    for (isize nr = 0; nr < count; nr++) {
 
-        BusOwner owner = laInfo.busOwner[i];
+        LogicAnalyzerSample sample {};
+        try { sample = core.agnus.logicAnalyzer.getTraceSample(nr); } catch (...) { return; }
+
+        const int i = segments - 1 - (int)nr;
+
+        m_positions[i] = (int)sample.hpos;
+
+        // The last four rows show the probed signals
+        for (int c = 2; c < numSignals; c++) {
+
+            isize value = sample.values[c - 2];
+            m_data[c][i] = value >= 0 ? (int)value : NoValue;
+        }
+
+        BusOwner owner = sample.owner;
         QString label;
         QColor color;
 
@@ -189,20 +204,8 @@ SiAmLogicView::cacheData()
         m_labels[i] = label;
         m_colors[i] = color;
 
-        m_data[0][i] = (int)laInfo.addrBus[i];
-        m_data[1][i] = (int)laInfo.dataBus[i];
-    }
-
-    for (int c = 2; c < numSignals; c++) {
-
-        const isize *values = laInfo.channel[c - 2];
-        if (!values) continue;
-
-        for (long i = 0; i < hpos; i++) {
-
-            isize value = values[i];
-            m_data[c][i] = value >= 0 ? (int)value : NoValue;
-        }
+        m_data[0][i] = (int)sample.addrBus;
+        m_data[1][i] = (int)sample.dataBus;
     }
 
     /* Name what the address bus points at, for symbolic mode.
@@ -213,7 +216,7 @@ SiAmLogicView::cacheData()
      */
     if (m_symbolic) {
 
-        for (long i = 0; i < hpos; i++) {
+        for (int i = 0; i < segments; i++) {
 
             if (m_data[0][i] != NoValue) m_symbols[i] = symbolize((unsigned)m_data[0][i]);
         }
@@ -332,7 +335,7 @@ SiAmLogicView::paint(QPainter *painter)
 
     /* Off by default, and deliberately.
      *
-     * Almost everything here is axis-aligned -- 228 vertical hairlines, the
+     * Almost everything here is axis-aligned -- the vertical hairlines, the
      * flat top and bottom of each hexagon, the mid-line of an empty cell --
      * and antialiasing those spreads a one-pixel line across two columns of
      * half-grey instead of drawing it. Only the hexagon's diagonal notches
@@ -398,13 +401,18 @@ SiAmLogicView::drawLabels(QPainter *p, qreal w, qreal headerHeight, qreal dx) co
 
         qreal x = i * dx;
 
-        // Cycle number, upper half of the header row.
-        QRectF numRect(x, 0, dx, 0.5 * headerHeight);
-        QString numText = m_hex ? QString("%1").arg((unsigned)i, 2, 16, QChar('0')).toUpper()
-                                 : QString::number(i);
-        p->setPen(m_textColor);
-        if (fm.horizontalAdvance(numText) <= numRect.width()) {
-            p->drawText(numRect, Qt::AlignCenter, numText);
+        // The sample's horizontal position, upper half of the header row.
+        // Blank where the trace does not reach back this far.
+        if (m_positions[i] != NoValue) {
+
+            unsigned hpos = (unsigned)m_positions[i];
+            QRectF numRect(x, 0, dx, 0.5 * headerHeight);
+            QString numText = m_hex ? QString("%1").arg(hpos, 2, 16, QChar('0')).toUpper()
+                                    : QString::number(hpos);
+            p->setPen(m_textColor);
+            if (fm.horizontalAdvance(numText) <= numRect.width()) {
+                p->drawText(numRect, Qt::AlignCenter, numText);
+            }
         }
 
         if (!m_labels[i].isEmpty()) {

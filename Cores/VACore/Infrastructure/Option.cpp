@@ -105,6 +105,7 @@ OptionParser::create(Opt opt, i64 arg)
         case Opt::XRAY_COLOR8:          return numParser();
         case Opt::XRAY_COLOR9:          return numParser();
 
+        case Opt::LA_CONNECT:                return boolParser();
         case Opt::LA_PROBE0:                 return enumParser.template operator()<ProbeEnum,Probe>();
         case Opt::LA_PROBE1:                 return enumParser.template operator()<ProbeEnum,Probe>();
         case Opt::LA_PROBE2:                 return enumParser.template operator()<ProbeEnum,Probe>();

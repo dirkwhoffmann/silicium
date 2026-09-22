@@ -13,6 +13,7 @@
 #include "SubComponent.h"
 #include "Constants.h"
 #include "utl/wrappers.h"
+#include "utl/storage/RingBuffer.h"
 
 namespace vamiga {
 
@@ -28,6 +29,7 @@ class LogicAnalyzer final : public SubComponent {
 
     Options options = {
 
+        Opt::LA_CONNECT,
         Opt::LA_PROBE0,
         Opt::LA_PROBE1,
         Opt::LA_PROBE2,
@@ -48,10 +50,9 @@ public:
 
 private:
 
-    // Recorded signal traces
-    isize record[4][HPOS_CNT];
+    // Recorded signal trace
+    RingBuffer<LogicAnalyzerSample, 512> trace;
     
-private:
     
     //
     // Constructing
@@ -129,10 +130,10 @@ public:
 private:
 
     // Records all signal values belonging to the current DMA cycle
-    void recordCurrent(isize hpos);
-
+    void recordCurrent(LogicAnalyzerSample &sample);
+    
     // Records all signal values belonging to the previous DMA cycle
-    void recordDelayed(isize hpos);
+    void recordDelayed(LogicAnalyzerSample &sample);
 
     // Enable or disables the logic analyzer based on the current config
     void checkEnable();
@@ -144,8 +145,17 @@ private:
     
 public:
     
-    isize get(isize channel, isize nr) { return record[channel][nr]; }
-    isize *get(isize channel) { return record[channel]; }
+    // Returns the number of samples held in the signal trace
+    isize traceCount() const { return trace.count(); }
+
+    /* Returns a sample from the signal trace. Sample 0 is the most recently
+     * recorded one, sample 1 the one before, and so on.
+     */
+    LogicAnalyzerSample traceSample(isize nr) const {
+
+        auto count = trace.count();
+        return nr >= 0 && nr < count ? trace.current(count - 1 - nr) : LogicAnalyzerSample { };
+    }
 };
 
 }
