@@ -50,7 +50,6 @@ Defaults::fallbacks()
     registerDefault(Opt::AMIGA_SPEED_BOOST,          100);
     registerDefault(Opt::AMIGA_RUN_AHEAD,            0);
 
-    registerDefault(Opt::AMIGA_WS_COMPRESSION,       true);
 
     registerDefault(Opt::AGNUS_REVISION,             (i64)AgnusRevision::ECS_1MB);
     registerDefault(Opt::AGNUS_PTR_DROPS,            true);

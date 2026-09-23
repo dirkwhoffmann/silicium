@@ -152,20 +152,5 @@ SettingsPage {
         //
         // Compression
         //
-
-        ConfigSection {
-
-            header: "COMPRESSION"
-            size: root.sectionWidth
-
-            SiComboBoxControl {
-                l: "Workspaces:"
-                lwidth: root.labelWidth
-                Layout.fillWidth: true
-                model: ["Off", "ADZ / HDZ"]
-                currentIndex: config.AMIGA_WS_COMPRESSION ? 1 : 0
-                onCurrentIndexChanged: config.AMIGA_WS_COMPRESSION = currentIndex === 1
-            }
-        }
     }
 }

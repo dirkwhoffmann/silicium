@@ -35,7 +35,6 @@ enum class Opt : long
     AMIGA_RUN_AHEAD,        ///< Number of run-ahead frames
 
     // Workspaces
-    AMIGA_WS_COMPRESSION,   ///< Workspace media file compression
 
     // Agnus
     AGNUS_REVISION,
@@ -252,7 +251,6 @@ struct OptEnum : Reflectable<OptEnum, Opt>
             case Opt::AMIGA_VSYNC:               return "AMIGA.VSYNC";
             case Opt::AMIGA_SPEED_BOOST:         return "AMIGA.SPEED_BOOST";
             case Opt::AMIGA_RUN_AHEAD:           return "AMIGA.RUN_AHEAD";
-            case Opt::AMIGA_WS_COMPRESSION:      return "AMIGA.WS_COMPRESSION";
                 
             case Opt::AGNUS_REVISION:            return "AGNUS.REVISION";
             case Opt::AGNUS_PTR_DROPS:           return "AGNUS.PTR_DROPS";
@@ -443,7 +441,6 @@ struct OptEnum : Reflectable<OptEnum, Opt>
             case Opt::AMIGA_VSYNC:               return "VSYNC mode";
             case Opt::AMIGA_SPEED_BOOST:         return "Speed adjustment";
             case Opt::AMIGA_RUN_AHEAD:           return "Run-ahead frames";
-            case Opt::AMIGA_WS_COMPRESSION:      return "Compress workspaces";
 
             case Opt::AGNUS_REVISION:            return "Chip revision";
             case Opt::AGNUS_PTR_DROPS:           return "Ignore certain register writes";

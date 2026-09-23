@@ -155,8 +155,7 @@ SiAmMediaController::hdImageName(int nr, const QUrl &url) const
 {
     /* Always .hdf, whatever was dropped. A .hdz is unpacked on the way in
      * (see copyAndAttachHd), so what ends up in the workspace is a plain
-     * image -- and stays one, because saveWorkspace() now leaves a drive on
-     * the file it is already sitting on rather than repacking it.
+     * image, which is what saveWorkspace() writes too.
      */
     (void)url;
     return QString("hd%1.hdf").arg(nr);
@@ -165,11 +164,9 @@ SiAmMediaController::hdImageName(int nr, const QUrl &url) const
 QString
 SiAmMediaController::hdExistingImage(int nr) const
 {
-    /* Both suffixes are checked, and neither is the one being dropped: what
-     * this slot already holds was written by saveWorkspace(), which names it
-     * .hdz or .hdf depending on WS_COMPRESSION (on by default). Asking only
-     * about the incoming file's suffix would miss the existing image almost
-     * every time, and the warning would never appear.
+    /* Both suffixes are checked. New workspaces are written uncompressed, but
+     * an SVM made before that carries .hdz images, and they still load -- so
+     * what this slot holds may be either, whatever is being dropped on it.
      */
     try {
         const auto folder = parent->workspaceFolder();
@@ -224,14 +221,16 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
         image->writeToFile(dest);
         image.reset();
 
-        /* Plug the controller in if this slot has none, then attach. A drive
-         * is of no use without a controller, and the drop zones no longer ask
-         * the user to arrange that first.
+        core.hd[nr]->attach(dest);
+
+        /* Plug the controller in afterwards, not before: the drive is ready
+         * by the time anything can look at it, and nothing this thread does
+         * to the drive overlaps a command being drained on the other one.
+         * Suspending would not help with that -- it stops frames from
+         * running, not commands from being processed.
          */
         auto *config = parent->getConfigController();
         if (!config->hdConnected(nr)) config->setHdConnected(nr, true);
-
-        core.hd[nr]->attach(dest);
 
         /* A hard reset rather than a power cycle. The machine has to go round
          * again to notice a drive that was not there when it booted, but it

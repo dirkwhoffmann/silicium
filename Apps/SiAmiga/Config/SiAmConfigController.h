@@ -773,10 +773,7 @@ class SiAmConfigController : public Controller {
     // Workspaces
     //
 
-    Q_PROPERTY(bool AMIGA_WS_COMPRESSION READ wsCompression WRITE setWsCompression NOTIFY configChanged)
 
-    bool wsCompression() const { return (bool)get(vamiga::Opt::AMIGA_WS_COMPRESSION); }
-    void setWsCompression(bool value) { set(vamiga::Opt::AMIGA_WS_COMPRESSION, (i64)value); }
 
     //
     // DMA Debugger
