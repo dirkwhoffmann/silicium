@@ -14,11 +14,6 @@ import Silicium.Controllers
 import Silicium.Assets
 import Silicium.Theme
 
-// Direct port of SiC64RetroShell.qml. Both apps' cores share the same
-// RetroShellAPI shape (RetroShellInfo.cursorRel, RSKey, text()/press()) --
-// see SiAmController::pressRetroShellKey(), a line-for-line port of
-// C64Controller's own -- so this view needed no adaptation beyond the
-// controller type it binds to.
 Rectangle {
 
     id: root
@@ -89,7 +84,7 @@ Rectangle {
             cursorVisible: false
             wrapMode: Text.Wrap
             selectByMouse: true
-            padding: Style.mediumSpacing
+            // padding: Style.mediumSpacing
 
             background: Rectangle {
                 color: "transparent"

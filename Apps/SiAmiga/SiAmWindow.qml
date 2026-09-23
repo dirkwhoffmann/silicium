@@ -24,10 +24,11 @@ ApplicationWindow {
     // mutually exclusive -- see the toolbar's RetroShell/Logger buttons.
     property bool loggerOpen: false
 
-    // No compact-menu preference hook yet (see SiC64Window's own
-    // root.compactMenu, sourced from Preferences.menuStyle) -- always false
-    // until SiAmiga grows a settings surface for it.
-    readonly property bool compactMenu: false
+    // Compact-menu mode (JetBrains style): the menu bar stays hidden and the
+    // toolbar shows a hamburger button instead. SiAmToolbar owns which row is
+    // currently revealed; this only says whether the mode is on. SiC64 gets
+    // the same binding from VMWindow, which this window does not derive from.
+    readonly property bool compactMenu: Preferences.menuStyle === 1
 
     visible: true
     width: 800
@@ -77,6 +78,10 @@ ApplicationWindow {
         }
     }
 
+    //
+    // Drop area
+    //
+
     SiAmDropOverlay {
 
         anchors.fill: canvas
@@ -98,24 +103,13 @@ ApplicationWindow {
     }
 
     //
-    // Console overlay (RetroShell / Logger). Starts below the toolbar
-    // (anchors.top: toolbar.bottom) rather than filling the whole window --
-    // SiAmToolbar floats over the canvas at z: 10 rather than reserving its
-    // own layout slot (see its own header comment), so a plain
-    // anchors.fill: parent here would extend underneath that opaque
-    // toolbar strip and get visibly covered by it. Starting below it
-    // instead avoids the overlap entirely, and keeps the toolbar reachable
-    // (to close the console again) as a side effect, without needing to
-    // out-z it.
+    // Console overlay (RetroShell / Logger)
     //
 
     Item {
 
         id: overlayPanel
-        anchors.top: toolbar.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        anchors.fill: parent
         opacity: (root.amiga.retroShell || root.loggerOpen) ? 0.85 : 0.0
         visible: opacity > 0.0
 
