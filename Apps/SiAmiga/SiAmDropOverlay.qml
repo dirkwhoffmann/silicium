@@ -59,9 +59,55 @@ DropOverlay {
         controller.media.insertDisk(driveNr, url)
     }
 
+    /* Dropping a hard drive is not the quick, reversible thing dropping a
+     * floppy is: it stops the machine and writes into the SVM, so it asks
+     * first. The copy and the attach are the dialog's job (see below), not
+     * this one's -- all that happens here is remembering what was dropped
+     * where.
+     */
     function attachDroppedHd(driveNr, url) {
 
-        controller.media.attachHd(driveNr, url)
+        hdDialog.driveNr = driveNr
+        hdDialog.fileUrl = url
+        hdDialog.open()
+    }
+
+    SiUserDialog {
+
+        id: hdDialog
+
+        // Parented to the window rather than to this overlay: the overlay is
+        // anchored to the canvas and disappears the moment the drag ends,
+        // which would take the dialog with it.
+        parent: root.window.contentItem
+
+        property int driveNr: 0
+        property string fileUrl: ""
+
+        readonly property string imageName: root.controller.media.hdImageName(driveNr, fileUrl)
+        readonly property bool overwrites: root.controller.media.hdImageExists(driveNr, fileUrl)
+
+        titleText: qsTr("Copy Hard Drive to Virtual Machine")
+        badgeSource: Assets.iconUrl(overwrites ? Assets.Biohazard : Assets.Help)
+
+        bodyText: {
+
+            let text = qsTr("The emulator will be shut down, and the hard drive " +
+                            "will be copied to the virtual machine folder.")
+
+            if (overwrites) {
+                text += "\n\n" + qsTr("This replaces the existing %1 in that folder. " +
+                                       "Its contents will be lost.").arg(imageName)
+            }
+
+            return text + "\n\n" + qsTr("Do you want to continue?")
+        }
+
+        buttons: Dialog.Cancel | Dialog.Ok
+        okLabel: qsTr("Continue")
+        sound: true
+
+        onAccepted: root.controller.media.copyAndAttachHd(driveNr, fileUrl)
     }
 
     // One Action per drive, built once and rebound into 'actions' below
@@ -102,10 +148,6 @@ DropOverlay {
         onTriggered: root.insertDroppedDisk(3, root.path)
     }
 
-    // Hd0 is always offered, connected or not -- matching DropZone.swift's
-    // own 'enabled = [true, hasHd(1), hasHd(2), hasHd(3)]': it's the
-    // built-in hard drive slot, and mounting an image there is expected to
-    // work even before it's been explicitly connected.
     Action {
         id: hd0Action
         text: "Hd0"

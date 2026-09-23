@@ -53,6 +53,20 @@ public:
 
     Q_INVOKABLE bool hdHasDisk(int nr) const;
     Q_INVOKABLE void attachHd(int nr, const QUrl &url);
+
+    /* Taking a dropped hard drive image into the machine.
+     *
+     * attachHd() above attaches the file where it lies, which leaves the
+     * machine depending on a path outside the SVM -- move or delete the
+     * original and the drive is gone. These three copy it in instead, under
+     * the hdN name Amiga::saveWorkspace() already uses, so the image travels
+     * with the SVM. 'nr' picks the name, the dropped file picks the suffix
+     * (.hdf or .hdz), and the two query calls let the caller warn before
+     * anything is overwritten.
+     */
+    Q_INVOKABLE QString hdImageName(int nr, const QUrl &url) const;
+    Q_INVOKABLE bool hdImageExists(int nr, const QUrl &url) const;
+    Q_INVOKABLE void copyAndAttachHd(int nr, const QUrl &url);
     // There's no direct "detach" call on the core's HardDriveAPI (unlike
     // FloppyDriveAPI::ejectDisk()) -- disconnecting the controller via
     // HDC_CONNECT is the closest equivalent, and it's what the menu's

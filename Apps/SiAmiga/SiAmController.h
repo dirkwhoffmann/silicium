@@ -141,6 +141,12 @@ public:
 
     void initialize();
 
+    /* Folder inside the SVM that holds this machine's media. Everything the
+     * machine owns lives here (see Amiga::saveWorkspace), so a file copied in
+     * travels with the SVM.
+     */
+    fs::path workspaceFolder() const;
+
     // Parses the command line, opens the SVM file it names into 'svm', and
     // collects any --exec (-e) commands into execCommands. Returns false if
     // no SVM file was given or it could not be opened, in which case

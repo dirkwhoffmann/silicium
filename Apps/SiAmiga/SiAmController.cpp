@@ -150,6 +150,13 @@ SiAmController::installBundledRomFiles(const QString &dir)
     }
 }
 
+fs::path
+SiAmController::workspaceFolder() const
+{
+    if (!svm) throw utl::IOError(utl::IOError::DIR_NOT_FOUND, "workspace");
+    return svm->root() / SVMFile::workspaceDir;
+}
+
 bool
 SiAmController::parseArguments(const QCoreApplication &app)
 {

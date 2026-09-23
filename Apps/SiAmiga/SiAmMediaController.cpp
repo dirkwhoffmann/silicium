@@ -8,6 +8,8 @@
 // -----------------------------------------------------------------------------
 
 #include "SiAmMediaController.h"
+#include "SVMFile.h"
+#include <QFileInfo>
 #include "SiAmController.h"
 #include "Config/SiAmConfigController.h"
 #include <QFile>
@@ -144,6 +146,67 @@ SiAmMediaController::attachHd(int nr, const QUrl &url)
     } catch (const std::exception &e) {
 
         showError("Failed to attach the hard drive.", e.what());
+    }
+}
+
+QString
+SiAmMediaController::hdImageName(int nr, const QUrl &url) const
+{
+    /* The suffix follows the dropped file rather than being fixed to .hdf:
+     * .hdz is a compressed image, and calling one .hdf would misdescribe it
+     * to everything that later opens the SVM (Amiga::saveWorkspace() picks
+     * between the same two suffixes for the same reason).
+     */
+    const QString suffix = QFileInfo(url.fileName()).suffix().toLower();
+    return QString("hd%1.%2").arg(nr).arg(suffix == "hdz" ? "hdz" : "hdf");
+}
+
+bool
+SiAmMediaController::hdImageExists(int nr, const QUrl &url) const
+{
+    try {
+        const auto dest = parent->workspaceFolder() / hdImageName(nr, url).toStdString();
+        return fs::exists(dest);
+
+    } catch (const std::exception &) {
+
+        // No workspace means nothing to overwrite. The copy itself reports
+        // the failure, so staying quiet here keeps one error per mishap.
+        return false;
+    }
+}
+
+void
+SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
+{
+    if (!url.isLocalFile()) return;
+
+    try {
+        const auto src = fs::path(url.toLocalFile().toStdWString());
+        const auto dest = parent->workspaceFolder() / hdImageName(nr, url).toStdString();
+
+        /* Power off first. A hard drive is not hot-pluggable on a real Amiga
+         * either, and the machine may hold unwritten changes to the drive
+         * this is about to replace. The dialog that leads here says as much,
+         * so the user has already agreed to it.
+         */
+        SiAmController::core().powerOff();
+
+        /* Copying a file onto itself is an error, not a no-op: re-attaching
+         * an image already living in the workspace is a perfectly reasonable
+         * thing to drop, and it needs no copy at all.
+         */
+        std::error_code ec;
+        if (!fs::equivalent(src, dest, ec)) {
+
+            fs::copy_file(src, dest, fs::copy_options::overwrite_existing);
+        }
+
+        SiAmController::core().hd[nr]->attach(dest);
+
+    } catch (const std::exception &e) {
+
+        showError("Failed to copy the hard drive.", e.what());
     }
 }
 
