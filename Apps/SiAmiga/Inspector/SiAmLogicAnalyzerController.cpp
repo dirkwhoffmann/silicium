@@ -130,6 +130,6 @@ SiAmLogicAnalyzerController::probeLabel(int channel) const
 
         case Probe::MEMORY: return QString("%1").arg((unsigned)addr, 6, 16, QChar('0')).toUpper();
         case Probe::IPL:    return QStringLiteral("IPL");
-        default:             return QObject::tr("Connect...");
+        default:            return QObject::tr("Connect...");
     }
 }

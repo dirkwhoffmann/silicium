@@ -57,11 +57,11 @@ Rectangle {
         onTriggered: root.tick++
     }
 
-    readonly property string ledRed:   "qrc:/images/led-round-red.png"
-    readonly property string ledGreen: "qrc:/images/led-round-green.png"
-    readonly property string ledGray:  "qrc:/images/led-round-gray.png"
-    readonly property string disk35:   "qrc:/images/media-35-dd-amiga.png"
-    readonly property string disk35wp: "qrc:/images/media-35-dd-amiga-wp.png"
+    readonly property string ledRed:   "qrc:/images/led-red.png"
+    readonly property string ledGreen: "qrc:/images/led-green.png"
+    readonly property string ledGray:  "qrc:/images/led-gray.png"
+    readonly property string disk35:   "qrc:/icons/disk-35.png"
+    readonly property string disk35wp: "qrc:/icons/disk-35-wp.png"
 
     function redIcon(nr)   { tick; return amiga.media.driveMotor(nr) ? ledRed : ledGray }
     function greenIcon(nr) { tick; return amiga.media.driveWriting(nr) ? ledGreen : ledGray }
@@ -95,11 +95,11 @@ Rectangle {
 
     component LED: ToolButton {
 
+        implicitWidth: 28
         implicitHeight: 22
-        implicitWidth: 22
         padding: 0
-        icon.width: 16
-        icon.height: 16
+        icon.width: 24
+        icon.height: 20
         background: Rectangle { color: "transparent" }
     }
 
@@ -161,7 +161,7 @@ Rectangle {
                 implicitHeight: 22
                 implicitWidth: 22
                 padding: 3
-                running: busy
+                running: busy && amiga.isRunning
             }
         }
     }

@@ -23,12 +23,19 @@ LogicAnalyzer::_pause()
 {
     // Complement the missing signal values of the most recent sample
     if (!trace.isEmpty()) recordDelayed(*trace.latestAddr());
+
+    /* Hand the result over right away rather than waiting for the end of the
+     * frame, which is not going to arrive: a paused machine has to show what
+     * it actually recorded, up to and including the cycle it stopped on.
+     */
+    publish();
 }
 
 void
 LogicAnalyzer::_didReset(bool hard)
 {
     trace.clear();
+    publish();
     checkEnable();
 }
 
@@ -161,6 +168,12 @@ LogicAnalyzer::setOption(Opt option, i64 value)
         }
     }
 
+    /* Both edits above (and the disconnect case) change the working buffer
+     * outside the recording path, and the machine may well be paused, so the
+     * result has to be handed over here instead of at the next frame end.
+     */
+    publish();
+
     // Enable or disable the logic analyzer
     checkEnable();
 }
@@ -178,6 +191,21 @@ LogicAnalyzer::checkEnable()
     bool enable = config.connect;
     
     enable ? agnus.syncEvent |= EVFL::PROBE : agnus.syncEvent &= ~EVFL::PROBE;
+}
+
+void
+LogicAnalyzer::eofHandler()
+{
+    publish();
+}
+
+void
+LogicAnalyzer::publish()
+{
+    {   SYNCHRONIZED
+
+        stable = trace;
+    }
 }
 
 void
