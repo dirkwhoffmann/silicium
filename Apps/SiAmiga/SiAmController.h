@@ -417,8 +417,8 @@ public:
 private:
 
     // Processes incoming RPC messages
-    void rpcReceive(const char *payload);
-    void rpcSend(const char *payload);
+    void rpcReceive(const string &payload);
+    void rpcSend(const string &payload);
 
     // Loads a specific snapshot from this VM's own SVM
     void loadSnapshot(const utl::UUID &uuid);

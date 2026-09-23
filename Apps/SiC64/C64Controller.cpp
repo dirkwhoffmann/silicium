@@ -1386,13 +1386,19 @@ C64Controller::process(const Message &msg, const string &attachment)
 
         case Msg::SRV_RECEIVE: {
 
-            rpcReceive(msg.str);
+            /* 'attachment', not msg.str: the message crossed a thread
+             * boundary (see ::process above), and msg.str still points into
+             * the emulator thread's copy of the packet, which is long gone
+             * by the time this runs. The marshalling lambda copied it into
+             * 'attachment' for exactly this reason.
+             */
+            rpcReceive(attachment);
             break;
         }
 
         case Msg::SRV_SEND: {
 
-            rpcSend(msg.str);
+            rpcSend(attachment);
             break;
         }
 
@@ -1404,9 +1410,9 @@ C64Controller::process(const Message &msg, const string &attachment)
 }
 
 void
-C64Controller::rpcReceive(const char *payload)
+C64Controller::rpcReceive(const string &payload)
 {
-    if (!payload) return;
+    if (payload.empty()) return;
 
     // Surface all received RPC traffic in the logger window as debug output.
     qCDebug(siLog).noquote() << "RPC recv:" << payload;
@@ -1456,9 +1462,9 @@ C64Controller::rpcReceive(const char *payload)
 }
 
 void
-C64Controller::rpcSend(const char *payload)
+C64Controller::rpcSend(const string &payload)
 {
-    if (!payload) return;
+    if (payload.empty()) return;
 
     // Surface all sent RPC traffic in the logger window as debug output.
     qCDebug(siLog).noquote() << "RPC: Sent" << payload;
