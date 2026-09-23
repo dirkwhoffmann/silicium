@@ -71,6 +71,11 @@ public:
 
     // Creates the workspace folder of a freshly made SVM and returns its path
     static fs::path prepareWorkspaceFolder(SVMFile &svm);
+
+    /* Writes the bundled Rom with this checksum to 'dest'. Throws if no
+     * embedded Rom carries it.
+     */
+    static void installBundledRom(u32 crc, const fs::path &dest);
     void createC64ConfigScript(SVMFile &svm, const fs::path &scriptFile);
     void createAmigaConfigScript(SVMFile &svm, const fs::path &scriptFile);
 

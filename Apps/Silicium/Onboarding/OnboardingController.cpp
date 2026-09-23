@@ -13,11 +13,16 @@
 #include "AppController.h"
 #include "Logger.h"
 #include "SVMFile.h"
+#include "RomManager.h"
+#include "utl/abilities/Hashable.h"
 #include "utl/io.h"
+#include <QDir>
+#include <QFile>
 #include <fstream>
 
 using utl::IOError;
 using retro::vault::Platform;
+using namespace retro::vault;
 
 OnboardingController::OnboardingController(QObject *parent) : Controller(parent)
 {
@@ -249,7 +254,65 @@ OnboardingController::createC64Workspace(SVMFile &svm)
 void
 OnboardingController::createAmigaWorkspace(SVMFile &svm)
 {
-    createAmigaConfigScript(svm, prepareWorkspaceFolder(svm) / "config.retrosh");
+    const auto folder = prepareWorkspaceFolder(svm);
+
+    /* The Roms are copied into the workspace rather than referenced where they
+     * happen to sit today: an SVM is meant to be self-contained, so that
+     * moving it to another machine (or emptying the Rom library) leaves a
+     * machine that still boots. 'rom.bin' and 'ext.bin' are the names
+     * Amiga::saveWorkspace() uses, so a later save overwrites these rather
+     * than leaving a second copy behind under a different name.
+     *
+     * Which Roms are bundled is decided in SiAmiga (see
+     * SiAmController::initialize(), which installs the same AROS pair) --
+     * keep the two in step.
+     */
+    if (m_romAmiga == "aros") {
+
+        // AROS replaces Kickstart in two parts, and is useless without both.
+        installBundledRom(CRC32_AROS_20260820, folder / "rom.bin");
+        installBundledRom(CRC32_AROS_20260820_EXT, folder / "ext.bin");
+
+    } else {
+
+        // DiagROM occupies the Kickstart socket on its own.
+        installBundledRom(CRC32_DIAG13, folder / "rom.bin");
+    }
+
+    createAmigaConfigScript(svm, folder / "config.retrosh");
+}
+
+void
+OnboardingController::installBundledRom(u32 crc, const fs::path &dest)
+{
+    /* The Roms are embedded as Qt resources (see qt_add_resources(silicium,
+     * "assets_files") in Apps/CMakeLists.txt), which std::filesystem cannot
+     * read and RomManager therefore cannot scan -- the Hub has no Rom library
+     * of its own the way SiAmiga does. So the resource folder is walked here
+     * and the wanted Rom picked out by checksum rather than by file name: a
+     * renamed or re-dated asset then fails loudly instead of quietly
+     * installing the wrong Rom.
+     */
+    for (const auto &info : QDir(":/Roms").entryInfoList(QDir::Files)) {
+
+        QFile file(info.filePath());
+        if (!file.open(QIODevice::ReadOnly)) continue;
+
+        const QByteArray data = file.readAll();
+        const auto *addr = reinterpret_cast<const u8 *>(data.constData());
+
+        if (utl::Hashable::crc32(addr, isize(data.size())) != crc) continue;
+
+        std::ofstream os(dest, std::ios::binary);
+        if (!os) throw IOError(IOError::FILE_CANT_CREATE, dest);
+
+        os.write(data.constData(), std::streamsize(data.size()));
+        if (!os) throw IOError(IOError::FILE_CANT_CREATE, dest);
+
+        return;
+    }
+
+    throw IOError(IOError::FILE_NOT_FOUND, dest.filename());
 }
 
 fs::path
@@ -318,64 +381,40 @@ OnboardingController::createAmigaConfigScript(SVMFile &svm, const fs::path &scri
     // ROM
     //
 
-    /*
-    if (m_romAmiga == "aros") {
+    // Names the files createAmigaWorkspace() has just put next to this script.
+    // They resolve against the workspace folder, which Amiga::loadWorkspace()
+    // installs as the search path before running us.
+    os << "mem load rom rom.bin" << std::endl;
+    if (m_romAmiga == "aros") os << "mem load ext ext.bin" << std::endl;
+    os << std::endl;
 
-        os << "" << std::endl;
-    }
-    */
-
-    //
-    // Chip revisions
-    //
+    /* Chip revisions and memory.
+     *
+     * The values come from the core's own model presets (see
+     * Amiga::set(ConfigScheme) -- A1000_OCS_1MB, A500_OCS_1MB, A500_PLUS_1MB,
+     * A1200_2MB), which is the one place in the tree that says what a given
+     * machine is made of. The A2000 has no preset of its own; it is an A500
+     * with ECS Agnus and a Fast RAM board, which is what the entry below
+     * spells out.
+     */
 
     if (m_modelAmiga == "a500") {
+        os << "cpu set REVISION 68000" << std::endl;
+        os << "cpu set OVERCLOCKING 0" << std::endl;
+        os << "agnus set REVISION OCS" << std::endl;
+        os << "denise set REVISION OCS" << std::endl;
+        os << "mem set CHIP_RAM 512" << std::endl;
+        os << "mem set SLOW_RAM 512" << std::endl;
+        os << "mem set FAST_RAM 0" << std::endl;
+        os << "mem set BUS_WIDTH 16" << std::endl;
+    }
+
+    if (m_modelAmiga == "a1000") {
+        // OCS_OLD is the MOS 8367 the A1000 shipped with, not a typo for OCS.
         os << "cpu set REVISION 68000" << std::endl;
         os << "cpu set OVERCLOCKING 0" << std::endl;
         os << "agnus set REVISION OCS_OLD" << std::endl;
         os << "denise set REVISION OCS" << std::endl;
-    }
-
-    if (m_modelAmiga == "a500") {
-        os << "cpu set REVISION 68000" << std::endl;
-        os << "cpu set OVERCLOCKING 0" << std::endl;
-        os << "agnus set REVISION ECS" << std::endl;
-        os << "denise set REVISION OCS" << std::endl;
-    }
-
-    if (m_modelAmiga == "a2000") {
-        os << "cpu set REVISION 68000" << std::endl;
-        os << "cpu set OVERCLOCKING 0" << std::endl;
-        os << "agnus set REVISION ECS" << std::endl;
-        os << "denise set REVISION OCS" << std::endl;
-    }
-
-    if (m_modelAmiga == "a500+") {
-        os << "cpu set REVISION 68000" << std::endl;
-        os << "cpu set OVERCLOCKING 0" << std::endl;
-        os << "agnus set REVISION ECS_2MB" << std::endl;
-        os << "denise set REVISION ECS" << std::endl;
-    }
-
-    if (m_modelAmiga == "a1200") {
-        os << "cpu set REVISION 68020" << std::endl;
-        os << "cpu set OVERCLOCKING 2" << std::endl;
-        os << "agnus set REVISION AGA" << std::endl;
-        os << "denise set REVISION AGA" << std::endl;
-    }
-
-    //
-    // Memory
-    //
-
-    if (m_modelAmiga == "a500") {
-        os << "mem set CHIP_RAM 512" << std::endl;
-        os << "mem set SLOW_RAM 512" << std::endl;
-        os << "mem set FAST_RAM 0" << std::endl;
-        os << "mem set BUS_WIDTH 16" << std::endl;
-    }
-
-    if (m_modelAmiga == "a500") {
         os << "mem set CHIP_RAM 512" << std::endl;
         os << "mem set SLOW_RAM 512" << std::endl;
         os << "mem set FAST_RAM 0" << std::endl;
@@ -383,6 +422,10 @@ OnboardingController::createAmigaConfigScript(SVMFile &svm, const fs::path &scri
     }
 
     if (m_modelAmiga == "a2000") {
+        os << "cpu set REVISION 68000" << std::endl;
+        os << "cpu set OVERCLOCKING 0" << std::endl;
+        os << "agnus set REVISION ECS_1MB" << std::endl;
+        os << "denise set REVISION OCS" << std::endl;
         os << "mem set CHIP_RAM 512" << std::endl;
         os << "mem set SLOW_RAM 512" << std::endl;
         os << "mem set FAST_RAM 8192" << std::endl;
@@ -390,6 +433,10 @@ OnboardingController::createAmigaConfigScript(SVMFile &svm, const fs::path &scri
     }
 
     if (m_modelAmiga == "a500+") {
+        os << "cpu set REVISION 68000" << std::endl;
+        os << "cpu set OVERCLOCKING 0" << std::endl;
+        os << "agnus set REVISION ECS_2MB" << std::endl;
+        os << "denise set REVISION ECS" << std::endl;
         os << "mem set CHIP_RAM 1024" << std::endl;
         os << "mem set SLOW_RAM 0" << std::endl;
         os << "mem set FAST_RAM 0" << std::endl;
@@ -397,6 +444,11 @@ OnboardingController::createAmigaConfigScript(SVMFile &svm, const fs::path &scri
     }
 
     if (m_modelAmiga == "a1200") {
+        // 68EC020 is the fastest CPU the core models; there is no plain 68020.
+        os << "cpu set REVISION 68EC020" << std::endl;
+        os << "cpu set OVERCLOCKING 2" << std::endl;
+        os << "agnus set REVISION AGA" << std::endl;
+        os << "denise set REVISION AGA" << std::endl;
         os << "mem set CHIP_RAM 2048" << std::endl;
         os << "mem set SLOW_RAM 0" << std::endl;
         os << "mem set FAST_RAM 0" << std::endl;
