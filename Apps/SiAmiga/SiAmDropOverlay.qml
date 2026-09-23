@@ -94,7 +94,7 @@ DropOverlay {
 
         bodyText: {
 
-            let text = qsTr("The emulator will be shut down, and the hard drive " +
+            let text = qsTr("The emulator will be reset, and the hard drive " +
                             "will be copied to the virtual machine folder.")
 
             if (overwrites) {

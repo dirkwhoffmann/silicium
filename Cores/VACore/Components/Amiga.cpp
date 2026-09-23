@@ -381,7 +381,7 @@ Amiga::saveWorkspace(const fs::path &path)
              * a file the image itself is loaded from, so this updates it in
              * place rather than replacing it.
              */
-            if (const auto own = drive.imagePath(); !own.empty()) {
+            if (const auto own = drive.getPath(); !own.empty()) {
 
                 std::error_code ec;
                 for (const auto *ext : { ".hdf", ".hdz" }) {
@@ -430,7 +430,7 @@ Amiga::saveWorkspace(const fs::path &path)
             if (!drive->hasDisk()) continue;
 
             std::error_code ec;
-            auto own = drive->imagePath();
+            auto own = drive->getPath();
             if (!own.empty() && fs::equivalent(own, file, ec)) return true;
         }
         return false;
@@ -957,6 +957,15 @@ Amiga::update(CmdQueue &queue)
 
     // Process all commands
     while (queue.poll(cmd)) {
+
+        /* Report the command as carried out however this iteration ends. A
+         * handler that throws would otherwise leave the command counted
+         * forever, and CmdQueue::wait() would never return.
+         */
+        struct Done {
+            CmdQueue &queue;
+            ~Done() { queue.done(); }
+        } done { queue };
 
         switch (cmd.type) {
 

@@ -198,52 +198,62 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
         const auto src = fs::path(url.toLocalFile().toStdWString());
         const auto dest = parent->workspaceFolder() / hdImageName(nr, url).toStdString();
 
+        auto &core = SiAmController::core();
+
         /* Read the image before anything else is disturbed. A file that turns
          * out not to be a hard drive image, or cannot be read, then fails
-         * while the machine is still running untouched. This also unpacks a
-         * .hdz: HDFFile puts a gzip backing under a compressed file, so what
-         * gets written out below is the plain image either way.
+         * while the machine is still untouched. This also unpacks a .hdz:
+         * HDFFile puts a gzip backing under a compressed file, so what gets
+         * written out below is the plain image either way.
          */
         auto image = std::make_unique<HDFFile>(src);
 
-        /* Power off. A hard drive is not hot-pluggable on a real Amiga
-         * either, and the machine may hold unwritten changes to the drive
-         * this is about to replace. The dialog that leads here says as much,
-         * so the user has already agreed to it.
+        /* Let the drive that is there now go of the file first.
+         *
+         * A hard drive reads its image lazily, straight from the file, so
+         * overwriting the file underneath it would corrupt the drive that is
+         * still using it. loadIntoMemory() takes the contents into RAM and
+         * drops the file, and it happens immediately rather than being queued
+         * for the emulator thread -- which matters, because the very next
+         * thing here replaces that file.
          */
-        SiAmController::core().powerOff();
+        std::error_code ec;
+        if (fs::equivalent(core.hd[nr]->path(), dest, ec)) core.hd[nr]->loadIntoMemory();
 
-        /* Plug the controller in if this slot has none. A drive is of no use
-         * without one, and the drop zones no longer ask the user to arrange
-         * that first. This has to happen while the machine is off, which it
-         * now is. It mirrors what 'hdN attach' does in RetroShell.
+        // Replace the image.
+        image->writeToFile(dest);
+        image.reset();
+
+        /* Plug the controller in if this slot has none, then attach. A drive
+         * is of no use without a controller, and the drop zones no longer ask
+         * the user to arrange that first.
          */
         auto *config = parent->getConfigController();
         if (!config->hdConnected(nr)) config->setHdConnected(nr, true);
 
-        /* Write the machine out before the image goes in, so the save starts
-         * from a folder this slot has no stale image in -- an old hd2.hdz
-         * left next to the hd2.hdf about to be written would otherwise be a
-         * second candidate for the same drive.
+        core.hd[nr]->attach(dest);
+
+        /* A hard reset rather than a power cycle. The machine has to go round
+         * again to notice a drive that was not there when it booted, but it
+         * does not have to be switched off to do that, and a reset is the
+         * milder of the two.
+         */
+        core.hardReset();
+
+        /* Wait for all of that to have happened before writing the machine
+         * out. Option changes and the reset are handed to the emulator thread
+         * and take effect a frame or so later, so without this the exported
+         * configuration can still describe a machine with no hard drive
+         * controller.
+         */
+        core.sync();
+
+        /* Write the machine out, so config.retrosh carries the attach line and
+         * the drive is still there the next time the SVM is opened. The file
+         * just written is left alone -- see Amiga::saveWorkspace(), which
+         * keeps the image a drive is sitting on.
          */
         parent->saveWorkspace();
-
-        // Write the image into the workspace, unpacked.
-        image->writeToFile(dest);
-        image.reset();
-
-        SiAmController::core().hd[nr]->attach(dest);
-
-        /* Save again, now that the drive is attached: this is the pass that
-         * puts 'hdN attach hdN.hdf' into config.retrosh, so the drive is
-         * still there the next time the SVM is opened. It leaves the file
-         * just written alone -- that is what the exception in
-         * SiAmController::saveWorkspace() is for.
-         */
-        parent->saveWorkspace();
-
-        // Everything is copied and configured, so bring the machine back up.
-        SiAmController::core().powerOn();
 
     } catch (const std::exception &e) {
 
