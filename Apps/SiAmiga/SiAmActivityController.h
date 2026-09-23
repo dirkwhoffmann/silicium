@@ -10,8 +10,9 @@
 #pragma once
 
 #include "Controller.h"
-#include "utl/common.h"
+// #include "SiAmController.h"
 #include "utl/chrono/Time.h"
+#include "utl/common.h"
 
 //
 // Port of Silicium's SiC64ActivityController. update(cycle, emuFrame, gpuFrame)
@@ -25,7 +26,7 @@ class SiAmActivityController : public Controller {
 
     Q_OBJECT
 
-    SiAmController *parent = nullptr;
+    class SiAmController *parent = nullptr;
 
     // Activity
     double m_ciaA      = 0.0; // CIA A activity
@@ -55,6 +56,8 @@ class SiAmActivityController : public Controller {
     // metrics. Called once per rendered frame from SiAmRenderer::tick().
     void update(i64 cycle, i64 emuFrame, i64 gpuFrame);
 
+    Q_PROPERTY(double overclocking READ overclocking NOTIFY activityChanged)
+
     Q_PROPERTY(double ciaA READ ciaA NOTIFY activityChanged)
     Q_PROPERTY(double ciaB READ ciaB NOTIFY activityChanged)
     Q_PROPERTY(double amigaMhz READ amigaMhz NOTIFY activityChanged)
@@ -73,9 +76,11 @@ class SiAmActivityController : public Controller {
 
   private:
 
+    double overclocking() const;
+
     double ciaA() const { return m_ciaA; }
     double ciaB() const { return m_ciaB; }
-    double amigaMhz() const { return m_amigaMhz; }
+    double amigaMhz() const { return m_amigaMhz * overclocking(); }
     double amigaFps() const { return m_amigaFps; }
     double hostLoad() const { return m_hostLoad; }
     double hostFps() const { return m_hostFps; }

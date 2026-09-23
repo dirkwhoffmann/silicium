@@ -355,7 +355,7 @@ Rectangle {
                     SiBarGauge {
 
                         visible: metric === 0
-                        maxValue: 2.0
+                        maxValue: 2.0 * 7.0 * activity.overclocking
                         value: activity.amigaMhz
                     }
 

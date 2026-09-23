@@ -76,6 +76,15 @@ SiAmActivityController::update(i64 cycle, i64 emuFrame, i64 gpuFrame)
     if (changed) emit activityChanged();
 }
 
+double
+SiAmActivityController::overclocking() const
+{
+  double result = 0.0;
+
+  if (parent) result = parent->getConfigController()->overclocking();
+  return result ? result : 1.0;
+}
+
 QString
 SiAmActivityController::ciaAString() const
 {
@@ -91,7 +100,7 @@ SiAmActivityController::ciaBString() const
 QString
 SiAmActivityController::amigaMhzString() const
 {
-    return QString("%1 MHz").arg(m_amigaMhz, 0, 'f', 2);
+    return QString("%1 MHz").arg(amigaMhz(), 0, 'f', 2);
 }
 
 QString
