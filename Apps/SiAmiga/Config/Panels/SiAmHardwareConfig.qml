@@ -200,15 +200,12 @@ SettingsPage {
 
                     /* CPU.OVERCLOCKING is a plain multiplier of the 7.09 MHz
                      * base clock (Moira::sync() runs 2 * overclocking micro-
-                     * cycles per DMA cycle), so the option value is the index
-                     * into this list. The multipliers in between are padded
-                     * with dummies and hidden rather than offered, which keeps
-                     * currentIndex equal to the value the core wants. 0 and 1
-                     * both mean unaccelerated; the core stores 0.
+                     * cycles per DMA cycle), so the multipliers we offer are
+                     * the tags. 0 and 1 both mean unaccelerated; the core
+                     * stores 0.
                      */
-                    model: ["7 MHz", "", "14 MHz", "", "28 MHz", "", "", "", "56 MHz"]
-                    isItemVisible: (text) => text !== ""
-
+                    model: ["7 MHz", "14 MHz", "28 MHz", "56 MHz"]
+                    tags: [0, 2, 4, 8]
                     currentIndex: config.CPU_OVERCLOCKING
                     onCurrentIndexChanged: config.CPU_OVERCLOCKING = currentIndex
                 }
