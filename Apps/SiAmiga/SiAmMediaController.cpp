@@ -9,6 +9,7 @@
 
 #include "SiAmMediaController.h"
 #include "SVMFile.h"
+#include "HDFFile.h"
 #include <QFileInfo>
 #include "SiAmController.h"
 #include "Config/SiAmConfigController.h"
@@ -152,13 +153,13 @@ SiAmMediaController::attachHd(int nr, const QUrl &url)
 QString
 SiAmMediaController::hdImageName(int nr, const QUrl &url) const
 {
-    /* The suffix follows the dropped file rather than being fixed to .hdf:
-     * .hdz is a compressed image, and calling one .hdf would misdescribe it
-     * to everything that later opens the SVM (Amiga::saveWorkspace() picks
-     * between the same two suffixes for the same reason).
+    /* Always .hdf, whatever was dropped. A .hdz is unpacked on the way in
+     * (see copyAndAttachHd), so what ends up in the workspace is a plain
+     * image -- and stays one, because saveWorkspace() now leaves a drive on
+     * the file it is already sitting on rather than repacking it.
      */
-    const QString suffix = QFileInfo(url.fileName()).suffix().toLower();
-    return QString("hd%1.%2").arg(nr).arg(suffix == "hdz" ? "hdz" : "hdf");
+    (void)url;
+    return QString("hd%1.hdf").arg(nr);
 }
 
 QString
@@ -197,33 +198,20 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
         const auto src = fs::path(url.toLocalFile().toStdWString());
         const auto dest = parent->workspaceFolder() / hdImageName(nr, url).toStdString();
 
-        /* Power off first. A hard drive is not hot-pluggable on a real Amiga
+        /* Read the image before anything else is disturbed. A file that turns
+         * out not to be a hard drive image, or cannot be read, then fails
+         * while the machine is still running untouched. This also unpacks a
+         * .hdz: HDFFile puts a gzip backing under a compressed file, so what
+         * gets written out below is the plain image either way.
+         */
+        auto image = std::make_unique<HDFFile>(src);
+
+        /* Power off. A hard drive is not hot-pluggable on a real Amiga
          * either, and the machine may hold unwritten changes to the drive
          * this is about to replace. The dialog that leads here says as much,
          * so the user has already agreed to it.
          */
         SiAmController::core().powerOff();
-
-        /* Copying a file onto itself is an error, not a no-op: re-attaching
-         * an image already living in the workspace is a perfectly reasonable
-         * thing to drop, and it needs no copy at all.
-         */
-        std::error_code ec;
-        if (!fs::equivalent(src, dest, ec)) {
-
-            fs::copy_file(src, dest, fs::copy_options::overwrite_existing);
-        }
-
-        /* Drop whatever this slot held before. Without this a leftover
-         * hd0.hdz would sit next to the hd0.hdf just written, and which one
-         * the machine picked up next time would come down to the compression
-         * setting rather than to what was actually dropped.
-         */
-        for (const auto *suffix : { "hdf", "hdz" }) {
-
-            const auto stale = parent->workspaceFolder() / ("hd" + std::to_string(nr) + "." + suffix);
-            if (!fs::equivalent(stale, dest, ec)) fs::remove(stale, ec);
-        }
 
         /* Plug the controller in if this slot has none. A drive is of no use
          * without one, and the drop zones no longer ask the user to arrange
@@ -233,21 +221,24 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
         auto *config = parent->getConfigController();
         if (!config->hdConnected(nr)) config->setHdConnected(nr, true);
 
-        /* Attach memory-backed, unlike attachHd() above.
-         *
-         * The image now lives inside the SVM, and saveWorkspace() below
-         * rebuilds that folder from scratch (fs::remove_all) before writing
-         * the drives back into it. A file-backed drive would be sitting on a
-         * file that its own save is about to delete. Floppies are
-         * memory-backed for the same reason. The cost is that the image has
-         * to fit HDC_MEM_LIMIT (256 MB by default), which reports itself
-         * clearly if it does not.
+        /* Write the machine out before the image goes in, so the save starts
+         * from a folder this slot has no stale image in -- an old hd2.hdz
+         * left next to the hd2.hdf about to be written would otherwise be a
+         * second candidate for the same drive.
          */
-        SiAmController::core().hd[nr]->attach(dest, StorageMode::MEMORY_BACKED);
+        parent->saveWorkspace();
 
-        /* Write the machine back out. This is what rewrites config.retrosh
-         * with the 'hdN attach' line, so the drive is still there the next
-         * time the SVM is opened rather than only for this session.
+        // Write the image into the workspace, unpacked.
+        image->writeToFile(dest);
+        image.reset();
+
+        SiAmController::core().hd[nr]->attach(dest);
+
+        /* Save again, now that the drive is attached: this is the pass that
+         * puts 'hdN attach hdN.hdf' into config.retrosh, so the drive is
+         * still there the next time the SVM is opened. It leaves the file
+         * just written alone -- that is what the exception in
+         * SiAmController::saveWorkspace() is for.
          */
         parent->saveWorkspace();
 

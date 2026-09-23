@@ -62,70 +62,92 @@ SiAmInfoController::grab(Component component)
 {
     auto &core = SiAmController::core();
 
+    /* Snapshots while the machine runs, live values while it is paused.
+     *
+     * getInfo() computes the value on this thread, straight out of state the
+     * emulator thread is changing underneath it: the two halves of a reading
+     * need not belong to the same moment, and DiskController::computeDSKBYTR()
+     * asserts on exactly such a pair (agnus.clock behind syncCycle). What the
+     * emulator thread records for us instead is taken between cycles and read
+     * back under a lock. A paused machine changes nothing, so there the live
+     * value is both safe and fresher than the last snapshot. vAmiga's own
+     * panels make the same distinction (see AgnusPanel.swift).
+     */
+    const bool live = core.isPaused();
+
     switch (component) {
 
         case CPU:
 
-            m_cpuInfo = core.cpu.getInfo();
+            m_cpuInfo = live ? core.cpu.getInfo() : core.cpu.getCachedInfo();
             break;
 
         case CIA:
 
-            m_ciaInfo[0] = core.ciaA.getInfo();
-            m_ciaInfo[1] = core.ciaB.getInfo();
-            m_ciaMetrics[0] = core.ciaA.getMetrics();
-            m_ciaMetrics[1] = core.ciaB.getMetrics();
+            m_ciaInfo[0] = live ? core.ciaA.getInfo() : core.ciaA.getCachedInfo();
+            m_ciaInfo[1] = live ? core.ciaB.getInfo() : core.ciaB.getCachedInfo();
+            m_ciaMetrics[0] = live ? core.ciaA.getMetrics() : core.ciaA.getCachedMetrics();
+            m_ciaMetrics[1] = live ? core.ciaB.getMetrics() : core.ciaB.getCachedMetrics();
             break;
 
         case AGNUS:
 
-            m_agnusInfo = core.agnus.getInfo();
+            m_agnusInfo = live ? core.agnus.getInfo() : core.agnus.getCachedInfo();
             break;
 
         case DENISE:
 
-            m_deniseInfo = core.denise.getInfo();
+            m_deniseInfo = live ? core.denise.getInfo() : core.denise.getCachedInfo();
             break;
 
         case PAULA:
 
-            m_paulaInfo = core.paula.getInfo();
-            m_audioInfo[0] = core.paula.audioChannel0.getInfo();
-            m_audioInfo[1] = core.paula.audioChannel1.getInfo();
-            m_audioInfo[2] = core.paula.audioChannel2.getInfo();
-            m_audioInfo[3] = core.paula.audioChannel3.getInfo();
-            m_diskControllerInfo = core.paula.diskController.getInfo();
+            m_paulaInfo = live ? core.paula.getInfo() : core.paula.getCachedInfo();
+            m_audioInfo[0] = live ? core.paula.audioChannel0.getInfo()
+                                   : core.paula.audioChannel0.getCachedInfo();
+            m_audioInfo[1] = live ? core.paula.audioChannel1.getInfo()
+                                   : core.paula.audioChannel1.getCachedInfo();
+            m_audioInfo[2] = live ? core.paula.audioChannel2.getInfo()
+                                   : core.paula.audioChannel2.getCachedInfo();
+            m_audioInfo[3] = live ? core.paula.audioChannel3.getInfo()
+                                   : core.paula.audioChannel3.getCachedInfo();
+            m_diskControllerInfo = live ? core.paula.diskController.getInfo()
+                                       : core.paula.diskController.getCachedInfo();
             break;
 
         case MEMORY:
 
-            m_memInfo = core.mem.getInfo();
+            m_memInfo = live ? core.mem.getInfo() : core.mem.getCachedInfo();
             m_memConfig = core.mem.getConfig();
             break;
 
         case DRIVE:
 
-            for (int i = 0; i < 4; i++) m_driveInfo[i] = core.df[i]->getInfo();
+            for (int i = 0; i < 4; i++) {
+                m_driveInfo[i] = live ? core.df[i]->getInfo() : core.df[i]->getCachedInfo();
+            }
             break;
 
         case HD:
 
-            for (int i = 0; i < 4; i++) m_hdInfo[i] = core.hd[i]->getInfo();
+            for (int i = 0; i < 4; i++) {
+                m_hdInfo[i] = live ? core.hd[i]->getInfo() : core.hd[i]->getCachedInfo();
+            }
             break;
 
         case AMIGA:
 
-            m_amigaInfo = core.amiga.getInfo();
+            m_amigaInfo = live ? core.amiga.getInfo() : core.amiga.getCachedInfo();
             break;
 
         case COPPER:
 
-            m_copperInfo = core.agnus.copper.getInfo();
+            m_copperInfo = live ? core.agnus.copper.getInfo() : core.agnus.copper.getCachedInfo();
             break;
 
         case BLITTER:
 
-            m_blitterInfo = core.agnus.blitter.getInfo();
+            m_blitterInfo = live ? core.agnus.blitter.getInfo() : core.agnus.blitter.getCachedInfo();
             break;
 
         default:

@@ -130,6 +130,17 @@ SiAmController::initialize()
     // together on this core's API (unlike VirtualC64, which splits them into
     // launch() and a separate setListener()).
     core().launch(this, ::process);
+
+    /* Ask the emulator thread to snapshot every component as it runs.
+     *
+     * Without this nothing ever calls Backed::record(), and the cached values
+     * SiAmInfoController reads would be frozen at whatever they were the
+     * first time somebody asked. vAmiga sets the same mask (Inspector.swift),
+     * but only while a debug panel is open; here the status bar wants this
+     * information continuously, so it stays on. The cost is one snapshot pass
+     * per inspection interval, off the GUI thread.
+     */
+    core().amiga.setAutoInspectionMask(u64(-1));
 }
 
 QString
@@ -460,8 +471,15 @@ SiAmController::saveWorkspace()
     LogTask task("Saving workspace...");
     try {
         const auto folder = svm->root() / SVMFile::workspaceDir;
-        fs::remove_all(folder);
-        fs::create_directories(folder);
+
+        /* The folder is not emptied here. Amiga::saveWorkspace() clears it
+         * itself, and it is the one that knows which files to spare: a hard
+         * drive loaded from one of them writes its changes back into it, so
+         * deleting it first would lose the drive.
+         */
+        std::error_code ec;
+        fs::create_directories(folder, ec);
+
         core().amiga.saveWorkspace(folder);
 
         if (m_renderer) {
