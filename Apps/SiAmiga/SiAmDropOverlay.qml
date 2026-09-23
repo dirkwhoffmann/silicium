@@ -84,8 +84,10 @@ DropOverlay {
         property int driveNr: 0
         property string fileUrl: ""
 
-        readonly property string imageName: root.controller.media.hdImageName(driveNr, fileUrl)
-        readonly property bool overwrites: root.controller.media.hdImageExists(driveNr, fileUrl)
+        // What the slot holds today, "" when it is empty -- not what the drop
+        // will be called, which is hdImageName().
+        readonly property string existing: root.controller.media.hdExistingImage(driveNr)
+        readonly property bool overwrites: existing !== ""
 
         titleText: qsTr("Copy Hard Drive to Virtual Machine")
         badgeSource: Assets.iconUrl(overwrites ? Assets.Biohazard : Assets.Help)
@@ -97,7 +99,7 @@ DropOverlay {
 
             if (overwrites) {
                 text += "\n\n" + qsTr("This replaces the existing %1 in that folder. " +
-                                       "Its contents will be lost.").arg(imageName)
+                                       "Its contents will be lost.").arg(existing)
             }
 
             return text + "\n\n" + qsTr("Do you want to continue?")
@@ -148,6 +150,12 @@ DropOverlay {
         onTriggered: root.insertDroppedDisk(3, root.path)
     }
 
+    /* Every hard drive zone is offered, connected or not: dropping an image
+     * on a slot that has no controller yet plugs one in (see
+     * SiAmMediaController::copyAndAttachHd), so requiring one beforehand would
+     * only hide the very zones a machine without hard drives needs.
+     */
+
     Action {
         id: hd0Action
         text: "Hd0"
@@ -160,7 +168,7 @@ DropOverlay {
         id: hd1Action
         text: "Hd1"
         icon.source: Assets.iconUrl(Assets.DropHd)
-        enabled: root.isHardDiskImage && root.config.hdConnected(1)
+        enabled: root.isHardDiskImage
         onTriggered: root.attachDroppedHd(1, root.path)
     }
 
@@ -168,7 +176,7 @@ DropOverlay {
         id: hd2Action
         text: "Hd2"
         icon.source: Assets.iconUrl(Assets.DropHd)
-        enabled: root.isHardDiskImage && root.config.hdConnected(2)
+        enabled: root.isHardDiskImage
         onTriggered: root.attachDroppedHd(2, root.path)
     }
 
@@ -176,7 +184,7 @@ DropOverlay {
         id: hd3Action
         text: "Hd3"
         icon.source: Assets.iconUrl(Assets.DropHd)
-        enabled: root.isHardDiskImage && root.config.hdConnected(3)
+        enabled: root.isHardDiskImage
         onTriggered: root.attachDroppedHd(3, root.path)
     }
 

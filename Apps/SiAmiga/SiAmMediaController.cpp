@@ -161,18 +161,30 @@ SiAmMediaController::hdImageName(int nr, const QUrl &url) const
     return QString("hd%1.%2").arg(nr).arg(suffix == "hdz" ? "hdz" : "hdf");
 }
 
-bool
-SiAmMediaController::hdImageExists(int nr, const QUrl &url) const
+QString
+SiAmMediaController::hdExistingImage(int nr) const
 {
+    /* Both suffixes are checked, and neither is the one being dropped: what
+     * this slot already holds was written by saveWorkspace(), which names it
+     * .hdz or .hdf depending on WS_COMPRESSION (on by default). Asking only
+     * about the incoming file's suffix would miss the existing image almost
+     * every time, and the warning would never appear.
+     */
     try {
-        const auto dest = parent->workspaceFolder() / hdImageName(nr, url).toStdString();
-        return fs::exists(dest);
+        const auto folder = parent->workspaceFolder();
+
+        for (const auto *suffix : { "hdf", "hdz" }) {
+
+            const auto name = QString("hd%1.%2").arg(nr).arg(suffix);
+            if (fs::exists(folder / name.toStdString())) return name;
+        }
+        return {};
 
     } catch (const std::exception &) {
 
         // No workspace means nothing to overwrite. The copy itself reports
         // the failure, so staying quiet here keeps one error per mishap.
-        return false;
+        return {};
     }
 }
 
@@ -202,7 +214,45 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
             fs::copy_file(src, dest, fs::copy_options::overwrite_existing);
         }
 
-        SiAmController::core().hd[nr]->attach(dest);
+        /* Drop whatever this slot held before. Without this a leftover
+         * hd0.hdz would sit next to the hd0.hdf just written, and which one
+         * the machine picked up next time would come down to the compression
+         * setting rather than to what was actually dropped.
+         */
+        for (const auto *suffix : { "hdf", "hdz" }) {
+
+            const auto stale = parent->workspaceFolder() / ("hd" + std::to_string(nr) + "." + suffix);
+            if (!fs::equivalent(stale, dest, ec)) fs::remove(stale, ec);
+        }
+
+        /* Plug the controller in if this slot has none. A drive is of no use
+         * without one, and the drop zones no longer ask the user to arrange
+         * that first. This has to happen while the machine is off, which it
+         * now is. It mirrors what 'hdN attach' does in RetroShell.
+         */
+        auto *config = parent->getConfigController();
+        if (!config->hdConnected(nr)) config->setHdConnected(nr, true);
+
+        /* Attach memory-backed, unlike attachHd() above.
+         *
+         * The image now lives inside the SVM, and saveWorkspace() below
+         * rebuilds that folder from scratch (fs::remove_all) before writing
+         * the drives back into it. A file-backed drive would be sitting on a
+         * file that its own save is about to delete. Floppies are
+         * memory-backed for the same reason. The cost is that the image has
+         * to fit HDC_MEM_LIMIT (256 MB by default), which reports itself
+         * clearly if it does not.
+         */
+        SiAmController::core().hd[nr]->attach(dest, StorageMode::MEMORY_BACKED);
+
+        /* Write the machine back out. This is what rewrites config.retrosh
+         * with the 'hdN attach' line, so the drive is still there the next
+         * time the SVM is opened rather than only for this session.
+         */
+        parent->saveWorkspace();
+
+        // Everything is copied and configured, so bring the machine back up.
+        SiAmController::core().powerOn();
 
     } catch (const std::exception &e) {
 

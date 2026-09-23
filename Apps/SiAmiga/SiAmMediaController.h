@@ -65,7 +65,7 @@ public:
      * anything is overwritten.
      */
     Q_INVOKABLE QString hdImageName(int nr, const QUrl &url) const;
-    Q_INVOKABLE bool hdImageExists(int nr, const QUrl &url) const;
+    Q_INVOKABLE QString hdExistingImage(int nr) const;
     Q_INVOKABLE void copyAndAttachHd(int nr, const QUrl &url);
     // There's no direct "detach" call on the core's HardDriveAPI (unlike
     // FloppyDriveAPI::ejectDisk()) -- disconnecting the controller via
