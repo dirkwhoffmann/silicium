@@ -50,6 +50,13 @@ Item {
                 checked: controller.modelAmiga == "a1000"
                 onClicked: controller.modelAmiga = "a1000"
             }
+
+            OnboardingOption {
+                icon.source: Assets.iconUrl(Assets.AmigaMonitor)
+                text: "Amiga 2000"
+                checked: controller.modelAmiga == "a2000"
+                onClicked: controller.modelAmiga = "a2000"
+            }
         }
 
         RowLayout {
@@ -59,9 +66,9 @@ Item {
 
             OnboardingOption {
                 icon.source: Assets.iconUrl(Assets.AmigaMonitor)
-                text: "Amiga 2000"
-                checked: controller.modelAmiga == "a2000"
-                onClicked: controller.modelAmiga = "a2000"
+                text: "Amiga 500+"
+                checked: controller.modelAmiga == "a500+"
+                onClicked: controller.modelAmiga = "a500+"
             }
 
             OnboardingOption {

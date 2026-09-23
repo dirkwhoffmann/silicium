@@ -314,12 +314,98 @@ OnboardingController::createAmigaConfigScript(SVMFile &svm, const fs::path &scri
     os << "# Created with Silicium " << AppController::version() << std::endl;
     os << std::endl;
 
-    /* Model and ROM selection (m_modelAmiga, m_romAmiga) have no RetroShell
-     * equivalent yet -- this codebase has no Amiga emulation core (see
-     * Cores/, which holds VCCore for the C64 only), so there is nothing yet
-     * to emit a command for. None of the Amiga showcases ship a
-     * config.retrosh either, which is consistent with this: there is
-     * currently nothing meaningful to put in one.
-     */
-    os << "# Add custom configurations here..." << std::endl;
+    //
+    // ROM
+    //
+
+    /*
+    if (m_romAmiga == "aros") {
+
+        os << "" << std::endl;
+    }
+    */
+
+    //
+    // Chip revisions
+    //
+
+    if (m_modelAmiga == "a500") {
+        os << "cpu set REVISION 68000" << std::endl;
+        os << "cpu set OVERCLOCKING 0" << std::endl;
+        os << "agnus set REVISION OCS_OLD" << std::endl;
+        os << "denise set REVISION OCS" << std::endl;
+    }
+
+    if (m_modelAmiga == "a500") {
+        os << "cpu set REVISION 68000" << std::endl;
+        os << "cpu set OVERCLOCKING 0" << std::endl;
+        os << "agnus set REVISION ECS" << std::endl;
+        os << "denise set REVISION OCS" << std::endl;
+    }
+
+    if (m_modelAmiga == "a2000") {
+        os << "cpu set REVISION 68000" << std::endl;
+        os << "cpu set OVERCLOCKING 0" << std::endl;
+        os << "agnus set REVISION ECS" << std::endl;
+        os << "denise set REVISION OCS" << std::endl;
+    }
+
+    if (m_modelAmiga == "a500+") {
+        os << "cpu set REVISION 68000" << std::endl;
+        os << "cpu set OVERCLOCKING 0" << std::endl;
+        os << "agnus set REVISION ECS_2MB" << std::endl;
+        os << "denise set REVISION ECS" << std::endl;
+    }
+
+    if (m_modelAmiga == "a1200") {
+        os << "cpu set REVISION 68020" << std::endl;
+        os << "cpu set OVERCLOCKING 2" << std::endl;
+        os << "agnus set REVISION AGA" << std::endl;
+        os << "denise set REVISION AGA" << std::endl;
+    }
+
+    //
+    // Memory
+    //
+
+    if (m_modelAmiga == "a500") {
+        os << "mem set CHIP_RAM 512" << std::endl;
+        os << "mem set SLOW_RAM 512" << std::endl;
+        os << "mem set FAST_RAM 0" << std::endl;
+        os << "mem set BUS_WIDTH 16" << std::endl;
+    }
+
+    if (m_modelAmiga == "a500") {
+        os << "mem set CHIP_RAM 512" << std::endl;
+        os << "mem set SLOW_RAM 512" << std::endl;
+        os << "mem set FAST_RAM 0" << std::endl;
+        os << "mem set BUS_WIDTH 16" << std::endl;
+    }
+
+    if (m_modelAmiga == "a2000") {
+        os << "mem set CHIP_RAM 512" << std::endl;
+        os << "mem set SLOW_RAM 512" << std::endl;
+        os << "mem set FAST_RAM 8192" << std::endl;
+        os << "mem set BUS_WIDTH 16" << std::endl;
+    }
+
+    if (m_modelAmiga == "a500+") {
+        os << "mem set CHIP_RAM 1024" << std::endl;
+        os << "mem set SLOW_RAM 0" << std::endl;
+        os << "mem set FAST_RAM 0" << std::endl;
+        os << "mem set BUS_WIDTH 16" << std::endl;
+    }
+
+    if (m_modelAmiga == "a1200") {
+        os << "mem set CHIP_RAM 2048" << std::endl;
+        os << "mem set SLOW_RAM 0" << std::endl;
+        os << "mem set FAST_RAM 0" << std::endl;
+        os << "mem set BUS_WIDTH 32" << std::endl;
+    }
+
+    //
+    // Video format
+    //
+
+    os << "amiga set VIDEO_FORMAT PAL" << std::endl;
 }
