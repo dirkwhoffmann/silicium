@@ -237,6 +237,8 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
          * using it. loadIntoMemory() takes the contents into RAM and drops
          * the file.
          */
+        task.setDescription(tr("Releasing the current hard drive...").toStdString());
+
         std::error_code ec;
         if (fs::equivalent(core.hd[nr]->path(), dest, ec)) core.hd[nr]->loadIntoMemory();
         task.setProgress(0.02);
@@ -252,6 +254,7 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
          * whole file looking for a root block, and it is the bulk of the job.
          */
         task.check();
+        task.setDescription(tr("Reading the disk image...").toStdString());
         auto image = std::make_unique<HDFFile>(src);
         task.check();
 
@@ -259,6 +262,8 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
         constexpr double copyShare = 0.88;
         constexpr isize chunk = 1024 * 1024;
         const auto total = image->getSize();
+
+        task.setDescription(tr("Copying the disk image...").toStdString());
 
         std::ofstream os(dest, std::ios::binary);
         if (!os) throw utl::IOError(utl::IOError::FILE_CANT_CREATE, dest);
@@ -290,6 +295,7 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
         }
         image.reset();
 
+        task.setDescription(tr("Attaching the hard drive...").toStdString());
         core.hd[nr]->attach(dest);
 
         /* Plug the controller in afterwards, not before: the drive is ready
@@ -313,6 +319,8 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
          */
         core.sync();
         task.setProgress(0.95);
+
+        task.setDescription(tr("Persisting the virtual machine...").toStdString());
 
         /* Write the machine out, so config.retrosh carries the attach line and
          * the drive is still there the next time the SVM is opened. The file

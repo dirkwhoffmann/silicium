@@ -28,10 +28,11 @@
  * that touches a window; the handover happens once here rather than in every
  * caller.
  *
- * Progress is sampled rather than forwarded. The task reports after every
- * chunk -- far more often than a window can be redrawn -- so a signal each
- * time would be work spent on frames nobody sees. The lifecycle hooks are rare
- * and are passed straight through.
+ * Progress and the step description are sampled rather than forwarded. The
+ * task reports progress after every chunk -- far more often than a window can
+ * be redrawn -- so a signal each time would be work spent on frames nobody
+ * sees, and reading the description on the same tick costs one uncontended
+ * lock. The lifecycle hooks are rare and are passed straight through.
  */
 class SiTask : public QObject {
 
@@ -39,6 +40,7 @@ class SiTask : public QObject {
 
     Q_PROPERTY(bool running READ running NOTIFY changed)
     Q_PROPERTY(qreal progress READ progress NOTIFY changed)
+    Q_PROPERTY(QString description READ description NOTIFY changed)
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY changed)
 
     utl::ProgressTask task;
@@ -52,6 +54,9 @@ public:
 
     bool running() const { return task.isRunning(); }
     qreal progress() const { return task.progress(); }
+
+    // What the job is doing at the moment ("Copying...", "Persisting...")
+    QString description() const { return QString::fromStdString(task.description()); }
 
     QString text() const { return m_text; }
     void setText(const QString &value);

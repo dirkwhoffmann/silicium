@@ -16,6 +16,7 @@
 #include <filesystem>
 #include <fstream>
 #include <functional>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
@@ -39,6 +40,10 @@ struct ProgressTaskCallbacks {
 
     std::function<void()> started;
     std::function<void(double)> progressed;
+
+    // The task has moved on to a step worth naming ("Copying...")
+    std::function<void(const std::string &)> described;
+
     std::function<void()> aborted;
     std::function<void(const std::string &)> failed;
     std::function<void()> finished;
@@ -67,6 +72,13 @@ class ProgressTask {
     std::atomic<double> fraction { 0.0 };
     std::atomic<bool> stopping { false };
     std::atomic<bool> busy { false };
+
+    /* What the task is doing at the moment. A string cannot be an atomic, so
+     * this one is behind a lock -- which is affordable because it changes a
+     * handful of times per task, unlike the progress beside it.
+     */
+    mutable std::mutex lock;
+    std::string step;
 
     /* Where the step now running began, so that a weighted step can report
      * within its own slice of the whole. Touched only by the worker.
@@ -109,6 +121,7 @@ public:
         fraction.store(0.0);
         stopping.store(false);
         base = 0.0;
+        { std::lock_guard<std::mutex> guard(lock); step.clear(); }
         busy.store(true);
 
         worker = std::thread([this, body = std::move(body)]() {
@@ -164,6 +177,27 @@ public:
 
     // How far along the whole task is, between 0 and 1
     double progress() const { return fraction.load(); }
+
+    // What the task is doing at the moment, empty until it says
+    std::string description() const {
+
+        std::lock_guard<std::mutex> guard(lock);
+        return step;
+    }
+
+    /* Names the step now running, for something that has to tell the user
+     * what is going on. Reporting it is all this does: it has no bearing on
+     * the progress beside it, so a step may take any share of the whole.
+     */
+    void setDescription(const std::string &text) {
+
+        {
+            std::lock_guard<std::mutex> guard(lock);
+            if (step == text) return;
+            step = text;
+        }
+        if (hooks.described) hooks.described(text);
+    }
 
     /* Reports overall progress, and makes that the point a following weighted
      * step carries on from.

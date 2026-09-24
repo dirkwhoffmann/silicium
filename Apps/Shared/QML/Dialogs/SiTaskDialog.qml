@@ -76,19 +76,29 @@ SiDialog {
             text: root.task ? root.task.text : ""
         }
 
-        SiProgressBar {
+        RowLayout {
 
             Layout.fillWidth: true
-            value: root.task ? root.task.progress : 0.0
-        }
+            spacing: Style.mediumSpacing
 
-        SiText {
+            SiCircularProgress {
 
-            Layout.fillWidth: true
-            horizontalAlignment: Text.AlignRight
-            font.pixelSize: Style.small
-            opacity: 0.7
-            text: root.task ? Math.round(root.task.progress * 100) + "%" : ""
+                Layout.alignment: Qt.AlignVCenter
+                implicitWidth: 32
+                implicitHeight: 32
+                value: root.task ? root.task.progress : 0.0
+            }
+
+            SiText {
+
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter
+                horizontalAlignment: Text.AlignLeft
+                wrapMode: Text.WordWrap
+                font.pixelSize: Style.regular
+                opacity: 0.7
+                text: root.task ? root.task.description : ""
+            }
         }
     }
 }

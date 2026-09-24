@@ -53,6 +53,7 @@ SiTask::run(const QString &text, utl::ProgressTask::Body body)
             post([this] { timer.start(); emit changed(); emit started(); });
         },
         .progressed = { },      // sampled by the timer instead, see SiTask.h
+        .described = { },       // likewise
         .aborted = [this, post] {
             post([this] { emit aborted(); });
         },
