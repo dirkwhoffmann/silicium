@@ -169,13 +169,13 @@ DropOverlay {
             spacing: Style.mediumSpacing
             visible: hdDialog.busy
 
-            SiCircularProgress {
+            BusyIndicator {
 
                 Layout.alignment: Qt.AlignVCenter
                 implicitWidth: 24
                 implicitHeight: 24
+                running: true
                 visible: hdDialog.visibleIndicator
-                value: hdDialog.task.progress
             }
 
             SiText {

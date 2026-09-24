@@ -81,12 +81,12 @@ SiDialog {
             Layout.fillWidth: true
             spacing: Style.mediumSpacing
 
-            SiCircularProgress {
+            BusyIndicator {
 
                 Layout.alignment: Qt.AlignVCenter
                 implicitWidth: 32
                 implicitHeight: 32
-                value: root.task ? root.task.progress : 0.0
+                running: true
             }
 
             SiText {
