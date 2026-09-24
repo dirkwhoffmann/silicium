@@ -75,18 +75,6 @@ DropOverlay {
     }
 
 
-    /* The copy runs on a worker thread and can take seconds for a large
-     * image, so it gets a progress bar rather than a frozen window. The
-     * dialog follows the task on its own -- it opens when the copy starts and
-     * closes when it ends.
-     */
-    SiTaskDialog {
-
-        parent: root.window.contentItem
-        task: root.controller.media.task
-        cancellable: true
-    }
-
 
     SiUserDialog {
 
@@ -118,17 +106,88 @@ DropOverlay {
                                        "Its contents will be lost.").arg(existing)
             }
 
-            return text + "\n\n" + qsTr("Do you want to continue?")
+            return busy ? text : text + "\n\n" + qsTr("Do you want to continue?")
         }
 
-        buttons: Dialog.Cancel | Dialog.Ok
-        okLabel: qsTr("Continue")
+        /* Apply rather than Ok, because Apply carries no accept role and so
+         * leaves the dialog open. The copy then reports inside the dialog
+         * that started it instead of a second one taking its place.
+         */
+        buttons: Dialog.Cancel | Dialog.Apply
+        applyLabel: qsTr("Continue")
         sound: true
 
-        onAccepted: {
-            console.log("Calling copyAndAttachHd")
+        readonly property var task: root.controller.media.task
+        readonly property bool busy: task.running
+
+        // Nothing to accept twice, and nothing to close by pressing Escape
+        // while a machine is being rearranged.
+        onBusyChanged: {
+            setButtonEnabled(Dialog.Apply, !busy)
+            closePolicy = busy ? Popup.NoAutoClose : Popup.CloseOnEscape
+        }
+
+        onApplied: {
+            indicator.restart()
             root.controller.media.copyAndAttachHd(driveNr, fileUrl)
-            console.log("Returning from copyAndAttachHd")
+        }
+
+        // Cancel means "do not install it" while the copy runs, and plain
+        // dismissal before it starts.
+        onRejected: if (busy) task.cancel()
+
+        Connections {
+
+            target: hdDialog.task
+            function onFinished() { indicator.stop(); hdDialog.close() }
+        }
+
+        /* The ring is held back for half a second. A mount that finishes
+         * sooner than that shows its step names and nothing else, which
+         * reads as the dialog simply getting on with it rather than as a
+         * spinner flashing up and vanishing.
+         */
+        Timer {
+
+            id: indicator
+            interval: 500
+            /* Qualified: an unqualified name inside this Timer would be
+             * looked up on the Timer and then on the root of this file, not
+             * on the dialog around it, and the assignment would quietly go
+             * nowhere.
+             */
+            onTriggered: if (hdDialog.busy) hdDialog.visibleIndicator = true
+        }
+
+        property bool visibleIndicator: false
+        onVisibleChanged: if (!visible) visibleIndicator = false
+
+        RowLayout {
+
+            Layout.fillWidth: true
+            Layout.topMargin: Style.smallSpacing
+            spacing: Style.mediumSpacing
+            visible: hdDialog.busy
+
+            SiCircularProgress {
+
+                Layout.alignment: Qt.AlignVCenter
+                implicitWidth: 24
+                implicitHeight: 24
+                visible: hdDialog.visibleIndicator
+                value: hdDialog.task.progress
+            }
+
+            SiText {
+
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter
+                horizontalAlignment: Text.AlignLeft
+                wrapMode: Text.WordWrap
+                font.pixelSize: Style.regular
+                opacity: 0.7
+                text: hdDialog.task.description
+            }
         }
     }
 

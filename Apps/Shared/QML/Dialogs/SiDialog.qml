@@ -10,6 +10,12 @@ Dialog {
 
     property string okLabel: "OK"
     property string cancelLabel: "Cancel"
+
+    /* Apply carries no accept role, so a dialog offering it stays open when
+     * it is pressed. That is what a dialog which turns into a progress
+     * display needs (see SiAmDropOverlay).
+     */
+    property string applyLabel: "Apply"
     property bool sound: false
 
     property alias buttons: buttonBox.standardButtons
@@ -31,6 +37,20 @@ Dialog {
 
         var btn = buttonBox.standardButton(Dialog.Cancel)
         if (btn) btn.text = root.cancelLabel
+    }
+
+    onApplyLabelChanged: {
+
+        var btn = buttonBox.standardButton(Dialog.Apply)
+        if (btn) btn.text = root.applyLabel
+    }
+
+    // Enables or disables one of the standard buttons, e.g. to stop a job
+    // being started twice while the first is still running.
+    function setButtonEnabled(which, value) {
+
+        var btn = buttonBox.standardButton(which)
+        if (btn) btn.enabled = value
     }
 
     // Positioning & Sizing
