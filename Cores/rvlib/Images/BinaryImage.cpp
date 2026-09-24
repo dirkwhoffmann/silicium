@@ -25,7 +25,7 @@ using utl::IOError;
 void
 BinaryImage::init(isize len)
 {
-    data.init(len, nullptr);
+    data.init(len);
 }
 
 void
@@ -41,26 +41,23 @@ BinaryImage::init(const fs::path &p)
     if (isPacked(p)) unpacked = unpack(p);
     const auto &source = isPacked(p) ? unpacked.path() : p;
 
-    // Open the file (throws if it does not exist or cannot be read)
-    auto backing = makeBacking(source);
-
-    if (backing->size() == 0)
+    if (utl::getSizeOfFile(source) <= 0)
         throw utl::IOError(utl::IOError::FILE_CANT_READ, p);
 
-    // Determine the image size (before the backing is handed over below)
-    auto size = imageSize(*backing);
+    // Ask the format how large the image in that file is
+    auto size = imageSize(source);
 
     this->path = p;
 
-    // Put the image on top of it. Nothing is loaded yet.
-    data.init(size, std::move(backing));
+    // Put the image on top of the file. Nothing is loaded yet.
+    data.init(size, source);
     didInitialize();
 }
 
 void
 BinaryImage::init(const LinearDevice &device)
 {
-    data.init(device.size(), nullptr);
+    data.init(device.size());
 
     // Pull in the contents
     auto bytes = data.mutableByteView(0, data.size());
@@ -73,16 +70,16 @@ BinaryImage::init(const u8 *buf, isize len)
 {
     assert(buf);
 
-    data.init(len, nullptr);
+    data.init(len);
 
     if (len) std::memcpy(data.mutableByteView(0, len).data(), buf, size_t(len));
     didInitialize();
 }
 
-std::unique_ptr<utl::Backing>
-BinaryImage::makeBacking(const fs::path &p) const
+isize
+BinaryImage::imageSize(const fs::path &p) const
 {
-    return std::make_unique<utl::FileBacking>(p);
+    return utl::getSizeOfFile(p);
 }
 
 bool
@@ -202,7 +199,7 @@ BinaryImage::saveAs(const fs::path &newPath)
         pack(temp.path(), newPath);
 
         path = newPath;
-        data.init(size, makeBacking(temp.path()));
+        data.init(size, temp.path());
         unpacked = std::move(temp);
         return;
     }
@@ -211,9 +208,8 @@ BinaryImage::saveAs(const fs::path &newPath)
     writeToFile(newPath);
 
     // Continue on top of the new file, which now holds exactly this image
-    auto backing = makeBacking(newPath);
     path = newPath;
-    data.init(size, std::move(backing));
+    data.init(size, newPath);
     unpacked.reset();
 }
 

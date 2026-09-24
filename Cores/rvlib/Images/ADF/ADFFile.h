@@ -84,7 +84,7 @@ public:
     ImageFormat format() const noexcept override { return ImageFormat::ADF; }
     std::vector<string> describeImage() const noexcept override;
     void didInitialize() override;
-    isize imageSize(utl::Backing &backing) const override;
+    isize imageSize(const fs::path &path) const override;
 
 
     //

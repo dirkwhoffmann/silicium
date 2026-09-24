@@ -88,20 +88,18 @@ public:
 
 protected:
 
-    /* Choosing the storage of an image read from a file.
+    /* How large the image in a file is.
      *
-     * init(path) asks makeBacking() where the bytes come from, and imageSize()
-     * how large the image is. Formats whose files are not the image itself
-     * override imageSize(): a short file may stand for an image larger than
-     * itself. Compression is not one of those cases -- it is dealt with
-     * before either of them is called (see isPacked()).
+     * By default exactly as large as the file, which is the normal case.
+     * Formats whose files are not the image itself override this: a short
+     * file may stand for a larger image. It is handed the file rather than
+     * its size, so a format can look inside first -- an HDF reads its rigid
+     * disk block to learn how large the drive is meant to be.
      *
-     * imageSize() is handed the backing, not just its size, so a format can
-     * look inside first -- an HDF reads its rigid disk block to learn how
-     * large the drive is meant to be. Nothing it reads stays loaded.
+     * The file it is given holds plain bytes: a compressed one has been
+     * unpacked by then (see isPacked()).
      */
-    virtual std::unique_ptr<utl::Backing> makeBacking(const fs::path &path) const;
-    virtual isize imageSize(utl::Backing &backing) const { return backing.size(); }
+    virtual isize imageSize(const fs::path &path) const;
 
 public:
 

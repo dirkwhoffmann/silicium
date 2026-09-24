@@ -18,6 +18,7 @@
 #include "utl/io.h"
 #include "utl/support.h"
 #include <format>
+#include <fstream>
 
 namespace retro::vault {
 
@@ -61,18 +62,26 @@ HDFFile::describeImage() const noexcept
 }
 
 isize
-HDFFile::imageSize(utl::Backing &backing) const
+HDFFile::imageSize(const fs::path &path) const
 {
-    auto available = backing.size();
+    auto available = utl::getSizeOfFile(path);
 
-    // Look for a rigid disk block, reading straight from the backing
-    HDFLayout lay([&backing](isize nr, u8 *dst) {
+    std::ifstream in(path, std::ios::binary);
+
+    if (!in.is_open())
+        throw utl::IOError(utl::IOError::FILE_CANT_READ, path);
+
+    // Look for a rigid disk block, reading straight from the file
+    HDFLayout lay([&in, available](isize nr, u8 *dst) {
 
         auto offset = nr * HDFLayout::bsize;
-        if (nr < 0 || offset + HDFLayout::bsize > backing.size()) return false;
+        if (nr < 0 || offset + HDFLayout::bsize > available) return false;
 
-        backing.read(dst, offset, HDFLayout::bsize);
-        return true;
+        in.clear();
+        in.seekg(offset);
+        in.read((char *)dst, HDFLayout::bsize);
+
+        return bool(in) && in.gcount() == HDFLayout::bsize;
 
     }, available);
 
