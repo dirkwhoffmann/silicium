@@ -178,40 +178,6 @@ ADFFile::describeImage() const noexcept
 }
 
 isize
-ADFFile::writeToFile(const fs::path &path) const
-{
-    return writeToFile(path, 0, size());
-}
-
-isize
-ADFFile::writeToFile(const fs::path &path, isize offset, isize len) const
-{
-    if (utl::lowercased(path.extension().string()) == ".adz") {
-
-        // Compress the requested range and write the result as a whole
-        utl::Buffer<u8> copy;
-        copy.init(byteView(offset, len).data(), len);
-        copy.gzip();
-        copy.write(path);
-        return copy.size;
-
-    } else {
-
-        return BinaryImage::writeToFile(path, offset, len);
-    }
-}
-
-std::unique_ptr<utl::Backing>
-ADFFile::makeBacking(const fs::path &path) const
-{
-    // An .adz file is compressed and has to be unpacked as a whole
-    if (utl::lowercased(path.extension().string()) == ".adz") {
-        return std::make_unique<utl::GzipBacking>(path);
-    }
-    return FloppyDiskImage::makeBacking(path);
-}
-
-isize
 ADFFile::imageSize(utl::Backing &backing) const
 {
     // Add some empty cylinders if the file contains less than 80

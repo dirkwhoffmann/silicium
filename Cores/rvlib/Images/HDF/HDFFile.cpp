@@ -61,40 +61,6 @@ HDFFile::describeImage() const noexcept
 }
 
 isize
-HDFFile::writeToFile(const fs::path &path) const
-{
-    return writeToFile(path, 0, size());
-}
-
-isize
-HDFFile::writeToFile(const fs::path &path, isize offset, isize len) const
-{
-    if (utl::lowercased(path.extension().string()) == ".hdz") {
-
-        // Compress the requested range and write the result as a whole
-        utl::Buffer<u8> copy;
-        copy.init(byteView(offset, len).data(), len);
-        copy.gzip();
-        copy.write(path);
-        return copy.size;
-
-    } else {
-
-        return BinaryImage::writeToFile(path, offset, len);
-    }
-}
-
-std::unique_ptr<utl::Backing>
-HDFFile::makeBacking(const fs::path &path) const
-{
-    // An .hdz file is compressed and has to be unpacked as a whole
-    if (utl::lowercased(path.extension().string()) == ".hdz") {
-        return std::make_unique<utl::GzipBacking>(path);
-    }
-    return HardDiskImage::makeBacking(path);
-}
-
-isize
 HDFFile::imageSize(utl::Backing &backing) const
 {
     auto available = backing.size();

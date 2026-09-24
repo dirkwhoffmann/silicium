@@ -22,9 +22,9 @@ namespace utl {
  *
  * A backing is plain storage with a length. It is asked for bytes it holds and
  * told to overwrite bytes it holds; the only way it ever grows is extend().
- * Anything smarter -- a compressed file, say, that has to be unpacked when it
- * is opened and packed again when it is written -- is a Backing of its own,
- * doing that work in its constructor and in flush(). GzipBacking is one.
+ * Anything smarter -- a compressed file, say -- is dealt with before a
+ * backing comes into play: whoever opens the file unpacks it and puts the
+ * buffer on top of the result (see retro::vault::BinaryImage).
  */
 class Backing {
 
@@ -94,36 +94,6 @@ public:
     void read(u8 *dst, isize offset, isize len) override;
     void write(const u8 *src, isize offset, isize len) override;
     void extend(isize newSize) override;
-};
-
-/* A backing that is a gzip compressed file, such as an .hdz or .adz image.
- *
- * A compressed file cannot be read or written in pieces, so the whole file is
- * unpacked into memory when the backing is created, and everything else
- * works on that. A buffer on top still loads lazily -- it copies pages out of
- * the unpacked data as they are asked for -- but the unpacking is eager.
- *
- * flush() packs the data and rewrites the file in full. It compresses before
- * it opens the file, so a failing compression leaves the file as it was; a
- * failing write does not.
- *
- * An empty file holds nothing, and nothing is written as an empty file.
- */
-class GzipBacking : public Backing {
-
-    fs::path path;
-    Buffer<u8> data;
-
-public:
-
-    // Unpacks the file. Throws if it cannot be read or is not gzip data.
-    explicit GzipBacking(const fs::path &path);
-
-    isize size() const override { return data.size; }
-    void read(u8 *dst, isize offset, isize len) override;
-    void write(const u8 *src, isize offset, isize len) override;
-    void extend(isize newSize) override;
-    void flush() override;
 };
 
 /* A byte buffer that loads its contents from a backing as they are needed.
