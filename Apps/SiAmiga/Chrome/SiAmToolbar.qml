@@ -282,6 +282,31 @@ ToolBar {
 
             NavDivider {}
 
+            NavTextButtonFlat {
+                phosphor: "database"
+                action: root.window.actions.saveWorkspace
+            }
+
+            NavDivider {}
+
+            NavTextButtonFlat {
+                phosphor: "download-simple"
+                action: root.window.actions.saveSnapshot
+            }
+
+            NavDivider {}
+
+            NavTextButtonFlat {
+                phosphor: "upload-simple"
+                action: root.window.actions.loadSnapshot
+            }
+
+            NavDivider {}
+
+            HSpacer {}
+
+            NavDivider {}
+
             DeviceSelectorFlat {
 
                 id: port0Selector

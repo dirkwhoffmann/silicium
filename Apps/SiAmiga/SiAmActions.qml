@@ -18,9 +18,8 @@ import Silicium.Preferences
 // below (openCPUInspector, openLogicAnalyzer, ...) mirror C64Actions' own
 // set one-for-one, each raising its own top-level window (see
 // SiAmInspectorWindow.qml) so several inspectors can stay open side by
-// side, exactly like SiC64. No saveWorkspace/saveSnapshot/loadSnapshot or
-// stopAndGo (no workspace/
-// snapshot persistence or datasette-era pause alias exist here), and no
+// side, exactly like SiC64. No stopAndGo (no datasette-era pause alias
+// exists here), and no
 // keyboardWindowAction distinct from a sheet-based 'keyboard' action --
 // SiAmiga's keyboard is a standalone window only, so the one 'keyboard'
 // action covers what SiC64Actions splits into 'keyboard' (sheet) and
@@ -68,6 +67,9 @@ Item {
     property alias retroShell: retroShellAction
     property alias logger: loggerAction
     property alias keyboard: keyboardAction
+    property alias saveWorkspace: saveWorkspaceAction
+    property alias saveSnapshot: saveSnapshotAction
+    property alias loadSnapshot: loadSnapshotAction
     property alias pause: pauseAction
     property alias reset: resetAction
     property alias power: powerAction
@@ -307,6 +309,27 @@ Item {
             keyboardWindowRef.raise()
             keyboardWindowRef.requestActivate()
         }
+    }
+
+    Action {
+
+        id: saveWorkspaceAction
+        text: qsTr("Save Workspace")
+        onTriggered: amiga.saveWorkspace()
+    }
+
+    Action {
+
+        id: saveSnapshotAction
+        text: qsTr("Save Snapshot")
+        onTriggered: amiga.saveSnapshot()
+    }
+
+    Action {
+
+        id: loadSnapshotAction
+        text: qsTr("Load Snapshot")
+        onTriggered: amiga.revertSnapshot()
     }
 
     Action {

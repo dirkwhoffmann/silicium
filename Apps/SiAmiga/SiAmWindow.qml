@@ -197,6 +197,34 @@ ApplicationWindow {
             root.shutdownInProgress = true
             Qt.quit()
         }
+
+        // What the controller reports when an action of ours fails, e.g.
+        // loading a snapshot from a machine that has none.
+        function onShowError(title, text) {
+
+            root.showError(title, text)
+        }
+    }
+
+    //
+    // Errors
+    //
+
+    // Shows a modal error dialog with a single OK button, as SiC64Window
+    // does -- without one, everything the controller reports goes nowhere.
+    function showError(title, text) {
+
+        errorDialog.titleText = title
+        errorDialog.bodyText = text
+        errorDialog.buttons = Dialog.Ok
+        errorDialog.okLabel = qsTr("OK")
+        errorDialog.open()
+    }
+
+    SiUserDialog {
+
+        id: errorDialog
+        sound: true
     }
 
     Component.onCompleted: updateOverlayStack()
@@ -388,23 +416,16 @@ ApplicationWindow {
      */
     onClosing: function(closeEvent) {
 
-        console.log("DIAG onClosing shutdownInProgress=", shutdownInProgress,
-                    "readOnly=", amiga.readOnly,
-                    "showDialog=", Preferences.showHibernationDialog)
-
         if (shutdownInProgress) return
 
         closeEvent.accepted = false
         amiga.pause()
 
         if (amiga.readOnly) {
-            console.log("DIAG branch: read-only, closing without asking")
             byebye()
         } else if (Preferences.showHibernationDialog) {
             hibernationDialog.open()
-            console.log("DIAG dialog opened, visible=", hibernationDialog.visible)
         } else {
-            console.log("DIAG branch: dialog disabled, hibernating silently")
             hibernate(Preferences.hibernateSnapshot, Preferences.hibernateWorkspace)
         }
     }
