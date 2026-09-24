@@ -202,82 +202,44 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
     const auto src = fs::path(url.toLocalFile().toStdWString());
     const auto dest = parent->workspaceFolder() / hdImageName(nr, url).toStdString();
 
-    auto &core = SiAmController::core();
-
-    try {
-        // Power off the emulator
-        printf("Powering off (%d)...\n", core.isPoweredOff());
-        core.powerOff();
-        printf("Power(0) = %d\n", core.isPoweredOff());
-
-        // Wait for the emulator to power off
-        core.sync();
-        printf("Power(1) = %d\n", core.isPoweredOff());
-
-        // Copy HDF into the SVM
-        printf("Copying file\n");
-        std::error_code ec;
-        if (!fs::copy_file(src, dest, fs::copy_options::overwrite_existing, ec)) {
-            printf("COPY FAILED\n");
-        }
-
-        // Make sure a hard-drive controller is installed
-        printf("Connecting hard-drive controller\n");
-        core.set(Opt::HDC_CONNECT, true, nr);
-
-        // Attach hard drive
-        printf("Attaching hard drive...\n");
-        core.hd[nr]->attach(dest);
-
-        // Relaunch
-        printf("Run...\n");
-        core.run();
-        printf("After run...\n");
-
-    } catch (const std::exception &e) {
-
-        printf("EXCEPTION: %s\n", e.what());
-    }
-
-#if 0
-    /* Let the drive that is there now go of the file before the worker starts
-     * on it.
-     *
-     * A hard drive reads its image lazily, straight from the file, so
-     * overwriting the file underneath it would corrupt the drive that is
-     * still using it. loadIntoMemory() takes the contents into RAM and drops
-     * the file. It happens here rather than in the worker because it touches
-     * the machine, and the machine belongs to this thread.
+    /* Report a failure once, for this drop. The signal arrives on this
+     * thread even though the task raised it on its own (see SiTask), so
+     * there is nothing to marshal here.
      */
-    try {
-        std::error_code ec;
-        if (fs::equivalent(SiAmController::core().hd[nr]->path(), dest, ec)) {
-            SiAmController::core().hd[nr]->loadIntoMemory();
-        }
+    connect(m_task, &SiTask::failed, this, [this](const QString &error) {
 
-    } catch (const std::exception &e) {
+        disconnect(m_task, &SiTask::failed, this, nullptr);
+        emit showError("Failed to attach the hard drive.", error);
+    });
+    connect(m_task, &SiTask::finished, this, [this] {
 
-        showError("Failed to copy the hard drive.", e.what());
-        return;
-    }
-
-    connect(m_task, &SiTask::finished, this,
-            [this, nr, dest](bool ok, bool cancelled, const QString &error) {
-
-        // One shot: the next drop connects its own handler
+        disconnect(m_task, &SiTask::failed, this, nullptr);
         disconnect(m_task, &SiTask::finished, this, nullptr);
-
-        if (cancelled) return;
-
-        if (!ok) {
-            showError("Failed to copy the hard drive.", error);
-            return;
-        }
-        installCopiedHd(nr, dest);
     });
 
+    /* The whole operation runs on the task, not just the copy.
+     *
+     * Everything here is allowed off the main thread: the emulator's public
+     * API asks only that the caller is not the emulator thread itself
+     * (Thread::isUserThread), and the calls that suspend it -- attach,
+     * loadIntoMemory, saveWorkspace -- are the only suspending calls in
+     * flight, because what the window does every frame merely reads.
+     */
     m_task->run(tr("Copying the hard drive into the virtual machine..."),
-                [src, dest](utl::ProgressTask &task) {
+                [this, nr, src, dest](utl::ProgressTask &task) {
+
+        auto &core = SiAmController::core();
+
+        /* Let the drive that is there now go of the file.
+         *
+         * A hard drive reads its image lazily, straight from the file, so
+         * overwriting the file underneath it would corrupt the drive still
+         * using it. loadIntoMemory() takes the contents into RAM and drops
+         * the file.
+         */
+        std::error_code ec;
+        if (fs::equivalent(core.hd[nr]->path(), dest, ec)) core.hd[nr]->loadIntoMemory();
+        task.setProgress(0.02);
 
         /* Reading the image is what validates it: a file that turns out not
          * to be a hard drive image, or cannot be read, fails here, before
@@ -289,14 +251,14 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
          * block that is no time at all; for one without, HDFLayout scans the
          * whole file looking for a root block, and it is the bulk of the job.
          */
+        task.check();
         auto image = std::make_unique<HDFFile>(src);
         task.check();
 
-        /* Written a chunk at a time rather than in one call, so that there is
-         * something to report and somewhere to stop.
-         */
-        const auto total = image->getSize();
+        // Writing the image is the long part, so it gets most of the bar.
+        constexpr double copyShare = 0.88;
         constexpr isize chunk = 1024 * 1024;
+        const auto total = image->getSize();
 
         std::ofstream os(dest, std::ios::binary);
         if (!os) throw utl::IOError(utl::IOError::FILE_CANT_CREATE, dest);
@@ -308,41 +270,33 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
 
                 const auto len = std::min(chunk, total - offset);
                 image->writeToStream(os, offset, len);
-                task.setProgress(double(offset + len) / double(total));
+                task.setProgress(0.02 + copyShare * double(offset + len) / double(total));
             }
 
             os.close();
             if (!os) throw utl::IOError(utl::IOError::FILE_CANT_WRITE, dest);
+
+            // The last chance to call it off. Past here the machine is being
+            // rearranged, and stopping half way would leave it inconsistent.
+            task.check();
 
         } catch (...) {
 
             // Leave no half-written image behind: it would look like one the
             // next launch could attach.
             os.close();
-            std::error_code ec;
             fs::remove(dest, ec);
             throw;
         }
-    });
-#endif
-}
-
-void
-SiAmMediaController::installCopiedHd(int nr, const fs::path &dest)
-{
-    try {
-        auto &core = SiAmController::core();
+        image.reset();
 
         core.hd[nr]->attach(dest);
 
         /* Plug the controller in afterwards, not before: the drive is ready
-         * by the time anything can look at it, and nothing this thread does
-         * to the drive overlaps a command being drained on the other one.
-         * Suspending would not help with that -- it stops frames from
-         * running, not commands from being processed.
+         * by the time anything can look at it, and nothing done here to the
+         * drive overlaps a command being drained on the emulator thread.
          */
-        auto *config = parent->getConfigController();
-        if (!config->hdConnected(nr)) config->setHdConnected(nr, true);
+        if (!core.get(Opt::HDC_CONNECT, nr)) core.set(Opt::HDC_CONNECT, true, nr);
 
         /* A hard reset rather than a power cycle. The machine has to go round
          * again to notice a drive that was not there when it booted, but it
@@ -358,6 +312,7 @@ SiAmMediaController::installCopiedHd(int nr, const fs::path &dest)
          * controller.
          */
         core.sync();
+        task.setProgress(0.95);
 
         /* Write the machine out, so config.retrosh carries the attach line and
          * the drive is still there the next time the SVM is opened. The file
@@ -365,11 +320,7 @@ SiAmMediaController::installCopiedHd(int nr, const fs::path &dest)
          * keeps the image a drive is sitting on.
          */
         parent->saveWorkspace();
-
-    } catch (const std::exception &e) {
-
-        showError("Failed to attach the hard drive.", e.what());
-    }
+    });
 }
 
 void

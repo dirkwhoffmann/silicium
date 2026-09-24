@@ -31,12 +31,6 @@ public:
 
     explicit SiAmMediaController(SiAmController *parent = nullptr);
 
-private:
-
-    // Second half of copyAndAttachHd(), once the image is in place
-    void installCopiedHd(int nr, const fs::path &dest);
-
-public:
 
 
     //
