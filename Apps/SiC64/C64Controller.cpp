@@ -827,7 +827,8 @@ C64Controller::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
         }
         if (hibernateWorkspace) {
 
-            saveWorkspace();
+            // On this thread: the app quits as soon as this returns
+            saveWorkspaceNow();
         }
 
     } catch (std::exception &e) {
@@ -836,57 +837,88 @@ C64Controller::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
     }
 }
 
+bool
+C64Controller::writeWorkspace(const fs::path &folder, const QImage &screenshot)
+{
+    // Start from scratch
+    fs::remove_all(folder);
+    fs::create_directories(folder);
+
+    // Save assets
+    core().c64.saveWorkspace(folder);
+
+    /* Refresh the VM's screenshot. This is the only place it is written:
+     * it depicts the machine as the workspace left it, so it lives in the
+     * workspace folder and is rewritten by the same operation that
+     * rewrites the workspace. Taking a snapshot captures a moment the
+     * workspace knows nothing about and deliberately leaves it alone.
+     *
+     * It has to be written after the folder is cleared above, which would
+     * otherwise wipe it. The path is stored relative to the workspace
+     * folder; that folder lives inside a randomized temp directory
+     * recreated every time the SVM is opened, so an absolute path would
+     * go stale as soon as this session ends.
+     */
+    if (screenshot.isNull()) return false;
+
+    if (!screenshot.save(QString::fromStdString((folder / "screenshot.jpg").string()))) {
+
+        qCWarning(siLog) << "Failed to save workspace screenshot.";
+        return false;
+    }
+    return true;
+}
+
 void
-C64Controller::saveWorkspace()
+C64Controller::workspaceWritten(bool screenshotSaved)
+{
+    // The manifest is read by the window, so it is only ever written here,
+    // on the window's own thread.
+    if (screenshotSaved) svm->getManifest().screenshot = "screenshot.jpg";
+
+    svm->persist();
+    emit workspaceSaved();
+    notifyPersist();
+    notifySvmChanged("workspace");
+}
+
+void
+C64Controller::saveWorkspaceNow()
 {
     LogTask task("Saving workspace...");
 
     try {
 
         const auto folder = svm->root() / SVMFile::workspaceDir;
+        auto screenshot = m_renderer ? m_renderer->grabScreenshot() : QImage();
 
-        // Start from scratch
-        fs::remove_all(folder);
-        fs::create_directories(folder);
-
-        // Save assets
-        core().c64.saveWorkspace(folder);
-
-        /* Refresh the VM's screenshot. This is the only place it is written:
-         * it depicts the machine as the workspace left it, so it lives in the
-         * workspace folder and is rewritten by the same operation that
-         * rewrites the workspace. Taking a snapshot captures a moment the
-         * workspace knows nothing about and deliberately leaves it alone.
-         *
-         * It has to be written after the folder is cleared above, which would
-         * otherwise wipe it. The path is stored relative to the workspace
-         * folder; that folder lives inside a randomized temp directory
-         * recreated every time the SVM is opened, so an absolute path would
-         * go stale as soon as this session ends.
-         */
-        if (m_renderer) {
-
-            if (auto image = m_renderer->grabScreenshot(); !image.isNull()) {
-
-                fs::path screenshot = "screenshot.jpg";
-
-                if (image.save(QString::fromStdString((folder / screenshot).string()))) {
-                    svm->getManifest().screenshot = screenshot;
-                } else {
-                    qCWarning(siLog) << "Failed to save workspace screenshot.";
-                }
-            }
-        }
-
-        svm->persist();
-        emit workspaceSaved();
-        notifyPersist();
-        notifySvmChanged("workspace");
+        workspaceWritten(writeWorkspace(folder, screenshot));
 
     } catch (const std::exception &e) {
 
         showError("Failed to save workspace.", e.what());
     }
+}
+
+void
+C64Controller::saveWorkspace()
+{
+    const auto folder = svm->root() / SVMFile::workspaceDir;
+
+    /* The screenshot is taken here rather than in the job: it has to show the
+     * machine as it is at the moment the workspace is asked for, not as it
+     * happens to be once a thread gets round to it.
+     */
+    auto screenshot = m_renderer ? m_renderer->grabScreenshot() : QImage();
+    auto saved = std::make_shared<std::atomic<bool>>(false);
+
+    runTask(tr("Saving workspace..."), tr("Failed to save workspace."),
+
+            [this, folder, screenshot, saved](utl::ProgressTask &) {
+
+                *saved = writeWorkspace(folder, screenshot);
+            },
+            [this, saved] { workspaceWritten(*saved); });
 }
 
 void

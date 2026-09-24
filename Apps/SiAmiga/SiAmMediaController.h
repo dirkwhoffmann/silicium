@@ -16,16 +16,11 @@
 
 class SiAmController;
 
-class SiTask;
-
 class SiAmMediaController : public Controller {
 
     Q_OBJECT
 
     SiAmController *parent = nullptr;
-
-    // Runs the file work of copyAndAttachHd() off this thread
-    SiTask *m_task = nullptr;
 
 public:
 
@@ -84,8 +79,6 @@ public:
     Q_INVOKABLE void copyAndAttachHd(int nr, const QUrl &url);
 
     // The copy above, for a progress dialog to watch
-    Q_PROPERTY(QObject *task READ task CONSTANT)
-    QObject *task() const;
     // There's no direct "detach" call on the core's HardDriveAPI (unlike
     // FloppyDriveAPI::ejectDisk()) -- disconnecting the controller via
     // HDC_CONNECT is the closest equivalent, and it's what the menu's

@@ -252,7 +252,15 @@ public:
     Q_INVOKABLE void openInspector() {}
     Q_INVOKABLE void openKeyboard() {}
 
+    /* Writes the workspace.
+     *
+     * saveWorkspace() hands the writing to a thread of its own and reports
+     * what it is doing through the window's progress banner. saveWorkspaceNow()
+     * does the same work on the calling thread, for hibernation, which is
+     * followed by the app quitting and so cannot wait for a thread.
+     */
     Q_INVOKABLE void saveWorkspace();
+    void saveWorkspaceNow();
     Q_INVOKABLE void saveSnapshot();
     Q_INVOKABLE void revertSnapshot();
 
@@ -491,6 +499,13 @@ public:
      * takes a title and a body.
      */
     Q_INVOKABLE void notifyFatalError(const QString &title, const QString &text);
+
+private:
+
+    // The file writing, and the bookkeeping that follows it. Split because
+    // only the first half may leave this thread (see saveWorkspace).
+    bool writeWorkspace(const fs::path &folder, const QImage &screenshot);
+    void workspaceWritten(bool screenshotSaved);
 
 signals:
 

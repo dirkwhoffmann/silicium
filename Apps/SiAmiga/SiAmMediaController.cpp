@@ -21,7 +21,7 @@ using namespace vamiga;
 SiAmMediaController::SiAmMediaController(SiAmController *parent)
     : Controller(parent), parent(parent)
 {
-    m_task = new SiTask(this);
+
 }
 
 bool
@@ -187,35 +187,13 @@ SiAmMediaController::hdExistingImage(int nr) const
     }
 }
 
-QObject *
-SiAmMediaController::task() const
-{
-    return m_task;
-}
-
 void
 SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
 {
     if (!url.isLocalFile()) return;
-    if (m_task->running()) return;
 
     const auto src = fs::path(url.toLocalFile().toStdWString());
     const auto dest = parent->workspaceFolder() / hdImageName(nr, url).toStdString();
-
-    /* Report a failure once, for this drop. The signal arrives on this
-     * thread even though the task raised it on its own (see SiTask), so
-     * there is nothing to marshal here.
-     */
-    connect(m_task, &SiTask::failed, this, [this](const QString &error) {
-
-        disconnect(m_task, &SiTask::failed, this, nullptr);
-        emit showError("Failed to attach hard drive.", error);
-    });
-    connect(m_task, &SiTask::finished, this, [this] {
-
-        disconnect(m_task, &SiTask::failed, this, nullptr);
-        disconnect(m_task, &SiTask::finished, this, nullptr);
-    });
 
     /* The whole operation runs on the task, not just the copy.
      *
@@ -225,8 +203,9 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
      * loadIntoMemory, saveWorkspace -- are the only suspending calls in
      * flight, because what the window does every frame merely reads.
      */
-    m_task->run(tr("Copying the hard drive into the virtual machine..."),
-                [this, nr, src, dest](utl::ProgressTask &task) {
+    runTask(tr("Copying the hard drive into the virtual machine..."),
+            tr("Failed to attach hard drive."),
+            [this, nr, src, dest](utl::ProgressTask &task) {
 
         auto &core = SiAmController::core();
 
@@ -327,7 +306,7 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
          * just written is left alone -- see Amiga::saveWorkspace(), which
          * keeps the image a drive is sitting on.
          */
-        parent->saveWorkspace();
+        parent->saveWorkspaceNow();
     });
 }
 

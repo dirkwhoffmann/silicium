@@ -467,48 +467,84 @@ SiAmController::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
             captureSnapshot();
         }
         if (hibernateWorkspace) {
-            saveWorkspace();
+            // On this thread: the app quits as soon as this returns
+            saveWorkspaceNow();
         }
     } catch (std::exception &e) {
         qCWarning(siLog) << "Failed to hibernate the virtual machine:" << e.what();
     }
 }
 
+bool
+SiAmController::writeWorkspace(const fs::path &folder, const QImage &screenshot)
+{
+    /* The folder is not emptied here. Amiga::saveWorkspace() clears it
+     * itself, and it is the one that knows which files to spare: a hard
+     * drive loaded from one of them writes its changes back into it, so
+     * deleting it first would lose the drive.
+     */
+    std::error_code ec;
+    fs::create_directories(folder, ec);
+
+    core().amiga.saveWorkspace(folder);
+
+    if (screenshot.isNull()) return false;
+
+    if (!screenshot.save(QString::fromStdString((folder / "screenshot.jpg").string()))) {
+
+        qCWarning(siLog) << "Failed to save workspace screenshot.";
+        return false;
+    }
+    return true;
+}
+
 void
-SiAmController::saveWorkspace()
+SiAmController::workspaceWritten(bool screenshotSaved)
+{
+    // The manifest is read by the window, so it is only ever written here,
+    // on the window's own thread.
+    if (screenshotSaved) svm->getManifest().screenshot = "screenshot.jpg";
+
+    svm->persist();
+    emit workspaceSaved();
+    notifyPersist();
+    notifySvmChanged("workspace");
+}
+
+void
+SiAmController::saveWorkspaceNow()
 {
     LogTask task("Saving workspace...");
     try {
         const auto folder = svm->root() / SVMFile::workspaceDir;
+        auto screenshot = m_renderer ? m_renderer->grabScreenshot() : QImage();
 
-        /* The folder is not emptied here. Amiga::saveWorkspace() clears it
-         * itself, and it is the one that knows which files to spare: a hard
-         * drive loaded from one of them writes its changes back into it, so
-         * deleting it first would lose the drive.
-         */
-        std::error_code ec;
-        fs::create_directories(folder, ec);
+        workspaceWritten(writeWorkspace(folder, screenshot));
 
-        core().amiga.saveWorkspace(folder);
-
-        if (m_renderer) {
-            if (auto image = m_renderer->grabScreenshot(); !image.isNull()) {
-                fs::path screenshot = "screenshot.jpg";
-                if (image.save(QString::fromStdString((folder / screenshot).string()))) {
-                    svm->getManifest().screenshot = screenshot;
-                } else {
-                    qCWarning(siLog) << "Failed to save workspace screenshot.";
-                }
-            }
-        }
-
-        svm->persist();
-        emit workspaceSaved();
-        notifyPersist();
-        notifySvmChanged("workspace");
     } catch (const std::exception &e) {
         showError("Failed to save workspace.", e.what());
     }
+}
+
+void
+SiAmController::saveWorkspace()
+{
+    const auto folder = svm->root() / SVMFile::workspaceDir;
+
+    /* The screenshot is taken here rather than in the job: it has to show the
+     * machine as it is at the moment the workspace is asked for, not as it
+     * happens to be once a thread gets round to it.
+     */
+    auto screenshot = m_renderer ? m_renderer->grabScreenshot() : QImage();
+    auto saved = std::make_shared<std::atomic<bool>>(false);
+
+    runTask(tr("Saving workspace..."), tr("Failed to save workspace."),
+
+            [this, folder, screenshot, saved](utl::ProgressTask &) {
+
+                *saved = writeWorkspace(folder, screenshot);
+            },
+            [this, saved] { workspaceWritten(*saved); });
 }
 
 void

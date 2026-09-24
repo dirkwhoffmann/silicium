@@ -227,6 +227,30 @@ ApplicationWindow {
         sound: true
     }
 
+    //
+    // Progress
+    //
+
+    /* What the machine is busy with, for as long as it is busy (see
+     * Controller::runTask). The job says when it is over by reporting an
+     * empty text, so unlike a hint this banner is on no timer.
+     */
+    SiBanner {
+
+        id: progressBanner
+
+        anchors.fill: parent
+        z: 2
+        alignment: Qt.AlignBottom
+        text: ""
+
+        Connections {
+
+            target: root.amiga
+            function onShowProgress(what) { progressBanner.text = what }
+        }
+    }
+
     Component.onCompleted: updateOverlayStack()
 
     //

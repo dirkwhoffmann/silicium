@@ -290,68 +290,31 @@ ApplicationWindow {
         }
     }
 
-    Item {
+    SiBanner {
 
         id: hintBanner
 
         anchors.fill: parent
         z: 2
-        opacity: 0.0
-        visible: opacity > 0.01
+    }
 
-        property string message: ""
+    /* What the machine is busy with, for as long as it is busy (see
+     * Controller::runTask). Unlike a hint, this one is not on a timer: the
+     * job says when it is over by reporting an empty text.
+     */
+    SiBanner {
 
-        function reveal(msg) {
+        id: progressBanner
 
-            message = msg
-            opacity = 1.0
-            hideTimer.restart()
-        }
+        anchors.fill: parent
+        z: 2
+        alignment: Qt.AlignBottom
+        text: ""
 
-        Behavior on opacity {
+        Connections {
 
-            NumberAnimation {
-                duration: 1000
-                easing.type: Easing.InOutQuad
-            }
-        }
-
-        Timer {
-
-            id: hideTimer
-            interval: 3000
-            onTriggered: hintBanner.opacity = 0.0
-        }
-
-        Rectangle {
-
-            anchors.centerIn: parent
-
-            width: hintLabel.implicitWidth + 2 * Style.largeSpacing
-            height: hintLabel.implicitHeight + 2 * Style.largeSpacing
-            radius: height / 2
-
-            color: "#A0000000"
-            border.color: "#50ffffff"
-
-            layer.enabled: true
-            layer.effect: MultiEffect {
-
-                shadowEnabled: true
-                shadowColor: "#80000000"
-                shadowBlur: 0.8
-                shadowVerticalOffset: 4
-            }
-
-            SiText {
-
-                id: hintLabel
-                anchors.centerIn: parent
-                text: hintBanner.message
-                color: "white"
-                font.pixelSize: Style.huge
-                font.bold: true
-            }
+            target: vmc
+            function onShowProgress(what) { progressBanner.text = what }
         }
     }
 }

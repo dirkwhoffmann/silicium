@@ -269,7 +269,18 @@ public:
 
     Q_INVOKABLE void toggleDebugPanel() { setDebugPanel(!m_debugPanel); }
 
+    /* Writes the workspace.
+     *
+     * saveWorkspace() hands the writing to a thread of its own and reports
+     * what it is doing through the window's progress banner, because a
+     * machine with hard drives attached takes long enough to freeze the
+     * window. saveWorkspaceNow() does the same work on the calling thread,
+     * for the two places that cannot wait for a thread: hibernation, which
+     * is followed by the app quitting, and a job that is already running off
+     * the window's thread (see SiAmMediaController::copyAndAttachHd).
+     */
     Q_INVOKABLE void saveWorkspace();
+    void saveWorkspaceNow();
     Q_INVOKABLE void saveSnapshot();
     Q_INVOKABLE void revertSnapshot();
 
@@ -460,6 +471,13 @@ public:
      * takes a title and a body.
      */
     Q_INVOKABLE void notifyFatalError(const QString &title, const QString &text);
+
+private:
+
+    // The file writing, and the bookkeeping that follows it. Split because
+    // only the first half may leave this thread (see saveWorkspace).
+    bool writeWorkspace(const fs::path &folder, const QImage &screenshot);
+    void workspaceWritten(bool screenshotSaved);
 
 signals:
 
