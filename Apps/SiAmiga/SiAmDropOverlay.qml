@@ -61,135 +61,26 @@ DropOverlay {
 
     /* Dropping a hard drive is not the quick, reversible thing dropping a
      * floppy is: it stops the machine and writes into the SVM, so it asks
-     * first. The copy and the attach are the dialog's job (see below), not
-     * this one's -- all that happens here is remembering what was dropped
-     * where.
+     * first. The copy and the attach are the dialog's job, not this one's --
+     * all that happens here is telling it what was dropped where.
      */
     function attachDroppedHd(driveNr, url) {
 
-        hdDialog.driveNr = driveNr
-        hdDialog.fileUrl = url
-        console.log("Calling hdDialog.open()")
-        hdDialog.open()
-        console.log("Returning from hdDialog.open()")
+        hdDialog.openFor(driveNr, url)
     }
 
-
-
-    SiUserDialog {
+    SiAmDropHdfDialog {
 
         id: hdDialog
+
+        controller: root.controller
 
         // Parented to the window rather than to this overlay: the overlay is
         // anchored to the canvas and disappears the moment the drag ends,
         // which would take the dialog with it.
         parent: root.window.contentItem
-
-        property int driveNr: 0
-        property string fileUrl: ""
-
-        // What the slot holds today, "" when it is empty -- not what the drop
-        // will be called, which is hdImageName().
-        readonly property string existing: root.controller.media.hdExistingImage(driveNr)
-        readonly property bool overwrites: existing !== ""
-
-        titleText: qsTr("Copy Hard Drive to Virtual Machine")
-        badgeSource: Assets.iconUrl(overwrites ? Assets.Biohazard : Assets.Help)
-
-        bodyText: {
-
-            let text = qsTr("The emulator will be reset, and the hard drive " +
-                            "will be copied to the virtual machine folder.")
-
-            if (overwrites) {
-                text += "\n\n" + qsTr("This replaces the existing %1 in that folder. " +
-                                       "Its contents will be lost.").arg(existing)
-            }
-
-            return busy ? text : text + "\n\n" + qsTr("Do you want to continue?")
-        }
-
-        /* Apply rather than Ok, because Apply carries no accept role and so
-         * leaves the dialog open. The copy then reports inside the dialog
-         * that started it instead of a second one taking its place.
-         */
-        buttons: Dialog.Cancel | Dialog.Apply
-        applyLabel: qsTr("Continue")
-        sound: true
-
-        readonly property var task: root.controller.media.task
-        readonly property bool busy: task.running
-
-        // Nothing to accept twice, and nothing to close by pressing Escape
-        // while a machine is being rearranged.
-        onBusyChanged: {
-            setButtonEnabled(Dialog.Apply, !busy)
-            closePolicy = busy ? Popup.NoAutoClose : Popup.CloseOnEscape
-        }
-
-        onApplied: {
-            indicator.restart()
-            root.controller.media.copyAndAttachHd(driveNr, fileUrl)
-        }
-
-        // Cancel means "do not install it" while the copy runs, and plain
-        // dismissal before it starts.
-        onRejected: if (busy) task.cancel()
-
-        Connections {
-
-            target: hdDialog.task
-            function onFinished() { indicator.stop(); hdDialog.close() }
-        }
-
-        /* The ring is held back for half a second. A mount that finishes
-         * sooner than that shows its step names and nothing else, which
-         * reads as the dialog simply getting on with it rather than as a
-         * spinner flashing up and vanishing.
-         */
-        Timer {
-
-            id: indicator
-            interval: 500
-            /* Qualified: an unqualified name inside this Timer would be
-             * looked up on the Timer and then on the root of this file, not
-             * on the dialog around it, and the assignment would quietly go
-             * nowhere.
-             */
-            onTriggered: if (hdDialog.busy) hdDialog.visibleIndicator = true
-        }
-
-        property bool visibleIndicator: false
-        onVisibleChanged: if (!visible) visibleIndicator = false
-
-        RowLayout {
-
-            Layout.fillWidth: true
-            Layout.topMargin: Style.smallSpacing
-            spacing: Style.mediumSpacing
-            visible: hdDialog.busy
-
-            BusyIndicator {
-
-                Layout.alignment: Qt.AlignVCenter
-                implicitWidth: 24
-                implicitHeight: 24
-                running: true
-                visible: hdDialog.visibleIndicator
-            }
-
-            SiText {
-
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignVCenter
-                horizontalAlignment: Text.AlignLeft
-                wrapMode: Text.WordWrap
-                font.pixelSize: Style.regular
-                opacity: 0.7
-                text: hdDialog.task.description
-            }
-        }
     }
+
 
     // One Action per drive, built once and rebound into 'actions' below
     // depending on what's being dragged -- df0..df3 for a floppy image,
