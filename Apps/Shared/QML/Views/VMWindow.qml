@@ -109,28 +109,10 @@ ApplicationWindow {
     // Dialogs
     //
 
-    SiUserDialog {
+    SiHibernationDialog {
 
         id: hibernationDialog
-        titleText: "Hibernate"
-        badgeSource: Assets.iconUrl(Assets.Help)
-        bodyText: "The virtual machine is about to hibernate. Would you like to save your current changes?"
-
-        SiCheckBoxControl {
-            id: snapshotBox
-            r: "Save machine state as a snapshot"
-            checked: Preferences.hibernateSnapshot
-        }
-
-        SiCheckBoxControl {
-            id: workspaceBox
-            r: "Save current workspace"
-            checked: Preferences.hibernateWorkspace
-        }
-
-        buttons: Dialog.Cancel | Dialog.Ok
-        okLabel: snapshotBox.checked || workspaceBox.checked ? "Save" : "Quit"
-        onAccepted: hibernate(snapshotBox.checked, workspaceBox.checked)
+        onConfirmed: (snapshot, workspace) => hibernate(snapshot, workspace)
     }
 
     SiProgressDialog {

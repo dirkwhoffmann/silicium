@@ -16,6 +16,10 @@ ApplicationWindow {
     property bool toolbarVisible: true
     property bool statusBarVisible: true
 
+    // Set once the machine has been put away and the app is on its way out,
+    // so the close this window asks for a second time is let through.
+    property bool shutdownInProgress: false
+
     // Whether the Logger overlay is showing, mirroring SiC64Window's own
     // loggerOpen -- RetroShell has its own visibility on SiAmController
     // (amiga.retroShell) since, unlike the Logger, other things also care
@@ -186,6 +190,12 @@ ApplicationWindow {
 
         function onRetroShellChanged() {
             updateOverlayStack()
+        }
+
+        function onShutdown() {
+
+            root.shutdownInProgress = true
+            Qt.quit()
         }
     }
 
@@ -358,5 +368,62 @@ ApplicationWindow {
 
         id: aboutWindow
         visible: false
+    }
+
+    //
+    // Closing
+    //
+
+    /* Closing sequence, mirroring SiC64's (see VMWindow.qml):
+     *
+     *    1. Pause the emulator
+     *    2. Optional: ask what to save
+     *    3. hibernate()
+     *    4. byebye()
+     *
+     * The window refuses the first close and goes away only once the machine
+     * has been put away, because everything from here on is asynchronous:
+     * a dialog is waiting for an answer, and a window that closed underneath
+     * it would take the answer -- and the machine -- with it.
+     */
+    onClosing: function(closeEvent) {
+
+        console.log("DIAG onClosing shutdownInProgress=", shutdownInProgress,
+                    "readOnly=", amiga.readOnly,
+                    "showDialog=", Preferences.showHibernationDialog)
+
+        if (shutdownInProgress) return
+
+        closeEvent.accepted = false
+        amiga.pause()
+
+        if (amiga.readOnly) {
+            console.log("DIAG branch: read-only, closing without asking")
+            byebye()
+        } else if (Preferences.showHibernationDialog) {
+            hibernationDialog.open()
+            console.log("DIAG dialog opened, visible=", hibernationDialog.visible)
+        } else {
+            console.log("DIAG branch: dialog disabled, hibernating silently")
+            hibernate(Preferences.hibernateSnapshot, Preferences.hibernateWorkspace)
+        }
+    }
+
+    SiHibernationDialog {
+
+        id: hibernationDialog
+        onConfirmed: (snapshot, workspace) => root.hibernate(snapshot, workspace)
+    }
+
+    function hibernate(snapshot, workspace) {
+
+        if (snapshot || workspace) amiga.hibernate(snapshot, workspace)
+        byebye()
+    }
+
+    function byebye() {
+
+        // Tells the controller to wind down, which comes back as onShutdown
+        amiga.shutdown()
     }
 }
