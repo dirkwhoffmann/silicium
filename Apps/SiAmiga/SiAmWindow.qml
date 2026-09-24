@@ -242,12 +242,14 @@ ApplicationWindow {
         anchors.fill: parent
         z: 2
         alignment: Qt.AlignBottom
-        text: ""
 
         Connections {
 
             target: root.amiga
-            function onShowProgress(what) { progressBanner.text = what }
+
+            // The end of the job comes through as an empty text, which the
+            // banner already understands as "nothing to say".
+            function onShowProgress(what) { progressBanner.show(what) }
         }
     }
 
