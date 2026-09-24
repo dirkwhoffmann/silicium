@@ -76,6 +76,15 @@ C64Controller::C64Controller()
     m_vicController       = make_unique<SiC64VICController>(this);
     m_sidController       = make_unique<SiC64SIDController>(this);
     m_mediaController     = make_unique<C64MediaController>(this);
+
+    /* The window is handed this controller and nothing else, so what the
+     * ones above report -- a disk that will not insert, a ROM that will not
+     * load -- would otherwise have no listener. Every one of them is a child
+     * of ours, so adopting them all keeps a new one from being forgotten.
+     */
+    for (auto *child : findChildren<Controller *>(Qt::FindDirectChildrenOnly)) {
+        adopt(child);
+    }
 }
 
 void

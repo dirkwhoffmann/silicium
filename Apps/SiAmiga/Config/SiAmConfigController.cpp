@@ -72,7 +72,7 @@ SiAmConfigController::loadExtRom(const QUrl &url)
 
     } catch (std::exception &e) {
 
-        emit showError("Failed to load Extended ROM.", e.what());
+        emit showError("Failed to load Kickstart Extension ROM.", e.what());
     }
 }
 
@@ -100,7 +100,7 @@ SiAmConfigController::deleteExtRom()
 
     } catch (std::exception &e) {
 
-        emit showError("Failed to delete Extended ROM.", e.what());
+        emit showError("Failed to delete Kickstart Extension ROM.", e.what());
     }
 }
 

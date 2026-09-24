@@ -17,6 +17,19 @@
 
 using namespace vc64;
 
+/* What to call a ROM in a message.
+ *
+ * Taken from the core's own table, so an error names a ROM the same way the
+ * Configurator does. A file whose type could not be determined has no name
+ * to give -- that is what the message is about -- so it stays a plain "ROM".
+ */
+static QString
+romName(RomType type)
+{
+    return type == RomType::UNKNOWN ? QStringLiteral("ROM")
+                                    : QString::fromUtf8(RomTypeEnum::help(type));
+}
+
 SiC64ConfigController::SiC64ConfigController(C64Controller *parent)
     : Controller(parent), parent(parent)
 {
@@ -83,12 +96,12 @@ SiC64ConfigController::loadRom(const QUrl &url, RomType type)
 
     } catch (IOError &) {
 
-        emit showError("Failed to load ROM.",
+        emit showError("Failed to load " + romName(type) + ".",
                        "The file is not recognized as a ROM of the requested type.");
 
     } catch (std::exception &e) {
 
-        emit showError("Failed to load ROM.", e.what());
+        emit showError("Failed to load " + romName(type) + ".", e.what());
     }
 }
 
@@ -137,7 +150,7 @@ SiC64ConfigController::installOpenRoms()
 
     } catch (std::exception &e) {
 
-        emit showError("Failed to install the OpenROMs.", e.what());
+        emit showError("Failed to install OpenROMs.", e.what());
     }
 }
 
@@ -151,7 +164,7 @@ SiC64ConfigController::deleteRom(RomType type)
 
     } catch (std::exception &e) {
 
-        emit showError("Failed to delete ROM.", e.what());
+        emit showError("Failed to delete " + romName(type) + ".", e.what());
     }
 }
 

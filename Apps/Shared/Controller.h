@@ -44,6 +44,20 @@ protected:
     Q_INVOKABLE virtual void start() { }
     Q_INVOKABLE virtual void stop() { }
 
+    /* Re-emits what a sub-controller reports as our own.
+     *
+     * A machine is split over a main controller and several smaller ones
+     * (media, config, ...), but the window only knows the one it was given.
+     * Without this, a message from a sub-controller has no listener and is
+     * lost -- an error dialog that never appears.
+     */
+    void adopt(Controller *child) {
+
+        connect(child, &Controller::showError, this, &Controller::showError);
+        connect(child, &Controller::showFatalError, this, &Controller::showFatalError);
+        connect(child, &Controller::showNotification, this, &Controller::showNotification);
+    }
+
 
     //
     // Signals

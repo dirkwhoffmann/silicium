@@ -71,7 +71,7 @@ SiAmMediaController::insertDisk(int nr, const QUrl &url, bool wp)
 
     } catch (const std::exception &e) {
 
-        showError("Failed to insert the disk.", e.what());
+        showError("Failed to insert disk.", e.what());
     }
 }
 
@@ -84,7 +84,7 @@ SiAmMediaController::newDisk(int nr)
 
     } catch (const std::exception &e) {
 
-        showError("Failed to create a new disk.", e.what());
+        showError("Failed to create disk.", e.what());
     }
 }
 
@@ -97,7 +97,7 @@ SiAmMediaController::ejectDisk(int nr)
 
     } catch (const std::exception &e) {
 
-        showError("Failed to eject the disk.", e.what());
+        showError("Failed to eject disk.", e.what());
     }
 }
 
@@ -112,7 +112,7 @@ SiAmMediaController::exportDisk(int nr, const QUrl &url)
 
     } catch (const std::exception &e) {
 
-        showError("Failed to export the disk.", e.what());
+        showError("Failed to export disk.", e.what());
     }
 }
 
@@ -126,7 +126,7 @@ SiAmMediaController::toggleWriteProtection(int nr)
 
     } catch (const std::exception &e) {
 
-        showError("Failed to change the write-protection status.", e.what());
+        showError("Failed to change write protection.", e.what());
     }
 }
 
@@ -147,7 +147,7 @@ SiAmMediaController::attachHd(int nr, const QUrl &url)
 
     } catch (const std::exception &e) {
 
-        showError("Failed to attach the hard drive.", e.what());
+        showError("Failed to attach hard drive.", e.what());
     }
 }
 
@@ -209,7 +209,7 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
     connect(m_task, &SiTask::failed, this, [this](const QString &error) {
 
         disconnect(m_task, &SiTask::failed, this, nullptr);
-        emit showError("Failed to attach the hard drive.", error);
+        emit showError("Failed to attach hard drive.", error);
     });
     connect(m_task, &SiTask::finished, this, [this] {
 
@@ -348,7 +348,7 @@ SiAmMediaController::exportHd(int nr, const QUrl &url)
 
     } catch (const std::exception &e) {
 
-        showError("Failed to export the hard drive.", e.what());
+        showError("Failed to export hard drive.", e.what());
     }
 }
 
