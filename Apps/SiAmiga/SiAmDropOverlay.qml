@@ -69,7 +69,9 @@ DropOverlay {
 
         hdDialog.driveNr = driveNr
         hdDialog.fileUrl = url
+        console.log("Calling hdDialog.open()")
         hdDialog.open()
+        console.log("Returning from hdDialog.open()")
     }
 
 
@@ -123,7 +125,11 @@ DropOverlay {
         okLabel: qsTr("Continue")
         sound: true
 
-        onAccepted: root.controller.media.copyAndAttachHd(driveNr, fileUrl)
+        onAccepted: {
+            console.log("Calling copyAndAttachHd")
+            root.controller.media.copyAndAttachHd(driveNr, fileUrl)
+            console.log("Returning from copyAndAttachHd")
+        }
     }
 
     // One Action per drive, built once and rebound into 'actions' below

@@ -202,6 +202,44 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
     const auto src = fs::path(url.toLocalFile().toStdWString());
     const auto dest = parent->workspaceFolder() / hdImageName(nr, url).toStdString();
 
+    auto core = SiAmController::core();
+
+    try {
+        // Power off the emulator
+        printf("Powering off (%d)...\n", core.isPoweredOff());
+        core.powerOff();
+        printf("Power(0) = %d\n", core.isPoweredOff());
+
+        // Wait for the emulator to power off
+        core.sync();
+        printf("Power(1) = %d\n", core.isPoweredOff());
+
+        // Copy HDF into the SVM
+        printf("Copying file");
+        std::error_code ec;
+        if (!fs::copy_file(src, dest, fs::copy_options::overwrite_existing, ec)) {
+            printf("COPY FAILED\n");
+        }
+
+        // Make sure a hard-drive controller is installed
+        printf("Connecting hard-drive controller\n");
+        core.set(Opt::HDC_CONNECT, true, nr);
+
+        // Attach hard drive
+        printf("Attaching hard drive...\n");
+        core.hd[nr]->attach(dest);
+
+        // Relaunch
+        printf("Run...\n");
+        core.run();
+        printf("After run...\n");
+
+    } catch (const std::exception &e) {
+
+        printf("EXCEPTION: %s\n", e.what());
+    }
+
+#if 0
     /* Let the drive that is there now go of the file before the worker starts
      * on it.
      *
@@ -285,6 +323,7 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
             throw;
         }
     });
+#endif
 }
 
 void
