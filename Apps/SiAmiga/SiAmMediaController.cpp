@@ -277,24 +277,25 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
     });
 
     m_task->run(tr("Copying the hard drive into the virtual machine..."),
-                [src, dest](utl::Progress &progress) {
+                [src, dest](utl::ProgressTask &task) {
 
         /* Reading the image is what validates it: a file that turns out not
          * to be a hard drive image, or cannot be read, fails here, before
          * anything has been written. It is also what unpacks a .hdz, since
-         * HDFFile puts a gzip backing under a compressed file -- which is why
-         * the total is only known afterwards, and the bar runs indeterminate
-         * until then.
+         * HDFFile puts a gzip backing under a compressed file.
+         *
+         * It is one opaque call with nowhere to report from, so the bar sits
+         * where it is until this returns. For an image with a rigid disk
+         * block that is no time at all; for one without, HDFLayout scans the
+         * whole file looking for a root block, and it is the bulk of the job.
          */
         auto image = std::make_unique<HDFFile>(src);
-        progress.check();
-
-        const auto total = image->getSize();
-        progress.setTotal(total);
+        task.check();
 
         /* Written a chunk at a time rather than in one call, so that there is
          * something to report and somewhere to stop.
          */
+        const auto total = image->getSize();
         constexpr isize chunk = 1024 * 1024;
 
         std::ofstream os(dest, std::ios::binary);
@@ -303,11 +304,11 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
         try {
             for (isize offset = 0; offset < total; offset += chunk) {
 
-                progress.check();
+                task.check();
 
                 const auto len = std::min(chunk, total - offset);
                 image->writeToStream(os, offset, len);
-                progress.advance(len);
+                task.setProgress(double(offset + len) / double(total));
             }
 
             os.close();

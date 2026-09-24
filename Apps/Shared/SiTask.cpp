@@ -11,19 +11,18 @@
 
 SiTask::SiTask(QObject *parent) : QObject(parent)
 {
-    /* Fast enough to look continuous, slow enough to be free. The worker
-     * advances its counters far more often than this; what is shown is
+    /* Fast enough to look continuous, slow enough to be free. The task
+     * advances its own counter far more often than this; what is shown is
      * simply wherever it had got to when the timer last looked.
      */
     timer.setInterval(40);
-    connect(&timer, &QTimer::timeout, this, &SiTask::poll);
+    connect(&timer, &QTimer::timeout, this, [this]() { emit changed(); });
 }
 
 SiTask::~SiTask()
 {
-    // The body holds a reference to this object's task, so it has to be gone
-    // before the task is.
-    task.cancel();
+    // The body reports through this object, so it has to be gone first.
+    task.abort();
     task.join();
 }
 
@@ -34,35 +33,36 @@ SiTask::setText(const QString &value)
 }
 
 void
-SiTask::run(const QString &text, std::function<void(utl::Progress &)> body)
+SiTask::run(const QString &text, utl::ProgressTask::Body body)
 {
     if (task.isRunning()) return;
 
     m_text = text;
-    task.start(std::move(body));
 
-    emit changed();
-    timer.start();
-}
-
-void
-SiTask::poll()
-{
-    emit changed();
-
-    if (task.isRunning()) return;
-
-    /* The job has ended. Stop looking, collect the thread, and say how it
-     * went -- on this thread, so a handler can go straight on with whatever
-     * had to wait for the job.
+    /* Each hook hands itself to this object's thread before touching
+     * anything. They arrive on the task's thread, where emitting a signal
+     * that a window is connected to would be undefined.
      */
-    timer.stop();
-    task.join();
+    auto post = [this](std::function<void()> action) {
 
-    const auto state = task.state();
-    const bool cancelled = state == utl::Task::State::Cancelled;
-    const bool ok = state == utl::Task::State::Completed;
+        QMetaObject::invokeMethod(this, std::move(action), Qt::QueuedConnection);
+    };
+
+    task.run({
+        .started = [this, post] {
+            post([this] { timer.start(); emit changed(); emit started(); });
+        },
+        .progressed = { },      // sampled by the timer instead, see SiTask.h
+        .aborted = [this, post] {
+            post([this] { emit aborted(); });
+        },
+        .failed = [this, post] (const std::string &error) {
+            post([this, error] { emit failed(QString::fromStdString(error)); });
+        },
+        .finished = [this, post] {
+            post([this] { timer.stop(); emit changed(); emit finished(); });
+        }
+    }, std::move(body));
 
     emit changed();
-    emit finished(ok, cancelled, QString::fromStdString(task.error()));
 }

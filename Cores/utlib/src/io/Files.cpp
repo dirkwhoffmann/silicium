@@ -53,50 +53,6 @@ ensureExtension(const fs::path &path, const string &extension)
     return result;
 }
 
-void
-copyFile(const fs::path &from, const fs::path &to, Progress &progress, isize chunk)
-{
-    std::ifstream in(from, std::ios::binary);
-    if (!in) throw IOError(IOError::FILE_CANT_READ, from);
-
-    std::ofstream out(to, std::ios::binary);
-    if (!out) throw IOError(IOError::FILE_CANT_CREATE, to);
-
-    progress.setTotal(getSizeOfFile(from));
-
-    std::vector<char> buffer(size_t(chunk), '\0');
-
-    try {
-
-        while (in) {
-
-            progress.check();
-
-            in.read(buffer.data(), std::streamsize(chunk));
-            auto read = in.gcount();
-            if (read <= 0) break;
-
-            if (!out.write(buffer.data(), read)) {
-                throw IOError(IOError::FILE_CANT_WRITE, to);
-            }
-            progress.advance(i64(read));
-        }
-
-        out.close();
-        if (!out) throw IOError(IOError::FILE_CANT_WRITE, to);
-
-    } catch (...) {
-
-        /* Leave nothing half-written behind. A partial image is worse than no
-         * image: it looks like a file the next thing along can open.
-         */
-        out.close();
-        std::error_code ec;
-        fs::remove(to, ec);
-        throw;
-    }
-}
-
 isize
 getSizeOfFile(const fs::path &path)
 {

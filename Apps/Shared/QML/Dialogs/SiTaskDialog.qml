@@ -15,10 +15,7 @@ import Silicium.Theme
 /* Shows what a SiTask is doing.
  *
  * Bind 'task' to one and the dialog follows it: it opens when the job starts
- * and closes when it ends, so a caller only has to start the job. The bar is
- * indeterminate until the job knows how much work there is, which spares the
- * user a bar that sits at nought percent through a first phase of unknown
- * length.
+ * and closes when it ends, so a caller only has to start the job.
  *
  * 'task' is untyped on purpose. SiTask is a plain QObject rather than a
  * registered QML type, so this file works in every app without each of them
@@ -82,8 +79,7 @@ SiDialog {
         SiProgressBar {
 
             Layout.fillWidth: true
-            indeterminate: root.task !== null && root.task.running && !root.task.determinate
-            value: root.task ? root.task.fraction : 0.0
+            value: root.task ? root.task.progress : 0.0
         }
 
         SiText {
@@ -92,15 +88,7 @@ SiDialog {
             horizontalAlignment: Text.AlignRight
             font.pixelSize: Style.small
             opacity: 0.7
-            visible: root.task !== null && root.task.determinate
-            text: root.task ? root.formatted(root.task.done) + " of " + root.formatted(root.task.total) : ""
+            text: root.task ? Math.round(root.task.progress * 100) + "%" : ""
         }
-    }
-
-    function formatted(bytes) {
-
-        if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + " MB"
-        if (bytes >= 1024) return Math.round(bytes / 1024) + " KB"
-        return bytes + " bytes"
     }
 }

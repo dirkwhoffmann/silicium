@@ -11,7 +11,6 @@
 
 #include "utl/abilities/Reflectable.h"
 #include "utl/io/IOError.h"
-#include "utl/concurrency/Task.h"
 #include <iostream>
 #include <algorithm>
 #include <filesystem>
@@ -32,20 +31,6 @@ fs::path ensureExtension(const fs::path &path, const string &extension);
 
 // Returns the size of a file in bytes
 isize getSizeOfFile(const fs::path &path);
-
-/* Copies a file, a chunk at a time, reporting how far it has got.
- *
- * Unlike fs::copy_file this can say what it is doing and can be stopped part
- * way through, which is what makes it usable behind a progress bar. It is
- * also slower for that reason, so it is worth the trouble only for files
- * large enough that somebody is waiting.
- *
- * The progress object is given the file's size up front and advanced after
- * every chunk; it is also asked between chunks whether to carry on, and a
- * cancelled copy throws Progress::Aborted after removing the partial file.
- */
-void copyFile(const fs::path &from, const fs::path &to, Progress &progress,
-              isize chunk = 1024 * 1024);
 
 // Checks if a file exists
 bool fileExists(const fs::path &path);

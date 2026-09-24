@@ -15,36 +15,33 @@
 #include <QTimer>
 #include <functional>
 
-/* A long-running job, as seen from QML.
+/* A utl::ProgressTask, as seen from QML.
  *
- * The work itself is a utl::Task, which knows nothing about Qt and lives in
- * utlib so that the same job can be driven from vAmiga's Cocoa front end. All
- * this class adds is a way to watch one: it samples the task's progress on a
- * timer and republishes it as properties, which is enough for a progress bar
- * to bind to.
+ * The work itself knows nothing about Qt and lives in utlib, so that the same
+ * job can be driven from vAmiga's Cocoa front end. All this class does is make
+ * one watchable: it republishes the task's progress as properties a progress
+ * bar can bind to, and turns the task's callbacks into signals delivered on
+ * this object's own thread.
  *
- * Sampling rather than signalling from the worker is deliberate. The worker
- * reports progress after every chunk -- far more often than a window can be
- * redrawn -- and a signal per chunk would be both wasted work and a stream of
- * cross-thread events. A watcher that reads three atomics per frame costs
- * nothing and cannot fall behind.
+ * That last part is the whole point of the class. A ProgressTask calls its
+ * hooks on the thread doing the work, which is the wrong thread for anything
+ * that touches a window; the handover happens once here rather than in every
+ * caller.
  *
- * finished() is emitted on the thread that owns this object, so whatever has
- * to happen after the job -- installing the file that was just copied, say --
- * can be done there without further marshalling.
+ * Progress is sampled rather than forwarded. The task reports after every
+ * chunk -- far more often than a window can be redrawn -- so a signal each
+ * time would be work spent on frames nobody sees. The lifecycle hooks are rare
+ * and are passed straight through.
  */
 class SiTask : public QObject {
 
     Q_OBJECT
 
     Q_PROPERTY(bool running READ running NOTIFY changed)
-    Q_PROPERTY(qreal fraction READ fraction NOTIFY changed)
-    Q_PROPERTY(bool determinate READ determinate NOTIFY changed)
-    Q_PROPERTY(qint64 done READ done NOTIFY changed)
-    Q_PROPERTY(qint64 total READ total NOTIFY changed)
+    Q_PROPERTY(qreal progress READ progress NOTIFY changed)
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY changed)
 
-    utl::Task task;
+    utl::ProgressTask task;
     QTimer timer;
     QString m_text;
 
@@ -54,35 +51,32 @@ public:
     ~SiTask() override;
 
     bool running() const { return task.isRunning(); }
-    qreal fraction() const { return task.progress().fraction(); }
-    bool determinate() const { return task.progress().isKnown(); }
-    qint64 done() const { return task.progress().done(); }
-    qint64 total() const { return task.progress().total(); }
+    qreal progress() const { return task.progress(); }
 
     QString text() const { return m_text; }
     void setText(const QString &value);
 
-    /* Hands the body to a worker thread and returns at once.
+    /* Starts the body on a thread of its own and returns at once.
      *
-     * The body reports through the Progress it is given, and is expected to
-     * call check() between chunks so that cancelling takes effect promptly.
-     * Whatever it throws ends the job; the message reaches finished().
+     * The body is handed the task, which is how it reports progress
+     * (setProgress, or a toolbox call such as copy) and how it notices that
+     * cancel() has been called (check).
      */
-    void run(const QString &text, std::function<void(utl::Progress &)> body);
+    void run(const QString &text, utl::ProgressTask::Body body);
 
     // Asks the job to stop. It ends as soon as its body notices.
-    Q_INVOKABLE void cancel() { task.cancel(); }
+    Q_INVOKABLE void cancel() { task.abort(); }
 
 signals:
 
     void changed();
 
-    /* The job has ended. 'cancelled' tells a clean stop from a failure, and
-     * 'error' is empty unless something went wrong.
-     */
-    void finished(bool ok, bool cancelled, const QString &error);
+    // The job has begun, ended without finishing, or failed. All are
+    // delivered on this object's thread.
+    void started();
+    void aborted();
+    void failed(const QString &error);
 
-private:
-
-    void poll();
+    // Always last, whichever of the three came before it
+    void finished();
 };
