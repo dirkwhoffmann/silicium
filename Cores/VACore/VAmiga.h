@@ -1782,6 +1782,9 @@ public:
     
     VAmiga();
     ~VAmiga();
+
+    VAmiga(const VAmiga &) = delete;
+    VAmiga &operator=(const VAmiga &) = delete;
     
     /// @name Analyzing the emulator
     /// @{

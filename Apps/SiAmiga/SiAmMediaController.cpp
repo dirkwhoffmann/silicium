@@ -202,7 +202,7 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
     const auto src = fs::path(url.toLocalFile().toStdWString());
     const auto dest = parent->workspaceFolder() / hdImageName(nr, url).toStdString();
 
-    auto core = SiAmController::core();
+    auto &core = SiAmController::core();
 
     try {
         // Power off the emulator
@@ -215,7 +215,7 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
         printf("Power(1) = %d\n", core.isPoweredOff());
 
         // Copy HDF into the SVM
-        printf("Copying file");
+        printf("Copying file\n");
         std::error_code ec;
         if (!fs::copy_file(src, dest, fs::copy_options::overwrite_existing, ec)) {
             printf("COPY FAILED\n");
