@@ -8,6 +8,7 @@
 // -----------------------------------------------------------------------------
 
 #include "SiAmMediaController.h"
+#include "SiTask.h"
 #include "SVMFile.h"
 #include "HDFFile.h"
 #include <QFileInfo>
@@ -20,7 +21,7 @@ using namespace vamiga;
 SiAmMediaController::SiAmMediaController(SiAmController *parent)
     : Controller(parent), parent(parent)
 {
-
+    m_task = new SiTask(this);
 }
 
 bool
@@ -186,40 +187,111 @@ SiAmMediaController::hdExistingImage(int nr) const
     }
 }
 
+QObject *
+SiAmMediaController::task() const
+{
+    return m_task;
+}
+
 void
 SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
 {
     if (!url.isLocalFile()) return;
+    if (m_task->running()) return;
 
+    const auto src = fs::path(url.toLocalFile().toStdWString());
+    const auto dest = parent->workspaceFolder() / hdImageName(nr, url).toStdString();
+
+    /* Let the drive that is there now go of the file before the worker starts
+     * on it.
+     *
+     * A hard drive reads its image lazily, straight from the file, so
+     * overwriting the file underneath it would corrupt the drive that is
+     * still using it. loadIntoMemory() takes the contents into RAM and drops
+     * the file. It happens here rather than in the worker because it touches
+     * the machine, and the machine belongs to this thread.
+     */
     try {
-        const auto src = fs::path(url.toLocalFile().toStdWString());
-        const auto dest = parent->workspaceFolder() / hdImageName(nr, url).toStdString();
+        std::error_code ec;
+        if (fs::equivalent(SiAmController::core().hd[nr]->path(), dest, ec)) {
+            SiAmController::core().hd[nr]->loadIntoMemory();
+        }
 
-        auto &core = SiAmController::core();
+    } catch (const std::exception &e) {
 
-        /* Read the image before anything else is disturbed. A file that turns
-         * out not to be a hard drive image, or cannot be read, then fails
-         * while the machine is still untouched. This also unpacks a .hdz:
-         * HDFFile puts a gzip backing under a compressed file, so what gets
-         * written out below is the plain image either way.
+        showError("Failed to copy the hard drive.", e.what());
+        return;
+    }
+
+    connect(m_task, &SiTask::finished, this,
+            [this, nr, dest](bool ok, bool cancelled, const QString &error) {
+
+        // One shot: the next drop connects its own handler
+        disconnect(m_task, &SiTask::finished, this, nullptr);
+
+        if (cancelled) return;
+
+        if (!ok) {
+            showError("Failed to copy the hard drive.", error);
+            return;
+        }
+        installCopiedHd(nr, dest);
+    });
+
+    m_task->run(tr("Copying the hard drive into the virtual machine..."),
+                [src, dest](utl::Progress &progress) {
+
+        /* Reading the image is what validates it: a file that turns out not
+         * to be a hard drive image, or cannot be read, fails here, before
+         * anything has been written. It is also what unpacks a .hdz, since
+         * HDFFile puts a gzip backing under a compressed file -- which is why
+         * the total is only known afterwards, and the bar runs indeterminate
+         * until then.
          */
         auto image = std::make_unique<HDFFile>(src);
+        progress.check();
 
-        /* Let the drive that is there now go of the file first.
-         *
-         * A hard drive reads its image lazily, straight from the file, so
-         * overwriting the file underneath it would corrupt the drive that is
-         * still using it. loadIntoMemory() takes the contents into RAM and
-         * drops the file, and it happens immediately rather than being queued
-         * for the emulator thread -- which matters, because the very next
-         * thing here replaces that file.
+        const auto total = image->getSize();
+        progress.setTotal(total);
+
+        /* Written a chunk at a time rather than in one call, so that there is
+         * something to report and somewhere to stop.
          */
-        std::error_code ec;
-        if (fs::equivalent(core.hd[nr]->path(), dest, ec)) core.hd[nr]->loadIntoMemory();
+        constexpr isize chunk = 1024 * 1024;
 
-        // Replace the image.
-        image->writeToFile(dest);
-        image.reset();
+        std::ofstream os(dest, std::ios::binary);
+        if (!os) throw utl::IOError(utl::IOError::FILE_CANT_CREATE, dest);
+
+        try {
+            for (isize offset = 0; offset < total; offset += chunk) {
+
+                progress.check();
+
+                const auto len = std::min(chunk, total - offset);
+                image->writeToStream(os, offset, len);
+                progress.advance(len);
+            }
+
+            os.close();
+            if (!os) throw utl::IOError(utl::IOError::FILE_CANT_WRITE, dest);
+
+        } catch (...) {
+
+            // Leave no half-written image behind: it would look like one the
+            // next launch could attach.
+            os.close();
+            std::error_code ec;
+            fs::remove(dest, ec);
+            throw;
+        }
+    });
+}
+
+void
+SiAmMediaController::installCopiedHd(int nr, const fs::path &dest)
+{
+    try {
+        auto &core = SiAmController::core();
 
         core.hd[nr]->attach(dest);
 
@@ -256,7 +328,7 @@ SiAmMediaController::copyAndAttachHd(int nr, const QUrl &url)
 
     } catch (const std::exception &e) {
 
-        showError("Failed to copy the hard drive.", e.what());
+        showError("Failed to attach the hard drive.", e.what());
     }
 }
 

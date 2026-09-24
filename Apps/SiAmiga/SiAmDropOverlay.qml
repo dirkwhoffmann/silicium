@@ -72,6 +72,20 @@ DropOverlay {
         hdDialog.open()
     }
 
+
+    /* The copy runs on a worker thread and can take seconds for a large
+     * image, so it gets a progress bar rather than a frozen window. The
+     * dialog follows the task on its own -- it opens when the copy starts and
+     * closes when it ends.
+     */
+    SiTaskDialog {
+
+        parent: root.window.contentItem
+        task: root.controller.media.task
+        cancellable: true
+    }
+
+
     SiUserDialog {
 
         id: hdDialog
