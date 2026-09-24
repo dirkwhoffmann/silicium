@@ -120,9 +120,7 @@ public:
 
     ~BackedBuffer();
 
-    /* Copying is refused, because two buffers would share one file without
-     * knowing about each other.
-     */
+    // Copying is refused, because two buffers would share one file
     BackedBuffer(const BackedBuffer &) = delete;
     BackedBuffer &operator=(const BackedBuffer &) = delete;
 
