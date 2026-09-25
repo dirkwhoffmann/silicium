@@ -69,6 +69,13 @@ Rectangle {
     function track(nr)     { tick; return amiga.media.driveTrack(nr) }
     function busy(nr)      { tick; return amiga.media.driveMotor(nr) }
 
+    Component.onCompleted: {
+
+        myTicker.show("Text 1", 500)
+        myTicker.show("Text 2", 500)
+        myTicker.show("Text 3", 500, 1500)
+    }
+
     //
     // Pictogram
     //
@@ -486,44 +493,83 @@ Rectangle {
         }
 
         //
-        // Floppy drives
+        // Ticker
         //
 
-        Repeater {
+        RowLayout {
 
-            model: 4
+            visible: myTicker.text !== ""
+            Layout.fillWidth: true
 
-            RowLayout {
+            BusyIndicator {
 
-                required property int index
+                visible: true
+                implicitHeight: 22
+                implicitWidth: 22
+                padding: 3
+                running: busy && amiga.isRunning
+            }
 
-                // driveConnected(nr) is a Q_INVOKABLE, not a Q_PROPERTY, so
-                // reading it here wouldn't register as a binding dependency
-                // and 'visible' would go stale -- see the DF0_CONNECTED..
-                // _CONNECTED comment in SiAmConfigController.h. index is
-                // fixed per delegate, so the matching named property keeps
-                // this reactive.
-                visible: {
-                    switch (index) {
-                        case 0: return config.DF0_CONNECTED
-                        case 1: return config.DF1_CONNECTED
-                        case 2: return config.DF2_CONNECTED
-                        case 3: return config.DF3_CONNECTED
+            SiTicker {
+
+                id: myTicker
+                Layout.fillWidth: true
+                size: Size.small
+            }
+        }
+
+        //
+        // LEDs / Peripherals
+        //
+
+        RowLayout {
+
+            visible: myTicker.text === ""
+
+            //
+            // Floppy drives
+            //
+
+            Repeater {
+
+                model: 4
+
+                RowLayout {
+
+                    required property int index
+
+                    // driveConnected(nr) is a Q_INVOKABLE, not a Q_PROPERTY, so
+                    // reading it here wouldn't register as a binding dependency
+                    // and 'visible' would go stale -- see the DF0_CONNECTED..
+                    // _CONNECTED comment in SiAmConfigController.h. index is
+                    // fixed per delegate, so the matching named property keeps
+                    // this reactive.
+                    visible: {
+                        switch (index) {
+                            case 0:
+                                return config.DF0_CONNECTED
+                            case 1:
+                                return config.DF1_CONNECTED
+                            case 2:
+                                return config.DF2_CONNECTED
+                            case 3:
+                                return config.DF3_CONNECTED
+                        }
+                        return false
                     }
-                    return false
-                }
 
-                FloppyObserver {
+                    FloppyObserver {
 
-                    redIcon: root.redIcon(index)
-                    greenIcon: root.greenIcon(index)
-                    diskIcon: root.diskIcon(index)
-                    track: root.track(index)
-                    busy: root.busy(index)
-                }
+                        redIcon: root.redIcon(index)
+                        greenIcon: root.greenIcon(index)
+                        diskIcon: root.diskIcon(index)
+                        track: root.track(index)
+                        busy: root.busy(index)
+                    }
 
-                HSpacer {
-                    size: Style.mediumSpacing
+                    HSpacer {
+                        size: Style.mediumSpacing
+                    }
                 }
             }
         }
