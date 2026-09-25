@@ -75,12 +75,33 @@ SiAmMediaController::insertDisk(int nr, const QUrl &url, bool wp)
     }
 }
 
+QString
+SiAmMediaController::driveCapacity(int nr) const
+{
+    switch (SiAmController::core().df[nr]->getConfig().type) {
+
+        case FloppyDriveType::DD_35:    return "3.5\" DD";
+        case FloppyDriveType::HD_35:    return "3.5\" HD";
+        case FloppyDriveType::DD_525:   return "5.25\" DD";
+    }
+    return "";
+}
+
+bool
+SiAmMediaController::driveHighDensity(int nr) const
+{
+    return SiAmController::core().df[nr]->getConfig().type == FloppyDriveType::HD_35;
+}
+
 void
-SiAmMediaController::newDisk(int nr)
+SiAmMediaController::newDisk(int nr, int fsFormat, int bootBlock, const QString &name)
 {
     try {
 
-        SiAmController::core().df[nr]->insertBlankDisk(amiga::FSFormat::OFS, amiga::BootBlockId::AMIGADOS_13, "Empty");
+        auto fs = amiga::FSFormat(fsFormat);
+        auto bb = amiga::BootBlockId(bootBlock);
+
+        SiAmController::core().df[nr]->insertBlankDisk(fs, bb, name.toStdString());
 
     } catch (const std::exception &e) {
 

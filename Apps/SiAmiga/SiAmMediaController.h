@@ -42,7 +42,22 @@ public:
     Q_INVOKABLE bool driveWriting(int nr) const;
     Q_INVOKABLE int driveTrack(int nr) const;
     Q_INVOKABLE void insertDisk(int nr, const QUrl &url, bool wp = false);
-    Q_INVOKABLE void newDisk(int nr);
+
+    // What the drive's model makes of a blank disk. SiAmDiskCreator shows the
+    // capacity and picks the disk icon from it -- the geometry itself isn't
+    // ours to choose, the core derives it from the drive (FloppyDrive::
+    // insertNew) exactly as vAmiga's own FloppyCreator reports it.
+    Q_INVOKABLE QString driveCapacity(int nr) const;
+    Q_INVOKABLE bool driveHighDensity(int nr) const;
+
+    /* Formats a blank disk and inserts it.
+     *
+     * 'fsFormat' and 'bootBlock' are raw amiga::FSFormat / amiga::BootBlockId
+     * values, which is what SiAmDiskCreator's combo box tags carry -- the
+     * enums aren't registered with QML, and listing only the entries worth
+     * offering means a position wouldn't identify one anyway.
+     */
+    Q_INVOKABLE void newDisk(int nr, int fsFormat, int bootBlock, const QString &name);
     Q_INVOKABLE void ejectDisk(int nr);
     Q_INVOKABLE void exportDisk(int nr, const QUrl &url);
     Q_INVOKABLE void toggleWriteProtection(int nr);

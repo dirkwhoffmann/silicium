@@ -218,6 +218,9 @@ ApplicationWindow {
         errorDialog.bodyText = text
         errorDialog.buttons = Dialog.Ok
         errorDialog.okLabel = qsTr("OK")
+        // The dialog is shared with proceedWithUnsavedFloppyDisk below, whose
+        // callback would otherwise still be armed when OK is pressed here.
+        errorDialog.acceptedCallback = null
         errorDialog.open()
     }
 
@@ -226,6 +229,47 @@ ApplicationWindow {
         id: errorDialog
         sound: true
     }
+
+    //
+    // Media files
+    //
+
+    /* Warns before a modified disk is thrown away.
+     *
+     * The port of SiC64Window's function of the same name, down to the
+     * preference that turns it off -- the core has no undo for an ejected
+     * disk, so what has not been exported is gone.
+     */
+    function proceedWithUnsavedFloppyDisk(driveNr, proceed) {
+
+        if (Preferences.ejectWithoutAsking || !amiga.media.driveModified(driveNr)) {
+            proceed()
+            return
+        }
+
+        errorDialog.titleText = qsTr("Drive df%1 contains an unsaved disk.").arg(driveNr)
+        errorDialog.bodyText = qsTr("Your changes will be lost if you proceed.")
+        errorDialog.buttons = Dialog.Cancel | Dialog.Ok
+        errorDialog.okLabel = qsTr("Proceed")
+        errorDialog.acceptedCallback = proceed
+        errorDialog.open()
+    }
+
+    function newDiskAction(driveNr) {
+
+        proceedWithUnsavedFloppyDisk(driveNr, function () {
+            diskCreatorDialog.driveNr = driveNr
+            diskCreatorDialog.open()
+        })
+    }
+
+    SiAmDiskCreator {
+
+        id: diskCreatorDialog
+        amiga: root.amiga
+    }
+
+
 
 
     Component.onCompleted: updateOverlayStack()

@@ -193,13 +193,12 @@ SiMenuBar {
 
         SiMenuSeparator { visible: connected }
 
-        // No FileDialog wiring yet -- SiAmWindow.qml doesn't have
-        // insertDiskAction/newDiskAction/exportDiskAction (see SiC64Window.qml
-        // for what these eventually look like).
+        // insertDiskAction/exportDiskAction are still missing from
+        // SiAmWindow.qml (see SiC64Window.qml for what these look like).
         SiMenuItem {
-            text: qsTr("New")
+            text: qsTr("New...")
             visible: connected
-            onTriggered: amiga.media.newDisk(driveNr)
+            onTriggered: window.newDiskAction(driveNr)
         }
         SiMenuItem {
             text: qsTr("Insert...")
