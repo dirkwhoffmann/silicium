@@ -15,19 +15,6 @@ import Silicium.Controllers
 import Silicium.Preferences
 import Silicium.Theme
 
-//
-// Port of SiC64Statusbar.qml. SiAmiga's SiAmInfoController (unlike the
-// original port note here) now does back the server-state popup -- see
-// SiAmServerConfig.qml, which uses the same serverState/serverStateIcon/
-// serverStateName machinery. The floppy indicators below read the info
-// controller's per-drive properties, which the core's own drive messages
-// keep fresh -- the same source SiC64Statusbar uses (info.spinning8 and
-// friends). The tape, cartridge and jammed/tracking/mute
-// pictogram row have no Amiga equivalent or backing state at all yet, so
-// they're still dropped rather than wired to nothing -- same trim
-// SiAmMenu.qml and SiAmToolbar.qml made.
-//
-
 Rectangle {
 
     id: root
@@ -119,9 +106,8 @@ Rectangle {
 
     Component.onCompleted: {
 
-        myTicker.show("Text 1", 500)
-        myTicker.show("Text 2", 500)
-        myTicker.show("Text 3", 500, 1500)
+        myTicker.show("Initializing...", 2000)
+        myTicker.hide()
     }
 
     //
@@ -166,7 +152,7 @@ Rectangle {
         required property url greenIcon
         required property url diskIcon
         required property int track
-        required property bool busy
+        required property bool spinning
 
         implicitWidth: layout.implicitWidth
         implicitHeight: layout.implicitHeight
@@ -211,14 +197,12 @@ Rectangle {
                 icon.source: diskIcon ? diskIcon : ""
             }
 
-            // Turning while this drive's motor is, and only while the
-            // machine is running: a paused Amiga has stopped everything.
             BusyIndicator {
 
                 implicitHeight: 22
                 implicitWidth: 22
                 padding: 3
-                running: root.busy && amiga.isRunning
+                running: root.spinning && amiga.isRunning
             }
         }
     }
@@ -551,13 +535,9 @@ Rectangle {
             visible: myTicker.text !== ""
             Layout.fillWidth: true
 
-            /* This one belongs to the message beside it, not to a drive.
-             * 'busy' here would have found the root's busy() function, which
-             * is a function and therefore always true -- it span whatever
-             * the machine was doing.
-             */
             BusyIndicator {
 
+                visible: root.amiga.busy
                 implicitHeight: 22
                 implicitWidth: 22
                 padding: 3
@@ -570,15 +550,11 @@ Rectangle {
                 Layout.fillWidth: true
                 size: Size.small
 
-                /* What the machine is busy with, for as long as it is busy
-                 * (see Controller::runTask). The job says when it is over by
-                 * reporting an empty text, which blanks the ticker and brings
-                 * the drive LEDs back.
-                 */
                 Connections {
 
                     target: amiga
                     function onShowProgress(what, percentage) { myTicker.show(what) }
+                    function onShowTicker(what) { myTicker.show(what) }
                 }
             }
         }
@@ -629,7 +605,7 @@ Rectangle {
                         greenIcon: root.greenIcon(index)
                         diskIcon: root.diskIcon(index)
                         track: root.track(index)
-                        busy: root.spinning(index)
+                        spinning: root.spinning(index)
                     }
 
                     HSpacer {

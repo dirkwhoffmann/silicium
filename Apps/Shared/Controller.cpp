@@ -36,6 +36,8 @@ Controller::runTask(const QString &what,
     if (m_busy) return false;
 
     m_busy = true;
+    emit busyChanged();
+
     announce(what, 0.0);
 
     /* The body says what went wrong itself, rather than letting the
@@ -58,6 +60,8 @@ Controller::runTask(const QString &what,
     QtConcurrent::task(std::move(guarded)).spawn().then(this, [this, failure, error, done] {
 
         m_busy = false;
+        emit busyChanged();
+
         announce({ }, 0.0);
 
         if (error->isEmpty()) {

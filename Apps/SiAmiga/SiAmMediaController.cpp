@@ -14,6 +14,7 @@
 #include "SiAmController.h"
 #include "Config/SiAmConfigController.h"
 #include <QFile>
+#include <unistd.h>
 
 using namespace vamiga;
 
@@ -409,6 +410,18 @@ SiAmMediaController::installDiagRom(quint32 crc32)
 void
 SiAmMediaController::installEmuTOS()
 {
+    // REMOVE ASAP
+    runTask(tr("Hello, world..."),
+            tr("Failed"),
+            [this] {
+                report(tr("Some task..."));
+                sleep(3);
+                report(tr("Another task..."));
+                sleep(2);
+                report(tr("Yet another task..."));
+                sleep(2);
+            });
+
     try {
 
         // Version 1.3 (March 2024); the only version bundled here.

@@ -224,7 +224,7 @@ Rectangle {
 
 
     //
-    // Server row (one line of the server popup)
+    // Server status
     //
 
     component ServerRow: Rectangle {

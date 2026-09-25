@@ -49,6 +49,8 @@ protected:
 
     Q_PROPERTY(QQuickWindow *window MEMBER m_window)
 
+    Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
+
     Q_INVOKABLE virtual void start() { }
     Q_INVOKABLE virtual void stop() { }
 
@@ -59,8 +61,23 @@ protected:
 
 public:
 
-    // Whether a job is running at the moment
-    bool busy() const { return m_busy; }
+    /* Whether a job is running: this controller's own, or one belonging to
+     * a sub-controller it adopted.
+     *
+     * The window is handed the machine's controller and nothing else, so
+     * what its media controller is busy with has to count as the machine
+     * being busy -- the same reason their messages are passed on (see
+     * adopt, which also forwards busyChanged).
+     */
+    bool busy() const {
+
+        if (m_busy) return true;
+
+        for (auto *child : findChildren<Controller *>(Qt::FindDirectChildrenOnly)) {
+            if (child->m_busy) return true;
+        }
+        return false;
+    }
 
     /* Runs a job on a thread of its own, and says so.
      *
@@ -102,6 +119,8 @@ public:
         connect(child, &Controller::showFatalError, this, &Controller::showFatalError);
         connect(child, &Controller::showNotification, this, &Controller::showNotification);
         connect(child, &Controller::showProgress, this, &Controller::showProgress);
+        connect(child, &Controller::showTicker, this, &Controller::showTicker);
+        connect(child, &Controller::busyChanged, this, &Controller::busyChanged);
     }
 
 
@@ -116,13 +135,10 @@ private:
 
 signals:
 
+    void busyChanged();
     void showError(const QString &what, const QString &why);
     void showFatalError(const QString &what, const QString &why);
     void showNotification(const QString &title, const QString &message);
-
-    /* What this controller is busy with and how far along it is, and an
-     * empty string when it is done. A window shows it for as long as it is
-     * not empty (see SiTicker).
-     */
+    void showTicker(const QString &what);
     void showProgress(const QString &what, qreal percentage);
 };
