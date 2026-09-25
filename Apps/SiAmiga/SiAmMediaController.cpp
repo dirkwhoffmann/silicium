@@ -172,6 +172,48 @@ SiAmMediaController::attachHd(int nr, const QUrl &url)
     }
 }
 
+QVariantMap
+SiAmMediaController::hdGeometryLimits() const
+{
+    using G = retro::vault::GeometryDescriptor;
+
+    return QVariantMap {
+        { "cMin", (int)G::cMin }, { "cMax", (int)G::cMax },
+        { "hMin", (int)G::hMin }, { "hMax", (int)G::hMax },
+        { "sMin", (int)G::sMin }, { "sMax", (int)G::sMax }
+    };
+}
+
+void
+SiAmMediaController::newHardDisk(int nr, int cylinders, int heads, int sectors, int bsize,
+                                 int fsFormat, const QString &name, const QUrl &importUrl)
+{
+    try {
+
+        auto &core = SiAmController::core();
+        auto fs = amiga::FSFormat(fsFormat);
+
+        core.hd[nr]->attach(cylinders, heads, sectors, bsize);
+        core.hd[nr]->format(fs, name.toStdString());
+
+        if (fs != amiga::FSFormat::NODOS && importUrl.isLocalFile()) {
+            core.hd[nr]->importFiles(fs::path(importUrl.toLocalFile().toStdWString()));
+        }
+
+        /* Same two steps the drop path takes once an image is in place (see
+         * copyAndAttachHd): plug the controller in, then send the machine
+         * round again, because a drive that was not there at boot time is a
+         * drive the Amiga has not seen.
+         */
+        if (!core.get(Opt::HDC_CONNECT, nr)) core.set(Opt::HDC_CONNECT, true, nr);
+        core.hardReset();
+
+    } catch (const std::exception &e) {
+
+        showError("Failed to create hard drive.", e.what());
+    }
+}
+
 QString
 SiAmMediaController::hdImageName(int nr, const QUrl &url) const
 {

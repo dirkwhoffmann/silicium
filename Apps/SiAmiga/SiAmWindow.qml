@@ -269,6 +269,37 @@ ApplicationWindow {
         amiga: root.amiga
     }
 
+    /* Building a hard drive replaces whatever the slot holds, and unlike a
+     * floppy there is no eject to undo it -- so a slot that already carries a
+     * disk asks first.
+     */
+    function newHardDiskAction(driveNr) {
+
+        if (!amiga.media.hdHasDisk(driveNr)) {
+            hardDiskCreatorDialog.driveNr = driveNr
+            hardDiskCreatorDialog.open()
+            return
+        }
+
+        errorDialog.titleText = qsTr("Hd%1 already holds a hard drive.").arg(driveNr)
+        errorDialog.bodyText = qsTr("Creating a new one replaces it. Anything on " +
+                                    "it that has not been exported will be lost.")
+        errorDialog.buttons = Dialog.Cancel | Dialog.Ok
+        errorDialog.okLabel = qsTr("Proceed")
+        errorDialog.acceptedCallback = function () {
+            hardDiskCreatorDialog.driveNr = driveNr
+            hardDiskCreatorDialog.open()
+        }
+        errorDialog.open()
+    }
+
+    SiAmHardDiskCreator {
+
+        id: hardDiskCreatorDialog
+        amiga: root.amiga
+    }
+
+
 
 
 

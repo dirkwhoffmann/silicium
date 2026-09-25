@@ -13,6 +13,7 @@
 #include "VAmiga.h"
 #include <QByteArray>
 #include <QUrl>
+#include <QVariantMap>
 
 class SiAmController;
 
@@ -69,6 +70,27 @@ public:
 
     Q_INVOKABLE bool hdHasDisk(int nr) const;
     Q_INVOKABLE void attachHd(int nr, const QUrl &url);
+
+    /* Builds a hard drive from scratch and plugs it in.
+     *
+     * The three steps vAmiga's own HardDiskCreator performs (attach a
+     * geometry, format it, import a folder), plus what a drive that was
+     * never there before needs to be seen: the controller, and a reset for
+     * the machine to walk the bus again. The disk lives in memory -- nothing
+     * is written until the workspace is saved.
+     *
+     * 'fsFormat' is a raw amiga::FSFormat value, as in newDisk() above.
+     * 'importUrl' may be empty; a folder is only imported into a formatted
+     * drive, since there is nowhere to put it otherwise.
+     */
+    Q_INVOKABLE void newHardDisk(int nr, int cylinders, int heads, int sectors, int bsize,
+                                 int fsFormat, const QString &name,
+                                 const QUrl &importUrl = {});
+
+    // What a geometry may look like, for the creator dialog to clamp to --
+    // the core's own HDR_C_MIN..HDR_S_MAX (see rvlib's DeviceTypes.h), rather
+    // than a second copy of those numbers in QML.
+    Q_INVOKABLE QVariantMap hdGeometryLimits() const;
 
     /* Taking a dropped hard drive image into the machine.
      *

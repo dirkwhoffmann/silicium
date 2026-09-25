@@ -269,6 +269,11 @@ SiMenuBar {
         SiMenuSeparator { visible: connected }
 
         SiMenuItem {
+            text: qsTr("New...")
+            visible: connected
+            onTriggered: window.newHardDiskAction(driveNr)
+        }
+        SiMenuItem {
             text: qsTr("Attach...")
             visible: connected
             onTriggered: window.attachHdAction(driveNr)
