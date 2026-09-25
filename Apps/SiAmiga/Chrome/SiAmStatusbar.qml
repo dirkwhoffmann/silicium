@@ -19,11 +19,10 @@ import Silicium.Theme
 // Port of SiC64Statusbar.qml. SiAmiga's SiAmInfoController (unlike the
 // original port note here) now does back the server-state popup -- see
 // SiAmServerConfig.qml, which uses the same serverState/serverStateIcon/
-// serverStateName machinery. The floppy indicators below still call
-// SiAmController's per-drive getters (driveMotor/driveWriting/driveTrack/
-// ...) directly and re-evaluate them off a local Timer tick (see 'tick'
-// below) instead of a real change notification, since those aren't
-// NOTIFY-backed properties. The tape, cartridge and jammed/tracking/mute
+// serverStateName machinery. The floppy indicators below read the info
+// controller's per-drive properties, which the core's own drive messages
+// keep fresh -- the same source SiC64Statusbar uses (info.spinning8 and
+// friends). The tape, cartridge and jammed/tracking/mute
 // pictogram row have no Amiga equivalent or backing state at all yet, so
 // they're still dropped rather than wired to nothing -- same trim
 // SiAmMenu.qml and SiAmToolbar.qml made.
@@ -43,31 +42,80 @@ Rectangle {
 
     property int metric: 0
 
-    // SiAmController's per-drive getters (driveMotor(nr), driveTrack(nr), ...)
-    // are plain Q_INVOKABLE calls, not NOTIFY-backed properties, so nothing
-    // tells QML to re-evaluate a binding that calls them. This tick forces
-    // periodic re-evaluation instead -- referencing it inside a binding is
-    // what makes that binding re-run every time it changes.
-    property int tick: 0
-
-    Timer {
-        interval: 200
-        running: true
-        repeat: true
-        onTriggered: root.tick++
-    }
-
     readonly property string ledRed:   "qrc:/images/led-red.png"
     readonly property string ledGreen: "qrc:/images/led-green.png"
     readonly property string ledGray:  "qrc:/images/led-gray.png"
     readonly property string disk35:   "qrc:/icons/disk-35.png"
     readonly property string disk35wp: "qrc:/icons/disk-35-wp.png"
 
-    function redIcon(nr)   { tick; return amiga.media.driveMotor(nr) ? ledRed : ledGray }
-    function greenIcon(nr) { tick; return amiga.media.driveWriting(nr) ? ledGreen : ledGray }
-    function diskIcon(nr)  { tick; return amiga.media.driveHasDisk(nr) ? (amiga.media.driveWriteProtected(nr) ? disk35wp : disk35) : "" }
-    function track(nr)     { tick; return amiga.media.driveTrack(nr) }
-    function busy(nr)      { tick; return amiga.media.driveMotor(nr) }
+    /* Drive state comes from the info controller, which the core tells when
+     * something moves (Msg::DRIVE_MOTOR and friends) and which samples the
+     * machine the way it is safe to: a snapshot taken by the emulator thread,
+     * not a reading made on this one (see SiAmInfoController::grab).
+     *
+     * Each of these is a NOTIFY-backed property per drive, named rather than
+     * indexed, so the switch is what registers the binding on the one drive
+     * that matters -- the same reason the 'visible' switch below spells out
+     * DF0_CONNECTED..DF3_CONNECTED.
+     */
+    function spinning(nr) {
+
+        switch (nr) {
+            case 0: return info.spinning0
+            case 1: return info.spinning1
+            case 2: return info.spinning2
+            case 3: return info.spinning3
+        }
+        return false
+    }
+
+    function writing(nr) {
+
+        switch (nr) {
+            case 0: return info.writing0
+            case 1: return info.writing1
+            case 2: return info.writing2
+            case 3: return info.writing3
+        }
+        return false
+    }
+
+    function hasDisk(nr) {
+
+        switch (nr) {
+            case 0: return info.hasDisk0
+            case 1: return info.hasDisk1
+            case 2: return info.hasDisk2
+            case 3: return info.hasDisk3
+        }
+        return false
+    }
+
+    function diskProtected(nr) {
+
+        switch (nr) {
+            case 0: return info.hasProtectedDisk0
+            case 1: return info.hasProtectedDisk1
+            case 2: return info.hasProtectedDisk2
+            case 3: return info.hasProtectedDisk3
+        }
+        return false
+    }
+
+    function track(nr) {
+
+        switch (nr) {
+            case 0: return info.track0
+            case 1: return info.track1
+            case 2: return info.track2
+            case 3: return info.track3
+        }
+        return 0
+    }
+
+    function redIcon(nr)   { return spinning(nr) ? ledRed : ledGray }
+    function greenIcon(nr) { return writing(nr) ? ledGreen : ledGray }
+    function diskIcon(nr)  { return hasDisk(nr) ? (diskProtected(nr) ? disk35wp : disk35) : "" }
 
     Component.onCompleted: {
 
@@ -163,12 +211,14 @@ Rectangle {
                 icon.source: diskIcon ? diskIcon : ""
             }
 
+            // Turning while this drive's motor is, and only while the
+            // machine is running: a paused Amiga has stopped everything.
             BusyIndicator {
 
                 implicitHeight: 22
                 implicitWidth: 22
                 padding: 3
-                running: busy && amiga.isRunning
+                running: root.busy && amiga.isRunning
             }
         }
     }
@@ -501,13 +551,17 @@ Rectangle {
             visible: myTicker.text !== ""
             Layout.fillWidth: true
 
+            /* This one belongs to the message beside it, not to a drive.
+             * 'busy' here would have found the root's busy() function, which
+             * is a function and therefore always true -- it span whatever
+             * the machine was doing.
+             */
             BusyIndicator {
 
-                visible: true
                 implicitHeight: 22
                 implicitWidth: 22
                 padding: 3
-                running: busy && amiga.isRunning
+                running: myTicker.text !== ""
             }
 
             SiTicker {
@@ -575,7 +629,7 @@ Rectangle {
                         greenIcon: root.greenIcon(index)
                         diskIcon: root.diskIcon(index)
                         track: root.track(index)
-                        busy: root.busy(index)
+                        busy: root.spinning(index)
                     }
 
                     HSpacer {
