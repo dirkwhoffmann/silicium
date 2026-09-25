@@ -208,6 +208,39 @@ class SiAmInfoController : public Controller {
     Q_PROPERTY(bool hasModifiedDisk3 READ hasModifiedDisk3 NOTIFY infoChanged)
     Q_PROPERTY(bool hasProtectedDisk3 READ hasProtectedDisk3 NOTIFY infoChanged)
 
+
+    //
+    // Hard drives (hd0..hd3)
+    //
+
+    Q_PROPERTY(bool hdConnected0 READ hdConnected0 NOTIFY infoChanged)
+    Q_PROPERTY(bool hdReading0 READ hdReading0 NOTIFY infoChanged)
+    Q_PROPERTY(bool hdWriting0 READ hdWriting0 NOTIFY infoChanged)
+    Q_PROPERTY(int hdCylinder0 READ hdCylinder0 NOTIFY infoChanged)
+    Q_PROPERTY(bool hdHasDisk0 READ hdHasDisk0 NOTIFY infoChanged)
+    Q_PROPERTY(bool hdProtected0 READ hdProtected0 NOTIFY infoChanged)
+
+    Q_PROPERTY(bool hdConnected1 READ hdConnected1 NOTIFY infoChanged)
+    Q_PROPERTY(bool hdReading1 READ hdReading1 NOTIFY infoChanged)
+    Q_PROPERTY(bool hdWriting1 READ hdWriting1 NOTIFY infoChanged)
+    Q_PROPERTY(int hdCylinder1 READ hdCylinder1 NOTIFY infoChanged)
+    Q_PROPERTY(bool hdHasDisk1 READ hdHasDisk1 NOTIFY infoChanged)
+    Q_PROPERTY(bool hdProtected1 READ hdProtected1 NOTIFY infoChanged)
+
+    Q_PROPERTY(bool hdConnected2 READ hdConnected2 NOTIFY infoChanged)
+    Q_PROPERTY(bool hdReading2 READ hdReading2 NOTIFY infoChanged)
+    Q_PROPERTY(bool hdWriting2 READ hdWriting2 NOTIFY infoChanged)
+    Q_PROPERTY(int hdCylinder2 READ hdCylinder2 NOTIFY infoChanged)
+    Q_PROPERTY(bool hdHasDisk2 READ hdHasDisk2 NOTIFY infoChanged)
+    Q_PROPERTY(bool hdProtected2 READ hdProtected2 NOTIFY infoChanged)
+
+    Q_PROPERTY(bool hdConnected3 READ hdConnected3 NOTIFY infoChanged)
+    Q_PROPERTY(bool hdReading3 READ hdReading3 NOTIFY infoChanged)
+    Q_PROPERTY(bool hdWriting3 READ hdWriting3 NOTIFY infoChanged)
+    Q_PROPERTY(int hdCylinder3 READ hdCylinder3 NOTIFY infoChanged)
+    Q_PROPERTY(bool hdHasDisk3 READ hdHasDisk3 NOTIFY infoChanged)
+    Q_PROPERTY(bool hdProtected3 READ hdProtected3 NOTIFY infoChanged)
+
   private:
 
     // Samples the given single component's structs from the core (no signal).
@@ -272,6 +305,39 @@ class SiAmInfoController : public Controller {
     bool hasDisk3() const { return m_driveInfo[3].hasDisk; }
     bool hasModifiedDisk3() const { return m_driveInfo[3].hasModifiedDisk; }
     bool hasProtectedDisk3() const { return m_driveInfo[3].hasProtectedDisk; }
+
+    /* Hard drive 0..3 state, read from the cached HardDriveInfo. A hard
+     * drive has no motor to run, so what stands in for a floppy's 'spinning'
+     * is the head being busy: reading or writing (see HardDriveState).
+     * 'cylinder' is where the head sits, the closest thing to a track.
+     */
+    bool hdConnected0() const { return m_hdInfo[0].isConnected; }
+    bool hdReading0() const { return m_hdInfo[0].state == vamiga::HardDriveState::READING; }
+    bool hdWriting0() const { return m_hdInfo[0].state == vamiga::HardDriveState::WRITING; }
+    int hdCylinder0() const { return (int)m_hdInfo[0].head.cylinder; }
+    bool hdHasDisk0() const { return m_hdInfo[0].hasDisk; }
+    bool hdProtected0() const { return m_hdInfo[0].hasProtectedDisk; }
+
+    bool hdConnected1() const { return m_hdInfo[1].isConnected; }
+    bool hdReading1() const { return m_hdInfo[1].state == vamiga::HardDriveState::READING; }
+    bool hdWriting1() const { return m_hdInfo[1].state == vamiga::HardDriveState::WRITING; }
+    int hdCylinder1() const { return (int)m_hdInfo[1].head.cylinder; }
+    bool hdHasDisk1() const { return m_hdInfo[1].hasDisk; }
+    bool hdProtected1() const { return m_hdInfo[1].hasProtectedDisk; }
+
+    bool hdConnected2() const { return m_hdInfo[2].isConnected; }
+    bool hdReading2() const { return m_hdInfo[2].state == vamiga::HardDriveState::READING; }
+    bool hdWriting2() const { return m_hdInfo[2].state == vamiga::HardDriveState::WRITING; }
+    int hdCylinder2() const { return (int)m_hdInfo[2].head.cylinder; }
+    bool hdHasDisk2() const { return m_hdInfo[2].hasDisk; }
+    bool hdProtected2() const { return m_hdInfo[2].hasProtectedDisk; }
+
+    bool hdConnected3() const { return m_hdInfo[3].isConnected; }
+    bool hdReading3() const { return m_hdInfo[3].state == vamiga::HardDriveState::READING; }
+    bool hdWriting3() const { return m_hdInfo[3].state == vamiga::HardDriveState::WRITING; }
+    int hdCylinder3() const { return (int)m_hdInfo[3].head.cylinder; }
+    bool hdHasDisk3() const { return m_hdInfo[3].hasDisk; }
+    bool hdProtected3() const { return m_hdInfo[3].hasProtectedDisk; }
 
   signals:
 

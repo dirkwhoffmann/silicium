@@ -12,6 +12,7 @@
 #include "SiAmRenderer.h"
 #include "SiAmActivityController.h"
 #include "Config/SiAmConfigController.h"
+#include "SiAmInfoController.h"
 #include "Inspector/SiAmLogicView.h"
 #include "Inspector/SiAmSpriteView.h"
 #include "Inspector/SiAmDmaView.h"
@@ -63,6 +64,7 @@ main(int argc, char *argv[])
     qmlRegisterType<SiAmRenderer>("Silicium.Controllers", 1, 0, "SiAmRenderer");
     qmlRegisterType<SiAmActivityController>("Silicium.Controllers", 1, 0, "SiAmActivityController");
     qmlRegisterType<SiAmConfigController>("Silicium.Controllers", 1, 0, "SiAmConfigController");
+    qmlRegisterType<SiAmInfoController>("Silicium.Controllers", 1, 0, "SiAmInfoController");
     qmlRegisterType<SiAmLogicView>("Silicium.Components", 1, 0, "SiAmLogicView");
     qmlRegisterType<SiAmSpriteView>("Silicium.Components", 1, 0, "SiAmSpriteView");
     qmlRegisterType<SiAmDmaView>("Silicium.Components", 1, 0, "SiAmDmaView");

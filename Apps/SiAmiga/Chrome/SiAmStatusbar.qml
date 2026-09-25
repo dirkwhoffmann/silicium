@@ -22,10 +22,7 @@ Rectangle {
     required property SiAmController amiga
     readonly property SiAmConfigController config: amiga.configController
     readonly property SiAmActivityController activity: amiga.activityController
-    // SiAmInfoController isn't registered via qmlRegisterType (unlike
-    // SiC64InfoController), so it's referenced as 'var' here too, matching
-    // every other SiAmiga panel that reads controller.info.
-    readonly property var info: amiga.info
+    readonly property SiAmInfoController info: amiga.info
 
     property int metric: 0
 
@@ -35,6 +32,7 @@ Rectangle {
     readonly property string ledGray:  "qrc:/images/led-gray.png"
     readonly property string disk35:   "qrc:/icons/disk-35.png"
     readonly property string disk35wp: "qrc:/icons/disk-35-wp.png"
+    readonly property string hardDisk: "qrc:/icons/drop-hd.png"
 
     /* Drive state comes from the info controller, which the core tells when
      * something moves (Msg::DRIVE_MOTOR and friends) and which samples the
@@ -101,9 +99,90 @@ Rectangle {
         return 0
     }
 
+    /* Which drives are there. DF0_CONNECTED..DF3_CONNECTED are named rather
+     * than indexed for the same reason the getters above are: reading
+     * driveConnected(nr) as a Q_INVOKABLE would not register as a binding
+     * dependency, so 'visible' would go stale (see SiAmConfigController.h).
+     */
+    function connected(nr) {
+
+        switch (nr) {
+            case 0: return config.DF0_CONNECTED
+            case 1: return config.DF1_CONNECTED
+            case 2: return config.DF2_CONNECTED
+            case 3: return config.DF3_CONNECTED
+        }
+        return false
+    }
+
     function redIcon(nr)   { return spinning(nr) ? ledRed : ledGray }
     function greenIcon(nr) { return writing(nr) ? ledGreen : ledGray }
     function diskIcon(nr)  { return hasDisk(nr) ? (diskProtected(nr) ? disk35wp : disk35) : "" }
+
+    /* The same again for the hard drives. A hard drive has no motor, so what
+     * lights its red LED is the head being busy at all -- reading or writing
+     * (see HardDriveState) -- and the number beside it is the cylinder the
+     * head sits on rather than a track.
+     */
+    function hdConnected(nr) {
+
+        switch (nr) {
+            case 0: return info.hdConnected0
+            case 1: return info.hdConnected1
+            case 2: return info.hdConnected2
+            case 3: return info.hdConnected3
+        }
+        return false
+    }
+
+    function hdReading(nr) {
+
+        switch (nr) {
+            case 0: return info.hdReading0
+            case 1: return info.hdReading1
+            case 2: return info.hdReading2
+            case 3: return info.hdReading3
+        }
+        return false
+    }
+
+    function hdWriting(nr) {
+
+        switch (nr) {
+            case 0: return info.hdWriting0
+            case 1: return info.hdWriting1
+            case 2: return info.hdWriting2
+            case 3: return info.hdWriting3
+        }
+        return false
+    }
+
+    function hdCylinder(nr) {
+
+        switch (nr) {
+            case 0: return info.hdCylinder0
+            case 1: return info.hdCylinder1
+            case 2: return info.hdCylinder2
+            case 3: return info.hdCylinder3
+        }
+        return 0
+    }
+
+    function hdHasDisk(nr) {
+
+        switch (nr) {
+            case 0: return info.hdHasDisk0
+            case 1: return info.hdHasDisk1
+            case 2: return info.hdHasDisk2
+            case 3: return info.hdHasDisk3
+        }
+        return false
+    }
+
+    function hdBusy(nr)      { return hdReading(nr) || hdWriting(nr) }
+    function hdRedIcon(nr)   { return hdBusy(nr) ? ledRed : ledGray }
+    function hdGreenIcon(nr) { return hdWriting(nr) ? ledGreen : ledGray }
+    function hdIcon(nr)      { return hdHasDisk(nr) ? hardDisk : "" }
 
     Component.onCompleted: {
 
@@ -204,6 +283,75 @@ Rectangle {
                 implicitWidth: 22
                 padding: 3
                 running: root.spinning && amiga.isRunning
+            }
+        }
+    }
+
+    /* The hard drive counterpart of FloppyObserver.
+     *
+     * Same shape, so a row of drives reads the same whichever kind it is:
+     * the two LEDs, where the head is, what is in the drive, and whether it
+     * is doing anything. No write-protected variant of the icon -- a hard
+     * drive has no such switch to show.
+     */
+    component HardDriveObserver: Control {
+
+        id: root
+
+        required property url redIcon
+        required property url greenIcon
+        required property url hdIcon
+        required property int cylinder
+        required property bool busy
+
+        implicitWidth: layout.implicitWidth
+        implicitHeight: layout.implicitHeight
+
+        RowLayout {
+
+            id: layout
+
+            Layout.alignment: Qt.AlignVCenter
+            spacing: Style.smallSpacing
+
+            Row {
+
+                spacing: 0
+
+                LED {
+
+                    padding: 0
+                    icon.source: redIcon ? redIcon : ""
+                }
+
+                LED {
+
+                    padding: 0
+                    icon.source: greenIcon ? greenIcon : ""
+                }
+            }
+
+            SiText {
+
+                text: cylinder ? cylinder : ""
+                font.pixelSize: Style.small
+                Layout.preferredWidth: 20
+                horizontalAlignment: Text.AlignHCenter
+                color: Palette.tertiary
+            }
+
+            PictogramIcon {
+
+                state: hdIcon !== ""
+                icon.source: hdIcon ? hdIcon : ""
+            }
+
+            BusyIndicator {
+
+                implicitHeight: 22
+                implicitWidth: 22
+                padding: 3
+                running: root.busy && amiga.isRunning
             }
         }
     }
@@ -580,25 +728,7 @@ Rectangle {
 
                     required property int index
 
-                    // driveConnected(nr) is a Q_INVOKABLE, not a Q_PROPERTY, so
-                    // reading it here wouldn't register as a binding dependency
-                    // and 'visible' would go stale -- see the DF0_CONNECTED..
-                    // _CONNECTED comment in SiAmConfigController.h. index is
-                    // fixed per delegate, so the matching named property keeps
-                    // this reactive.
-                    visible: {
-                        switch (index) {
-                            case 0:
-                                return config.DF0_CONNECTED
-                            case 1:
-                                return config.DF1_CONNECTED
-                            case 2:
-                                return config.DF2_CONNECTED
-                            case 3:
-                                return config.DF3_CONNECTED
-                        }
-                        return false
-                    }
+                    visible: root.connected(index)
 
                     FloppyObserver {
 
@@ -607,6 +737,35 @@ Rectangle {
                         diskIcon: root.diskIcon(index)
                         track: root.track(index)
                         spinning: root.spinning(index)
+                    }
+
+                    HSpacer {
+                        size: Style.mediumSpacing
+                    }
+                }
+            }
+
+            //
+            // Hard drives
+            //
+
+            Repeater {
+
+                model: 4
+
+                RowLayout {
+
+                    required property int index
+
+                    visible: root.hdConnected(index)
+
+                    HardDriveObserver {
+
+                        redIcon: root.hdRedIcon(index)
+                        greenIcon: root.hdGreenIcon(index)
+                        hdIcon: root.hdIcon(index)
+                        cylinder: root.hdCylinder(index)
+                        busy: root.hdBusy(index)
                     }
 
                     HSpacer {
