@@ -553,7 +553,7 @@ Rectangle {
             greenIcon: root.greenIcon8
             diskIcon: root.diskIcon8
             track: info.track8 ?? 0
-            busy: info.spinning8 ?? false
+            spinning: info.spinning8 ?? false
         }
 
         HSpacer {
@@ -567,7 +567,7 @@ Rectangle {
             greenIcon: root.greenIcon9
             diskIcon: root.diskIcon9
             track: info.track9 ?? 0
-            busy: info.spinning9 ?? false
+            spinning: info.spinning9 ?? false
         }
 
         HSpacer {
