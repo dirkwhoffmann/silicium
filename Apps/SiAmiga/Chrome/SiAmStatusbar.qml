@@ -29,6 +29,7 @@ Rectangle {
 
     property int metric: 0
 
+    // Status icons
     readonly property string ledRed:   "qrc:/images/led-red.png"
     readonly property string ledGreen: "qrc:/images/led-green.png"
     readonly property string ledGray:  "qrc:/images/led-gray.png"
@@ -208,7 +209,7 @@ Rectangle {
     }
 
     //
-    // Server row (one line of the server popup)
+    // Server status
     //
 
     component ServerRow: Rectangle {

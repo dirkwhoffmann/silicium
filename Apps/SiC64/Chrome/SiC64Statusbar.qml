@@ -1,3 +1,12 @@
+// -----------------------------------------------------------------------------
+// This file is part of Silicium UI
+//
+// Copyright (C) Dirk W. Hoffmann. www.dirkwhoffmann.de
+// Licensed under the GNU General Public License v3
+//
+// See https://www.gnu.org for license information
+// -----------------------------------------------------------------------------
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -19,21 +28,12 @@ Rectangle {
 
     property int metric: 0
 
-    //
-    // Floppy-drive status icons, computed from the info controller's drive
-    // state. Red/green LEDs light up when lit, else show the gray LED; the
-    // disk icon reflects write protection, or is blank when no disk is in.
-    //
-
+    // Status icons
     readonly property string ledRed:    "qrc:/images/led-round-red.png"
     readonly property string ledGreen:  "qrc:/images/led-round-green.png"
     readonly property string ledGray:   "qrc:/images/led-round-gray.png"
     readonly property string disk525:   "qrc:/icons/disk-525.png"
     readonly property string disk525wp: "qrc:/icons/disk-525-wp.png"
-
-    // Remote-server state (LED, icon, label) is computed by the info
-    // controller -- see SiC64InfoController::serverStateLed/Icon/Name --
-    // so the statusbar and the server config panel render it identically.
 
     readonly property url redIcon8:   info.redLED8 ? ledRed : ledGray
     readonly property url greenIcon8: info.greenLED8 ? ledGreen : ledGray
@@ -71,7 +71,6 @@ Rectangle {
         icon.color: Palette.tertiary
     }
 
-
     //
     // Floppy observer
     //
@@ -94,7 +93,7 @@ Rectangle {
         required property url greenIcon
         required property url diskIcon
         required property int track
-        required property bool busy
+        required property bool spinning
 
         implicitWidth: layout.implicitWidth
         implicitHeight: layout.implicitHeight
@@ -144,7 +143,7 @@ Rectangle {
                 implicitHeight: 22
                 implicitWidth: 22
                 padding: 3
-                running: busy
+                running: root.spinning && amiga.isRunning
             }
         }
     }
