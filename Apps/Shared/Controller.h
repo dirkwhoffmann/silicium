@@ -34,8 +34,9 @@ protected:
     // The job this controller is running, if any (see runTask)
     SiTask m_task;
 
-    // What was last said about it, so the same text is not said twice
+    // What was last said about it, so the same thing is not said twice
     QString m_progress;
+    qreal m_percentage = 0.0;
 
 
     //
@@ -114,8 +115,9 @@ signals:
     void showFatalError(const QString &what, const QString &why);
     void showNotification(const QString &title, const QString &message);
 
-    /* What this controller is busy with, and an empty string when it is done.
-     * A window shows it in a banner for as long as it is not empty.
+    /* What this controller is busy with and how far along it is, and an
+     * empty string when it is done. A window shows it for as long as it is
+     * not empty (see SiTicker).
      */
-    void showProgress(const QString &what);
+    void showProgress(const QString &what, qreal percentage);
 };

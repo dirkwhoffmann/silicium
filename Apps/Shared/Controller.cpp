@@ -8,6 +8,7 @@
 // -----------------------------------------------------------------------------
 
 #include "Controller.h"
+#include <cmath>
 
 /*
 void
@@ -74,12 +75,23 @@ Controller::reportProgress()
      * text it was started with, and one that is over says nothing at all.
      */
     QString text;
+    qreal percentage = 0.0;
 
     if (m_task.running()) {
 
         text = m_task.description();
         if (text.isEmpty()) text = m_task.text();
+        percentage = m_task.progress();
     }
 
-    if (text != m_progress) { m_progress = text; emit showProgress(text); }
+    /* Both are reported, because a step that takes a while keeps its text and
+     * moves its bar. A hundredth of the bar is under a pixel wide, so
+     * anything finer than that is not worth waking the window for.
+     */
+    if (text != m_progress || std::abs(percentage - m_percentage) >= 0.01) {
+
+        m_progress = text;
+        m_percentage = percentage;
+        emit showProgress(text, percentage);
+    }
 }

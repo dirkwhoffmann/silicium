@@ -227,29 +227,32 @@ ApplicationWindow {
         sound: true
     }
 
+
     //
     // Progress
     //
 
     /* What the machine is busy with, for as long as it is busy (see
      * Controller::runTask). The job says when it is over by reporting an
-     * empty text, so unlike a hint this banner is on no timer.
+     * empty text, which is all the dialog needs to take itself away.
+     *
+     * SiC64 shows the same thing in a SiBanner along the bottom edge -- the
+     * two are interchangeable, both being driven by a SiTicker.
      */
-    SiBanner {
+    SiProgressPopup {
 
         id: progressBanner
 
         anchors.fill: parent
         z: 2
-        alignment: Qt.AlignBottom
 
         Connections {
 
             target: root.amiga
+            function onShowProgress(what, percentage) {
 
-            // The end of the job comes through as an empty text, which the
-            // banner already understands as "nothing to say".
-            function onShowProgress(what) { progressBanner.show(what) }
+                progressBanner.show(what, undefined, undefined, percentage)
+            }
         }
     }
 

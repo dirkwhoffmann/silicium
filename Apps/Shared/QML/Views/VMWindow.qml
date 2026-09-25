@@ -257,9 +257,8 @@ ApplicationWindow {
     // windows (e.g. SiC64Window) call this directly for their own hints.
     function showHint(message) {
 
-        // Up for the banner's own time, and away again right after
-        hintBanner.show(message)
-        hintBanner.hide()
+        // Readable, and gone again three seconds later without being told
+        hintBanner.show(message, 500, 3000)
     }
 
     // When the mouse is captured, briefly tell the user how to get it back.
@@ -299,10 +298,6 @@ ApplicationWindow {
 
         anchors.fill: parent
         z: 2
-
-        // A hint is read once and then gone, so it is given longer than the
-        // running commentary a job provides.
-        minimumTime: 3000
     }
 
     /* What the machine is busy with, for as long as it is busy (see
@@ -323,7 +318,10 @@ ApplicationWindow {
 
             // The end of the job comes through as an empty text, which the
             // banner already understands as "nothing to say".
-            function onShowProgress(what) { progressBanner.show(what) }
+            function onShowProgress(what, percentage) {
+
+                progressBanner.show(what, undefined, undefined, percentage)
+            }
         }
     }
 }
