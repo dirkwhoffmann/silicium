@@ -38,7 +38,7 @@ import Silicium.Theme
  * a job that finishes instantly is still readable.
  *
  * A message may also carry a value -- how far along the job is -- for a
- * display that has somewhere to put it (see SiProgressPopup). The ticker
+ * display with somewhere to put it, such as a progress bar. The ticker
  * itself only shows the text.
  */
 SiLabel {

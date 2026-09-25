@@ -15,8 +15,8 @@ import Silicium.Theme
  * exit" banner browsers show.
  *
  * What to show and for how long is the ticker's part (see SiTicker, whose
- * show() and hide() this passes on); this is what it looks like.
- * SiProgressPopup is the other one.
+ * show() and hide() this passes on); this is what it looks like. SiAmiga
+ * shows the same messages in its status bar ticker instead.
  */
 Item {
 
