@@ -12,8 +12,8 @@
 #include "SiObject.h"
 #include "AppServices.h"
 #include "AudioController.h"
-#include "SiTask.h"
 #include <QObject>
+#include <functional>
 #include <QQuickWindow>
 
 
@@ -31,8 +31,8 @@ protected:
     // Handle to the associated window
     QQuickWindow *m_window = nullptr;
 
-    // The job this controller is running, if any (see runTask)
-    SiTask m_task;
+    // Whether a job is running (see runTask)
+    bool m_busy = false;
 
     // What was last said about it, so the same thing is not said twice
     QString m_progress;
@@ -59,19 +59,17 @@ protected:
 
 public:
 
-    // The job this controller is running, for a dialog that wants to watch it
-    Q_PROPERTY(SiTask *task READ task CONSTANT)
-    SiTask *task() { return &m_task; }
+    // Whether a job is running at the moment
+    bool busy() const { return m_busy; }
 
     /* Runs a job on a thread of its own, and says so.
      *
      * Anything that would hold up the window for longer than a frame belongs
-     * here: saving a workspace, copying a disk image. While the job runs, what
-     * it reports about itself (ProgressTask::setDescription) is published
-     * through showProgress(), which is how the window's banner learns what to
-     * say; the banner goes away when the job does. A job that throws is
-     * reported through showError() under the given title, and 'done' then
-     * does not run.
+     * here: saving a workspace, copying a disk image. The body runs on a
+     * QtConcurrent thread and says what it is doing through report(), which
+     * reaches the window as showProgress(); the display goes away when the
+     * job does. A body that throws is reported through showError() under the
+     * given title, and 'done' then does not run.
      *
      * 'done' is the part that has to happen on this thread once the work is
      * over -- touching the manifest, telling the world. Returns false if a
@@ -80,8 +78,15 @@ public:
      */
     bool runTask(const QString &what,
                  const QString &failure,
-                 utl::ProgressTask::Body body,
+                 std::function<void()> body,
                  std::function<void()> done = {});
+
+    /* Says what the job is doing now, and how far along it is.
+     *
+     * Called from the body, which is on a thread of its own, so the message
+     * is handed to this object's own thread before anyone hears it.
+     */
+    void report(const QString &what, qreal percentage = 0.0);
 
 
     /* Re-emits what a sub-controller reports as our own.
@@ -106,8 +111,8 @@ public:
 
 private:
 
-    // Publishes what the job is doing, and the end of it
-    void reportProgress();
+    // Says it, on this object's thread, unless it has just been said
+    void announce(const QString &what, qreal percentage);
 
 signals:
 

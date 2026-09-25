@@ -229,6 +229,7 @@ target_link_libraries(SiC64 PRIVATE
         rvlib
         VCCore
         Qt6::Core
+        Qt6::Concurrent
         Qt6::Gui
         Qt6::Multimedia
         Qt6::Quick
@@ -301,6 +302,7 @@ target_link_libraries(SiAmiga PRIVATE
         rvlib
         VACore
         Qt6::Core
+        Qt6::Concurrent
         Qt6::Gui
         Qt6::Multimedia
         Qt6::Quick

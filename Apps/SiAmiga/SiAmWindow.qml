@@ -228,34 +228,6 @@ ApplicationWindow {
     }
 
 
-    //
-    // Progress
-    //
-
-    /* What the machine is busy with, for as long as it is busy (see
-     * Controller::runTask). The job says when it is over by reporting an
-     * empty text, which is all the dialog needs to take itself away.
-     *
-     * SiC64 shows the same thing in a SiBanner along the bottom edge -- the
-     * two are interchangeable, both being driven by a SiTicker.
-     */
-    SiProgressPopup {
-
-        id: progressBanner
-
-        anchors.fill: parent
-        z: 2
-
-        Connections {
-
-            target: root.amiga
-            function onShowProgress(what, percentage) {
-
-                progressBanner.show(what, undefined, undefined, percentage)
-            }
-        }
-    }
-
     Component.onCompleted: updateOverlayStack()
 
     //

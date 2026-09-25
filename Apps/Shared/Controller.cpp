@@ -8,6 +8,7 @@
 // -----------------------------------------------------------------------------
 
 #include "Controller.h"
+#include <QtConcurrent>
 #include <cmath>
 
 /*
@@ -21,77 +22,79 @@ Controller::setWindow(QQuickWindow *ptr)
     }
 }
 */
-Controller::Controller(QObject *parent) : QObject(parent), m_task(this)
+Controller::Controller(QObject *parent) : QObject(parent)
 {
-    // The task samples itself on a timer; every tick is a chance that what it
-    // is doing has changed (see SiTask).
-    connect(&m_task, &SiTask::changed, this, &Controller::reportProgress);
+
 }
 
 bool
 Controller::runTask(const QString &what,
                     const QString &failure,
-                    utl::ProgressTask::Body body,
+                    std::function<void()> body,
                     std::function<void()> done)
 {
-    if (m_task.running()) return false;
+    if (m_busy) return false;
 
-    /* Whether the job got all the way through. A failure is reported by the
-     * task itself, before finished(); 'done' is the caller's follow-up work
-     * and has no business running after a job that did not finish.
+    m_busy = true;
+    announce(what, 0.0);
+
+    /* The body says what went wrong itself, rather than letting the
+     * exception travel: QFuture hands a foreign exception on wrapped in a
+     * QUnhandledException, whose what() is the useless "std::exception".
      */
-    auto completed = std::make_shared<bool>(true);
+    auto error = std::make_shared<QString>();
 
-    connect(&m_task, &SiTask::failed, this, [this, failure, completed](const QString &error) {
+    auto guarded = [body = std::move(body), error] {
 
-        *completed = false;
-        emit showError(failure, error);
+        try { body(); }
+        catch (const std::exception &e) { *error = QString::fromUtf8(e.what()); }
+        catch (...) { *error = QStringLiteral("?"); }
+    };
 
-    }, Qt::SingleShotConnection);
+    /* The body runs on a pooled thread and the continuation back here, on
+     * this object's thread, because what it touches -- the manifest, the
+     * window -- belongs to it.
+     */
+    QtConcurrent::task(std::move(guarded)).spawn().then(this, [this, failure, error, done] {
 
-    connect(&m_task, &SiTask::aborted, this, [completed] {
+        m_busy = false;
+        announce({ }, 0.0);
 
-        *completed = false;
+        if (error->isEmpty()) {
 
-    }, Qt::SingleShotConnection);
+            if (done) done();
 
-    connect(&m_task, &SiTask::finished, this, [this, done, completed] {
+        } else {
 
-        reportProgress();
-        if (*completed && done) done();
-
-    }, Qt::SingleShotConnection);
-
-    m_task.run(what, std::move(body));
-    reportProgress();
+            emit showError(failure, *error == "?" ? tr("Unknown error") : *error);
+        }
+    });
 
     return true;
 }
 
 void
-Controller::reportProgress()
+Controller::report(const QString &what, qreal percentage)
 {
-    /* A job that has not said anything about itself yet is described by the
-     * text it was started with, and one that is over says nothing at all.
+    // Off this object's thread, so the message is queued rather than said
+    QMetaObject::invokeMethod(this, [this, what, percentage] {
+
+        announce(what, percentage);
+
+    }, Qt::QueuedConnection);
+}
+
+void
+Controller::announce(const QString &what, qreal percentage)
+{
+    /* A step that takes a while keeps its text and moves its bar, so both
+     * are compared. A hundredth of a bar is under a pixel wide; anything
+     * finer than that is not worth waking the window for.
      */
-    QString text;
-    qreal percentage = 0.0;
+    if (what == m_progress && std::abs(percentage - m_percentage) < 0.01) return;
 
-    if (m_task.running()) {
+    m_progress = what;
+    m_percentage = percentage;
 
-        text = m_task.description();
-        if (text.isEmpty()) text = m_task.text();
-        percentage = m_task.progress();
-    }
-
-    /* Both are reported, because a step that takes a while keeps its text and
-     * moves its bar. A hundredth of the bar is under a pixel wide, so
-     * anything finer than that is not worth waking the window for.
-     */
-    if (text != m_progress || std::abs(percentage - m_percentage) >= 0.01) {
-
-        m_progress = text;
-        m_percentage = percentage;
-        emit showProgress(text, percentage);
-    }
+    emit showProgress(what, percentage);
 }

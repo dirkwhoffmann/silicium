@@ -515,6 +515,17 @@ Rectangle {
                 id: myTicker
                 Layout.fillWidth: true
                 size: Size.small
+
+                /* What the machine is busy with, for as long as it is busy
+                 * (see Controller::runTask). The job says when it is over by
+                 * reporting an empty text, which blanks the ticker and brings
+                 * the drive LEDs back.
+                 */
+                Connections {
+
+                    target: amiga
+                    function onShowProgress(what, percentage) { myTicker.show(what) }
+                }
             }
         }
 

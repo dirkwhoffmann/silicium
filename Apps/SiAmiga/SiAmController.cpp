@@ -540,7 +540,7 @@ SiAmController::saveWorkspace()
 
     runTask(tr("Saving workspace..."), tr("Failed to save workspace."),
 
-            [this, folder, screenshot, saved](utl::ProgressTask &) {
+            [this, folder, screenshot, saved] {
 
                 *saved = writeWorkspace(folder, screenshot);
             },
