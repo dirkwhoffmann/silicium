@@ -231,25 +231,19 @@ SiAmMediaController::newHardDisk(int nr, int megabytes, int fsFormat, const QStr
 
             /* Lay down the file the drive will live on.
              *
-             * Written as a hole rather than as that many zero bytes: the file
-             * system records the size and nothing else, so a 2 GB drive
-             * appears at once and costs what is actually stored in it. An
-             * empty file carries no rigid disk block, which is exactly right
-             * -- HDFFile then takes the geometry from the size, and it is the
-             * geometry computed above.
+             * A hole rather than that many zero bytes (see
+             * utl::createEmptyFile), so a 2 GB drive appears at once and
+             * costs what is actually stored in it. An empty image carries no
+             * rigid disk block, which is exactly right -- HDFFile then takes
+             * the geometry from the size, and it is the geometry computed
+             * above.
              */
             report(tr("Creating the disk image..."), 0.05);
-            {
-                std::ofstream os(path, std::ios::binary | std::ios::trunc);
-                if (!os) throw utl::IOError(utl::IOError::FILE_CANT_CREATE, path);
 
-                os.seekp(geometry.numBytes() - 1);
-                os.put('\0');
-                os.close();
-
-                if (!os) throw utl::IOError(utl::IOError::FILE_CANT_WRITE, path);
-                written = true;
+            if (!utl::createEmptyFile(path, geometry.numBytes())) {
+                throw utl::IOError(utl::IOError::FILE_CANT_CREATE, path);
             }
+            written = true;
 
             /* Straight after writing it, so that a drive already sitting on
              * this very file reads from it for as short a time as possible --

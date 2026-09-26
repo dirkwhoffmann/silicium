@@ -41,6 +41,9 @@ bool isDirectory(const fs::path &path);
 // Creates a directory
 bool createDirectory(const fs::path &path);
 
+// Creates a file of the given size which reads as zeros throughout
+bool createEmptyFile(const fs::path &path, isize size);
+
 // Removes a file or directory
 void remove(const fs::path &path);
 

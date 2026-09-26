@@ -97,6 +97,36 @@ createDirectory(const fs::path &path)
     }
 }
 
+bool
+createEmptyFile(const fs::path &path, isize size)
+{
+    if (size < 0) return false;
+
+    try {
+
+        std::ofstream os(path, std::ios::binary | std::ios::trunc);
+        if (!os) return false;
+
+        if (size > 0) {
+
+            // Note: Only the last byte is written. Seeking past the end of a
+            // new file and writing there leaves a hole, which reads back as
+            // zeros. This allows the OS to create the file as a sparse file
+            // if such files are supported.
+
+            os.seekp(std::streamoff(size - 1));
+            os.put('\0');
+        }
+
+        os.close();
+        return bool(os);
+
+    } catch (...) {
+
+        return false;
+    }
+}
+
 void
 remove(const fs::path &path)
 {
