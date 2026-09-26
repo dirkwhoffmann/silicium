@@ -284,10 +284,7 @@ constexpr i64 diskIsOmitted = -2;
 bool
 HardDrive::snapshotable() const
 {
-    if (!image || fileBacked()) return false;
-    if (!config.snapshots) return false;
-
-    return size() <= config.snapshotLimit * 1024 * 1024;
+    return image && size() <= config.snapshotLimit * 1024 * 1024;
 }
 
 void
@@ -565,6 +562,7 @@ HardDrive::cacheInfo() const
     info.hasUnmodifiedDisk = hasUnmodifiedDisk();
     info.hasProtectedDisk = hasProtectedDisk();
     info.hasUnprotectedDisk = hasUnprotectedDisk();
+    info.snapshotable = snapshotable();
 
     info.partitions = numPartitions();
 

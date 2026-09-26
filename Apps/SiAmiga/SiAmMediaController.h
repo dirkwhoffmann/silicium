@@ -33,9 +33,8 @@ public:
     // Floppy drives (df0..df3)
     //
 
-    // 'nr' is 0-3 throughout this class' public API, matching the core's
-    // df[] indexing (and SiAmConfigController's driveConnected(nr)/
-    // setDriveConnected(nr,..)).
+public:
+
     Q_INVOKABLE bool driveHasDisk(int nr) const;
     Q_INVOKABLE bool driveWriteProtected(int nr) const;
     Q_INVOKABLE bool driveModified(int nr) const;
@@ -43,21 +42,9 @@ public:
     Q_INVOKABLE bool driveWriting(int nr) const;
     Q_INVOKABLE int driveTrack(int nr) const;
     Q_INVOKABLE void insertDisk(int nr, const QUrl &url, bool wp = false);
-
-    // What the drive's model makes of a blank disk. SiAmDiskCreator shows the
-    // capacity and picks the disk icon from it -- the geometry itself isn't
-    // ours to choose, the core derives it from the drive (FloppyDrive::
-    // insertNew) exactly as vAmiga's own FloppyCreator reports it.
     Q_INVOKABLE QString driveCapacity(int nr) const;
     Q_INVOKABLE bool driveHighDensity(int nr) const;
 
-    /* Formats a blank disk and inserts it.
-     *
-     * 'fsFormat' and 'bootBlock' are raw amiga::FSFormat / amiga::BootBlockId
-     * values, which is what SiAmDiskCreator's combo box tags carry -- the
-     * enums aren't registered with QML, and listing only the entries worth
-     * offering means a position wouldn't identify one anyway.
-     */
     Q_INVOKABLE void newDisk(int nr, int fsFormat, int bootBlock, const QString &name);
     Q_INVOKABLE void ejectDisk(int nr);
     Q_INVOKABLE void exportDisk(int nr, const QUrl &url);
@@ -68,35 +55,16 @@ public:
     // Hard drives (hd0..hd3)
     //
 
+public:
+
     Q_INVOKABLE bool hdHasDisk(int nr) const;
 
-    /* What this slot's image is called, and what it already holds.
-     *
-     * A drive the machine owns lives in the machine's own folder, under the
-     * hdN name Amiga::saveWorkspace() uses, so that the image travels with
-     * the SVM instead of the machine depending on a path outside it. 'nr'
-     * picks the name; the two query calls let the caller warn before
-     * anything is overwritten.
-     */
-    Q_INVOKABLE QString hdImageName(int nr, const QUrl &url) const;
-    Q_INVOKABLE QString hdExistingImage(int nr) const;
-
-    /* The largest drive this slot accepts, in MB (0 = no limit).
-     *
-     * The controller's own limit (Opt::HDC_MB_LIMIT) and nothing else. The
-     * memory limit beside it (HDC_MEM_LIMIT) has no say here: it caps a disk
-     * held in RAM, and a drive made here lives in a file.
-     */
+    // Size limits (in MB)
     Q_INVOKABLE int hdCapacityLimit(int nr) const;
-
-    /* The largest drive OFS or FFS can describe, in MB.
-     *
-     * Past this a drive can still be created, but only without a file
-     * system -- there is no Amiga file system that would span it. Nothing
-     * else in the app knows this number, so the dialog asks for it rather
-     * than carrying a copy.
-     */
     Q_INVOKABLE int hdFileSystemLimit() const;
+
+    // Checks whether the SVM contains an existing hard-drive image
+    Q_INVOKABLE QString hdExistingImage(int nr) const;
 
     /* Puts a hard drive into the machine, and returns at once.
      *
@@ -137,35 +105,15 @@ public:
 
 private:
 
-    /* The three steps the two entry points above are made of.
-     *
-     * All of them run on the job's thread, not this one. That is allowed:
-     * the emulator's public API asks only that the caller is not the
-     * emulator thread itself (Thread::isUserThread), and the calls here that
-     * suspend it -- attach, loadIntoMemory, format, saveWorkspace -- are the
-     * only suspending calls in flight, because what the window does every
-     * frame merely reads.
-     *
-     * The first two leave a finished image in the machine's folder and touch
-     * the machine no more than they must; the third is what the machine
-     * notices. Each reports its progress as it goes.
-     */
-
-    // Copies a dropped image into the machine's folder
-    void copyHd(int nr, const QUrl &url);
-
-    // Lays down a new image there and puts a file system on it
-    void createHd(int nr, int megabytes, int fsFormat, const QString &name,
-                  const QUrl &importUrl = {});
+    // Creates a new image file and installes a file system if requested
+    void createHd(int nr, int megabytes, int fsFormat, const QString &name, const QUrl &importUrl = {});
 
     // Attaches an image and lets the machine see it
     void attachHd(int nr, const QUrl &url);
+    void attachHd(int nr, const fs::path &path);
 
-    // Where this slot's image lives
-    std::filesystem::path hdImagePath(int nr) const;
-
-    // Says that a job could not be started, rather than failing silently
-    void reportBusy(const QString &failure);
+    // Reports a warning if a large drive is attached
+    void checkForLargeDrive(int nr);
 
 public:
 

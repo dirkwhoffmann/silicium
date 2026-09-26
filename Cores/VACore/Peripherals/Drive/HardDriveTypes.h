@@ -188,7 +188,8 @@ typedef struct
     bool hasUnmodifiedDisk;
     bool hasProtectedDisk;
     bool hasUnprotectedDisk;
-    
+    bool snapshotable;
+
     // Logical layout (partitions)
     isize partitions;
     
