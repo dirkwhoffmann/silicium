@@ -95,11 +95,7 @@ public:
     optional<string> getControllerProduct() const { return rdbString(196, 16); }
     optional<string> getControllerRevision() const { return rdbString(212, 4); }
 
-    /* Predicts the number of blocks of this image.
-     *
-     * Only meaningful for an image without an RDB, and expensive: with no
-     * RDB to consult, finding the root block means scanning the image.
-     */
+    // Predicts the number of blocks for an image with no RDB
     isize predictNumBlocks() const;
 
 

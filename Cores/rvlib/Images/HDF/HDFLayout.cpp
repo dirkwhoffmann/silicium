@@ -13,6 +13,7 @@
 #include "Devices/LinearDevice.h"
 #include "utl/support.h"
 #include <cstring>
+#include <algorithm>
 
 namespace retro::vault {
 
@@ -50,7 +51,19 @@ HDFLayout::isRB(const u8 *ptr) const
 optional<isize>
 HDFLayout::seekRB() const
 {
-    for (isize nr = 0; bsize * (nr + 1) <= bytes; nr++) {
+    /* A file system keeps its root block at (numReserved + highKey) / 2
+     * with highKey being the last used block. It cannot use more blocks than
+     * the image has, so the root block cannot lie past the middle. If a HDF
+     * contais a file systems that falls short of filling the  entire image,
+     * the root block might be located below. We therefore seeks the root block
+     * in a limited range around the expected position.
+     */
+    constexpr isize numReserved = 2;
+    constexpr isize slack = 32;
+
+    const isize middle = (numReserved + bytes / bsize - 1) / 2;
+
+    for (isize nr = std::max(isize(0), middle - slack); nr <= middle; nr++) {
         if (isRB(seek(nr))) return nr;
     }
 
