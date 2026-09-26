@@ -135,6 +135,13 @@ ComboBox {
         id: input
         text: root.editText
         font: root.font
+
+        /* ComboBox carries a 'validator' of its own, but nothing applies it
+         * to a contentItem the style did not supply -- the stock styles bind
+         * it here, in their own ComboBox.qml, exactly like this. Without the
+         * line the property would sit on the control doing nothing.
+         */
+        validator: root.validator
         color: root.enabled ? root.primary : root.disabled
         verticalAlignment: Text.AlignVCenter
         leftPadding: 0

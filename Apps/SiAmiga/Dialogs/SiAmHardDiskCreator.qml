@@ -171,6 +171,18 @@ SiDialog {
                 l: qsTr("Capacity:")
                 lwidth: root.labelWidth
                 model: ["4 MB", "8 MB", "16 MB", "32 MB", "64 MB", "128 MB", "256 MB"]
+
+                /* A number, optionally followed by the unit the list entries
+                 * carry -- so "384", "384 MB" and a picked "64 MB" are all
+                 * spellings of the same thing, and a letter typed where a
+                 * digit belongs never lands. Six digits is past every limit
+                 * below; what is well-formed but too large is caught there,
+                 * not here.
+                 */
+                validator: RegularExpressionValidator {
+                    regularExpression: /[0-9]{0,6} ?([Mm][Bb]?)?/
+                }
+
                 onAccepted: root.normalize()
                 onEditingFinished: root.normalize()
             }

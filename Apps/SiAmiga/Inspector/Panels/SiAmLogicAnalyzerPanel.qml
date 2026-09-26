@@ -88,22 +88,16 @@ SiAmInspectorWindow {
         textRole: "name"
         placeholderText: qsTr("Address")
 
-        // Plain property assignment (not a binding) is what ComboBox itself
-        // does to editText on every keystroke/selection, which breaks a
-        // declarative binding here the same way -- so it's restored with
-        // Qt.binding() after each accepted edit instead of written once.
-        editText: (root.configVersion, root.logicAnalyzer.probeLabel(channel))
+        /* The label is the probe's, not the field's: what the user types is
+         * an instruction to change the probe, and the field shows whatever
+         * the probe says afterwards. SiComboInputControl puts it back in
+         * step on its own, so an address selectAddress() refuses leaves the
+         * old label on screen with nothing to restore here.
+         */
+        text: (root.configVersion, root.logicAnalyzer.probeLabel(channel))
 
-        onActivated: (index) => {
-            root.logicAnalyzer.selectPreset(channel, index)
-            editText = Qt.binding(function() { return (root.configVersion, root.logicAnalyzer.probeLabel(channel)) })
-        }
-
-        onAccepted: {
-            if (root.logicAnalyzer.selectAddress(channel, editText)) {
-                editText = Qt.binding(function() { return (root.configVersion, root.logicAnalyzer.probeLabel(channel)) })
-            }
-        }
+        onActivated: (index) => root.logicAnalyzer.selectPreset(channel, index)
+        onAccepted: root.logicAnalyzer.selectAddress(channel, editText)
     }
 
     /* The two cell kinds of the hover tooltip's grid.
