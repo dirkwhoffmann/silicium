@@ -66,7 +66,6 @@ class HardDrive final : public Drive, public TrackDevice {
 
         Opt::HDR_TYPE,
         Opt::HDR_WRITE_THROUGH,
-        Opt::HDR_SNAPSHOT,
         Opt::HDR_SNAPSHOT_LIMIT,
         Opt::HDR_PAN,
         Opt::HDR_STEP_VOLUME
