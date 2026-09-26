@@ -13,6 +13,7 @@
 #include "Logger.h"
 #include <QCursor>
 #include <QGuiApplication>
+#include <QInputMethod>
 #include <QQuickWindow>
 #include <QTextStream>
 #include <QTimer>
@@ -220,6 +221,35 @@ InputManager::setCaptureKeyboard(bool value)
 }
 
 bool
+InputManager::editingText()
+{
+    /* Whether a keystroke belongs to something being typed into.
+     *
+     * Capturing the keyboard means swallowing every key before it reaches
+     * the focused item (see the filters below), which is right while the
+     * user is driving the virtual machine and wrong the moment a text field
+     * in the same window has the focus -- a name to type into the disk
+     * creator, a value in a dialog. The window is active and RetroShell is
+     * closed either way, so the capture flag alone cannot tell the two
+     * apart.
+     *
+     * Asked of the focus object rather than answered from a list of types:
+     * Qt::ImEnabled is what every text-entry item reports (and what Qt
+     * itself consults to decide whether to raise a virtual keyboard), so
+     * this covers TextField, TextArea, an editable ComboBox's inner input
+     * and anything else built on TextInput, without this file knowing about
+     * any of them.
+     */
+    auto *focus = QGuiApplication::focusObject();
+    if (!focus) return false;
+
+    QInputMethodQueryEvent query(Qt::ImEnabled);
+    QCoreApplication::sendEvent(focus, &query);
+
+    return query.value(Qt::ImEnabled).toBool();
+}
+
+bool
 InputManager::eventFilter(QObject *object, QEvent *event)
 {
     switch (event->type()) {
@@ -334,6 +364,10 @@ InputManager::mouseButtonEventFilter(QObject *obj, QMouseEvent *event)
 bool
 InputManager::keyDownEventFilter(QObject *obj, QKeyEvent *event)
 {
+    // Who the key belongs to, asked once and used for both decisions below
+    // (feeding the machine, and swallowing the event).
+    const bool capture = m_captureKeyboard && !editingText();
+
     if (delegate && !isRepeat(event)) {
 
         rememberEvent(event);
@@ -393,7 +427,7 @@ InputManager::keyDownEventFilter(QObject *obj, QKeyEvent *event)
                     break;
             }
 
-        } else if (m_captureKeyboard) {
+        } else if (capture) {
 
             /* Only while the emulator owns the keyboard.
              *
@@ -415,7 +449,7 @@ InputManager::keyDownEventFilter(QObject *obj, QKeyEvent *event)
         }
     }
 
-    return m_captureKeyboard || QObject::eventFilter(obj, event);
+    return capture || QObject::eventFilter(obj, event);
 }
 
 optional<KeyCombo>
@@ -435,6 +469,8 @@ InputManager::keyCombo(QKeyEvent *event) const
 bool
 InputManager::keyUpEventFilter(QObject *obj, QKeyEvent *event)
 {
+    const bool capture = m_captureKeyboard && !editingText();
+
     if (delegate && !isRepeat(event)) {
 
         rememberEvent(event);
@@ -501,7 +537,11 @@ InputManager::keyUpEventFilter(QObject *obj, QKeyEvent *event)
         }
     }
 
-    return m_captureKeyboard || QObject::eventFilter(obj, event);
+    /* Consumed on the same terms as the press, so that a key typed into a
+     * text field reaches it. The delegate above still hears the release
+     * either way -- that is the point of the block above.
+     */
+    return capture || QObject::eventFilter(obj, event);
 }
 
 bool

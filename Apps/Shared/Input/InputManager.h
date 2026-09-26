@@ -201,6 +201,14 @@ public:
     void setCaptureWindow(QQuickWindow *window);
 
     bool getCaptureKeyboard() { return m_captureKeyboard; }
+
+    /* Whether the focused item is one that takes typed text.
+     *
+     * The second half of the capture question: m_captureKeyboard says the
+     * machine may have the keyboard, this says whether something in the app
+     * is being typed into right now. See the definition.
+     */
+    static bool editingText();
     void setCaptureKeyboard(bool value);
 
     int mods() { return m_mods.bits(); }
