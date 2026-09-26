@@ -893,6 +893,12 @@ public:
      */
     void attach(isize c, isize h, isize s, isize b = 512);
 
+    /** @brief  Takes the disk out of the drive.
+     *  @note   The counterpart of attach(). The drive is left as it was
+     *          before anything was attached.
+     */
+    void detach();
+
     /** @brief  Imports files from a folder
      *  @note   All existing files are deleted prior to importing the folder.
      */

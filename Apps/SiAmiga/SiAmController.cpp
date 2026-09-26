@@ -1042,6 +1042,8 @@ SiAmController::process(const Message &msg, const string &attachment)
         case Msg::DISK_PROTECTED:
         case Msg::HDC_CONNECT:
         case Msg::HDC_STATE:
+        case Msg::HDR_ATTACH:
+        case Msg::HDR_DETACH:
         case Msg::HDR_STEP:
         case Msg::HDR_READ:
         case Msg::HDR_WRITE:
