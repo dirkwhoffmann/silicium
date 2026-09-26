@@ -212,12 +212,14 @@ SiAmMediaController::attachHdAsync(int nr, const QUrl &url)
 
                 // Attach the copied image
                 attachHd(nr, target);
-            },
+            } /*,
             [this, nr] {
 
                 // Show warning if a large hard drive has been attached
                 checkForLargeDrive(nr);
-            });
+            }
+            */
+            );
 }
 
 void
@@ -236,14 +238,15 @@ SiAmMediaController::attachHdAsync(int nr, int megabytes, int fsFormat, const QS
 
                 // Attach the copied image
                 attachHd(nr, target);
-            },
+            } /*,
             [this, nr] {
 
                 // Show warning if a large hard drive has been attached
                 checkForLargeDrive(nr);
-            });
+            }*/);
 }
 
+/*
 void
 SiAmMediaController::checkForLargeDrive(int nr)
 {
@@ -259,6 +262,7 @@ SiAmMediaController::checkForLargeDrive(int nr)
                          .arg(nr).arg(limit));
     }
 }
+*/
 
 /*
 void

@@ -446,6 +446,7 @@ private:
     void didRun();
     void didPause();
     void didShutdown();
+    void didHdrAttach(i64 nr);
 
 private:
 

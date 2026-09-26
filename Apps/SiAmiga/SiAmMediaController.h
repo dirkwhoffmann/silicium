@@ -113,7 +113,7 @@ private:
     void attachHd(int nr, const fs::path &path);
 
     // Reports a warning if a large drive is attached
-    void checkForLargeDrive(int nr);
+    // void checkForLargeDrive(int nr);
 
 public:
 

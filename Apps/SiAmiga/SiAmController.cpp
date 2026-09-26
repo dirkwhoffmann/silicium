@@ -983,6 +983,22 @@ SiAmController::didShutdown()
 }
 
 void
+SiAmController::didHdrAttach(i64 nr)
+{
+    auto &core = SiAmController::core();
+    auto &info = core.hd[nr]->getInfo();
+
+    if (info.hasDisk && !info.snapshotable) {
+
+        const auto limit = (int)core.get(Opt::HDR_SNAPSHOT_LIMIT, nr);
+        showNotification(tr("Large hard drive"),
+        tr("HD%1 is too large to be saved in snapshots because it exceeds "
+            "the %2 MB limit. It is kept in the virtual machine folder only.")
+            .arg(nr).arg(limit));
+    }
+}
+
+void
 SiAmController::process(const Message &msg, const string &attachment)
 {
     switch (msg.type) {
@@ -1042,7 +1058,16 @@ SiAmController::process(const Message &msg, const string &attachment)
         case Msg::DISK_PROTECTED:
         case Msg::HDC_CONNECT:
         case Msg::HDC_STATE:
+
+            m_infoIsDirty = true;
+            break;
+
         case Msg::HDR_ATTACH:
+
+            didHdrAttach(msg.value);
+            m_infoIsDirty = true;
+            break;
+
         case Msg::HDR_DETACH:
         case Msg::HDR_STEP:
         case Msg::HDR_READ:
