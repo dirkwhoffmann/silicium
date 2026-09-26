@@ -204,6 +204,23 @@ ApplicationWindow {
 
             root.showError(title, text)
         }
+
+        // Worth saying, not worth interrupting for -- e.g. that a hard drive
+        // just created is too large to travel in a snapshot. VMWindow does
+        // the same for SiC64.
+        function onShowNotification(title, message) {
+
+            notifications.show(title, message)
+        }
+    }
+
+    NotificationCenter {
+
+        id: notifications
+        maxWidth: root.width - 2 * Style.largeSpacing
+        maxHeight: root.height - 2 * Style.largeSpacing
+        watchdog: 0
+        z: 999
     }
 
     //
@@ -275,13 +292,21 @@ ApplicationWindow {
      */
     function newHardDiskAction(driveNr) {
 
-        if (!amiga.media.hdHasDisk(driveNr)) {
+        // The image file is asked about as well as the drive: the new one
+        // is written under that same name (hdN.hdf), so a file left in the
+        // folder by an earlier drive is overwritten even when the slot
+        // itself is empty.
+        const existing = amiga.media.hdExistingImage(driveNr)
+
+        if (!amiga.media.hdHasDisk(driveNr) && existing === "") {
             hardDiskCreatorDialog.driveNr = driveNr
             hardDiskCreatorDialog.open()
             return
         }
 
-        errorDialog.titleText = qsTr("Hd%1 already holds a hard drive.").arg(driveNr)
+        errorDialog.titleText = amiga.media.hdHasDisk(driveNr) ?
+            qsTr("Hd%1 already holds a hard drive.").arg(driveNr) :
+            qsTr("The machine folder already holds %1.").arg(existing)
         errorDialog.bodyText = qsTr("Creating a new one replaces it. Anything on " +
                                     "it that has not been exported will be lost.")
         errorDialog.buttons = Dialog.Cancel | Dialog.Ok
@@ -298,6 +323,7 @@ ApplicationWindow {
         id: hardDiskCreatorDialog
         amiga: root.amiga
     }
+
 
 
 

@@ -14,6 +14,7 @@
 #include "SiAmController.h"
 #include "Config/SiAmConfigController.h"
 #include <QFile>
+#include <fstream>
 #include <unistd.h>
 
 using namespace vamiga;
@@ -173,42 +174,75 @@ SiAmMediaController::attachHd(int nr, const QUrl &url)
 }
 
 int
-SiAmMediaController::hdCapacityLimit(int nr, bool formatted) const
+SiAmMediaController::hdCapacityLimit(int nr) const
 {
-    auto &core = SiAmController::core();
+    return (int)SiAmController::core().get(Opt::HDC_MB_LIMIT, nr);
+}
 
-    // The largest volume OFS and FFS can describe (FSDescriptor::
-    // checkCompatibility). Nothing else in the chain knows about it.
-    constexpr int fsLimit = 504;
-
-    int limit = formatted ? fsLimit : 0;
-
-    for (auto opt : { Opt::HDC_MB_LIMIT, Opt::HDC_MEM_LIMIT }) {
-
-        const auto value = (int)core.get(opt, nr);
-        if (value && (!limit || value < limit)) limit = value;
-    }
-
-    return limit;
+int
+SiAmMediaController::hdFileSystemLimit() const
+{
+    /* 4 GB, the largest volume OFS and FFS can address.
+     *
+     * Past it a drive is still created, just without a file system (see the
+     * dialog). rvlib judges a volume's capacity for itself in
+     * FSDescriptor::checkCompatibility() -- if that rule changes, this is
+     * the number to bring back into step with it.
+     */
+    return 4096;
 }
 
 bool
 SiAmMediaController::newHardDisk(int nr, int megabytes, int fsFormat, const QString &name,
                                  const QUrl &importUrl)
 {
+    const auto path = parent->workspaceFolder() / hdImageName(nr, {}).toStdString();
+    bool written = false;
+
     try {
 
         auto &core = SiAmController::core();
         auto fs = amiga::FSFormat(fsFormat);
         auto geometry = retro::vault::GeometryDescriptor(isize(megabytes) * 1024 * 1024);
 
-        core.hd[nr]->attach(geometry.cylinders, geometry.heads,
-                            geometry.sectors, geometry.bsize);
+        /* Lay down the file the drive will live on.
+         *
+         * Written as a hole rather than as that many zero bytes: the file
+         * system records the size and nothing else, so a 2 GB drive appears
+         * at once and costs what is actually stored in it. An empty file
+         * carries no rigid disk block, which is exactly right -- HDFFile
+         * then takes the geometry from the size, and it is the geometry
+         * computed above.
+         */
+        {
+            std::ofstream os(path, std::ios::binary | std::ios::trunc);
+            if (!os) throw utl::IOError(utl::IOError::FILE_CANT_CREATE, path);
+
+            os.seekp(geometry.numBytes() - 1);
+            os.put('\0');
+            os.close();
+
+            if (!os) throw utl::IOError(utl::IOError::FILE_CANT_WRITE, path);
+            written = true;
+        }
+
+        /* Straight after writing it, so that a drive already sitting on this
+         * very file reads from it for as short a time as possible -- the
+         * attach replaces that drive outright, and the reset below sends the
+         * machine round again regardless.
+         */
+        core.hd[nr]->attach(path);
         core.hd[nr]->format(fs, name.toStdString());
 
         if (fs != amiga::FSFormat::NODOS && importUrl.isLocalFile()) {
             core.hd[nr]->importFiles(fs::path(importUrl.toLocalFile().toStdWString()));
         }
+
+        /* The file holds nothing but the hole until this. Formatting works on
+         * the drive, and a drive only writes back when it is told to or when
+         * HDR_WRITE_THROUGH says so -- which by default it does not.
+         */
+        core.hd[nr]->persist();
 
         /* Same two steps the drop path takes once an image is in place (see
          * copyAndAttachHd): plug the controller in, then send the machine
@@ -217,10 +251,44 @@ SiAmMediaController::newHardDisk(int nr, int megabytes, int fsFormat, const QStr
          */
         if (!core.get(Opt::HDC_CONNECT, nr)) core.set(Opt::HDC_CONNECT, true, nr);
         core.hardReset();
+        core.sync();
+
+        // Write the machine out, so config.retrosh carries the attach line
+        // and the drive is still there the next time the SVM is opened.
+        parent->saveWorkspaceNow();
+
+        /* A drive this large is the machine's alone.
+         *
+         * It lives in a file either way, and a disk in a file is stored in a
+         * snapshot as its path (see HardDrive::snapshotable) -- but past
+         * HDR_SNAPSHOT_LIMIT it would not be stored even if it were held in
+         * memory, so a snapshot taken now is worth nothing without the SVM
+         * beside it. Said once, here, rather than left to be discovered.
+         */
+        if (const auto limit = core.get(Opt::HDR_SNAPSHOT_LIMIT, nr); limit && megabytes > limit) {
+
+            showNotification(tr("Hard drive too large for snapshots"),
+                             tr("At %1 MB, hd%2 is past the %3 MB a snapshot stores. "
+                                "It is kept in the virtual machine folder only.")
+                                 .arg(megabytes).arg(nr).arg(limit));
+        }
 
         return true;
 
     } catch (const std::exception &e) {
+
+        /* Leave no image behind that nothing asked for.
+         *
+         * The file is laid down before the drive can be attached, let alone
+         * formatted, so a failure past that point would otherwise leave the
+         * whole requested size sitting in the machine's folder for a drive
+         * the user never got.
+         */
+        if (written) {
+
+            std::error_code ec;
+            fs::remove(path, ec);
+        }
 
         showError("Failed to create hard drive.", e.what());
         return false;

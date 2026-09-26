@@ -76,8 +76,13 @@ public:
      * The three steps vAmiga's own HardDiskCreator performs (attach a
      * geometry, format it, import a folder), plus what a drive that was
      * never there before needs to be seen: the controller, and a reset for
-     * the machine to walk the bus again. The disk lives in memory -- nothing
-     * is written until the workspace is saved.
+     * the machine to walk the bus again.
+     *
+     * The drive is built as a file in the machine's own folder (hd0.hdf and
+     * friends, the names Amiga::saveWorkspace already uses) and attached on
+     * top of it, rather than in memory: a drive of the sizes this now allows
+     * has no business being held in RAM, and one that lives in a file is
+     * carried by the SVM instead of by every snapshot.
      *
      * The caller gives a capacity, not a geometry: deriving CHS from a size
      * is what GeometryDescriptor(isize) already does, and it does it better
@@ -97,18 +102,20 @@ public:
 
     /* The largest drive this slot accepts, in MB (0 = no limit).
      *
-     * Both of the controller's limits, whichever bites first: HDC_MB_LIMIT
-     * caps the drive, HDC_MEM_LIMIT caps what a disk held in memory may be,
-     * and a drive built here is held in memory. Worth showing rather than
-     * leaving to be discovered -- the default memory limit is 256 MB, which
-     * is below what a user may well type.
-     *
-     * A drive that is to carry a file system has a third ceiling: OFS and
-     * FFS stop at 504 MB (FSDescriptor::checkCompatibility). It only bites
-     * where the two controller limits have been lifted, but where it does,
-     * the drive would attach and then fail to format.
+     * The controller's own limit (Opt::HDC_MB_LIMIT) and nothing else. The
+     * memory limit beside it (HDC_MEM_LIMIT) has no say here: it caps a disk
+     * held in RAM, and newHardDisk() above builds one in a file.
      */
-    Q_INVOKABLE int hdCapacityLimit(int nr, bool formatted = true) const;
+    Q_INVOKABLE int hdCapacityLimit(int nr) const;
+
+    /* The largest drive OFS or FFS can describe, in MB.
+     *
+     * Past this a drive can still be created, but only without a file
+     * system -- there is no Amiga file system that would span it. Nothing
+     * else in the app knows this number, so the dialog asks for it rather
+     * than carrying a copy.
+     */
+    Q_INVOKABLE int hdFileSystemLimit() const;
 
     /* Taking a dropped hard drive image into the machine.
      *

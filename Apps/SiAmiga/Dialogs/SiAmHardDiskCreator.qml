@@ -26,9 +26,9 @@ import Silicium.Theme
  * offers the CHS fields instead, which is the same question asked three
  * times over.
  *
- * The drive is built in memory. Nothing reaches the disk until the workspace
- * is saved -- unlike a dropped image, which is copied into the SVM there and
- * then (see SiAmDropHdfDialog).
+ * The drive is built as a file in the machine's own folder and attached on
+ * top of it (see SiAmMediaController::newHardDisk), so the SVM carries it
+ * and a snapshot need not.
  *
  * Bind 'amiga' and set driveNr before opening.
  */
@@ -42,17 +42,28 @@ SiDialog {
 
     // amiga::FSFormat::NODOS, as SiAmDiskCreator names it
     readonly property int nodos: 8
-    readonly property bool formatted: fsCombo.currentIndex !== root.nodos
 
     // The capacity being asked for, in MB. Whatever the field says, parsed.
     readonly property int megabytes: root.parseCapacity(capacityCombo.editText)
 
     // What this slot accepts, 0 when it is unlimited (see hdCapacityLimit).
-    // It moves with the file system: a formatted drive stops where OFS and
-    // FFS do.
-    readonly property int limit:
-        root.amiga.media.hdCapacityLimit(root.driveNr, root.formatted)
+    readonly property int limit: root.amiga.media.hdCapacityLimit(root.driveNr)
     readonly property bool tooLarge: root.limit > 0 && root.megabytes > root.limit
+
+    /* Past what any Amiga file system can describe.
+     *
+     * Not a reason to refuse the drive -- a drive this large is perfectly
+     * usable, it just cannot be formatted here, so everything belonging to a
+     * file system goes grey and the drive is created raw. Formatting it is
+     * then the guest's business, with whatever it uses for drives of this
+     * size.
+     */
+    readonly property bool unformattable:
+        root.megabytes > root.amiga.media.hdFileSystemLimit()
+
+    // Whether a file system is actually going to be created.
+    readonly property bool formatted:
+        fsCombo.currentIndex !== root.nodos && !root.unformattable
 
     // Where the drive's initial contents come from, "" for an empty drive.
     property url importUrl: ""
@@ -94,7 +105,7 @@ SiDialog {
 
         const ok = root.amiga.media.newHardDisk(root.driveNr,
                                                 root.megabytes,
-                                                fsCombo.currentIndex,
+                                                root.formatted ? fsCombo.currentIndex : root.nodos,
                                                 root.formatted ? nameField.text : "",
                                                 root.formatted ? root.importUrl : "")
 
@@ -194,6 +205,8 @@ SiDialog {
                 font.pixelSize: Style.small
                 color: root.tooLarge ? Palette.warning : Palette.tertiary
                 text: root.tooLarge ? qsTr("This slot holds at most %1 MB.").arg(root.limit)
+                    : root.unformattable ? qsTr("Too large for a file system. " +
+                                                "The drive is created unformatted.")
                     : root.limit > 0 ? qsTr("Up to %1 MB.").arg(root.limit)
                     : qsTr("Type a size in MB, or pick one.")
             }
@@ -205,6 +218,7 @@ SiDialog {
                 lwidth: root.labelWidth
                 model: [qsTr("None"), qsTr("OFS"), qsTr("FFS")]
                 tags: [root.nodos, 0, 1]    // NODOS, OFS, FFS
+                enabled: !root.unformattable
 
                 // An unformatted drive has nowhere to put files, so the
                 // folder goes with the file system (as it does in vAmiga).
@@ -215,7 +229,8 @@ SiDialog {
 
                 l: qsTr("Name:")
                 lwidth: root.labelWidth
-                visible: root.formatted
+                visible: root.formatted || root.unformattable
+                enabled: !root.unformattable
 
                 control: [
                     SiTextField {
@@ -232,7 +247,8 @@ SiDialog {
                 id: importControl
                 l: qsTr("Files:")
                 lwidth: root.labelWidth
-                visible: root.formatted
+                visible: root.formatted || root.unformattable
+                enabled: !root.unformattable
 
                 control: [
                     SiButton {
@@ -246,7 +262,8 @@ SiDialog {
 
                 Layout.fillWidth: true
                 Layout.leftMargin: root.labelWidth + Style.mediumSpacing
-                visible: root.formatted
+                visible: root.formatted || root.unformattable
+                enabled: !root.unformattable
                 elide: Text.ElideMiddle
                 color: root.importUrl != "" ? Palette.secondary : Palette.tertiary
                 text: root.importUrl != "" ? root.importUrl.toString().replace("file://", "")
