@@ -71,7 +71,7 @@ public:
     Q_INVOKABLE bool hdHasDisk(int nr) const;
     Q_INVOKABLE void attachHd(int nr, const QUrl &url);
 
-    /* Builds a hard drive from scratch and plugs it in.
+    /* Builds a hard drive of the given size and plugs it in.
      *
      * The three steps vAmiga's own HardDiskCreator performs (attach a
      * geometry, format it, import a folder), plus what a drive that was
@@ -79,18 +79,36 @@ public:
      * the machine to walk the bus again. The disk lives in memory -- nothing
      * is written until the workspace is saved.
      *
+     * The caller gives a capacity, not a geometry: deriving CHS from a size
+     * is what GeometryDescriptor(isize) already does, and it does it better
+     * than the dialog used to -- it grows the sector count before the head
+     * count, so a size like 384 MB, which no doubling of heads alone can
+     * describe, still lands on a legal geometry.
+     *
      * 'fsFormat' is a raw amiga::FSFormat value, as in newDisk() above.
      * 'importUrl' may be empty; a folder is only imported into a formatted
      * drive, since there is nowhere to put it otherwise.
+     *
+     * Returns false when nothing was created, having reported why -- the
+     * dialog stays open in that case rather than closing over an error.
      */
-    Q_INVOKABLE void newHardDisk(int nr, int cylinders, int heads, int sectors, int bsize,
-                                 int fsFormat, const QString &name,
+    Q_INVOKABLE bool newHardDisk(int nr, int megabytes, int fsFormat, const QString &name,
                                  const QUrl &importUrl = {});
 
-    // What a geometry may look like, for the creator dialog to clamp to --
-    // the core's own HDR_C_MIN..HDR_S_MAX (see rvlib's DeviceTypes.h), rather
-    // than a second copy of those numbers in QML.
-    Q_INVOKABLE QVariantMap hdGeometryLimits() const;
+    /* The largest drive this slot accepts, in MB (0 = no limit).
+     *
+     * Both of the controller's limits, whichever bites first: HDC_MB_LIMIT
+     * caps the drive, HDC_MEM_LIMIT caps what a disk held in memory may be,
+     * and a drive built here is held in memory. Worth showing rather than
+     * leaving to be discovered -- the default memory limit is 256 MB, which
+     * is below what a user may well type.
+     *
+     * A drive that is to carry a file system has a third ceiling: OFS and
+     * FFS stop at 504 MB (FSDescriptor::checkCompatibility). It only bites
+     * where the two controller limits have been lifted, but where it does,
+     * the drive would attach and then fail to format.
+     */
+    Q_INVOKABLE int hdCapacityLimit(int nr, bool formatted = true) const;
 
     /* Taking a dropped hard drive image into the machine.
      *

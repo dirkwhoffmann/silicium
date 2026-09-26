@@ -20,9 +20,11 @@ import Silicium.Theme
  * The port of vAmiga's HardDiskCreator (GUI/Dialogs/HardDiskCreator.swift),
  * and the hard-drive counterpart to SiAmDiskCreator. A floppy has one
  * geometry and nothing to decide; a hard drive has a size, and the size is
- * what the whole dialog turns on: pick a capacity and the CHS fields follow
- * it, pick "User defined" and they become yours to set, within what a
- * geometry may hold (see SiAmMediaController::hdGeometryLimits).
+ * the whole of what this dialog asks for: a capacity is either picked from
+ * the list or typed in, and the geometry that describes it is the core's
+ * business (see SiAmMediaController::newHardDisk). vAmiga's own dialog
+ * offers the CHS fields instead, which is the same question asked three
+ * times over.
  *
  * The drive is built in memory. Nothing reaches the disk until the workspace
  * is saved -- unlike a dropped image, which is copied into the SVM there and
@@ -42,112 +44,63 @@ SiDialog {
     readonly property int nodos: 8
     readonly property bool formatted: fsCombo.currentIndex !== root.nodos
 
-    // "User defined" carries no capacity of its own, which is what makes it
-    // the one entry that leaves the geometry alone.
-    readonly property bool custom: capacityCombo.currentIndex === 0
+    // The capacity being asked for, in MB. Whatever the field says, parsed.
+    readonly property int megabytes: root.parseCapacity(capacityCombo.editText)
 
-    // The geometry being described. vAmiga keeps these outside its controls
-    // too: the fields display them, the capacity computes them, and neither
-    // is their home.
-    property int cylinders: 0
-    property int heads: 0
-    property int sectors: 0
-    property int bsize: 512
-
-    readonly property var limits: root.amiga.media.hdGeometryLimits()
-    readonly property real megabytes:
-        cylinders * heads * sectors * bsize / (1024 * 1024)
+    // What this slot accepts, 0 when it is unlimited (see hdCapacityLimit).
+    // It moves with the file system: a formatted drive stops where OFS and
+    // FFS do.
+    readonly property int limit:
+        root.amiga.media.hdCapacityLimit(root.driveNr, root.formatted)
+    readonly property bool tooLarge: root.limit > 0 && root.megabytes > root.limit
 
     // Where the drive's initial contents come from, "" for an empty drive.
     property url importUrl: ""
 
-    width: 620
+    width: 520
 
     onOpened: {
 
-        capacityCombo.currentIndex = 8      // 8 MB, as vAmiga preselects
+        capacityCombo.currentIndex = 1      // 8 MB, as vAmiga preselects
         fsCombo.currentIndex = 0            // OFS
         nameField.text = qsTr("Hdrv")
         root.importUrl = ""
-        root.setCapacity(8)
     }
 
-    /* Derives a geometry from a capacity.
+    /* The number in front of whatever the user typed.
      *
-     * vAmiga's own arithmetic (HardDiskCreator.setCapacity): 32 sectors of
-     * 512 bytes, and as many cylinders as that takes -- doubling the head
-     * count whenever the cylinders would run past what an Amiga hard drive
-     * plausibly has.
+     * The field is free text, so it takes "384" and "384 MB" alike, and 0
+     * for anything that carries no number at all -- which is what disables
+     * the Attach button.
      */
-    function setCapacity(mb) {
+    function parseCapacity(text) {
 
-        if (mb <= 0) return
-
-        root.bsize = 512
-        root.sectors = 32
-        root.heads = 1
-        root.cylinders = (mb * 1024 * 1024) / (root.heads * root.sectors * root.bsize)
-
-        while (root.cylinders > 1024) {
-
-            root.cylinders /= 2
-            root.heads *= 2
-        }
+        const mb = parseInt(text)
+        return isNaN(mb) || mb < 0 ? 0 : mb
     }
 
-    function clamp(value, lo, hi) {
-        return Math.max(lo, Math.min(hi, value))
+    // Puts the field back into the shape the list entries have, so a typed
+    // "384" reads like a capacity once it has been accepted.
+    function normalize() {
+
+        if (root.megabytes > 0) capacityCombo.editText = root.megabytes + " MB"
     }
 
     function attach() {
 
-        root.amiga.media.newHardDisk(root.driveNr,
-                                     root.cylinders, root.heads, root.sectors, root.bsize,
-                                     fsCombo.currentIndex,
-                                     root.formatted ? nameField.text : "",
-                                     root.formatted ? root.importUrl : "")
-        root.close()
-    }
+        // Guards the Enter key in the name field, which reaches this without
+        // passing the Attach button's own 'enabled'.
+        if (root.megabytes <= 0 || root.tooLarge) return
 
-    /* A number field with the two arrows beside it.
-     *
-     * The stepper lives in SiControl's 'accessories', which is where a
-     * control's trailing decoration goes -- there is no stepper component in
-     * the shared set, and one pair of arrows used by one dialog is not yet a
-     * reason to add one.
-     */
-    component GeometryField : SiNumberInputControl {
+        const ok = root.amiga.media.newHardDisk(root.driveNr,
+                                                root.megabytes,
+                                                fsCombo.currentIndex,
+                                                root.formatted ? nameField.text : "",
+                                                root.formatted ? root.importUrl : "")
 
-        id: field
-
-        property int minimum: 0
-        property int maximum: 999999
-        signal bumped(int delta)
-
-        lwidth: 70
-        controlWidth: 72
-        minValue: minimum
-        maxValue: maximum
-
-        ColumnLayout {
-
-            spacing: 0
-            enabled: field.enabled
-
-            SiControlButton {
-                symbol: "keyboard_arrow_up"
-                implicitWidth: 22
-                implicitHeight: 13
-                onClicked: field.bumped(1)
-            }
-
-            SiControlButton {
-                symbol: "keyboard_arrow_down"
-                implicitWidth: 22
-                implicitHeight: 13
-                onClicked: field.bumped(-1)
-            }
-        }
+        // Only on success: a drive the core refused leaves the dialog up,
+        // with the error beside it saying what to change.
+        if (ok) root.close()
     }
 
     RowLayout {
@@ -207,15 +160,30 @@ SiDialog {
                 color: Palette.border
             }
 
-            SiComboBoxControl {
+            /* Editable, unlike the list vAmiga offers: the entries are the
+             * sizes worth one click, and anything else -- "384" -- is typed
+             * straight in. That is also what retires the CHS fields, whose
+             * only job was to express a size the list did not carry.
+             */
+            SiComboInputControl {
 
                 id: capacityCombo
                 l: qsTr("Capacity:")
                 lwidth: root.labelWidth
-                model: [qsTr("User defined"),
-                    "4 MB", "8 MB", "16 MB", "32 MB", "64 MB", "128 MB", "256 MB"]
-                tags: [0, 4, 8, 16, 32, 64, 128, 256]
-                onActivated: (tag) => root.setCapacity(tag)
+                model: ["4 MB", "8 MB", "16 MB", "32 MB", "64 MB", "128 MB", "256 MB"]
+                onAccepted: root.normalize()
+                onEditingFinished: root.normalize()
+            }
+
+            SiText {
+
+                Layout.fillWidth: true
+                Layout.leftMargin: root.labelWidth + Style.mediumSpacing
+                font.pixelSize: Style.small
+                color: root.tooLarge ? Palette.warning : Palette.tertiary
+                text: root.tooLarge ? qsTr("This slot holds at most %1 MB.").arg(root.limit)
+                    : root.limit > 0 ? qsTr("Up to %1 MB.").arg(root.limit)
+                    : qsTr("Type a size in MB, or pick one.")
             }
 
             SiComboBoxControl {
@@ -274,62 +242,6 @@ SiDialog {
             }
         }
 
-        //
-        // Geometry
-        //
-
-        ColumnLayout {
-
-            Layout.alignment: Qt.AlignTop
-            Layout.topMargin: Style.large + 2 * Style.smallSpacing + Style.mediumSpacing
-            spacing: Style.mediumSpacing
-
-            GeometryField {
-
-                l: qsTr("Cylinders:")
-                enabled: root.custom
-                intValue: root.cylinders
-                minimum: root.limits.cMin
-                maximum: root.limits.cMax
-                onValueEdited: (v) => root.cylinders = root.clamp(v, minimum, maximum)
-                onBumped: (d) => root.cylinders = root.clamp(root.cylinders + d, minimum, maximum)
-            }
-
-            GeometryField {
-
-                l: qsTr("Heads:")
-                enabled: root.custom
-                intValue: root.heads
-                minimum: root.limits.hMin
-                maximum: root.limits.hMax
-                onValueEdited: (v) => root.heads = root.clamp(v, minimum, maximum)
-                onBumped: (d) => root.heads = root.clamp(root.heads + d, minimum, maximum)
-            }
-
-            GeometryField {
-
-                l: qsTr("Sectors:")
-                enabled: root.custom
-                intValue: root.sectors
-                minimum: root.limits.sMin
-                maximum: root.limits.sMax
-                onValueEdited: (v) => root.sectors = root.clamp(v, minimum, maximum)
-                onBumped: (d) => root.sectors = root.clamp(root.sectors + d, minimum, maximum)
-            }
-
-            // What the three above add up to. vAmiga leaves this to the
-            // capacity popup, which says nothing once the geometry is edited
-            // by hand -- and that is exactly when the number is worth having.
-            SiText {
-
-                Layout.alignment: Qt.AlignRight
-                Layout.rightMargin: 22 + Style.smallSpacing
-                color: Palette.secondary
-                font.pixelSize: Style.small
-                text: root.megabytes < 1 ? qsTr("%1 KB").arg(Math.round(root.megabytes * 1024))
-                                         : qsTr("%1 MB").arg(root.megabytes.toFixed(1))
-            }
-        }
     }
 
     FolderDialog {
@@ -361,6 +273,7 @@ SiDialog {
             SiButton {
                 accented: true
                 text: qsTr("Attach")
+                enabled: root.megabytes > 0 && !root.tooLarge
                 onClicked: root.attach()
             }
         }

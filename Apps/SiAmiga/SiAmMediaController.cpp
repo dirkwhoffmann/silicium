@@ -172,28 +172,38 @@ SiAmMediaController::attachHd(int nr, const QUrl &url)
     }
 }
 
-QVariantMap
-SiAmMediaController::hdGeometryLimits() const
+int
+SiAmMediaController::hdCapacityLimit(int nr, bool formatted) const
 {
-    using G = retro::vault::GeometryDescriptor;
+    auto &core = SiAmController::core();
 
-    return QVariantMap {
-        { "cMin", (int)G::cMin }, { "cMax", (int)G::cMax },
-        { "hMin", (int)G::hMin }, { "hMax", (int)G::hMax },
-        { "sMin", (int)G::sMin }, { "sMax", (int)G::sMax }
-    };
+    // The largest volume OFS and FFS can describe (FSDescriptor::
+    // checkCompatibility). Nothing else in the chain knows about it.
+    constexpr int fsLimit = 504;
+
+    int limit = formatted ? fsLimit : 0;
+
+    for (auto opt : { Opt::HDC_MB_LIMIT, Opt::HDC_MEM_LIMIT }) {
+
+        const auto value = (int)core.get(opt, nr);
+        if (value && (!limit || value < limit)) limit = value;
+    }
+
+    return limit;
 }
 
-void
-SiAmMediaController::newHardDisk(int nr, int cylinders, int heads, int sectors, int bsize,
-                                 int fsFormat, const QString &name, const QUrl &importUrl)
+bool
+SiAmMediaController::newHardDisk(int nr, int megabytes, int fsFormat, const QString &name,
+                                 const QUrl &importUrl)
 {
     try {
 
         auto &core = SiAmController::core();
         auto fs = amiga::FSFormat(fsFormat);
+        auto geometry = retro::vault::GeometryDescriptor(isize(megabytes) * 1024 * 1024);
 
-        core.hd[nr]->attach(cylinders, heads, sectors, bsize);
+        core.hd[nr]->attach(geometry.cylinders, geometry.heads,
+                            geometry.sectors, geometry.bsize);
         core.hd[nr]->format(fs, name.toStdString());
 
         if (fs != amiga::FSFormat::NODOS && importUrl.isLocalFile()) {
@@ -208,9 +218,12 @@ SiAmMediaController::newHardDisk(int nr, int cylinders, int heads, int sectors, 
         if (!core.get(Opt::HDC_CONNECT, nr)) core.set(Opt::HDC_CONNECT, true, nr);
         core.hardReset();
 
+        return true;
+
     } catch (const std::exception &e) {
 
         showError("Failed to create hard drive.", e.what());
+        return false;
     }
 }
 
