@@ -277,7 +277,7 @@ public:
      * window. saveWorkspaceNow() does the same work on the calling thread,
      * for the two places that cannot wait for a thread: hibernation, which
      * is followed by the app quitting, and a job that is already running off
-     * the window's thread (see SiAmMediaController::copyAndAttachHd).
+     * the window's thread (see SiAmMediaController::attachHdAsync).
      */
     Q_INVOKABLE void saveWorkspace();
     void saveWorkspaceNow();

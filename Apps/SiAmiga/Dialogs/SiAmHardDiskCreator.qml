@@ -22,12 +22,12 @@ import Silicium.Theme
  * geometry and nothing to decide; a hard drive has a size, and the size is
  * the whole of what this dialog asks for: a capacity is either picked from
  * the list or typed in, and the geometry that describes it is the core's
- * business (see SiAmMediaController::newHardDisk). vAmiga's own dialog
+ * business (see SiAmMediaController::attachHdAsync). vAmiga's own dialog
  * offers the CHS fields instead, which is the same question asked three
  * times over.
  *
  * The drive is built as a file in the machine's own folder and attached on
- * top of it (see SiAmMediaController::newHardDisk), so the SVM carries it
+ * top of it (see SiAmMediaController::attachHdAsync), so the SVM carries it
  * and a snapshot need not.
  *
  * Bind 'amiga' and set driveNr before opening.
@@ -103,19 +103,19 @@ SiDialog {
         // passing the Attach button's own 'enabled'.
         if (root.megabytes <= 0 || root.tooLarge) return
 
-        const ok = root.amiga.media.newHardDisk(root.driveNr,
-                                                root.megabytes,
-                                                root.formatted ? fsCombo.currentIndex : root.nodos,
-                                                root.formatted ? nameField.text : "",
-                                                root.formatted ? root.importUrl : "")
+        root.amiga.media.attachHdAsync(root.driveNr,
+                                       root.megabytes,
+                                       root.formatted ? fsCombo.currentIndex : root.nodos,
+                                       root.formatted ? nameField.text : "",
+                                       root.formatted ? root.importUrl : "")
 
-        /* Only once the job is under way: the drive is built in the
-         * background now (see SiAmMediaController::newHardDisk), so what
-         * follows this is the status bar's business, and an error, if there
-         * is one, arrives on its own. The dialog stays up only when nothing
-         * was started at all.
+        /* Closed as soon as the job is under way: the drive is built in the
+         * background (see SiAmMediaController::attachHdAsync), so what
+         * follows is the status bar's business, and an error -- including
+         * one saying the job could not be started at all -- arrives on its
+         * own.
          */
-        if (ok) root.close()
+        root.close()
     }
 
     RowLayout {

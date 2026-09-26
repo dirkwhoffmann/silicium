@@ -122,7 +122,7 @@ DropOverlay {
 
     /* Every hard drive zone is offered, connected or not: dropping an image
      * on a slot that has no controller yet plugs one in (see
-     * SiAmMediaController::copyAndAttachHd), so requiring one beforehand would
+     * SiAmMediaController::attachHdAsync), so requiring one beforehand would
      * only hide the very zones a machine without hard drives needs.
      */
 

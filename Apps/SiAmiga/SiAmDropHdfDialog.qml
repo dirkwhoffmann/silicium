@@ -65,5 +65,5 @@ SiUserDialog {
     okLabel: qsTr("Continue")
     sound: true
 
-    onAccepted: root.controller.media.copyAndAttachHd(driveNr, fileUrl)
+    onAccepted: root.controller.media.attachHdAsync(driveNr, fileUrl)
 }
