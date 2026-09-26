@@ -109,8 +109,12 @@ SiDialog {
                                                 root.formatted ? nameField.text : "",
                                                 root.formatted ? root.importUrl : "")
 
-        // Only on success: a drive the core refused leaves the dialog up,
-        // with the error beside it saying what to change.
+        /* Only once the job is under way: the drive is built in the
+         * background now (see SiAmMediaController::newHardDisk), so what
+         * follows this is the status bar's business, and an error, if there
+         * is one, arrives on its own. The dialog stays up only when nothing
+         * was started at all.
+         */
         if (ok) root.close()
     }
 

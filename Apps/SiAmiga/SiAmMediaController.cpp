@@ -197,65 +197,132 @@ SiAmMediaController::newHardDisk(int nr, int megabytes, int fsFormat, const QStr
                                  const QUrl &importUrl)
 {
     const auto path = parent->workspaceFolder() / hdImageName(nr, {}).toStdString();
-    bool written = false;
+    const auto fsType = amiga::FSFormat(fsFormat);
+    const auto folder = importUrl.isLocalFile() ?
+        std::filesystem::path(importUrl.toLocalFile().toStdWString()) : std::filesystem::path();
 
-    try {
+    /* Whether a snapshot would leave this drive behind, decided here rather
+     * than in the task: reading an option is the emulator's business and
+     * this is the thread that owns it. Reported at the end, if the drive
+     * comes into being at all.
+     */
+    const auto snapshotLimit = (int)SiAmController::core().get(Opt::HDR_SNAPSHOT_LIMIT, nr);
+    const bool beyondSnapshots = snapshotLimit && megabytes > snapshotLimit;
+
+    /* Off the GUI thread, like the drop path beside it (see copyAndAttachHd
+     * for what is and is not allowed there). Laying down the file is quick,
+     * but writing a formatted image of some gigabytes back to it is not, and
+     * neither is saving the machine afterwards -- long enough that the window
+     * would stop redrawing for it.
+     *
+     * Returns false when another job of this controller's is still running,
+     * in which case nothing has been started and nothing was touched.
+     */
+    const bool started = runTask(tr("Creating the hard drive..."),
+                   tr("Failed to create hard drive."),
+                   [this, nr, megabytes, fsType, folder, path,
+                    name = name.toStdString()] {
 
         auto &core = SiAmController::core();
-        auto fs = amiga::FSFormat(fsFormat);
         auto geometry = retro::vault::GeometryDescriptor(isize(megabytes) * 1024 * 1024);
+        bool written = false;
 
-        /* Lay down the file the drive will live on.
-         *
-         * Written as a hole rather than as that many zero bytes: the file
-         * system records the size and nothing else, so a 2 GB drive appears
-         * at once and costs what is actually stored in it. An empty file
-         * carries no rigid disk block, which is exactly right -- HDFFile
-         * then takes the geometry from the size, and it is the geometry
-         * computed above.
-         */
-        {
-            std::ofstream os(path, std::ios::binary | std::ios::trunc);
-            if (!os) throw utl::IOError(utl::IOError::FILE_CANT_CREATE, path);
+        try {
 
-            os.seekp(geometry.numBytes() - 1);
-            os.put('\0');
-            os.close();
+            /* Lay down the file the drive will live on.
+             *
+             * Written as a hole rather than as that many zero bytes: the file
+             * system records the size and nothing else, so a 2 GB drive
+             * appears at once and costs what is actually stored in it. An
+             * empty file carries no rigid disk block, which is exactly right
+             * -- HDFFile then takes the geometry from the size, and it is the
+             * geometry computed above.
+             */
+            report(tr("Creating the disk image..."), 0.05);
+            {
+                std::ofstream os(path, std::ios::binary | std::ios::trunc);
+                if (!os) throw utl::IOError(utl::IOError::FILE_CANT_CREATE, path);
 
-            if (!os) throw utl::IOError(utl::IOError::FILE_CANT_WRITE, path);
-            written = true;
+                os.seekp(geometry.numBytes() - 1);
+                os.put('\0');
+                os.close();
+
+                if (!os) throw utl::IOError(utl::IOError::FILE_CANT_WRITE, path);
+                written = true;
+            }
+
+            /* Straight after writing it, so that a drive already sitting on
+             * this very file reads from it for as short a time as possible --
+             * the attach replaces that drive outright, and the reset below
+             * sends the machine round again regardless.
+             */
+            report(tr("Attaching the hard drive..."), 0.15);
+            core.hd[nr]->attach(path);
+
+            if (fsType != amiga::FSFormat::NODOS) {
+
+                report(tr("Creating the file system..."), 0.25);
+                core.hd[nr]->format(fsType, name);
+
+                if (!folder.empty()) {
+
+                    report(tr("Importing files..."), 0.45);
+                    core.hd[nr]->importFiles(folder);
+                }
+
+            } else {
+
+                core.hd[nr]->format(fsType, name);
+            }
+
+            /* The file holds nothing but the hole until this. Formatting
+             * works on the drive, and a drive only writes back when it is
+             * told to or when HDR_WRITE_THROUGH says so -- which by default
+             * it does not. For a large drive this is the bulk of the job.
+             */
+            report(tr("Writing the disk image..."), 0.60);
+            core.hd[nr]->persist();
+
+            /* Same two steps the drop path takes once an image is in place
+             * (see copyAndAttachHd): plug the controller in, then send the
+             * machine round again, because a drive that was not there at boot
+             * time is a drive the Amiga has not seen.
+             */
+            report(tr("Attaching the hard drive..."), 0.85);
+            if (!core.get(Opt::HDC_CONNECT, nr)) core.set(Opt::HDC_CONNECT, true, nr);
+            core.hardReset();
+
+            /* Wait for all of that to have happened before writing the
+             * machine out -- option changes and the reset are handed to the
+             * emulator thread and take effect a frame or so later.
+             */
+            core.sync();
+
+            // Write the machine out, so config.retrosh carries the attach line
+            // and the drive is still there the next time the SVM is opened.
+            report(tr("Persisting the virtual machine..."), 0.95);
+            parent->saveWorkspaceNow();
+
+        } catch (...) {
+
+            /* Leave no image behind that nothing asked for.
+             *
+             * The file is laid down before the drive can be attached, let
+             * alone formatted, so a failure past that point would otherwise
+             * leave the whole requested size sitting in the machine's folder
+             * for a drive the user never got.
+             */
+            if (written) {
+
+                std::error_code ec;
+                std::filesystem::remove(path, ec);
+            }
+
+            // On to runTask's own handler, which reports what went wrong
+            throw;
         }
 
-        /* Straight after writing it, so that a drive already sitting on this
-         * very file reads from it for as short a time as possible -- the
-         * attach replaces that drive outright, and the reset below sends the
-         * machine round again regardless.
-         */
-        core.hd[nr]->attach(path);
-        core.hd[nr]->format(fs, name.toStdString());
-
-        if (fs != amiga::FSFormat::NODOS && importUrl.isLocalFile()) {
-            core.hd[nr]->importFiles(fs::path(importUrl.toLocalFile().toStdWString()));
-        }
-
-        /* The file holds nothing but the hole until this. Formatting works on
-         * the drive, and a drive only writes back when it is told to or when
-         * HDR_WRITE_THROUGH says so -- which by default it does not.
-         */
-        core.hd[nr]->persist();
-
-        /* Same two steps the drop path takes once an image is in place (see
-         * copyAndAttachHd): plug the controller in, then send the machine
-         * round again, because a drive that was not there at boot time is a
-         * drive the Amiga has not seen.
-         */
-        if (!core.get(Opt::HDC_CONNECT, nr)) core.set(Opt::HDC_CONNECT, true, nr);
-        core.hardReset();
-        core.sync();
-
-        // Write the machine out, so config.retrosh carries the attach line
-        // and the drive is still there the next time the SVM is opened.
-        parent->saveWorkspaceNow();
+    }, [this, nr, megabytes, snapshotLimit, beyondSnapshots] {
 
         /* A drive this large is the machine's alone.
          *
@@ -264,35 +331,29 @@ SiAmMediaController::newHardDisk(int nr, int megabytes, int fsFormat, const QStr
          * HDR_SNAPSHOT_LIMIT it would not be stored even if it were held in
          * memory, so a snapshot taken now is worth nothing without the SVM
          * beside it. Said once, here, rather than left to be discovered.
+         *
+         * In the continuation rather than in the task: this runs on the GUI
+         * thread, and only when the drive was actually created.
          */
-        if (const auto limit = core.get(Opt::HDR_SNAPSHOT_LIMIT, nr); limit && megabytes > limit) {
+        if (beyondSnapshots) {
 
             showNotification(tr("Hard drive too large for snapshots"),
                              tr("At %1 MB, hd%2 is past the %3 MB a snapshot stores. "
                                 "It is kept in the virtual machine folder only.")
-                                 .arg(megabytes).arg(nr).arg(limit));
+                                 .arg(megabytes).arg(nr).arg(snapshotLimit));
         }
+    });
 
-        return true;
+    // Said rather than left to be guessed: the button was pressed and the
+    // dialog stayed where it was.
+    if (!started) {
 
-    } catch (const std::exception &e) {
-
-        /* Leave no image behind that nothing asked for.
-         *
-         * The file is laid down before the drive can be attached, let alone
-         * formatted, so a failure past that point would otherwise leave the
-         * whole requested size sitting in the machine's folder for a drive
-         * the user never got.
-         */
-        if (written) {
-
-            std::error_code ec;
-            fs::remove(path, ec);
-        }
-
-        showError("Failed to create hard drive.", e.what());
-        return false;
+        showError(tr("Failed to create hard drive."),
+                  tr("Another operation is still running. Wait for it to finish "
+                     "and try again."));
     }
+
+    return started;
 }
 
 QString

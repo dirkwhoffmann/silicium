@@ -94,8 +94,15 @@ public:
      * 'importUrl' may be empty; a folder is only imported into a formatted
      * drive, since there is nowhere to put it otherwise.
      *
-     * Returns false when nothing was created, having reported why -- the
-     * dialog stays open in that case rather than closing over an error.
+     * The work runs as a background job (see Controller::runTask), because
+     * writing a formatted image of some gigabytes back to its file is not
+     * something to do on the thread that redraws the window. What it is
+     * doing shows up wherever progress shows up -- the status bar's ticker
+     * -- and a failure arrives as an error afterwards.
+     *
+     * Returns whether the job was started; it is not, and nothing has been
+     * touched, while another job of this controller's is still running. The
+     * dialog stays open in that case rather than closing over nothing.
      */
     Q_INVOKABLE bool newHardDisk(int nr, int megabytes, int fsFormat, const QString &name,
                                  const QUrl &importUrl = {});
