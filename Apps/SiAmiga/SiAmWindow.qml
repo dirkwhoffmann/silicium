@@ -43,14 +43,62 @@ ApplicationWindow {
     title: "SiAmiga"
     color: "black"
 
+    /* The picture reaches up behind the title bar.
+     *
+     * ExpandedClientAreaHint hands us the whole window frame to draw on
+     * (NSWindowStyleMaskFullSizeContentView on macOS) and
+     * NoTitleBarBackgroundHint takes the title bar's own backdrop away, so
+     * what shows up there is ours. Unlike FramelessWindowHint this keeps the
+     * window controls and the drag region. Neither flag needs a
+     * platform #ifdef: where the window manager cannot honour them they
+     * are ignored, and the safe area below then reports nothing to work
+     * around.
+     */
+    flags: Qt.Window | Qt.ExpandedClientAreaHint | Qt.NoTitleBarBackgroundHint
+
     Palette.appearance: Preferences.appearance
     Palette.theme: Preferences.colorTheme
 
     SiAmCanvas {
 
         id: canvas
+
+        /* Being an ApplicationWindow (a Control underneath) this window
+         * insets its contentItem by the safe area on its own, which is what
+         * puts the toolbar below the window controls without it asking. The
+         * picture is the one thing that wants none of that, so it takes the
+         * inset back off again. The figure is zero wherever the title bar is
+         * opaque or the window is in real fullscreen, which leaves this
+         * anchored exactly as it was before.
+         */
         anchors.fill: parent
+        anchors.topMargin: -root.contentItem.y
+
         controller: root.amiga
+    }
+
+    /* Drags the window by what used to be the title bar.
+     *
+     * Moving a window by its title bar is something the frame does, and the
+     * frame is no longer up there -- the picture is, and a content view
+     * keeps the press to itself. So this strip takes the press and hands it
+     * straight back to the window manager, which then runs its own drag,
+     * snapping and all. It covers exactly the inset the safe area asks for,
+     * which is nothing at all on a platform that left the title bar alone.
+     *
+     * It lives outside contentItem (that inset is measured from there, so a
+     * child of it could not reach the strip) and above the picture. The
+     * window controls are the windowing system's own and sit above both, so
+     * they go on taking their clicks.
+     */
+    MouseArea {
+
+        parent: root.contentItem.parent
+        anchors { left: parent.left; right: parent.right; top: parent.top }
+        height: root.contentItem.y
+        z: 100
+
+        onPressed: root.startSystemMove()
     }
 
     // Click-to-capture-the-mouse handler, mirroring SiC64Window's
@@ -61,7 +109,11 @@ ApplicationWindow {
     // events and lets clicks fall through to here.
     MouseArea {
 
-        anchors.fill: canvas
+        // Fills the content area rather than the canvas: the strip of
+        // picture behind the title bar is for looking at, not for clicking,
+        // and a MouseArea over it would swallow the drag that moves the
+        // window and capture the Amiga's mouse instead.
+        anchors.fill: parent
         hoverEnabled: true
         preventStealing: true
 
