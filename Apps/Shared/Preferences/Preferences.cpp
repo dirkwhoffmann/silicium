@@ -147,6 +147,10 @@ Preferences::loadAppearanceSettings()
     statusbar    = s.value("statusbar", 1).toInt();
     resizeMode   = s.value("resizeMode", 0).toInt();
     autoHideToolbar = s.value("autoHideToolbar", false).toBool();
+    transparentMenus = s.value("transparentMenus", false).toBool();
+    // Defaults to the window keeping its title bar, so installations that
+    // never touch this option look exactly as they did before it existed.
+    titleBar = s.value("titleBar", true).toBool();
 
     s.endGroup();
 }
@@ -425,6 +429,8 @@ Preferences::saveAppearanceSettings()
     s.setValue("statusbar", statusbar);
     s.setValue("resizeMode", resizeMode);
     s.setValue("autoHideToolbar", autoHideToolbar);
+    s.setValue("transparentMenus", transparentMenus);
+    s.setValue("titleBar", titleBar);
 
     s.endGroup();
 

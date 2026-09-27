@@ -259,5 +259,61 @@ PrefPage {
                 text: "Fades the toolbar out while the mouse is away from it, letting the emulated screen extend behind it, and fades it back in as soon as the mouse moves over it."
             }
         }
+
+        HelpWrapper {
+
+            SiCheckBoxControl {
+
+                id: transparentMenus
+                r: "Transparent menus"
+                lwidth: root.labelWidth
+
+                SiHelpButton {
+
+                    id: transparentMenusHelp
+                    checkable: true
+                    alignment: Qt.AlignLeft
+                }
+
+                HSpacer { }
+
+                checked: Preferences.transparentMenus
+                onCheckedChanged: Preferences.transparentMenus = checked
+            }
+
+            HelpBox {
+
+                visibleTarget: transparentMenusHelp.checked
+                text: "Dims the menu and toolbar background so the emulated screen shows through it. The screen then extends behind the toolbar instead of starting below it."
+            }
+        }
+
+        HelpWrapper {
+
+            SiCheckBoxControl {
+
+                id: titleBar
+                r: "Show title bar"
+                lwidth: root.labelWidth
+
+                SiHelpButton {
+
+                    id: titleBarHelp
+                    checkable: true
+                    alignment: Qt.AlignLeft
+                }
+
+                HSpacer { }
+
+                checked: Preferences.titleBar
+                onCheckedChanged: Preferences.titleBar = checked
+            }
+
+            HelpBox {
+
+                visibleTarget: titleBarHelp.checked
+                text: "Keeps the window's own title bar. Turning it off hands that row to the emulator window, which moves the menu and toolbar up into it, clear of the window buttons. Drag the window by any empty part of that row."
+            }
+        }
     }
 }
