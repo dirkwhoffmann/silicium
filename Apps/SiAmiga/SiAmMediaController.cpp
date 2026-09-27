@@ -158,18 +158,6 @@ SiAmMediaController::hdHasDisk(int nr) const
     return SiAmController::core().hd[nr]->getInfo().hasDisk;
 }
 
-int
-SiAmMediaController::hdCapacityLimit(int nr) const
-{
-    return (int)SiAmController::core().get(Opt::HDC_MB_LIMIT, nr);
-}
-
-int
-SiAmMediaController::hdFileSystemLimit() const
-{
-    return 4096; // 4 GB
-}
-
 QString
 SiAmMediaController::hdExistingImage(int nr) const
 {

@@ -9,6 +9,7 @@ ApplicationWindow {
     id: root
 
     property SiAmController amiga: SiAmController
+    readonly property SiAmInfoController info: amiga.info
 
     // Shared with SiAmMenu's "Toolbar" shortcut hint.
     readonly property string toolbarShortcut: "Ctrl+Alt+T"
@@ -292,19 +293,25 @@ ApplicationWindow {
      */
     function newHardDiskAction(driveNr) {
 
+        const hasDisk =
+                driveNr === 0 ? info.hdHasDisk0 :
+                        driveNr === 1 ? info.hdHasDisk1 :
+                                driveNr === 2 ? info.hdHasDisk2 :
+                                        driveNr === 3 ? info.hdHasDisk3 : false
+
         // The image file is asked about as well as the drive: the new one
         // is written under that same name (hdN.hdf), so a file left in the
         // folder by an earlier drive is overwritten even when the slot
         // itself is empty.
         const existing = amiga.media.hdExistingImage(driveNr)
 
-        if (!amiga.media.hdHasDisk(driveNr) && existing === "") {
+        if (!hasDisk && existing === "") {
             hardDiskCreatorDialog.driveNr = driveNr
             hardDiskCreatorDialog.open()
             return
         }
 
-        errorDialog.titleText = amiga.media.hdHasDisk(driveNr) ?
+        errorDialog.titleText = hasDisk ?
             qsTr("Hd%1 already holds a hard drive.").arg(driveNr) :
             qsTr("The machine folder already holds %1.").arg(existing)
         errorDialog.bodyText = qsTr("Creating a new one replaces it. Anything on " +

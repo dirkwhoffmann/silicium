@@ -37,29 +37,23 @@ SiDialog {
     id: root
 
     required property SiAmController amiga
+    readonly property SiAmInfoController info: amiga.info
+
     property int driveNr: 0
     readonly property int labelWidth: 90
 
     // amiga::FSFormat::NODOS, as SiAmDiskCreator names it
     readonly property int nodos: 8
 
-    // The capacity being asked for, in MB. Whatever the field says, parsed.
+    // The capacity being asked for, in MB. Whatever the field says, parsed
     readonly property int megabytes: root.parseCapacity(capacityCombo.editText)
 
-    // What this slot accepts, 0 when it is unlimited (see hdCapacityLimit).
+    // What this slot accepts, 0 when it is unlimited (see hdCapacityLimit)
     readonly property int limit: root.amiga.media.hdCapacityLimit(root.driveNr)
     readonly property bool tooLarge: root.limit > 0 && root.megabytes > root.limit
 
-    /* Past what any Amiga file system can describe.
-     *
-     * Not a reason to refuse the drive -- a drive this large is perfectly
-     * usable, it just cannot be formatted here, so everything belonging to a
-     * file system goes grey and the drive is created raw. Formatting it is
-     * then the guest's business, with whatever it uses for drives of this
-     * size.
-     */
-    readonly property bool unformattable:
-        root.megabytes > root.amiga.media.hdFileSystemLimit()
+    // Maximum hard drive size in MB, OFS and FFS can handle
+    readonly property bool unformattable: root.megabytes > 4096
 
     // Whether a file system is actually going to be created.
     readonly property bool formatted:
