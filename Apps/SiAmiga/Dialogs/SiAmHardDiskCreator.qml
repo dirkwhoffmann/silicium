@@ -26,6 +26,8 @@ SiDialog {
     readonly property int labelWidth: 90
 
     readonly property int nodos: 8 // amiga::FSFormat::NODOS
+    readonly property int ofs: 0   // amiga::FSFormat::OFS
+    readonly property int ffs: 1   // amiga::FSFormat::FFS
 
     /* The capacity being asked for, in MB.
      *
@@ -195,9 +197,6 @@ SiDialog {
                 l: qsTr("Capacity:")
                 lwidth: root.labelWidth
                 model: ["4 MB", "8 MB", "16 MB", "32 MB", "64 MB", "128 MB", "256 MB"]
-
-                // The three ways an edit ends: Return, moving on (Tab, or a
-                // click elsewhere), and picking an entry from the list.
                 onAccepted: root.commit()
                 onEditingFinished: root.commit()
                 onActivated: root.commit()
@@ -209,11 +208,8 @@ SiDialog {
                 l: qsTr("File system:")
                 lwidth: root.labelWidth
                 model: [qsTr("None"), qsTr("OFS"), qsTr("FFS")]
-                tags: [root.nodos, 0, 1]    // NODOS, OFS, FFS
+                tags: [root.nodos, root.ofs, root.ffs]
                 enabled: !root.unformattable
-
-                // An unformatted drive has nowhere to put files, so the
-                // folder goes with the file system (as it does in vAmiga).
                 onActivated: { if (!root.formatted) root.importUrl = "" }
             }
 
@@ -243,13 +239,26 @@ SiDialog {
                 enabled: !root.unformattable
 
                 control: [
-                    SiButton {
-                        text: qsTr("Add folder...")
+
+                    SiSymbolButton {
+                    size: Size.large
+                        phosphor: "folder"
                         onClicked: importDialog.open()
+                    },
+
+                    SiText {
+
+                        Layout.fillWidth: true
+                        enabled: !root.unformattable
+                        elide: Text.ElideMiddle
+                        color: root.importUrl != "" ? Palette.secondary : Palette.tertiary
+                        text: root.importUrl != "" ? root.importUrl.toString().replace("file://", "")
+                            : qsTr("Path to import folder...")
                     }
                 ]
             }
 
+            /*
             SiText {
 
                 Layout.fillWidth: true
@@ -261,6 +270,8 @@ SiDialog {
                 text: root.importUrl != "" ? root.importUrl.toString().replace("file://", "")
                                            : qsTr("Path to import folder")
             }
+
+             */
         }
 
     }
