@@ -14,21 +14,6 @@ import Silicium.Assets
 import Silicium.Controllers
 import Silicium.Theme
 
-/* Formats a blank floppy disk and inserts it.
- *
- * The SiAmiga counterpart to SiC64DiskCreator, and the port of vAmiga's own
- * FloppyCreator (GUI/Dialogs/FloppyCreator.swift). What differs from the C64
- * is what an Amiga disk carries: two file systems worth offering rather than
- * one, and a boot block, which is where the two viruses vAmiga has always
- * been able to write live.
- *
- * The capacity is shown but not offered. It follows from the drive's model
- * (see FloppyDrive::insertNew, which derives the geometry from diameter and
- * density), so there is nothing to pick -- change the drive in the config
- * window and this follows.
- *
- * Bind 'amiga' and set driveNr before opening.
- */
 SiDialog {
 
     id: root
@@ -37,9 +22,6 @@ SiDialog {
     property int driveNr: 0
     readonly property int labelWidth: 90
 
-    // The combo box tags are raw core values (see SiAmMediaController::
-    // newDisk), so these name the two the layout turns on rather than
-    // comparing against bare numbers.
     readonly property int nodos: 8          // amiga::FSFormat::NODOS
     readonly property int firstVirus: 3     // amiga::BootBlockId::SCA
 

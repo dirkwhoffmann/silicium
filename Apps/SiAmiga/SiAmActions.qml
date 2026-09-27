@@ -13,21 +13,7 @@ import Silicium.Controllers
 import Silicium.Preferences
 
 //
-// Central definition of all SiAmiga window actions. Port of SiC64Actions.qml,
-// trimmed to what SiAmiga actually has: the per-panel inspector actions
-// below (openCPUInspector, openLogicAnalyzer, ...) mirror C64Actions' own
-// set one-for-one, each raising its own top-level window (see
-// SiAmInspectorWindow.qml) so several inspectors can stay open side by
-// side, exactly like SiC64. No stopAndGo (no datasette-era pause alias
-// exists here), and no
-// keyboardWindowAction distinct from a sheet-based 'keyboard' action --
-// SiAmiga's keyboard is a standalone window only, so the one 'keyboard'
-// action covers what SiC64Actions splits into 'keyboard' (sheet) and
-// 'keyboardWindowAction' (window).
-//
-// SiAmToolbar and SiAmMenu pull their actions from this the same way
-// SiC64Toolbar/SiC64Menu do: via window.actions.xxx (see SiAmWindow.qml's
-// 'actions' alias), not by taking an SiAmActions reference of their own.
+// Central definition of all SiAmiga window actions
 //
 
 Item {

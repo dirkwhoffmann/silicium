@@ -15,23 +15,6 @@ import Silicium.Assets
 import Silicium.Controllers
 import Silicium.Theme
 
-/* Builds a hard drive from scratch and plugs it in.
- *
- * The port of vAmiga's HardDiskCreator (GUI/Dialogs/HardDiskCreator.swift),
- * and the hard-drive counterpart to SiAmDiskCreator. A floppy has one
- * geometry and nothing to decide; a hard drive has a size, and the size is
- * the whole of what this dialog asks for: a capacity is either picked from
- * the list or typed in, and the geometry that describes it is the core's
- * business (see SiAmMediaController::attachHdAsync). vAmiga's own dialog
- * offers the CHS fields instead, which is the same question asked three
- * times over.
- *
- * The drive is built as a file in the machine's own folder and attached on
- * top of it (see SiAmMediaController::attachHdAsync), so the SVM carries it
- * and a snapshot need not.
- *
- * Bind 'amiga' and set driveNr before opening.
- */
 SiDialog {
 
     id: root
@@ -42,8 +25,7 @@ SiDialog {
     property int driveNr: 0
     readonly property int labelWidth: 90
 
-    // amiga::FSFormat::NODOS, as SiAmDiskCreator names it
-    readonly property int nodos: 8
+    readonly property int nodos: 8 // amiga::FSFormat::NODOS
 
     // The capacity being asked for, in MB. Whatever the field says, parsed
     readonly property int megabytes: root.parseCapacity(capacityCombo.editText)
@@ -93,8 +75,6 @@ SiDialog {
         return isNaN(mb) || mb < 0 ? 0 : mb
     }
 
-    // Puts the field back into the shape the list entries have, so a typed
-    // "384" reads like a capacity once it has been accepted.
     function normalize() {
 
         if (root.megabytes > 0) capacityCombo.editText = root.megabytes + " MB"
@@ -131,8 +111,6 @@ SiDialog {
             radius: Style.borderRadius
             color: Palette.surfaceElevated
 
-            // Follows the import folder, as vAmiga's does: what is about to
-            // be created is the folder's contents, not an empty drive.
             Image {
 
                 anchors.centerIn: parent
