@@ -49,6 +49,13 @@ SiDialog {
         return 0
     }
 
+    /* A capacity past what the slot accepts.
+     *
+     * commit() turns one away before it gets this far, so this is only ever
+     * true when the limit itself changed while the dialog stood open. It
+     * gates the Attach button, which is the one place that must not take a
+     * capacity the controller would refuse.
+     */
     readonly property bool tooLarge: root.limit > 0 && root.megabytes > root.limit
 
     // Maximum hard drive size in MB, OFS and FFS can handle
@@ -86,22 +93,26 @@ SiDialog {
      *
      * Nothing is refused while it is being typed -- a field that rejects
      * keystrokes leaves the user guessing which one it disliked. The text
-     * is judged when the edit ends instead, and text that means nothing is
-     * simply undone: the capacity goes back to the last one that did mean
-     * something, which is the value still shown everywhere else in the
-     * dialog.
+     * is judged when the edit ends instead, and whatever cannot be used is
+     * undone: the capacity goes back to the last one that could be, which
+     * is the value still shown everywhere else in the dialog.
      *
-     * A number that is understood but too large is not undone. It is a
-     * capacity, just not one this slot can hold, and the hint underneath
-     * says so -- putting the old value back would take the explanation away
-     * with it.
+     * Text carrying no usable number is undone in silence; there is nothing
+     * to explain that the field does not already show. A capacity that is
+     * merely too large for this slot is undone with a word about why, since
+     * on the face of it there is nothing wrong with the number.
      */
     function commit() {
 
         const mb = root.parseCapacity(capacityCombo.editText)
+        console.log("mb = ", mb, " limit = ", root.limit)
+        const refused = mb > 0 && root.limit > 0 && mb > root.limit
 
-        if (mb > 0) root.megabytes = mb
+        if (mb > 0 && !refused) root.megabytes = mb
+
+        // The old value first, so the dialog appears over a settled field
         root.showCapacity()
+        if (refused) capacityRefused.open()
     }
 
     // Puts the field into the shape the list entries have
@@ -192,19 +203,6 @@ SiDialog {
                 onActivated: root.commit()
             }
 
-            SiText {
-
-                Layout.fillWidth: true
-                Layout.leftMargin: root.labelWidth + Style.mediumSpacing
-                font.pixelSize: Style.small
-                color: root.tooLarge ? Palette.warning : Palette.tertiary
-                text: root.tooLarge ? qsTr("This slot holds at most %1 MB.").arg(root.limit)
-                    : root.unformattable ? qsTr("Too large for a file system. " +
-                                                "The drive is created unformatted.")
-                    : root.limit > 0 ? qsTr("Up to %1 MB.").arg(root.limit)
-                    : qsTr("Type a size in MB, or pick one.")
-            }
-
             SiComboBoxControl {
 
                 id: fsCombo
@@ -265,6 +263,16 @@ SiDialog {
             }
         }
 
+    }
+
+    SiUserDialog {
+
+        id: capacityRefused
+        titleText: qsTr("Maximum hard drive capacity exceeded.")
+        bodyText: qsTr("HD%1 can hold at most %2 MB.").arg(root.driveNr).arg(root.limit)
+        buttons: Dialog.Ok
+        okLabel: qsTr("OK")
+        sound: true
     }
 
     FolderDialog {
