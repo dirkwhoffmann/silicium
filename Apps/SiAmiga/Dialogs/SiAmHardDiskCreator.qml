@@ -61,11 +61,12 @@ SiDialog {
     readonly property bool tooLarge: root.limit > 0 && root.megabytes > root.limit
 
     // Maximum hard drive size in MB, OFS and FFS can handle
+    readonly property bool formattable: root.megabytes <= 4096
     readonly property bool unformattable: root.megabytes > 4096
 
     // Whether a file system is actually going to be created.
     readonly property bool formatted:
-        fsCombo.currentIndex !== root.nodos && !root.unformattable
+        fsCombo.currentIndex !== root.nodos && root.formattable
 
     // Where the drive's initial contents come from, "" for an empty drive.
     property url importUrl: ""
@@ -107,7 +108,6 @@ SiDialog {
     function commit() {
 
         const mb = root.parseCapacity(capacityCombo.editText)
-        console.log("mb = ", mb, " limit = ", root.limit)
         const refused = mb > 0 && root.limit > 0 && mb > root.limit
 
         if (mb > 0 && !refused) root.megabytes = mb
@@ -127,11 +127,22 @@ SiDialog {
 
         if (root.megabytes <= 0 || root.tooLarge) return
 
-        root.amiga.media.attachHdAsync(root.driveNr,
-                                       root.megabytes,
-                                       root.formatted ? fsCombo.currentIndex : root.nodos,
-                                       root.formatted ? nameField.text : "",
-                                       root.formatted ? root.importUrl : "")
+        if (root.formattable && fsCombo.currentIndex !== root.nodos) {
+
+            root.amiga.media.attachHdAsync(root.driveNr,
+                root.megabytes,
+                fsCombo.currentIndex,
+                nameField.text,
+                root.importUrl)
+
+        } else {
+
+            root.amiga.media.attachHdAsync(root.driveNr,
+                root.megabytes,
+                root.nodos,
+                "",
+                "")
+        }
 
         root.close()
     }
@@ -209,7 +220,7 @@ SiDialog {
                 lwidth: root.labelWidth
                 model: [qsTr("None"), qsTr("OFS"), qsTr("FFS")]
                 tags: [root.nodos, root.ofs, root.ffs]
-                enabled: !root.unformattable
+                enabled: root.formattable
                 onActivated: { if (!root.formatted) root.importUrl = "" }
             }
 
@@ -217,8 +228,7 @@ SiDialog {
 
                 l: qsTr("Name:")
                 lwidth: root.labelWidth
-                visible: root.formatted || root.unformattable
-                enabled: !root.unformattable
+                opacity: root.formattable && fsCombo.currentIndex !== root.nodos ? 1.0 : 0.0
 
                 control: [
                     SiTextField {
@@ -235,8 +245,9 @@ SiDialog {
                 id: importControl
                 l: qsTr("Files:")
                 lwidth: root.labelWidth
-                visible: root.formatted || root.unformattable
-                enabled: !root.unformattable
+                opacity: root.formattable && fsCombo.currentIndex !== root.nodos ? 1.0 : 0.0
+                // visible: root.formatted || root.unformattable
+                // enabled: !root.unformattable
 
                 control: [
 
