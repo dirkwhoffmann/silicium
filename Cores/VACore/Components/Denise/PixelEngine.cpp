@@ -881,7 +881,7 @@ PixelEngine::mergeXray()
     auto &config = dmaDebugger.getConfig();
     if (!config.overlay) return;
 
-    double opacity = config.opacity / 255.0;
+    double opacity = double(config.opacity) / 255.0;
     double bgWeight = 0;
     double fgWeight = 0;
 
