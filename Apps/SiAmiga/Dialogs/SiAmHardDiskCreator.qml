@@ -27,8 +27,16 @@ SiDialog {
 
     readonly property int nodos: 8 // amiga::FSFormat::NODOS
 
-    // The capacity being asked for, in MB. Whatever the field says, parsed
-    readonly property int megabytes: root.parseCapacity(capacityCombo.editText)
+    /* The capacity being asked for, in MB.
+     *
+     * The value the dialog stands behind, which is not the same thing as
+     * what the field says: the field takes any text at all, and only an
+     * edit that has been finished (Return, Tab, or a pick from the list)
+     * turns into a capacity here. Everything else -- the limits, the hint,
+     * the Attach button -- reads this, so a half-typed number never makes
+     * the dialog flicker.
+     */
+    property int megabytes: 8
 
     // Maximum hard-drive capacity
     readonly property int limit: {
@@ -57,27 +65,49 @@ SiDialog {
 
     onOpened: {
 
-        capacityCombo.currentIndex = 1      // 8 MB, as vAmiga preselects
+        root.megabytes = 8                  // as vAmiga preselects
+        root.showCapacity()
         fsCombo.currentIndex = 0            // OFS
         nameField.text = qsTr("Hdrv")
         root.importUrl = ""
     }
 
-    /* The number in front of whatever the user typed.
-     *
-     * The field is free text, so it takes "384" and "384 MB" alike, and 0
-     * for anything that carries no number at all -- which is what disables
-     * the Attach button.
+    /* The number in front of whatever the user typed, or 0 for text that
+     * carries no usable one. "384" and "384 MB" are the same thing, as is a
+     * "64 MB" picked from the list.
      */
     function parseCapacity(text) {
 
         const mb = parseInt(text)
-        return isNaN(mb) || mb < 0 ? 0 : mb
+        return isNaN(mb) || mb <= 0 ? 0 : mb
     }
 
-    function normalize() {
+    /* Takes what the field says, once the user has finished saying it.
+     *
+     * Nothing is refused while it is being typed -- a field that rejects
+     * keystrokes leaves the user guessing which one it disliked. The text
+     * is judged when the edit ends instead, and text that means nothing is
+     * simply undone: the capacity goes back to the last one that did mean
+     * something, which is the value still shown everywhere else in the
+     * dialog.
+     *
+     * A number that is understood but too large is not undone. It is a
+     * capacity, just not one this slot can hold, and the hint underneath
+     * says so -- putting the old value back would take the explanation away
+     * with it.
+     */
+    function commit() {
 
-        if (root.megabytes > 0) capacityCombo.editText = root.megabytes + " MB"
+        const mb = root.parseCapacity(capacityCombo.editText)
+
+        if (mb > 0) root.megabytes = mb
+        root.showCapacity()
+    }
+
+    // Puts the field into the shape the list entries have
+    function showCapacity() {
+
+        capacityCombo.editText = root.megabytes + " MB"
     }
 
     function attach() {
@@ -123,7 +153,7 @@ SiDialog {
         }
 
         //
-        // Form
+        // Options
         //
 
         ColumnLayout {
@@ -148,11 +178,6 @@ SiDialog {
                 color: Palette.border
             }
 
-            /* Editable, unlike the list vAmiga offers: the entries are the
-             * sizes worth one click, and anything else -- "384" -- is typed
-             * straight in. That is also what retires the CHS fields, whose
-             * only job was to express a size the list did not carry.
-             */
             SiComboInputControl {
 
                 id: capacityCombo
@@ -160,19 +185,11 @@ SiDialog {
                 lwidth: root.labelWidth
                 model: ["4 MB", "8 MB", "16 MB", "32 MB", "64 MB", "128 MB", "256 MB"]
 
-                /* A number, optionally followed by the unit the list entries
-                 * carry -- so "384", "384 MB" and a picked "64 MB" are all
-                 * spellings of the same thing, and a letter typed where a
-                 * digit belongs never lands. Six digits is past every limit
-                 * below; what is well-formed but too large is caught there,
-                 * not here.
-                 */
-                validator: RegularExpressionValidator {
-                    regularExpression: /[0-9]{0,6} ?([Mm][Bb]?)?/
-                }
-
-                onAccepted: root.normalize()
-                onEditingFinished: root.normalize()
+                // The three ways an edit ends: Return, moving on (Tab, or a
+                // click elsewhere), and picking an entry from the list.
+                onAccepted: root.commit()
+                onEditingFinished: root.commit()
+                onActivated: root.commit()
             }
 
             SiText {
