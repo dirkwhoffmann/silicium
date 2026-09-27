@@ -287,49 +287,19 @@ ApplicationWindow {
         amiga: root.amiga
     }
 
-    /* Building a hard drive replaces whatever the slot holds, and unlike a
-     * floppy there is no eject to undo it -- so a slot that already carries a
-     * disk asks first.
-     */
-    function newHardDiskAction(driveNr) {
-
-        const hasDisk =
-                driveNr === 0 ? info.hdHasDisk0 :
-                        driveNr === 1 ? info.hdHasDisk1 :
-                                driveNr === 2 ? info.hdHasDisk2 :
-                                        driveNr === 3 ? info.hdHasDisk3 : false
-
-        // The image file is asked about as well as the drive: the new one
-        // is written under that same name (hdN.hdf), so a file left in the
-        // folder by an earlier drive is overwritten even when the slot
-        // itself is empty.
-        const existing = amiga.media.hdExistingImage(driveNr)
-
-        if (!hasDisk && existing === "") {
-            hardDiskCreatorDialog.driveNr = driveNr
-            hardDiskCreatorDialog.open()
-            return
-        }
-
-        errorDialog.titleText = hasDisk ?
-            qsTr("Hd%1 already holds a hard drive.").arg(driveNr) :
-            qsTr("The machine folder already holds %1.").arg(existing)
-        errorDialog.bodyText = qsTr("Creating a new one replaces it. Anything on " +
-                                    "it that has not been exported will be lost.")
-        errorDialog.buttons = Dialog.Cancel | Dialog.Ok
-        errorDialog.okLabel = qsTr("Proceed")
-        errorDialog.acceptedCallback = function () {
-            hardDiskCreatorDialog.driveNr = driveNr
-            hardDiskCreatorDialog.open()
-        }
-        errorDialog.open()
-    }
-
     SiAmHardDiskCreator {
 
         id: hardDiskCreatorDialog
         amiga: root.amiga
     }
+
+    /* Reached from SiAmActions, where the actions that drive these two live.
+     * Named apart from the ids they point at: an alias whose name is the id
+     * it targets resolves to undefined.
+     */
+    property alias hardDiskCreator: hardDiskCreatorDialog
+    property alias userDialog: errorDialog
+
 
 
     Component.onCompleted: updateOverlayStack()

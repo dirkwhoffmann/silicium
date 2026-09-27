@@ -74,6 +74,50 @@ Item {
     property alias formatDecimal: formatDecimalAction
     property alias formatDecimalPadded: formatDecimalPaddedAction
 
+    /* Asks for a new hard drive, and warns first where one is at stake.
+     *
+     * A function rather than an Action: it takes the slot it is about, and
+     * an Action carries no argument. The dialogs it drives are the window's
+     * (see SiAmWindow.qml) -- this is the decision, not the furniture.
+     */
+    function newHardDiskAction(driveNr) {
+
+        const hasDisk =
+                driveNr === 0 ? amiga.info.hdHasDisk0 :
+                        driveNr === 1 ? amiga.info.hdHasDisk1 :
+                                driveNr === 2 ? amiga.info.hdHasDisk2 :
+                                        driveNr === 3 ? amiga.info.hdHasDisk3 : false
+
+        // The image file is asked about as well as the drive: the new one
+        // is written under that same name (hdN.hdf), so a file left in the
+        // folder by an earlier drive is overwritten even when the slot
+        // itself is empty.
+        const existing = amiga.media.hdExistingImage(driveNr)
+
+        const creator = hostWindow.hardDiskCreator
+
+        if (!hasDisk && existing === "") {
+            creator.driveNr = driveNr
+            creator.open()
+            return
+        }
+
+        const dialog = hostWindow.userDialog
+        dialog.titleText = hasDisk ?
+            qsTr("Hd%1 already holds a hard drive.").arg(driveNr) :
+            qsTr("The machine folder already holds %1.").arg(existing)
+        dialog.bodyText = qsTr("Creating a new one replaces it. Anything on " +
+                               "it that has not been exported will be lost.")
+        dialog.buttons = Dialog.Cancel | Dialog.Ok
+        dialog.okLabel = qsTr("Proceed")
+        dialog.acceptedCallback = function () {
+            creator.driveNr = driveNr
+            creator.open()
+        }
+        dialog.open()
+    }
+
+
     Action {
 
         id: configAction
