@@ -234,9 +234,10 @@ SiDialog {
                     SiTextField {
                         id: nameField
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 24
+                        Layout.preferredHeight: 22
                         onAccepted: root.attach()
-                    }
+                    },
+                    HSpacer { size: 20 }
                 ]
             }
 
@@ -252,12 +253,13 @@ SiDialog {
                 control: [
 
                     SiSymbolButton {
-                    size: Size.large
+
+                        size: Size.large
                         phosphor: "folder"
                         onClicked: importDialog.open()
                     },
 
-                    SiText {
+                    SiLabel {
 
                         Layout.fillWidth: true
                         enabled: !root.unformattable
@@ -268,21 +270,6 @@ SiDialog {
                     }
                 ]
             }
-
-            /*
-            SiText {
-
-                Layout.fillWidth: true
-                Layout.leftMargin: root.labelWidth + Style.mediumSpacing
-                visible: root.formatted || root.unformattable
-                enabled: !root.unformattable
-                elide: Text.ElideMiddle
-                color: root.importUrl != "" ? Palette.secondary : Palette.tertiary
-                text: root.importUrl != "" ? root.importUrl.toString().replace("file://", "")
-                                           : qsTr("Path to import folder")
-            }
-
-             */
         }
 
     }
