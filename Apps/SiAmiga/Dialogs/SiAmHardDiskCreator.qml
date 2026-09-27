@@ -48,8 +48,17 @@ SiDialog {
     // The capacity being asked for, in MB. Whatever the field says, parsed
     readonly property int megabytes: root.parseCapacity(capacityCombo.editText)
 
-    // What this slot accepts, 0 when it is unlimited (see hdCapacityLimit)
-    readonly property int limit: root.amiga.media.hdCapacityLimit(root.driveNr)
+    // Maximum hard-drive capacity
+    readonly property int limit: {
+        switch (root.driveNr) {
+            case 0: return root.amiga.configController.HD0_MB_LIMIT
+            case 1: return root.amiga.configController.HD1_MB_LIMIT
+            case 2: return root.amiga.configController.HD2_MB_LIMIT
+            case 3: return root.amiga.configController.HD3_MB_LIMIT
+        }
+        return 0
+    }
+
     readonly property bool tooLarge: root.limit > 0 && root.megabytes > root.limit
 
     // Maximum hard drive size in MB, OFS and FFS can handle
@@ -93,8 +102,6 @@ SiDialog {
 
     function attach() {
 
-        // Guards the Enter key in the name field, which reaches this without
-        // passing the Attach button's own 'enabled'.
         if (root.megabytes <= 0 || root.tooLarge) return
 
         root.amiga.media.attachHdAsync(root.driveNr,
@@ -103,12 +110,6 @@ SiDialog {
                                        root.formatted ? nameField.text : "",
                                        root.formatted ? root.importUrl : "")
 
-        /* Closed as soon as the job is under way: the drive is built in the
-         * background (see SiAmMediaController::attachHdAsync), so what
-         * follows is the status bar's business, and an error -- including
-         * one saying the job could not be started at all -- arrives on its
-         * own.
-         */
         root.close()
     }
 

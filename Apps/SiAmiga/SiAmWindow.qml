@@ -332,10 +332,6 @@ ApplicationWindow {
     }
 
 
-
-
-
-
     Component.onCompleted: updateOverlayStack()
 
     //

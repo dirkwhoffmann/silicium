@@ -348,15 +348,18 @@ class SiAmConfigController : public Controller {
     Q_PROPERTY(int DF2_TYPE READ df2Type WRITE setDf2Type NOTIFY configChanged)
     Q_PROPERTY(bool DF3_CONNECTED READ df3Connected WRITE setDf3Connected NOTIFY configChanged)
     Q_PROPERTY(int DF3_TYPE READ df3Type WRITE setDf3Type NOTIFY configChanged)
-
     Q_PROPERTY(bool HD0_CONNECTED READ hd0Connected WRITE setHd0Connected NOTIFY configChanged)
     Q_PROPERTY(int HD0_TYPE READ hd0Type WRITE setHd0Type NOTIFY configChanged)
+    Q_PROPERTY(int HD0_MB_LIMIT READ hd0MbLimit WRITE setHd0MbLimit NOTIFY configChanged)
     Q_PROPERTY(bool HD1_CONNECTED READ hd1Connected WRITE setHd1Connected NOTIFY configChanged)
     Q_PROPERTY(int HD1_TYPE READ hd1Type WRITE setHd1Type NOTIFY configChanged)
+    Q_PROPERTY(int HD1_MB_LIMIT READ hd1MbLimit WRITE setHd1MbLimit NOTIFY configChanged)
     Q_PROPERTY(bool HD2_CONNECTED READ hd2Connected WRITE setHd2Connected NOTIFY configChanged)
     Q_PROPERTY(int HD2_TYPE READ hd2Type WRITE setHd2Type NOTIFY configChanged)
+    Q_PROPERTY(int HD2_MB_LIMIT READ hd2MbLimit WRITE setHd2MbLimit NOTIFY configChanged)
     Q_PROPERTY(bool HD3_CONNECTED READ hd3Connected WRITE setHd3Connected NOTIFY configChanged)
     Q_PROPERTY(int HD3_TYPE READ hd3Type WRITE setHd3Type NOTIFY configChanged)
+    Q_PROPERTY(int HD3_MB_LIMIT READ hd3MbLimit WRITE setHd3MbLimit NOTIFY configChanged)
 
     // The Compatibility panel's "Emulate mechanical delays" checkbox
     // broadcasts across every floppy drive -- reads df0, writes df0..df3 --
@@ -406,18 +409,26 @@ class SiAmConfigController : public Controller {
     void setHd0Connected(bool value) { set(vamiga::Opt::HDC_CONNECT, (i64)value, 0); }
     int hd0Type() const { return (int)get(vamiga::Opt::HDR_TYPE, 0); }
     void setHd0Type(int value) { set(vamiga::Opt::HDR_TYPE, (i64)value, 0); }
+    int hd0MbLimit() const { return (int)get(vamiga::Opt::HDC_MB_LIMIT, 0); }
+    void setHd0MbLimit(int value) { set(vamiga::Opt::HDC_MB_LIMIT, (i64)value, 0); }
     bool hd1Connected() const { return (bool)get(vamiga::Opt::HDC_CONNECT, 1); }
     void setHd1Connected(bool value) { set(vamiga::Opt::HDC_CONNECT, (i64)value, 1); }
     int hd1Type() const { return (int)get(vamiga::Opt::HDR_TYPE, 1); }
     void setHd1Type(int value) { set(vamiga::Opt::HDR_TYPE, (i64)value, 1); }
+    int hd1MbLimit() const { return (int)get(vamiga::Opt::HDC_MB_LIMIT, 1); }
+    void setHd1MbLimit(int value) { set(vamiga::Opt::HDC_MB_LIMIT, (i64)value, 1); }
     bool hd2Connected() const { return (bool)get(vamiga::Opt::HDC_CONNECT, 2); }
     void setHd2Connected(bool value) { set(vamiga::Opt::HDC_CONNECT, (i64)value, 2); }
     int hd2Type() const { return (int)get(vamiga::Opt::HDR_TYPE, 2); }
     void setHd2Type(int value) { set(vamiga::Opt::HDR_TYPE, (i64)value, 2); }
+    int hd2MbLimit() const { return (int)get(vamiga::Opt::HDC_MB_LIMIT, 2); }
+    void setHd2MbLimit(int value) { set(vamiga::Opt::HDC_MB_LIMIT, (i64)value, 2); }
     bool hd3Connected() const { return (bool)get(vamiga::Opt::HDC_CONNECT, 3); }
     void setHd3Connected(bool value) { set(vamiga::Opt::HDC_CONNECT, (i64)value, 3); }
     int hd3Type() const { return (int)get(vamiga::Opt::HDR_TYPE, 3); }
     void setHd3Type(int value) { set(vamiga::Opt::HDR_TYPE, (i64)value, 3); }
+    int hd3MbLimit() const { return (int)get(vamiga::Opt::HDC_MB_LIMIT, 3); }
+    void setHd3MbLimit(int value) { set(vamiga::Opt::HDC_MB_LIMIT, (i64)value, 3); }
 
     bool driveMechanicsAll() const { return (bool)get(vamiga::Opt::DRIVE_MECHANICS, 0); }
     void setDriveMechanicsAll(bool value) {
