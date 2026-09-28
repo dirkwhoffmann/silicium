@@ -458,21 +458,30 @@ ApplicationWindow {
         toolbarVisible: root.toolbarVisible
         compactMenu: root.compactMenu
 
-        SiAmToolbar {
+        menuContent: SiAmMenu {
 
             anchors.fill: parent
-            wrapper: toolbar
 
             amiga: root.amiga
             window: root
 
             onOpenAbout: aboutWindow.show()
 
+            // Lets the View menu's checkable items show the right state; the
+            // window owns the visibility and answers the signals below.
             toolbarVisible: root.toolbarVisible
             statusBarVisible: root.statusBarVisible
 
             onToggleToolbar: root.toolbarVisible = !root.toolbarVisible
             onToggleStatusBar: root.statusBarVisible = !root.statusBarVisible
+        }
+
+        toolbarContent: SiAmToolbar {
+
+            anchors.fill: parent
+
+            amiga: root.amiga
+            window: root
         }
     }
 
