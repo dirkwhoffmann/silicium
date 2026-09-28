@@ -42,7 +42,6 @@ Menu {
 
     implicitWidth: Math.max(maxItemWidth + leftPadding + rightPadding, 160)
 
-
     background: Rectangle {
 
         color: Qt.alpha(Palette.background, 0.96)

@@ -120,7 +120,7 @@ ApplicationWindow {
         height: root.overlaid ? root.titleBarInset : toolbar.y + toolbar.height
         z: 4
 
-        color: "transparent" // toolbar.fill
+        color: toolbar.fill
     }
 
     /* Drags the window by what used to be the title bar.

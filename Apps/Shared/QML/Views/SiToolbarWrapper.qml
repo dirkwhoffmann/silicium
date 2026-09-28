@@ -70,13 +70,15 @@ Item {
                                        && Preferences.overlayType === 1
 
     // Enable dark mode if the background shows through it
+    /*
     Palette.appearance: root.seeThrough ? Palette.Appearance.Dark
                                         : Palette.Appearance.Auto
+    */
 
     // What the strip is painted with. Stated once here because the window
     // paints the title bar row with it too, and the two must never disagree.
     readonly property color fill: root.seeThrough
-        ? Palette.overlay // (Qt.rgba(Palette.toolbar.r, Palette.toolbar.g, Palette.toolbar.b, 0.55)
+        ? Qt.alpha(Palette.background, 0.9) // Palette.overlay // (Qt.rgba(Palette.toolbar.r, Palette.toolbar.g, Palette.toolbar.b, 0.55)
         : Palette.toolbar
 
     // What each row holds, after the compact-mode button: an item, parented
