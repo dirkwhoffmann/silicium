@@ -12,6 +12,6 @@ MenuBar {
 
     background: Rectangle {
 
-        color: Palette.toolbar
+        color: "transparent"
     }
 }

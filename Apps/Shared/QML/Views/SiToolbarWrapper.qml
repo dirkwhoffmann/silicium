@@ -79,7 +79,7 @@ Item {
     property alias toolbarContent: toolbarSlot.data
 
     // How far the strip is held off the edges of the space it was given.
-    readonly property real inset: Style.largeSpacing
+    readonly property real inset: Style.mediumSpacing
 
     // Nothing at all when neither row is on show, rather than an empty strip
     // the height of its own inset.
@@ -88,12 +88,19 @@ Item {
         : 0
     height: implicitHeight
 
+    //
+    // Main
+    //
+
     Rectangle {
 
         id: container
 
         anchors.fill: parent
         anchors.margins: root.inset
+        radius: 10
+        border.width: 2
+        border.color: "green"
 
         color: root.seeThrough
             ? Qt.rgba(Palette.toolbar.r, Palette.toolbar.g, Palette.toolbar.b, 0.55)
@@ -102,6 +109,7 @@ Item {
         ColumnLayout {
 
             anchors.fill: parent
+            anchors.margins: Style.mediumSpacing
             spacing: 0
 
             RowLayout {
