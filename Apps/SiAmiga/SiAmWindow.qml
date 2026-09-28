@@ -120,7 +120,7 @@ ApplicationWindow {
         height: root.overlaid ? root.titleBarInset : toolbar.y + toolbar.height
         z: 4
 
-        color: toolbar.fill
+        color: "transparent" // toolbar.fill
     }
 
     /* Drags the window by what used to be the title bar.
@@ -151,17 +151,13 @@ ApplicationWindow {
 
         id: chromeToggle
 
-        z: 20
         anchors.right: parent.right
         anchors.rightMargin: Style.mediumSpacing
         y: (root.titleBarInset - height) / 2
-
+        z: 20
         phosphor: "list"
-        // size: Size.small
-        // checked: root.toolbarVisible
-
-        color: "#888888"
-        background: Rectangle { color: "#20000000"; radius: 3 }
+        color: "white" // "#888888"
+        background: Rectangle { color: "#20000000"; radius: height / 2 }
 
         onClicked: root.toolbarVisible = !root.toolbarVisible
     }

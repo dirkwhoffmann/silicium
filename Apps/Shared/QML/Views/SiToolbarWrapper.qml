@@ -87,7 +87,7 @@ Item {
     // How far the strip is held off the edges of the space it was given, and
     // how far its rows are held off its own edges.
     readonly property real inset: Style.mediumSpacing
-    readonly property real padding: Style.mediumSpacing
+    readonly property real padding: Style.smallSpacing //  mediumSpacing
 
     /* As tall as what it holds.
      *
@@ -100,7 +100,10 @@ Item {
      * Nothing assigns 'height', so it follows implicitHeight the way any
      * item's does.
      */
-    implicitHeight: container.height > 0 ? container.height + 2 * root.inset : 0
+    implicitHeight: container.height
+    // implicitHeight: container.height > 0 ? container.height + 2 * root.inset : 0
+
+    DebugRect {}
 
     //
     // Main
@@ -111,10 +114,12 @@ Item {
         id: container
 
         anchors {
+
             left: parent.left
             right: parent.right
             top: parent.top
-            margins: root.inset
+            leftMargin: root.inset
+            rightMargin: root.inset
         }
 
         // Its rows, plus the padding it holds them off its own edges by.
@@ -122,8 +127,8 @@ Item {
 
         visible: root.toolbarVisible
 
-        radius: 10
-        border.width: 2
+        radius: Style.radius
+        border.width: 1
         border.color: "green"
 
         color: root.fill
