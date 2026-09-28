@@ -146,30 +146,22 @@ ApplicationWindow {
         onPressed: root.startSystemMove()
     }
 
-    /* Hides and shows the menu and toolbar.
-     *
-     * In the title bar row, which is ours whichever way the chrome is
-     * arranged, so this is always on offer. The View menu writes to the same
-     * toolbarVisible.
-     *
-     * At the far end of the row from the window buttons. Beside them is no
-     * good: a band of roughly x 83..100 next to the buttons swallows presses
-     * before they reach us, so a control put there looks clickable and is
-     * not.
-     */
+    // Hides and shows the menu and toolbar
     SiSymbolButton {
 
         id: chromeToggle
 
         z: 20
-
         anchors.right: parent.right
         anchors.rightMargin: Style.mediumSpacing
         y: (root.titleBarInset - height) / 2
 
         phosphor: "list"
-        size: Size.small
-        checked: root.toolbarVisible
+        // size: Size.small
+        // checked: root.toolbarVisible
+
+        color: "#888888"
+        background: Rectangle { color: "#20000000"; radius: 3 }
 
         onClicked: root.toolbarVisible = !root.toolbarVisible
     }

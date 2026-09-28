@@ -6,7 +6,9 @@ import Silicium.Theme
 ToolButton {
 
     id: control
-    property string symbol: ""
+    property string symbol
+    property string awesome
+    property string phosphor
     property real size: 48
     property real scaleFactor: 1.05
     property real hoverExpansion: 0
@@ -18,9 +20,9 @@ ToolButton {
     contentItem: SiText {
 
         id: content
-        text: control.symbol
+        text: symbol ? symbol : phosphor ? phosphor + Fonts.phosphorSuffix : awesome
         color: control.enabled ? "#fff" : "#ccc"
-        font.family: Fonts.symbols
+        font.family: symbol ? Fonts.symbols : phosphor ? Fonts.phosphor : Fonts.awesome
         font.pixelSize: (0.8 * control.size) + (control.enabled && hovered ? hoverExpansion : 0)
         scale: control.enabled && hovered ? scaleFactor : 1.0
         horizontalAlignment: Text.AlignHCenter
