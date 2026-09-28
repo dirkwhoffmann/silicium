@@ -476,6 +476,7 @@ ApplicationWindow {
         toolbarVisible: root.toolbarVisible
         compactMenu: root.compactMenu
 
+
         menuContent: SiAmMenu {
 
             anchors.fill: parent

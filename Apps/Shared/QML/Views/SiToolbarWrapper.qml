@@ -115,7 +115,8 @@ Item {
 
         // Its rows, plus the padding it holds them off its own edges by.
         height: layout.implicitHeight > 0 ? layout.implicitHeight + 2 * root.padding : 0
-        visible: height > 0
+
+        visible: root.toolbarVisible
 
         radius: 10
         border.width: 2
