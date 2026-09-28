@@ -54,15 +54,11 @@ ToolBar {
     property bool menuRevealed: false
     onCompactMenuChanged: menuRevealed = false
 
-    // Auto-hide (see Preferences.autoHideToolbar): the row content and
-    // background fade in as soon as the mouse enters the toolbar area, and
-    // fade out a short delay after it leaves (so briefly crossing the strip
-    // doesn't cause flicker). Guarding every use of contentHidden with the
-    // preference means turning it off always shows the toolbar, with no
-    // extra reset logic.
-    readonly property bool autoHideActive: Preferences.autoHideToolbar
-    property bool revealed: true
-    readonly property bool contentHidden: autoHideActive && !revealed
+    // Nothing fades any more: the menu and toolbar are shown or hidden
+    // outright (toolbarVisible). Kept as a constant rather than unpicked
+    // from the rows below, which SiAmToolbar has already been through --
+    // this file follows when the rest of its chrome does.
+    readonly property bool contentHidden: false
 
     // toolbarVisible is the single switch for the whole header: when false,
     // neither row shows. When true, both rows show in normal mode; in

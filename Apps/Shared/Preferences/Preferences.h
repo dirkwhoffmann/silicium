@@ -49,11 +49,9 @@ class Preferences : public QObject {
 
     //
     int menuStyle;
+    int menuType;
     int statusbar;
     int resizeMode;
-    bool autoHideToolbar;
-    bool transparentMenus;
-    bool titleBar;
 
     // Themes
     int appearance;
@@ -274,11 +272,9 @@ class Preferences : public QObject {
   public:
 
     Q_PROPERTY(int menuStyle READ getMenuStyle WRITE setMenuStyle NOTIFY appearancePrefsChanged)
+    Q_PROPERTY(int menuType READ getMenuType WRITE setMenuType NOTIFY appearancePrefsChanged)
     Q_PROPERTY(int statusbar READ getStatusbar WRITE setStatusbar NOTIFY appearancePrefsChanged)
     Q_PROPERTY(int resizeMode READ getResizeMode WRITE setResizeMode NOTIFY appearancePrefsChanged)
-    Q_PROPERTY(bool autoHideToolbar READ getAutoHideToolbar WRITE setAutoHideToolbar NOTIFY appearancePrefsChanged)
-    Q_PROPERTY(bool transparentMenus READ getTransparentMenus WRITE setTransparentMenus NOTIFY appearancePrefsChanged)
-    Q_PROPERTY(bool titleBar READ getTitleBar WRITE setTitleBar NOTIFY appearancePrefsChanged)
 
     Q_PROPERTY(int appearance READ getAppearance WRITE setAppearance NOTIFY appearancePrefsChanged)
     Q_PROPERTY(int colorTheme READ getColorTheme WRITE setColorTheme NOTIFY appearancePrefsChanged)
@@ -287,16 +283,12 @@ class Preferences : public QObject {
 
     int getMenuStyle() const { return menuStyle; }
     void setMenuStyle(int value) { setAppearanceProperty(menuStyle, value); }
+    int getMenuType() const { return menuType; }
+    void setMenuType(int value) { setAppearanceProperty(menuType, value); }
     int getStatusbar() const { return statusbar; }
     void setStatusbar(int value) { setAppearanceProperty(statusbar, value); }
     int getResizeMode() const { return resizeMode; }
     void setResizeMode(int value) { setAppearanceProperty(resizeMode, value); }
-    bool getAutoHideToolbar() const { return autoHideToolbar; }
-    void setAutoHideToolbar(bool value) { setAppearanceProperty(autoHideToolbar, value); }
-    bool getTransparentMenus() const { return transparentMenus; }
-    void setTransparentMenus(bool value) { setAppearanceProperty(transparentMenus, value); }
-    bool getTitleBar() const { return titleBar; }
-    void setTitleBar(bool value) { setAppearanceProperty(titleBar, value); }
 
     int getAppearance() const { return appearance; }
     void setAppearance(int value) { setAppearanceProperty(appearance, value); }

@@ -76,13 +76,15 @@ VMWindow {
     }
 
     // Floats over the canvas (z above it) instead of using header:, which
-    // reserves its own layout slot above the content area. With
-    // Preferences.autoHideToolbar on, the canvas extends behind it (see
-    // wrapper's anchors.top below) so fading the toolbar out reveals the
-    // canvas rather than plain window background. With it off, the canvas
-    // is anchored below the toolbar instead -- same reserved-space layout
-    // header: used to give, and the toolbar itself never fades (see
-    // SiC64Toolbar's autoHideActive).
+    // reserves its own layout slot above the content area. An overlaid menu
+    // type (see Preferences.menuType) lets the canvas extend behind it,
+    // while a standard one anchors the canvas below it -- the same
+    // reserved-space layout header: used to give.
+    //
+    // SiAmiga additionally drops the window's title bar in the overlay
+    // types and offers a toggle beside the window buttons; this window has
+    // neither yet, so here the setting reaches the canvas and the
+    // toolbar's own fill, and nothing else.
     SiC64Toolbar {
 
         id: toolbar
@@ -374,11 +376,10 @@ VMWindow {
     CanvasWrapper {
 
         id: wrapper
-        // Auto-hide on: extends behind the floating toolbar, since fading it
-        // out is meant to reveal the canvas underneath. Auto-hide off: the
-        // toolbar never fades, so start the canvas below it instead -- no
-        // reason to let it hide part of the picture permanently.
-        anchors.top: Preferences.autoHideToolbar ? parent.top : toolbar.bottom
+        // Overlaid: extends behind the toolbar, which is laid over it.
+        // Standard: starts below the toolbar instead -- no reason to let it
+        // hide part of the picture permanently.
+        anchors.top: Preferences.menuType !== 0 ? parent.top : toolbar.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom

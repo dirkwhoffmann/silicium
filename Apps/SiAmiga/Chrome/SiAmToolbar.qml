@@ -52,26 +52,6 @@ ToolBar {
     property bool menuRevealed: false
     onCompactMenuChanged: menuRevealed = false
 
-    // Auto-hide (see Preferences.autoHideToolbar): the row content and
-    // background fade in as soon as the mouse enters the toolbar area, and
-    // fade out a short delay after it leaves (so briefly crossing the strip
-    // doesn't cause flicker). Guarding every use of contentHidden with the
-    // preference means turning it off always shows the toolbar, with no
-    // extra reset logic.
-    readonly property bool autoHideActive: Preferences.autoHideToolbar
-    property bool revealed: true
-    readonly property bool contentHidden: autoHideActive && !revealed
-
-    /* How far the first row has to start in from the left.
-     *
-     * Zero in an ordinary window. When the window has given its title bar
-     * row away this row lands in it, and the window controls are still
-     * drawn there by the windowing system -- so the row is told to begin
-     * after them. Only the first one shown needs it; the row below is clear
-     * of them.
-     */
-    property real windowControlsInset: 0
-
     // toolbarVisible is the single switch for the whole header: when false,
     // neither row shows. When true, both rows show in normal mode; in
     // compact mode they still alternate via menuRevealed.
@@ -88,20 +68,15 @@ ToolBar {
 
     background: Rectangle {
 
-        /* See-through (Preferences.transparentMenus) lets the picture show
+        /* A transparent overlay (Preferences.menuType) lets the picture show
          * through the strip instead of the theme's own fill. It is dimmed
          * rather than cleared so that labels and icons keep something to
          * stand against -- a bare picture behind them is unreadable on
          * anything but a dark scene.
          */
-        color: Preferences.transparentMenus
+        color: Preferences.menuType === 2
             ? Qt.rgba(Palette.toolbar.r, Palette.toolbar.g, Palette.toolbar.b, 0.55)
             : Palette.toolbar
-        opacity: root.contentHidden ? 0 : 1
-
-        Behavior on opacity {
-            NumberAnimation { duration: 300 }
-        }
 
         Rectangle {
 
@@ -117,44 +92,16 @@ ToolBar {
 
     contentItem: ColumnLayout {
 
-        // contentItem itself always stays visible/enabled -- only individual
-        // rows below fade in and out -- so a HoverHandler placed directly
-        // here (tracking the whole toolbar area) never sits behind an
-        // invisible ancestor and always keeps working.
         spacing: 0
-
-        HoverHandler {
-
-            id: toolbarHover
-            onHoveredChanged: if (hovered) root.revealed = true
-        }
-
-        // Delays fading out after the mouse leaves, so briefly crossing the
-        // strip doesn't cause flicker. Declarative running (rather than
-        // start()/stop() on the leave event) so it's correctly armed from
-        // the very first frame too -- covers the case where the mouse never
-        // enters the toolbar at all after launch.
-        Timer {
-
-            id: hideDelayTimer
-            interval: 800
-            running: root.autoHideActive && !toolbarHover.hovered && root.revealed
-            onTriggered: root.revealed = false
-        }
 
         RowLayout {
 
             Layout.fillWidth: true
             Layout.preferredHeight: 28
-            Layout.leftMargin: root.windowControlsInset
+            Layout.leftMargin: 0
             Layout.rightMargin: 0
-            visible: root.showMenu && opacity > 0
-            opacity: root.contentHidden ? 0 : 1
+            visible: root.showMenu
             spacing: 0
-
-            Behavior on opacity {
-                NumberAnimation { duration: 300 }
-            }
 
             NavTextButtonFlat {
 
@@ -170,17 +117,6 @@ ToolBar {
             }
 
             SiAmMenu {
-
-                /* Does not inset itself a second time.
-                 *
-                 * A Control offers the safe area to its contentItem as top
-                 * padding, and this row may be sitting in the title bar row,
-                 * where that is the height of the row itself. The row is
-                 * already placed clear of the window controls (see
-                 * windowControlsInset), so a menu bar that honoured the
-                 * figure again would drop its items onto the row below.
-                 */
-                topPadding: 0
 
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignVCenter
@@ -200,17 +136,10 @@ ToolBar {
 
             Layout.fillWidth: true
             Layout.preferredHeight: 28
-            // Only when this is the row at the top -- below the menu row it
-            // is clear of the window controls.
-            Layout.leftMargin: root.showMenu ? 0 : root.windowControlsInset
+            Layout.leftMargin: 0
             Layout.rightMargin: 0
-            visible: root.showToolbar && opacity > 0
-            opacity: root.contentHidden ? 0 : 1
+            visible: root.showToolbar
             spacing: 0
-
-            Behavior on opacity {
-                NumberAnimation { duration: 300 }
-            }
 
             NavTextButtonFlat {
 

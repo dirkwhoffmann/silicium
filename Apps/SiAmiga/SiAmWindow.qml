@@ -44,60 +44,61 @@ ApplicationWindow {
      *
      * The windowing system goes on drawing the window's name across the
      * title bar row even once it has stopped drawing the row itself, which
-     * lands it straight on top of the first menu. Giving the row away means
-     * giving up the name written in it; the menu says whose window this is.
+     * would leave it written over the picture. An overlaid window says whose
+     * it is in the menu instead.
      */
-    title: Preferences.titleBar ? "SiAmiga" : ""
+    title: root.overlaid ? "" : "SiAmiga"
     color: "black"
 
-    /* Gives the title bar row away (Preferences.titleBar off).
+    /* The two ways of arranging the chrome (Preferences.menuType).
      *
-     * ExpandedClientAreaHint hands us the whole window frame to draw on
+     * Standard is an ordinary window: its own title bar, the menu and
+     * toolbar below it, and the picture below those again. Either overlay
+     * takes the title bar away, leaving only the window buttons, and lets
+     * the picture fill the window with the menu and toolbar laid over it --
+     * in the same place they would have been, which is why the toolbar is
+     * offset by the row the title bar used to occupy rather than moved into
+     * it. Transparent differs from opaque only in letting the picture show
+     * through them.
+     */
+    readonly property bool overlaid: Preferences.menuType !== 0
+    readonly property bool seeThrough: Preferences.menuType === 2
+
+    /* ExpandedClientAreaHint hands us the whole window frame to draw on
      * (NSWindowStyleMaskFullSizeContentView on macOS) and
      * NoTitleBarBackgroundHint takes the title bar's own backdrop away, so
      * what shows up there is ours. Unlike FramelessWindowHint this keeps the
-     * window controls and the drag region. Neither flag needs a
-     * platform #ifdef: where the window manager cannot honour them they
-     * are ignored, and titleBarInset below then reports nothing to work
-     * around.
+     * window buttons and the drag region. Neither flag needs a platform
+     * #ifdef: where the window manager cannot honour them they are ignored,
+     * and titleBarInset below then reports nothing to work around.
      */
-    flags: Preferences.titleBar
-        ? Qt.Window
-        : Qt.Window | Qt.ExpandedClientAreaHint | Qt.NoTitleBarBackgroundHint
+    flags: root.overlaid
+        ? Qt.Window | Qt.ExpandedClientAreaHint | Qt.NoTitleBarBackgroundHint
+        : Qt.Window
 
     /* An ApplicationWindow is a Control, and a Control insets its own
-     * contentItem by the safe area. That would put the toolbar below the
-     * window controls and leave the row above it empty, which is the
-     * opposite of what giving the row away is for. Dropping the padding
-     * hands the whole window to contentItem and leaves the figure itself
-     * readable below, so each item decides for itself whether to honour it.
+     * contentItem by the safe area. Dropping the padding hands the whole
+     * window to contentItem and leaves the figure itself readable below, so
+     * each item decides for itself whether to honour it -- the picture does
+     * not, the toolbar does.
      */
     topPadding: 0
 
-    // How much of the top belongs to the window controls: the height of the
-    // title bar row when we have taken it over, and zero whenever the
-    // windowing system is still drawing its own.
+    // The row the title bar would have been: its height once we have taken
+    // it over, and nothing whenever the windowing system still draws it.
     readonly property real titleBarInset: contentItem.SafeArea.margins.top
 
-    /* Where the window controls end, so the first row can start after them.
+    /* Where the window buttons end, so the toggle can sit beside them.
      *
-     * The safe area gives the height of the row but not where the controls
-     * sit inside it, so this is measured rather than asked for: on macOS
-     * close/minimise/zoom occupy x 8..70, and 78 clears the last of them.
-     * They are on the left here; a platform that puts them on the right
-     * would want this as a right-hand inset instead.
+     * The safe area gives the height of the row but not where the buttons
+     * sit inside it, so this is measured rather than asked for. On macOS
+     * close/minimise/zoom occupy x 8..70, but clearing them is not enough:
+     * a band of roughly x 83..100 beside them swallows presses before they
+     * reach us, so anything put there looks clickable and is not. 100 is
+     * past it. They are on the left here; a platform that puts them on the
+     * right would want this mirrored.
      */
-    readonly property real windowControlsInset: root.titleBarInset > 0 ? 78 : 0
-
-    /* Whether the toolbar takes its space out of the picture or floats.
-     *
-     * A toolbar that is both solid and always there would hide the top of
-     * the picture for good, so it gets its own strip and the canvas starts
-     * below it. Once it is see-through or fades away on its own, the
-     * picture is meant to run underneath it.
-     */
-    readonly property bool floatingToolbar: Preferences.transparentMenus
-                                            || Preferences.autoHideToolbar
+    readonly property real windowControlsInset: root.titleBarInset > 0 ? 100 : 0
 
     Palette.appearance: Preferences.appearance
     Palette.theme: Preferences.colorTheme
@@ -106,11 +107,11 @@ ApplicationWindow {
 
         id: canvas
 
-        // Runs the full height of the window, title bar row included, and
-        // gives way only to a toolbar that has been given a strip of its
-        // own (see floatingToolbar).
+        // Overlaid, it runs the full height of the window, title bar row and
+        // all. In a standard window it starts below the toolbar, so that no
+        // part of it is ever covered.
         anchors.fill: parent
-        anchors.topMargin: root.floatingToolbar ? 0 : toolbar.height
+        anchors.topMargin: root.overlaid ? 0 : toolbar.height
 
         controller: root.amiga
     }
@@ -124,11 +125,10 @@ ApplicationWindow {
      * snapping and all. It covers exactly the inset the safe area asks for,
      * which is nothing at all on a platform that left the title bar alone.
      *
-     * It sits above the picture but below the toolbar, which may be sharing
-     * this row: a press on a button is the button's, and one that lands on
-     * bare row falls through to here and moves the window, the way a
-     * unified toolbar behaves. The window controls are the windowing
-     * system's own and sit above everything, so they keep their clicks.
+     * It sits above the picture and below the toggle beside it, so the one
+     * thing drawn in this row keeps its clicks and the rest of the row
+     * moves the window. The window buttons are the windowing system's own
+     * and sit above everything, so they keep theirs too.
      */
     MouseArea {
 
@@ -137,6 +137,30 @@ ApplicationWindow {
         z: 5
 
         onPressed: root.startSystemMove()
+    }
+
+    /* Hides and shows the menu and toolbar.
+     *
+     * Only in an overlaid window, where the row the title bar used to occupy
+     * is ours to put it in. A standard window has no room of its own beside
+     * the window buttons and offers the same switch in the View menu, which
+     * is where this one ends up too -- both write to toolbarVisible.
+     */
+    SiSymbolButton {
+
+        id: chromeToggle
+
+        visible: root.overlaid
+        z: 20
+
+        x: root.windowControlsInset + Style.mediumSpacing
+        y: (root.titleBarInset - height) / 2
+
+        phosphor: "list"
+        size: Size.small
+        checked: root.toolbarVisible
+
+        onClicked: root.toolbarVisible = !root.toolbarVisible
     }
 
     // Click-to-capture-the-mouse handler, mirroring SiC64Window's
@@ -189,7 +213,7 @@ ApplicationWindow {
         // canvas at z: 10 -- see its own header comment. Anchoring under it
         // here, rather than reusing SiC64DevPanel's fixed y: 20, keeps this
         // panel from starting out hidden under that opaque toolbar.
-        y: toolbar.height + Style.mediumSpacing
+        y: toolbar.y + toolbar.height + Style.mediumSpacing
         visible: root.amiga.debugPanel && Preferences.developerMode
     }
 
@@ -422,23 +446,21 @@ ApplicationWindow {
     // individual actions via window.actions.xxx (e.g. window.actions.reset).
     property alias actions: siActions
 
-    // Sits at the very top of the window rather than using header:, which
-    // would reserve its own layout slot above the content area -- see
-    // SiC64Window.qml for the full rationale (auto-hide reveals the canvas
-    // underneath instead of plain window background). Whether it takes that
-    // space from the picture or floats over it is the canvas' side of the
-    // arrangement, above. With the title bar row given away this lands in
-    // it, which is why it is told where the window controls end.
+    // Sits below the title bar row rather than using header:, which would
+    // reserve its own layout slot above the content area -- see
+    // SiC64Window.qml for the full rationale. That row is the window's own
+    // in a standard window and nothing at all in an overlaid one, so the
+    // same offset puts this in the same place either way; what changes is
+    // only whether the picture runs on underneath it.
     SiAmToolbar {
 
         id: toolbar
 
         anchors.top: parent.top
+        anchors.topMargin: root.titleBarInset
         anchors.left: parent.left
         anchors.right: parent.right
         z: 10
-
-        windowControlsInset: root.windowControlsInset
 
 
         amiga: root.amiga

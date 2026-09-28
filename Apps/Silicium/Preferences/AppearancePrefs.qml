@@ -203,6 +203,40 @@ PrefPage {
 
             SiComboBoxControl {
 
+                id: menuType
+                l: "Menu Type:"
+                lwidth: root.labelWidth
+                controlWidth: root.comboWidth
+                model: [
+                    "Standard",
+                    "Opaque overlay",
+                    "Transparent overlay"
+                ]
+
+                currentIndex: Preferences.menuType
+                onCurrentIndexChanged: Preferences.menuType = currentIndex
+
+                SiHelpButton {
+
+                    id: menuTypeHelp
+                    checkable: true
+                    alignment: Qt.AlignLeft
+                }
+
+                HSpacer { }
+            }
+
+            HelpBox {
+
+                visibleTarget: menuTypeHelp.checked
+                text: "\"Standard\" gives the window its usual title bar, with the menu and toolbar below it and the emulated screen below that. The two overlay styles drop the title bar, leaving only the window buttons, and let the screen fill the whole window with the menu and toolbar laid over it in the same place. \"Transparent overlay\" additionally lets the screen show through them. In both overlay styles, the button beside the window buttons hides and shows the menu and toolbar."
+            }
+        }
+
+        HelpWrapper {
+
+            SiComboBoxControl {
+
                 id: menuStyle
                 l: "Menu Style:"
                 lwidth: root.labelWidth
@@ -232,88 +266,5 @@ PrefPage {
             }
         }
 
-        HelpWrapper {
-
-            SiCheckBoxControl {
-
-                id: autoHideToolbar
-                r: "Auto-hide toolbar"
-                lwidth: root.labelWidth
-
-                SiHelpButton {
-
-                    id: autoHideToolbarHelp
-                    checkable: true
-                    alignment: Qt.AlignLeft
-                }
-
-                HSpacer { }
-
-                checked: Preferences.autoHideToolbar
-                onCheckedChanged: Preferences.autoHideToolbar = checked
-            }
-
-            HelpBox {
-
-                visibleTarget: autoHideToolbarHelp.checked
-                text: "Fades the toolbar out while the mouse is away from it, letting the emulated screen extend behind it, and fades it back in as soon as the mouse moves over it."
-            }
-        }
-
-        HelpWrapper {
-
-            SiCheckBoxControl {
-
-                id: transparentMenus
-                r: "Transparent menus"
-                lwidth: root.labelWidth
-
-                SiHelpButton {
-
-                    id: transparentMenusHelp
-                    checkable: true
-                    alignment: Qt.AlignLeft
-                }
-
-                HSpacer { }
-
-                checked: Preferences.transparentMenus
-                onCheckedChanged: Preferences.transparentMenus = checked
-            }
-
-            HelpBox {
-
-                visibleTarget: transparentMenusHelp.checked
-                text: "Dims the menu and toolbar background so the emulated screen shows through it. The screen then extends behind the toolbar instead of starting below it."
-            }
-        }
-
-        HelpWrapper {
-
-            SiCheckBoxControl {
-
-                id: titleBar
-                r: "Show title bar"
-                lwidth: root.labelWidth
-
-                SiHelpButton {
-
-                    id: titleBarHelp
-                    checkable: true
-                    alignment: Qt.AlignLeft
-                }
-
-                HSpacer { }
-
-                checked: Preferences.titleBar
-                onCheckedChanged: Preferences.titleBar = checked
-            }
-
-            HelpBox {
-
-                visibleTarget: titleBarHelp.checked
-                text: "Keeps the window's own title bar. Turning it off hands that row to the emulator window, which moves the menu and toolbar up into it, clear of the window buttons. Drag the window by any empty part of that row."
-            }
-        }
     }
 }

@@ -144,13 +144,11 @@ Preferences::loadAppearanceSettings()
     monoFontTheme = s.value("monoFontTheme", 1).toInt();
 
     menuStyle    = s.value("menuStyle", 0).toInt();
+    // Defaults to a standard window, so installations that never touch this
+    // option look exactly as they did before it existed.
+    menuType     = s.value("menuType", 0).toInt();
     statusbar    = s.value("statusbar", 1).toInt();
     resizeMode   = s.value("resizeMode", 0).toInt();
-    autoHideToolbar = s.value("autoHideToolbar", false).toBool();
-    transparentMenus = s.value("transparentMenus", false).toBool();
-    // Defaults to the window keeping its title bar, so installations that
-    // never touch this option look exactly as they did before it existed.
-    titleBar = s.value("titleBar", true).toBool();
 
     s.endGroup();
 }
@@ -426,11 +424,9 @@ Preferences::saveAppearanceSettings()
     s.setValue("monoFontTheme", monoFontTheme);
 
     s.setValue("menuStyle", menuStyle);
+    s.setValue("menuType", menuType);
     s.setValue("statusbar", statusbar);
     s.setValue("resizeMode", resizeMode);
-    s.setValue("autoHideToolbar", autoHideToolbar);
-    s.setValue("transparentMenus", transparentMenus);
-    s.setValue("titleBar", titleBar);
 
     s.endGroup();
 
