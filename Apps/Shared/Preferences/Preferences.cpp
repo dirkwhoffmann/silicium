@@ -144,9 +144,10 @@ Preferences::loadAppearanceSettings()
     monoFontTheme = s.value("monoFontTheme", 1).toInt();
 
     menuStyle    = s.value("menuStyle", 0).toInt();
-    // Defaults to a standard window, so installations that never touch this
-    // option look exactly as they did before it existed.
+    // Defaults to an attached menu in an ordinary window, so installations
+    // that never touch these look as they did before they existed.
     menuType     = s.value("menuType", 0).toInt();
+    overlayType  = s.value("overlayType", 0).toInt();
     statusbar    = s.value("statusbar", 1).toInt();
     resizeMode   = s.value("resizeMode", 0).toInt();
 
@@ -425,6 +426,7 @@ Preferences::saveAppearanceSettings()
 
     s.setValue("menuStyle", menuStyle);
     s.setValue("menuType", menuType);
+    s.setValue("overlayType", overlayType);
     s.setValue("statusbar", statusbar);
     s.setValue("resizeMode", resizeMode);
 

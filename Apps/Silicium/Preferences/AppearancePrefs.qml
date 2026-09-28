@@ -208,9 +208,8 @@ PrefPage {
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
                 model: [
-                    "Standard",
-                    "Opaque overlay",
-                    "Transparent overlay"
+                    "Attach",
+                    "Overlay"
                 ]
 
                 currentIndex: Preferences.menuType
@@ -229,7 +228,44 @@ PrefPage {
             HelpBox {
 
                 visibleTarget: menuTypeHelp.checked
-                text: "\"Standard\" gives the window its usual title bar, with the menu and toolbar below it and the emulated screen below that. The two overlay styles drop the title bar, leaving only the window buttons, and let the screen fill the whole window with the menu and toolbar laid over it in the same place. \"Transparent overlay\" additionally lets the screen show through them. In both overlay styles, the button beside the window buttons hides and shows the menu and toolbar."
+                text: "\"Attach\" gives the window its usual title bar, with the menu and toolbar below it and the emulated screen below that, so all of the screen stays visible. \"Overlay\" drops the title bar, leaving only the window buttons, and lets the screen fill the whole window with the menu and toolbar laid over it in the same place as before. The button at the right-hand end of that row then hides and shows them."
+            }
+        }
+
+        HelpWrapper {
+
+            SiComboBoxControl {
+
+                id: overlayType
+                l: "Overlay Type:"
+                lwidth: root.labelWidth
+                controlWidth: root.comboWidth
+                model: [
+                    "Opaque",
+                    "Transparent"
+                ]
+
+                // Nothing to say about an attached menu: it has the row to
+                // itself, with no screen behind it to show through.
+                controlEnabled: Preferences.menuType === 1
+
+                currentIndex: Preferences.overlayType
+                onCurrentIndexChanged: Preferences.overlayType = currentIndex
+
+                SiHelpButton {
+
+                    id: overlayTypeHelp
+                    checkable: true
+                    alignment: Qt.AlignLeft
+                }
+
+                HSpacer { }
+            }
+
+            HelpBox {
+
+                visibleTarget: overlayTypeHelp.checked
+                text: "How an overlaid menu and toolbar are filled. \"Opaque\" covers the emulated screen behind them; \"Transparent\" dims it instead, so it shows through. Only applies while Menu Type is set to \"Overlay\"."
             }
         }
 

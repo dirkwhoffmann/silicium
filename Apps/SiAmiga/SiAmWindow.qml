@@ -52,17 +52,15 @@ ApplicationWindow {
 
     /* The two ways of arranging the chrome (Preferences.menuType).
      *
-     * Standard is an ordinary window: its own title bar, the menu and
-     * toolbar below it, and the picture below those again. Either overlay
-     * takes the title bar away, leaving only the window buttons, and lets
-     * the picture fill the window with the menu and toolbar laid over it --
-     * in the same place they would have been, which is why the toolbar is
-     * offset by the row the title bar used to occupy rather than moved into
-     * it. Transparent differs from opaque only in letting the picture show
-     * through them.
+     * Attached is an ordinary window: its own title bar, the menu and
+     * toolbar below it, and the picture below those again, so none of the
+     * picture is ever covered. Overlaid takes the title bar away, leaving
+     * only the window buttons, and lets the picture fill the window with the
+     * menu and toolbar laid over it -- in the same place they would have
+     * been, which is why the toolbar is offset by the row the title bar used
+     * to occupy rather than moved into it.
      */
-    readonly property bool overlaid: Preferences.menuType !== 0
-    readonly property bool seeThrough: Preferences.menuType === 2
+    readonly property bool overlaid: Preferences.menuType === 1
 
     /* ExpandedClientAreaHint hands us the whole window frame to draw on
      * (NSWindowStyleMaskFullSizeContentView on macOS) and
@@ -88,17 +86,6 @@ ApplicationWindow {
     // it over, and nothing whenever the windowing system still draws it.
     readonly property real titleBarInset: contentItem.SafeArea.margins.top
 
-    /* Where the window buttons end, so the toggle can sit beside them.
-     *
-     * The safe area gives the height of the row but not where the buttons
-     * sit inside it, so this is measured rather than asked for. On macOS
-     * close/minimise/zoom occupy x 8..70, but clearing them is not enough:
-     * a band of roughly x 83..100 beside them swallows presses before they
-     * reach us, so anything put there looks clickable and is not. 100 is
-     * past it. They are on the left here; a platform that puts them on the
-     * right would want this mirrored.
-     */
-    readonly property real windowControlsInset: root.titleBarInset > 0 ? 100 : 0
 
     Palette.appearance: Preferences.appearance
     Palette.theme: Preferences.colorTheme
@@ -142,9 +129,14 @@ ApplicationWindow {
     /* Hides and shows the menu and toolbar.
      *
      * Only in an overlaid window, where the row the title bar used to occupy
-     * is ours to put it in. A standard window has no room of its own beside
-     * the window buttons and offers the same switch in the View menu, which
-     * is where this one ends up too -- both write to toolbarVisible.
+     * is ours to put it in. An attached window has no room of its own up
+     * there and offers the same switch in the View menu, which is where this
+     * one ends up too -- both write to toolbarVisible.
+     *
+     * At the far end of the row from the window buttons. Beside them is no
+     * good: a band of roughly x 83..100 next to the buttons swallows presses
+     * before they reach us, so a control put there looks clickable and is
+     * not.
      */
     SiSymbolButton {
 
@@ -153,7 +145,8 @@ ApplicationWindow {
         visible: root.overlaid
         z: 20
 
-        x: root.windowControlsInset + Style.mediumSpacing
+        anchors.right: parent.right
+        anchors.rightMargin: Style.mediumSpacing
         y: (root.titleBarInset - height) / 2
 
         phosphor: "list"

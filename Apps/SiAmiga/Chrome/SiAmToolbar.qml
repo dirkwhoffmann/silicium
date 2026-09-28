@@ -68,13 +68,17 @@ ToolBar {
 
     background: Rectangle {
 
-        /* A transparent overlay (Preferences.menuType) lets the picture show
-         * through the strip instead of the theme's own fill. It is dimmed
-         * rather than cleared so that labels and icons keep something to
-         * stand against -- a bare picture behind them is unreadable on
-         * anything but a dark scene.
+        /* A transparent overlay (Preferences.overlayType) lets the picture
+         * show through the strip instead of the theme's own fill. It is
+         * dimmed rather than cleared so that labels and icons keep something
+         * to stand against -- a bare picture behind them is unreadable on
+         * anything but a dark scene. An attached menu has the row to itself
+         * and is always filled, whatever the overlay type happens to say.
          */
-        color: Preferences.menuType === 2
+        readonly property bool seeThrough: Preferences.menuType === 1
+                                           && Preferences.overlayType === 1
+
+        color: seeThrough
             ? Qt.rgba(Palette.toolbar.r, Palette.toolbar.g, Palette.toolbar.b, 0.55)
             : Palette.toolbar
 

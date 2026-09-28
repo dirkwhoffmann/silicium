@@ -379,7 +379,7 @@ VMWindow {
         // Overlaid: extends behind the toolbar, which is laid over it.
         // Standard: starts below the toolbar instead -- no reason to let it
         // hide part of the picture permanently.
-        anchors.top: Preferences.menuType !== 0 ? parent.top : toolbar.bottom
+        anchors.top: Preferences.menuType === 1 ? parent.top : toolbar.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
