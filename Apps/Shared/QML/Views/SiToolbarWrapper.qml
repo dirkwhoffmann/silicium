@@ -69,6 +69,12 @@ Item {
     readonly property bool seeThrough: Preferences.menuType === 1
                                        && Preferences.overlayType === 1
 
+    // What the strip is painted with. Stated once here because the window
+    // paints the title bar row with it too, and the two must never disagree.
+    readonly property color fill: root.seeThrough
+        ? Qt.rgba(Palette.toolbar.r, Palette.toolbar.g, Palette.toolbar.b, 0.55)
+        : Palette.toolbar
+
     // What each row holds, after the compact-mode button: an item, parented
     // into that row, filling whatever it does not already use.
     property alias menuContent: menuSlot.data
@@ -115,9 +121,7 @@ Item {
         border.width: 2
         border.color: "green"
 
-        color: root.seeThrough
-            ? Qt.rgba(Palette.toolbar.r, Palette.toolbar.g, Palette.toolbar.b, 0.55)
-            : Palette.toolbar
+        color: root.fill
 
         ColumnLayout {
 

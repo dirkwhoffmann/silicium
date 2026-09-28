@@ -40,39 +40,34 @@ ApplicationWindow {
     height: 600
     minimumWidth: 400
     minimumHeight: 300
-    /* Says nothing while the row is not ours to write on.
-     *
-     * The windowing system goes on drawing the window's name across the
-     * title bar row even once it has stopped drawing the row itself, which
-     * would leave it written over the picture. An overlaid window says whose
-     * it is in the menu instead.
-     */
-    title: root.overlaid ? "" : "SiAmiga"
+    title: "SiAmiga"
     color: "black"
 
     /* The two ways of arranging the chrome (Preferences.menuType).
      *
-     * Attached is an ordinary window: its own title bar, the menu and
-     * toolbar below it, and the picture below those again, so none of the
-     * picture is ever covered. Overlaid takes the title bar away, leaving
-     * only the window buttons, and lets the picture fill the window with the
-     * menu and toolbar laid over it -- in the same place they would have
-     * been, which is why the toolbar is offset by the row the title bar used
-     * to occupy rather than moved into it.
+     * Attached keeps the picture clear of the chrome: the menu and toolbar
+     * have a strip of their own and the picture starts below it. Overlaid
+     * lets the picture fill the window and lays the strip over it, in the
+     * same place it would otherwise have been.
+     *
+     * The title bar row is ours either way -- see the flags below -- so this
+     * decides only what happens underneath it.
      */
     readonly property bool overlaid: Preferences.menuType === 1
 
-    /* ExpandedClientAreaHint hands us the whole window frame to draw on
+    /* The title bar row belongs to us, always.
+     *
+     * ExpandedClientAreaHint hands us the whole window frame to draw on
      * (NSWindowStyleMaskFullSizeContentView on macOS) and
      * NoTitleBarBackgroundHint takes the title bar's own backdrop away, so
-     * what shows up there is ours. Unlike FramelessWindowHint this keeps the
-     * window buttons and the drag region. Neither flag needs a platform
-     * #ifdef: where the window manager cannot honour them they are ignored,
-     * and titleBarInset below then reports nothing to work around.
+     * what shows up there is ours to paint -- which is what lets the chrome
+     * toggle sit up there whichever way the chrome is arranged. Unlike
+     * FramelessWindowHint this keeps the window buttons, the drag region and
+     * the name the windowing system writes in the row. Neither flag needs a
+     * platform #ifdef: where the window manager cannot honour them they are
+     * ignored, and titleBarInset below then reports nothing to work around.
      */
-    flags: root.overlaid
-        ? Qt.Window | Qt.ExpandedClientAreaHint | Qt.NoTitleBarBackgroundHint
-        : Qt.Window
+    flags: Qt.Window | Qt.ExpandedClientAreaHint | Qt.NoTitleBarBackgroundHint
 
     /* An ApplicationWindow is a Control, and a Control insets its own
      * contentItem by the safe area. Dropping the padding hands the whole
@@ -82,8 +77,8 @@ ApplicationWindow {
      */
     topPadding: 0
 
-    // The row the title bar would have been: its height once we have taken
-    // it over, and nothing whenever the windowing system still draws it.
+    // The row the title bar would have been, which is now ours to draw in.
+    // Nothing at all on a platform that would not hand it over.
     readonly property real titleBarInset: contentItem.SafeArea.margins.top
 
 
@@ -95,12 +90,37 @@ ApplicationWindow {
         id: canvas
 
         // Overlaid, it runs the full height of the window, title bar row and
-        // all. In a standard window it starts below the toolbar, so that no
-        // part of it is ever covered.
+        // all. Attached, it starts below the strip -- which is itself below
+        // the title bar row -- so that no part of it is ever covered.
         anchors.fill: parent
-        anchors.topMargin: root.overlaid ? 0 : toolbar.height
+        anchors.topMargin: root.overlaid ? 0 : toolbar.y + toolbar.height
 
         controller: root.amiga
+    }
+
+    /* Paints the chrome behind the title bar row and the strip.
+     *
+     * The windowing system has stopped putting a backdrop in the title bar
+     * row (see the flags above), so the row would otherwise show whatever is
+     * behind it. It takes the strip's own fill, stated once in
+     * SiToolbarWrapper, so that the two can never disagree.
+     *
+     * How far down it reaches is the difference between the two
+     * arrangements. Attached, it runs to the bottom of the strip, so the row,
+     * the gap the strip is inset by and the strip itself read as one block
+     * of chrome with the picture starting beneath it. Overlaid, it stops at
+     * the row, leaving the picture to fill everything below -- including
+     * around the strip, which is what makes it look laid on top. It ends up
+     * the same either way once the strip is hidden, there being nothing left
+     * to reach down to.
+     */
+    Rectangle {
+
+        anchors { left: parent.left; right: parent.right; top: parent.top }
+        height: root.overlaid ? root.titleBarInset : toolbar.y + toolbar.height
+        z: 4
+
+        color: toolbar.fill
     }
 
     /* Drags the window by what used to be the title bar.
@@ -128,10 +148,9 @@ ApplicationWindow {
 
     /* Hides and shows the menu and toolbar.
      *
-     * Only in an overlaid window, where the row the title bar used to occupy
-     * is ours to put it in. An attached window has no room of its own up
-     * there and offers the same switch in the View menu, which is where this
-     * one ends up too -- both write to toolbarVisible.
+     * In the title bar row, which is ours whichever way the chrome is
+     * arranged, so this is always on offer. The View menu writes to the same
+     * toolbarVisible.
      *
      * At the far end of the row from the window buttons. Beside them is no
      * good: a band of roughly x 83..100 next to the buttons swallows presses
@@ -142,7 +161,6 @@ ApplicationWindow {
 
         id: chromeToggle
 
-        visible: root.overlaid
         z: 20
 
         anchors.right: parent.right
