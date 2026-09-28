@@ -58,10 +58,6 @@ Item {
                                      && (!root.compactMenu || root.menuRevealed)
     readonly property bool showToolbar: root.toolbarVisible
                                         && !(root.compactMenu && root.menuRevealed)
-    readonly property bool showAny: showMenu || showToolbar
-
-    // The height of one row, which the rows themselves ask for as well.
-    readonly property real rowHeight: 28
 
     /* A transparent overlay (Preferences.overlayType) lets the picture show
      * through the strip instead of the theme's own fill. It is dimmed rather
@@ -78,15 +74,23 @@ Item {
     property alias menuContent: menuSlot.data
     property alias toolbarContent: toolbarSlot.data
 
-    // How far the strip is held off the edges of the space it was given.
+    // How far the strip is held off the edges of the space it was given, and
+    // how far its rows are held off its own edges.
     readonly property real inset: Style.mediumSpacing
+    readonly property real padding: Style.mediumSpacing
 
-    // Nothing at all when neither row is on show, rather than an empty strip
-    // the height of its own inset.
-    implicitHeight: showAny
-        ? (showMenu ? rowHeight : 0) + (showToolbar ? rowHeight : 0) + 2 * inset
-        : 0
-    height: implicitHeight
+    /* As tall as what it holds.
+     *
+     * The rows are as tall as the controls standing in them, the strip is as
+     * tall as its rows and its own padding, and this is as tall as the strip
+     * and the inset it is held off the edges by. No row height is stated
+     * anywhere along that chain: hide both rows and the whole thing closes
+     * up to nothing by itself.
+     *
+     * Nothing assigns 'height', so it follows implicitHeight the way any
+     * item's does.
+     */
+    implicitHeight: container.height > 0 ? container.height + 2 * root.inset : 0
 
     //
     // Main
@@ -96,8 +100,17 @@ Item {
 
         id: container
 
-        anchors.fill: parent
-        anchors.margins: root.inset
+        anchors {
+            left: parent.left
+            right: parent.right
+            top: parent.top
+            margins: root.inset
+        }
+
+        // Its rows, plus the padding it holds them off its own edges by.
+        height: layout.implicitHeight > 0 ? layout.implicitHeight + 2 * root.padding : 0
+        visible: height > 0
+
         radius: 10
         border.width: 2
         border.color: "green"
@@ -108,14 +121,15 @@ Item {
 
         ColumnLayout {
 
+            id: layout
+
             anchors.fill: parent
-            anchors.margins: Style.mediumSpacing
+            anchors.margins: root.padding
             spacing: 0
 
             RowLayout {
 
                 Layout.fillWidth: true
-                Layout.preferredHeight: root.rowHeight
                 visible: root.showMenu
                 spacing: 0
 
@@ -135,15 +149,21 @@ Item {
                 Item {
 
                     id: menuSlot
+
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+
+                    // The content fills this, so its own height says nothing
+                    // about how tall the row wants to be. Its implicit
+                    // height does, so that is what gets passed up.
+                    implicitHeight: children.length > 0
+                                    ? children[0].implicitHeight : 0
                 }
             }
 
             RowLayout {
 
                 Layout.fillWidth: true
-                Layout.preferredHeight: root.rowHeight
                 visible: root.showToolbar
                 spacing: 0
 
@@ -163,8 +183,15 @@ Item {
                 Item {
 
                     id: toolbarSlot
+
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+
+                    // The content fills this, so its own height says nothing
+                    // about how tall the row wants to be. Its implicit
+                    // height does, so that is what gets passed up.
+                    implicitHeight: children.length > 0
+                                    ? children[0].implicitHeight : 0
                 }
             }
         }

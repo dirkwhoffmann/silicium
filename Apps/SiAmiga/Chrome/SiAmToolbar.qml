@@ -36,7 +36,13 @@ Item {
     required property SiAmController amiga
     required property SiAmWindow window
 
+    // As tall as the row of buttons wants to be, so that the strip this is
+    // handed to can take its own height from it.
+    implicitHeight: row.implicitHeight
+
     RowLayout {
+
+        id: row
 
         anchors.fill: parent
         spacing: 0

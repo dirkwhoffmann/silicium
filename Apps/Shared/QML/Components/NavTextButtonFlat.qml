@@ -17,7 +17,16 @@ AbstractButton {
     property string awesome: ""
     property string phosphor: ""
 
+    /* Asks for a size in both directions.
+     *
+     * Height as well as width, so that a row of these is as tall as they
+     * are rather than the other way round -- a toolbar that stated its own
+     * height would leave the buttons stretching to whatever it happened to
+     * be. Filling is kept for the case where something else in the row is
+     * taller.
+     */
     Layout.preferredWidth: 32
+    Layout.preferredHeight: 28
     Layout.fillHeight: true
     padding: 0
 
