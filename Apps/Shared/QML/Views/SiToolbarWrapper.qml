@@ -76,7 +76,7 @@ Item {
     // What the strip is painted with. Stated once here because the window
     // paints the title bar row with it too, and the two must never disagree.
     readonly property color fill: root.seeThrough
-        ? Qt.rgba(Palette.toolbar.r, Palette.toolbar.g, Palette.toolbar.b, 0.55)
+        ? Palette.overlay // (Qt.rgba(Palette.toolbar.r, Palette.toolbar.g, Palette.toolbar.b, 0.55)
         : Palette.toolbar
 
     // What each row holds, after the compact-mode button: an item, parented
@@ -103,7 +103,7 @@ Item {
     implicitHeight: container.height
     // implicitHeight: container.height > 0 ? container.height + 2 * root.inset : 0
 
-    DebugRect {}
+    // DebugRect {}
 
     //
     // Main
@@ -129,7 +129,7 @@ Item {
 
         radius: Style.radius
         border.width: 1
-        border.color: "green"
+        border.color: Palette.overlayBorder
 
         color: root.fill
 

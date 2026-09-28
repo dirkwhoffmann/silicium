@@ -266,6 +266,11 @@ Palette::computeDefaultColor(Color c, bool darkMode) const
             case Color::ControlBorder:          return lighter(Color::Control,140);
             case Color::ControlBorderSelected:  return lighter(Color::ControlSelected,150);
 
+            case Color::Overlay:                return QColor("#C0000000");
+            case Color::OverlayElevated:        return QColor("#E0000000");
+            case Color::OverlayBorder:          return QColor("#50ffffff");
+            case Color::OverlayBorderElevated:  return QColor("#90ffffff");
+
             default:
                 return QColor("red");
         }
@@ -311,6 +316,11 @@ Palette::computeDefaultColor(Color c, bool darkMode) const
             case Color::ControlSelected:        return QColor("#FFFFFF");
             case Color::ControlBorder:          return darker(Color::Control);
             case Color::ControlBorderSelected:  return darker(Color::ControlBorder);
+
+            case Color::Overlay:                return QColor("#C0000000");
+            case Color::OverlayElevated:        return QColor("#E0000000");
+            case Color::OverlayBorder:          return QColor("#50ffffff");
+            case Color::OverlayBorderElevated:  return QColor("#90ffffff");
 
             default:
                 return QColor("red");
@@ -361,6 +371,11 @@ Palette::computeSolarisColor(Color c, bool darkMode) const
         case Color::ControlSelected:        return lighter(Color::Control); //, 130);
         case Color::ControlBorder:          return darker(Color::Control, 150); //, 140);
         case Color::ControlBorderSelected:  return darker(Color::ControlBorder);
+
+        case Color::Overlay:                return QColor("#C0000000");
+        case Color::OverlayElevated:        return QColor("#E0000000");
+        case Color::OverlayBorder:          return QColor("#50ffffff");
+        case Color::OverlayBorderElevated:  return QColor("#90ffffff");
 
         default:
             return computeDefaultColor(c, darkMode);

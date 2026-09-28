@@ -63,6 +63,12 @@ class Palette : public QQuickAttachedPropertyPropagator {
         ControlBorder,
         ControlBorderSelected,
 
+        // Transparent overlays
+        Overlay,
+        OverlayElevated,
+        OverlayBorder,
+        OverlayBorderElevated,
+
         Count
     };
 
@@ -117,6 +123,11 @@ private:
     Q_PROPERTY(QColor controlSelected READ controlSelected NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor controlBorder READ controlBorder NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor controlBorderSelected READ controlBorderSelected NOTIFY themeChanged FINAL)
+
+    Q_PROPERTY(QColor overlay READ overlay NOTIFY themeChanged FINAL)
+    Q_PROPERTY(QColor overlayElevated READ overlayElevated NOTIFY themeChanged FINAL)
+    Q_PROPERTY(QColor overlayBorder READ overlayBorder NOTIFY themeChanged FINAL)
+    Q_PROPERTY(QColor overlayBorderElevated READ overlayBorderElevated NOTIFY themeChanged FINAL)
 
     Appearance m_appearance = Appearance::Auto;
     bool m_explicitAppearance = false;
@@ -178,6 +189,11 @@ private:
     QColor controlSelected() const { return getColor(Color::ControlSelected); }
     QColor controlBorder() const { return getColor(Color::ControlBorder); }
     QColor controlBorderSelected() const { return getColor(Color::ControlBorderSelected); }
+
+    QColor overlay() const { return getColor(Color::Overlay); }
+    QColor overlayElevated() const { return getColor(Color::OverlayElevated); }
+    QColor overlayBorder() const { return getColor(Color::OverlayBorder); }
+    QColor overlayBorderElevated() const { return getColor(Color::OverlayBorderElevated); }
 
 Q_SIGNALS:
 
