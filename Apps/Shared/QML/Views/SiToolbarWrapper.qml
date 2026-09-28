@@ -69,6 +69,21 @@ Item {
     readonly property bool seeThrough: Preferences.menuType === 1
                                        && Preferences.overlayType === 1
 
+    /* Dark chrome once the picture shows through it.
+     *
+     * A dimmed light fill over a bright screen washes out; a dark one keeps
+     * its labels and icons legible whatever is behind them. Set here, on the
+     * strip itself, so that it reaches everything standing in it -- both
+     * rows, and the fill below, which is why the title bar row follows too.
+     *
+     * Auto is not "ignore what the user asked for": the Palette attached to
+     * the window writes their choice into the process-wide colour scheme,
+     * and an Auto one down here reads it back. So the strip looks exactly as
+     * it did whenever the picture is not showing through.
+     */
+    Palette.appearance: root.seeThrough ? Palette.Appearance.Dark
+                                        : Palette.Appearance.Auto
+
     // What the strip is painted with. Stated once here because the window
     // paints the title bar row with it too, and the two must never disagree.
     readonly property color fill: root.seeThrough
