@@ -445,7 +445,7 @@ ApplicationWindow {
     // in a standard window and nothing at all in an overlaid one, so the
     // same offset puts this in the same place either way; what changes is
     // only whether the picture runs on underneath it.
-    SiAmToolbar {
+    SiToolbarWrapper {
 
         id: toolbar
 
@@ -455,19 +455,25 @@ ApplicationWindow {
         anchors.right: parent.right
         z: 10
 
-
-        amiga: root.amiga
-        window: root
-
-        onOpenAbout: aboutWindow.show()
-
+        toolbarVisible: root.toolbarVisible
         compactMenu: root.compactMenu
 
-        toolbarVisible: root.toolbarVisible
-        statusBarVisible: root.statusBarVisible
+        SiAmToolbar {
 
-        onToggleToolbar: root.toolbarVisible = !root.toolbarVisible
-        onToggleStatusBar: root.statusBarVisible = !root.statusBarVisible
+            anchors.fill: parent
+            wrapper: toolbar
+
+            amiga: root.amiga
+            window: root
+
+            onOpenAbout: aboutWindow.show()
+
+            toolbarVisible: root.toolbarVisible
+            statusBarVisible: root.statusBarVisible
+
+            onToggleToolbar: root.toolbarVisible = !root.toolbarVisible
+            onToggleStatusBar: root.statusBarVisible = !root.statusBarVisible
+        }
     }
 
     footer: SiAmStatusbar {

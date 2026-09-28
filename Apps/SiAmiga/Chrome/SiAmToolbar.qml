@@ -15,19 +15,27 @@ import Silicium.Controllers
 import Silicium.Preferences
 import Silicium.Theme
 
-//
-// Combined toolbar / menubar. Port of SiC64Toolbar.qml, trimmed the same way
-// SiAmMenu.qml was trimmed relative to SiC64Menu.qml: the workspace/snapshot
-// save/load buttons aren't wired to anything because that subsystem doesn't
-// exist in SiAmiga yet. Every other button is wired via root.window.actions
-// (see SiAmActions.qml), same as SiC64Toolbar's window.actions.* calls.
-//
-
-ToolBar {
+/* What the menu and toolbar rows contain.
+ *
+ * Only the contents: how tall the strip is, which of its rows are on show and
+ * what it is filled with belong to the SiToolbarWrapper this fills, which is
+ * the same for every emulator. This reads that state back through 'wrapper'
+ * and writes to it when one of its own buttons swaps the rows over.
+ *
+ * Port of SiC64Toolbar.qml, trimmed the same way SiAmMenu.qml was trimmed
+ * relative to SiC64Menu.qml: the workspace/snapshot save/load buttons aren't
+ * wired to anything because that subsystem doesn't exist in SiAmiga yet.
+ * Every other button is wired via root.window.actions (see SiAmActions.qml),
+ * same as SiC64Toolbar's window.actions.* calls.
+ */
+Item {
 
     id: root
 
     required property SiAmController amiga
+
+    // The strip this fills, which owns everything about its shape.
+    required property SiToolbarWrapper wrapper
 
     // Emitted by the Amiga menu's "About" item -- the one menu command with
     // no SiAmActions entry (see that file's class comment; C64Actions has
@@ -46,78 +54,31 @@ ToolBar {
     signal toggleToolbar()
     signal toggleStatusBar()
 
-    // Compact-menu mode: Only one row (menu or icons) is shown at a time,
-    // switched via the burger button embedded in each row.
-    property bool compactMenu: false
-    property bool menuRevealed: false
-    onCompactMenuChanged: menuRevealed = false
+    ColumnLayout {
 
-    // toolbarVisible is the single switch for the whole header: when false,
-    // neither row shows. When true, both rows show in normal mode; in
-    // compact mode they still alternate via menuRevealed.
-    readonly property bool showMenu: root.toolbarVisible && (!root.compactMenu || root.menuRevealed)
-    readonly property bool showToolbar: root.toolbarVisible && !(root.compactMenu && root.menuRevealed)
-    readonly property bool showAny: showMenu || showToolbar
-
-    topPadding: 0
-    bottomPadding: 0
-    leftPadding: 0
-    rightPadding: 0
-
-    height: (showMenu ? 28 : 0) + (showToolbar ? 28 : 0) + (showAny ? 1 : 0)
-
-    background: Rectangle {
-
-        /* A transparent overlay (Preferences.overlayType) lets the picture
-         * show through the strip instead of the theme's own fill. It is
-         * dimmed rather than cleared so that labels and icons keep something
-         * to stand against -- a bare picture behind them is unreadable on
-         * anything but a dark scene. An attached menu has the row to itself
-         * and is always filled, whatever the overlay type happens to say.
-         */
-        readonly property bool seeThrough: Preferences.menuType === 1
-                                           && Preferences.overlayType === 1
-
-        color: seeThrough
-            ? Qt.rgba(Palette.toolbar.r, Palette.toolbar.g, Palette.toolbar.b, 0.55)
-            : Palette.toolbar
-
-        Rectangle {
-
-            anchors {
-                left: parent.left
-                right: parent.right
-                bottom: parent.bottom
-            }
-            height: 1
-            color: Palette.toolbarBorder
-        }
-    }
-
-    contentItem: ColumnLayout {
-
+        anchors.fill: parent
         spacing: 0
 
         RowLayout {
 
             Layout.fillWidth: true
-            Layout.preferredHeight: 28
+            Layout.preferredHeight: root.wrapper.rowHeight
             Layout.leftMargin: 0
             Layout.rightMargin: 0
-            visible: root.showMenu
+            visible: root.wrapper.showMenu
             spacing: 0
 
             NavTextButtonFlat {
 
-                visible: root.compactMenu
+                visible: root.wrapper.compactMenu
                 phosphor: "list"
                 text: qsTr("Show Toolbar")
-                onClicked: root.menuRevealed = false
+                onClicked: root.wrapper.menuRevealed = false
             }
 
             NavDivider {
 
-                visible: root.compactMenu
+                visible: root.wrapper.compactMenu
             }
 
             SiAmMenu {
@@ -139,23 +100,23 @@ ToolBar {
         RowLayout {
 
             Layout.fillWidth: true
-            Layout.preferredHeight: 28
+            Layout.preferredHeight: root.wrapper.rowHeight
             Layout.leftMargin: 0
             Layout.rightMargin: 0
-            visible: root.showToolbar
+            visible: root.wrapper.showToolbar
             spacing: 0
 
             NavTextButtonFlat {
 
-                visible: root.compactMenu
+                visible: root.wrapper.compactMenu
                 phosphor: "list"
                 text: qsTr("Show Menu")
-                onClicked: root.menuRevealed = true
+                onClicked: root.wrapper.menuRevealed = true
             }
 
             NavDivider {
 
-                visible: root.compactMenu
+                visible: root.wrapper.compactMenu
             }
 
             NavTextButtonFlat {
