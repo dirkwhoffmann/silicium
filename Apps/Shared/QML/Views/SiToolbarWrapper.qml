@@ -59,27 +59,37 @@ Item {
     readonly property bool showToolbar: root.toolbarVisible
                                         && !(root.compactMenu && root.menuRevealed)
 
-    /* A transparent overlay (Preferences.overlayType) lets the picture show
-     * through the strip instead of the theme's own fill. It is dimmed rather
-     * than cleared so that labels and icons keep something to stand against
-     * -- a bare picture behind them is unreadable on anything but a dark
-     * scene. An attached menu has the row to itself and is always filled,
-     * whatever the overlay type happens to say.
+    /* An overlaid strip lets the picture show through it instead of standing
+     * on the theme's own fill. It is dimmed rather than cleared so that
+     * labels and icons keep something to stand against -- a bare picture
+     * behind them is unreadable on anything but a dark scene. An attached
+     * strip has its row to itself, with no picture behind it to show, and is
+     * filled outright.
      */
     readonly property bool seeThrough: Preferences.menuType === 1
-                                       && Preferences.overlayType === 1
-
-    // Enable dark mode if the background shows through it
-    /*
-    Palette.appearance: root.seeThrough ? Palette.Appearance.Dark
-                                        : Palette.Appearance.Auto
-    */
 
     // What the strip is painted with. Stated once here because the window
-    // paints the title bar row with it too, and the two must never disagree.
+    // reaches for it when painting the title bar row, and the two must never
+    // disagree about what "the toolbar colour" is.
     readonly property color fill: root.seeThrough
-        ? Qt.alpha(Palette.background, 0.9) // Palette.overlay // (Qt.rgba(Palette.toolbar.r, Palette.toolbar.g, Palette.toolbar.b, 0.55)
+        ? Qt.alpha(Palette.background, 0.9)
         : Palette.toolbar
+
+    /* What the title bar row is painted with (Preferences.titleBar).
+     *
+     * The windowing system no longer puts a backdrop up there, so the row is
+     * ours to fill, and this is the choice between the two ways of doing it.
+     * "Standard" keeps it looking like the title bar of any other window,
+     * with the strip reading as a separate thing below it. "Unified" gives
+     * it the strip's own fill, so the row and the strip read as one block of
+     * chrome -- the macOS unified look.
+     *
+     * It lives here rather than in the window because it is the same
+     * decision for every window that has one, and because "the toolbar
+     * colour" is this component's to define.
+     */
+    readonly property color titleBarFill: Preferences.titleBar === 1
+                                          ? root.fill : Palette.background
 
     // What each row holds, after the compact-mode button: an item, parented
     // into that row, filling whatever it does not already use.
@@ -88,7 +98,7 @@ Item {
 
     // How far the strip is held off the edges of the space it was given, and
     // how far its rows are held off its own edges.
-    readonly property real inset: Style.mediumSpacing
+    readonly property real inset: 0 // Style.mediumSpacing
     readonly property real padding: Style.smallSpacing //  mediumSpacing
 
     /* As tall as what it holds.
@@ -129,9 +139,9 @@ Item {
 
         visible: root.toolbarVisible
 
-        radius: Style.radius
-        border.width: 1
-        border.color: Palette.overlayBorder
+        // radius: Style.radius
+        // border.width: 1
+        // border.color: Palette.overlayBorder
 
         color: root.fill
 
@@ -142,6 +152,16 @@ Item {
             anchors.fill: parent
             anchors.margins: root.padding
             spacing: 0
+
+            /*
+            Rectangle {
+
+                Layout.fillWidth: true
+                height: 2
+                color: "red"
+            }
+
+             */
 
             RowLayout {
 

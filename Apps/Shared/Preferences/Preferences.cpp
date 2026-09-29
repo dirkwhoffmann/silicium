@@ -147,7 +147,7 @@ Preferences::loadAppearanceSettings()
     // Defaults to an attached menu in an ordinary window, so installations
     // that never touch these look as they did before they existed.
     menuType     = s.value("menuType", 0).toInt();
-    overlayType  = s.value("overlayType", 0).toInt();
+    titleBar     = s.value("titleBar", 0).toInt();
     statusbar    = s.value("statusbar", 1).toInt();
     resizeMode   = s.value("resizeMode", 0).toInt();
 
@@ -426,7 +426,7 @@ Preferences::saveAppearanceSettings()
 
     s.setValue("menuStyle", menuStyle);
     s.setValue("menuType", menuType);
-    s.setValue("overlayType", overlayType);
+    s.setValue("titleBar", titleBar);
     s.setValue("statusbar", statusbar);
     s.setValue("resizeMode", resizeMode);
 

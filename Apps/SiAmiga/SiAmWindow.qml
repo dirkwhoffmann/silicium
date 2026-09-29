@@ -98,29 +98,45 @@ ApplicationWindow {
         controller: root.amiga
     }
 
-    /* Paints the chrome behind the title bar row and the strip.
+    /* Paints the chrome behind the strip, where the picture does not reach.
      *
-     * The windowing system has stopped putting a backdrop in the title bar
-     * row (see the flags above), so the row would otherwise show whatever is
-     * behind it. It takes the strip's own fill, stated once in
-     * SiToolbarWrapper, so that the two can never disagree.
-     *
-     * How far down it reaches is the difference between the two
-     * arrangements. Attached, it runs to the bottom of the strip, so the row,
-     * the gap the strip is inset by and the strip itself read as one block
-     * of chrome with the picture starting beneath it. Overlaid, it stops at
-     * the row, leaving the picture to fill everything below -- including
-     * around the strip, which is what makes it look laid on top. It ends up
-     * the same either way once the strip is hidden, there being nothing left
-     * to reach down to.
+     * Only in the attached arrangement is there any: the strip is inset from
+     * the edges it was given, and the picture starts below all of it, so the
+     * gap around the strip would otherwise show the window's own black.
+     * Filling it with what the strip is filled with makes the strip and its
+     * surround read as one band of chrome. Overlaid there is nothing to
+     * paint -- the picture runs on underneath and around the strip, which is
+     * what makes it look laid on top.
      */
     Rectangle {
 
         anchors { left: parent.left; right: parent.right; top: parent.top }
-        height: root.overlaid ? root.titleBarInset : toolbar.y + toolbar.height
+        height: root.overlaid ? 0 : toolbar.y + toolbar.height
         z: 4
 
         color: toolbar.fill
+    }
+
+    /* Paints the title bar row.
+     *
+     * The windowing system has stopped putting a backdrop up there (see the
+     * flags above), so the row would otherwise show whatever is behind it.
+     * What goes in it is the user's choice -- see titleBarFill in
+     * SiToolbarWrapper, which owns both the colours it picks between.
+     *
+     * It is drawn after the band above, and so over it, because in the
+     * attached arrangement the two overlap: the band starts at the top of
+     * the window and this decides what that first stretch of it looks like.
+     * On a platform that kept its title bar to itself the inset is nothing
+     * and this paints nothing.
+     */
+    Rectangle {
+
+        anchors { left: parent.left; right: parent.right; top: parent.top }
+        height: root.titleBarInset
+        z: 4
+
+        color: toolbar.titleBarFill
     }
 
     /* Drags the window by what used to be the title bar.
@@ -409,8 +425,6 @@ ApplicationWindow {
     property alias hardDiskCreator: hardDiskCreatorDialog
     property alias userDialog: errorDialog
 
-
-
     Component.onCompleted: updateOverlayStack()
 
     //
@@ -463,8 +477,7 @@ ApplicationWindow {
 
         toolbarVisible: root.toolbarVisible
         compactMenu: root.compactMenu
-
-
+        
         menuContent: SiAmMenu {
 
             anchors.fill: parent

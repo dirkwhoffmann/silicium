@@ -50,7 +50,7 @@ class Preferences : public QObject {
     //
     int menuStyle;
     int menuType;
-    int overlayType;
+    int titleBar;
     int statusbar;
     int resizeMode;
 
@@ -274,7 +274,7 @@ class Preferences : public QObject {
 
     Q_PROPERTY(int menuStyle READ getMenuStyle WRITE setMenuStyle NOTIFY appearancePrefsChanged)
     Q_PROPERTY(int menuType READ getMenuType WRITE setMenuType NOTIFY appearancePrefsChanged)
-    Q_PROPERTY(int overlayType READ getOverlayType WRITE setOverlayType NOTIFY appearancePrefsChanged)
+    Q_PROPERTY(int titleBar READ getTitleBar WRITE setTitleBar NOTIFY appearancePrefsChanged)
     Q_PROPERTY(int statusbar READ getStatusbar WRITE setStatusbar NOTIFY appearancePrefsChanged)
     Q_PROPERTY(int resizeMode READ getResizeMode WRITE setResizeMode NOTIFY appearancePrefsChanged)
 
@@ -287,8 +287,8 @@ class Preferences : public QObject {
     void setMenuStyle(int value) { setAppearanceProperty(menuStyle, value); }
     int getMenuType() const { return menuType; }
     void setMenuType(int value) { setAppearanceProperty(menuType, value); }
-    int getOverlayType() const { return overlayType; }
-    void setOverlayType(int value) { setAppearanceProperty(overlayType, value); }
+    int getTitleBar() const { return titleBar; }
+    void setTitleBar(int value) { setAppearanceProperty(titleBar, value); }
     int getStatusbar() const { return statusbar; }
     void setStatusbar(int value) { setAppearanceProperty(statusbar, value); }
     int getResizeMode() const { return resizeMode; }

@@ -236,25 +236,21 @@ PrefPage {
 
             SiComboBoxControl {
 
-                id: overlayType
-                l: "Overlay Type:"
+                id: titleBar
+                l: "Title Bar:"
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
                 model: [
-                    "Opaque",
-                    "Transparent"
+                    "Standard",
+                    "Unified"
                 ]
 
-                // Nothing to say about an attached menu: it has the row to
-                // itself, with no screen behind it to show through.
-                controlEnabled: Preferences.menuType === 1
-
-                currentIndex: Preferences.overlayType
-                onCurrentIndexChanged: Preferences.overlayType = currentIndex
+                currentIndex: Preferences.titleBar
+                onCurrentIndexChanged: Preferences.titleBar = currentIndex
 
                 SiHelpButton {
 
-                    id: overlayTypeHelp
+                    id: titleBarHelp
                     checkable: true
                     alignment: Qt.AlignLeft
                 }
@@ -264,8 +260,8 @@ PrefPage {
 
             HelpBox {
 
-                visibleTarget: overlayTypeHelp.checked
-                text: "How an overlaid menu and toolbar are filled. \"Opaque\" covers the emulated screen behind them; \"Transparent\" dims it instead, so it shows through. Only applies while Menu Type is set to \"Overlay\"."
+                visibleTarget: titleBarHelp.checked
+                text: "How the title bar row is filled. \"Standard\" gives it the usual title bar background, so the menu and toolbar read as something separate below it. \"Unified\" gives it the same colour as the menu and toolbar, so the whole thing reads as one block of chrome."
             }
         }
 
