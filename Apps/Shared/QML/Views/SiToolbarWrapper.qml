@@ -112,7 +112,7 @@ Item {
      * Nothing assigns 'height', so it follows implicitHeight the way any
      * item's does.
      */
-    implicitHeight: container.height
+    implicitHeight: separator.height + container.height
     // implicitHeight: container.height > 0 ? container.height + 2 * root.inset : 0
 
     // DebugRect {}
@@ -120,6 +120,32 @@ Item {
     //
     // Main
     //
+
+    /* Sets the strip off from the title bar row above it.
+     *
+     * Only the standard fill needs it. Unified gives the row and the strip
+     * the same colour on purpose, and a line across the middle of that would
+     * undo the very thing it is for; standard sets them apart already, and
+     * this makes the boundary deliberate rather than a place where two
+     * greys happen to meet.
+     *
+     * It is drawn in the first pixel the strip owns, not in the last one of
+     * the row above, so that nothing of ours reaches into a row the
+     * windowing system still considers its own. The rows start below it --
+     * see the anchor on container -- so it takes its own space rather than
+     * covering theirs, and it goes when the strip does: with no strip there
+     * is no boundary left to mark.
+     */
+    Rectangle {
+
+        id: separator
+
+        anchors { left: parent.left; right: parent.right; top: parent.top }
+        height: visible ? 1 : 0
+
+        visible: Preferences.titleBar === 0 && root.toolbarVisible
+        color: Qt.alpha(Palette.background, 0.5)
+    }
 
     Rectangle {
 
@@ -129,7 +155,7 @@ Item {
 
             left: parent.left
             right: parent.right
-            top: parent.top
+            top: separator.bottom
             leftMargin: root.inset
             rightMargin: root.inset
         }
