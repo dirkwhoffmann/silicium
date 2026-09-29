@@ -40,7 +40,11 @@ ApplicationWindow {
     height: 600
     minimumWidth: 400
     minimumHeight: 300
-    title: "SiAmiga"
+    // Nothing but the toggle stands in the title bar row once the chrome is
+    // hidden, and a name floating over the picture on its own reads as a
+    // caption on it rather than as the window's. What the row is filled with
+    // goes the same way -- see the rectangle that paints it.
+    title: root.toolbarVisible ? "SiAmiga" : ""
     color: "black"
 
     /* The two ways of arranging the chrome (Preferences.menuType).
@@ -107,11 +111,17 @@ ApplicationWindow {
      * surround read as one band of chrome. Overlaid there is nothing to
      * paint -- the picture runs on underneath and around the strip, which is
      * what makes it look laid on top.
+     *
+     * With the chrome hidden there is likewise nothing to surround. It has
+     * to go rather than merely be covered: it starts at the top of the
+     * window, so anything left of it would show through the title bar row
+     * the moment that row goes transparent.
      */
     Rectangle {
 
         anchors { left: parent.left; right: parent.right; top: parent.top }
-        height: root.overlaid ? 0 : toolbar.y + toolbar.height
+        height: root.overlaid || !root.toolbarVisible ? 0
+                                                      : toolbar.y + toolbar.height
         z: 4
 
         color: toolbar.fill
@@ -129,6 +139,12 @@ ApplicationWindow {
      * the window and this decides what that first stretch of it looks like.
      * On a platform that kept its title bar to itself the inset is nothing
      * and this paints nothing.
+     *
+     * With the chrome hidden it paints nothing either. There is no strip for
+     * the row to belong to, so a band of toolbar colour across the top would
+     * be chrome standing on its own; clearing it hands the row back to
+     * whatever is behind -- the picture, overlaid, and the window's own
+     * black when attached.
      */
     Rectangle {
 
@@ -136,7 +152,7 @@ ApplicationWindow {
         height: root.titleBarInset
         z: 4
 
-        color: toolbar.titleBarFill
+        color: root.toolbarVisible ? toolbar.titleBarFill : "transparent"
     }
 
     /* Drags the window by what used to be the title bar.

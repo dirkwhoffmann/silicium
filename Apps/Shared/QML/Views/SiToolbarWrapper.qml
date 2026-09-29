@@ -35,10 +35,18 @@ import Silicium.Theme
  * window that has taken over its title bar row starts it below that row, and
  * an ordinary one has nothing to allow for. So callers anchor it themselves
  * and this only ever settles its own height.
+ *
+ * It is a layout rather than a plain item because everything in it is stacked:
+ * the separator, then the strip, then inside that the two rows. Stating that
+ * once, as an order, keeps each piece from having to name the one above it --
+ * and a piece that hides is dropped from the stack rather than having to
+ * collapse itself to nothing.
  */
-Item {
+ColumnLayout {
 
     id: root
+
+    spacing: 0
 
     // The single switch for the whole strip: when false, neither row shows.
     property bool toolbarVisible: true
@@ -104,16 +112,14 @@ Item {
     /* As tall as what it holds.
      *
      * The rows are as tall as the controls standing in them, the strip is as
-     * tall as its rows and its own padding, and this is as tall as the strip
-     * and the inset it is held off the edges by. No row height is stated
-     * anywhere along that chain: hide both rows and the whole thing closes
-     * up to nothing by itself.
+     * tall as its rows and its own padding, and this is as tall as whichever
+     * of its children are showing. No height is stated anywhere along that
+     * chain: hide everything and the whole thing closes up to nothing by
+     * itself, because a layout leaves out what is not visible.
      *
-     * Nothing assigns 'height', so it follows implicitHeight the way any
-     * item's does.
+     * Nothing assigns 'height', so it follows the implicitHeight the layout
+     * works out, the way any item's does.
      */
-    implicitHeight: separator.height + container.height
-    // implicitHeight: container.height > 0 ? container.height + 2 * root.inset : 0
 
     // DebugRect {}
 
@@ -131,19 +137,21 @@ Item {
      *
      * It is drawn in the first pixel the strip owns, not in the last one of
      * the row above, so that nothing of ours reaches into a row the
-     * windowing system still considers its own. The rows start below it --
-     * see the anchor on container -- so it takes its own space rather than
-     * covering theirs, and it goes when the strip does: with no strip there
-     * is no boundary left to mark.
+     * windowing system still considers its own. Being first in the stack, it
+     * takes its own space rather than covering the rows'.
+     *
+     * It stays when the rows are hidden. What it marks is the foot of the
+     * title bar row, and that row is there with or without them; the strip
+     * merely happens to be the usual thing on the other side of it.
      */
     Rectangle {
 
         id: separator
 
-        anchors { left: parent.left; right: parent.right; top: parent.top }
-        height: visible ? 1 : 0
+        Layout.fillWidth: true
+        Layout.preferredHeight: 1
 
-        visible: Preferences.titleBar === 0 && root.toolbarVisible
+        visible: Preferences.titleBar === 0
         color: Qt.alpha(Palette.background, 0.5)
     }
 
@@ -151,17 +159,12 @@ Item {
 
         id: container
 
-        anchors {
-
-            left: parent.left
-            right: parent.right
-            top: separator.bottom
-            leftMargin: root.inset
-            rightMargin: root.inset
-        }
+        Layout.fillWidth: true
+        Layout.leftMargin: root.inset
+        Layout.rightMargin: root.inset
 
         // Its rows, plus the padding it holds them off its own edges by.
-        height: layout.implicitHeight > 0 ? layout.implicitHeight + 2 * root.padding : 0
+        Layout.preferredHeight: layout.implicitHeight + 2 * root.padding
 
         visible: root.toolbarVisible
 
