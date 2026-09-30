@@ -112,6 +112,10 @@ class SiAmController : public Controller {
     bool m_joy_right = false;
     bool m_joy_fire  = false;
 
+    // Last joystick state seen per port (up, down, left, right, fire), used to
+    // forward only the changes to the core
+    bool m_joy_prev[2][5] = {};
+
     // Sampled once per rendered frame (see update()) rather than read
     // straight off the core, so the status bar's warp icon gets a change
     // notification instead of having to poll.

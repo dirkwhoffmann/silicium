@@ -1015,7 +1015,31 @@ SiAmController::mouseButton(int port, u64 timestamp, int button, bool down)
 void
 SiAmController::joystickMotionEvent(int port, u64 timestamp, bool state[5])
 {
-    // The state is ordered up, down, left, right, fire
+    // The state is ordered up, down, left, right, fire. Only changes are
+    // forwarded: pressing fire again would toggle autofire, for example.
+    if (port == 0 || port == 1) {
+
+        auto &joystick = port == 0 ? core().controlPort1.joystick : core().controlPort2.joystick;
+        auto *prev = m_joy_prev[port];
+
+        if (state[0] != prev[0] || state[1] != prev[1]) {
+
+            joystick.trigger(state[0] ? GamePadAction::PULL_UP :
+                             state[1] ? GamePadAction::PULL_DOWN : GamePadAction::RELEASE_Y);
+        }
+        if (state[2] != prev[2] || state[3] != prev[3]) {
+
+            joystick.trigger(state[2] ? GamePadAction::PULL_LEFT :
+                             state[3] ? GamePadAction::PULL_RIGHT : GamePadAction::RELEASE_X);
+        }
+        if (state[4] != prev[4]) {
+
+            joystick.trigger(state[4] ? GamePadAction::PRESS_FIRE : GamePadAction::RELEASE_FIRE);
+        }
+        std::copy(state, state + 5, prev);
+    }
+
+    // Record the state for the dev panel
     setJoyUp(state[0]);
     setJoyDown(state[1]);
     setJoyLeft(state[2]);
