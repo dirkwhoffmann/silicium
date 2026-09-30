@@ -6,7 +6,8 @@ MenuBarItem {
 
     id: root
 
-    implicitHeight: 26
+    // Same height as NavTextButtonFlat, so both line up in the toolbar row
+    implicitHeight: 28
     topPadding: 0
     bottomPadding: 0
     leftPadding: Style.mediumSpacing
