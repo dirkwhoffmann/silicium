@@ -33,11 +33,16 @@ import Silicium.Theme
  *   allows the user to switch between the toolbar and the menu strip.
  */
 
-ColumnLayout {
+Rectangle {
 
     id: root
 
-    spacing: 0
+    color: root.commandBarBg
+    implicitHeight: content.implicitHeight
+
+    // Content
+    property alias menuContent: menuSlot.data
+    property alias toolbarContent: toolbarSlot.data
 
     // Visual style
     required property bool overlayed
@@ -63,159 +68,116 @@ ColumnLayout {
         root.overlayed ? Qt.alpha(Palette.toolbar, 0.9) : Palette.toolbar
 
     readonly property color titleBarBg: root.unified
-        ? commandBarBg
+        ? "transparent"
         : Palette.background
-
-    // What each row holds, after the compact-mode button: an item, parented
-    // into that row, filling whatever it does not already use.
-    property alias menuContent: menuSlot.data
-    property alias toolbarContent: toolbarSlot.data
-
-    // How far the strip is held off the edges of the space it was given, and
-    // how far its rows are held off its own edges.
-    readonly property real inset: 0 // Style.mediumSpacing
-    readonly property real padding: Style.smallSpacing //  mediumSpacing
 
     //
     // Main
     //
 
-    //
-    // Title bar
-    //
+    ColumnLayout {
 
-    Rectangle {
+        id: content
 
-        id: titleRow
+        anchors { left: parent.left; right: parent.right; top: parent.top }
+        spacing: 0
 
-        Layout.fillWidth: true
-        Layout.preferredHeight: root.titleBarInset
-
-        color: root.titleBarBg
-    }
-
-    //
-    // Separator line
-    //
-
-    Rectangle {
-
-        id: separator
-
-        Layout.fillWidth: true
-        Layout.preferredHeight: 1
-
-        visible: !root.unified
-        color: Qt.alpha(root.commandBarBg, 0.5)
-    }
-
-    //
-    // Command bar
-    //
-
-    Rectangle {
-
-        id: band
-
-        Layout.fillWidth: true
-        Layout.preferredHeight: container.height
-
-        visible: !root.hidden
-        color: root.commandBarBg
+        //
+        // Title bar
+        //
 
         Rectangle {
 
-            id: container
+            id: titleRow
 
-            color: "transparent"
+            Layout.fillWidth: true
+            Layout.preferredHeight: root.titleBarInset
 
-            anchors {
+            color: root.titleBarBg
+        }
 
-                left: parent.left
-                right: parent.right
-                top: parent.top
-                leftMargin: root.inset
-                rightMargin: root.inset
+        //
+        // Separator line
+        //
+
+        Rectangle {
+
+            id: separator
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: 1
+
+            visible: !root.unified
+            color: Qt.alpha(root.commandBarBg, 0.5)
+        }
+
+        //
+        // Menu row
+        //
+
+        RowLayout {
+
+            id: menuRow
+
+            Layout.fillWidth: true
+            visible: root.showMenu
+            spacing: 0
+
+            NavTextButtonFlat {
+
+                visible: root.compact
+                phosphor: "list"
+                text: qsTr("Show Toolbar")
+                onClicked: root.menuSwitch = 1
             }
 
-            // Its rows, plus the padding it holds them off its own edges by.
-            height: layout.implicitHeight + 2 * root.padding
+            NavDivider {
 
-            ColumnLayout {
+                visible: root.compact
+            }
 
-                id: layout
+            Item {
 
-                anchors.fill: parent
-                anchors.margins: root.padding
-                spacing: 0
+                id: menuSlot
 
-                RowLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                implicitHeight: children.length > 0 ? children[0].implicitHeight : 0
+            }
+        }
 
-                    Layout.fillWidth: true
-                    visible: root.showMenu
-                    spacing: 0
+        //
+        // Toolbar row
+        //
 
-                    NavTextButtonFlat {
+        RowLayout {
 
-                        visible: root.compact
-                        phosphor: "list"
-                        text: qsTr("Show Toolbar")
-                        onClicked: root.menuSwitch = 1
-                    }
+            id: toolbarRow
 
-                    NavDivider {
+            Layout.fillWidth: true
+            visible: root.showToolbar
+            spacing: 0
 
-                        visible: root.compact
-                    }
+            NavTextButtonFlat {
 
-                    Item {
+                visible: root.compact
+                phosphor: "list"
+                text: qsTr("Show Menu")
+                onClicked: root.menuSwitch = 0
+            }
 
-                        id: menuSlot
+            NavDivider {
 
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
+                visible: root.compact
+            }
 
-                        // The content fills this, so its own height says nothing
-                        // about how tall the row wants to be. Its implicit
-                        // height does, so that is what gets passed up.
-                        implicitHeight: children.length > 0
-                                        ? children[0].implicitHeight : 0
-                    }
-                }
+            Item {
 
-                RowLayout {
+                id: toolbarSlot
 
-                    Layout.fillWidth: true
-                    visible: root.showToolbar
-                    spacing: 0
-
-                    NavTextButtonFlat {
-
-                        visible: root.compact
-                        phosphor: "list"
-                        text: qsTr("Show Menu")
-                        onClicked: root.menuSwitch = 0
-                    }
-
-                    NavDivider {
-
-                        visible: root.compact
-                    }
-
-                    Item {
-
-                        id: toolbarSlot
-
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-
-                        // The content fills this, so its own height says nothing
-                        // about how tall the row wants to be. Its implicit
-                        // height does, so that is what gets passed up.
-                        implicitHeight: children.length > 0
-                                        ? children[0].implicitHeight : 0
-                    }
-                }
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                implicitHeight: children.length > 0 ? children[0].implicitHeight : 0
             }
         }
     }
