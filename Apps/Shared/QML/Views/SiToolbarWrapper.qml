@@ -33,11 +33,11 @@ import Silicium.Theme
  *   to switch between the toolbar and the menu strip.
  */
 
-Rectangle {
+Item {
 
     id: root
 
-    color: root.commandBarBg
+    // color: root.commandBarBg
     implicitHeight: content.implicitHeight
 
     // Content
@@ -60,17 +60,27 @@ Rectangle {
     property int menuSwitch: 0
 
     // Computed properties
+    readonly property bool showTitleBar: !root.hidden || !root.unified
     readonly property bool showMenu: !root.hidden && (!root.compact || menuSwitch === 0)
     readonly property bool showToolbar: !root.hidden && (!root.compact || menuSwitch === 1)
 
     // Colors
+    readonly property real alpha: root.overlay ? 0.85 : 1.0
+    readonly property color commandBarBg: Palette.toolbar
+    readonly property color titleBarBg: root.unified ? Palette.toolbar : Palette.background
+
+    // readonly property color titleBarOverlayBg: root.unified ? Qt.alpha(titleBarAttachedBg, 0.85)
+
+    /*
     readonly property color commandBarBg: root.hidden ?
         "transparent" :
         root.overlayed ? Qt.alpha(Palette.toolbar, 0.85) : Palette.toolbar
 
-    readonly property color titleBarBg: root.unified
-        ? "transparent"
+    readonly property color titleBarBg: (root.unified && !root.hidden)
+        ? commandBarBg :
+        "transparent"
         : Palette.background
+    */
 
     //
     // Main
@@ -94,7 +104,7 @@ Rectangle {
             Layout.fillWidth: true
             Layout.preferredHeight: root.titleBarInset
 
-            color: root.titleBarBg
+            color: showTitleBar ? Qt.alpha(root.titleBarBg, root.alpha) : "transparent"
 
             Row {
 
@@ -127,34 +137,41 @@ Rectangle {
         // Menu row
         //
 
-        RowLayout {
+        Rectangle {
 
-            id: menuRow
-
-            Layout.fillWidth: true
             visible: root.showMenu
-            spacing: 0
+            color: Qt.alpha(root.commandBarBg, root.alpha)
+            Layout.fillWidth: true
+            implicitHeight: menuRow.implicitHeight
 
-            NavTextButtonFlat {
+            RowLayout {
 
-                visible: root.compact
-                phosphor: "list"
-                text: qsTr("Show Toolbar")
-                onClicked: root.menuSwitch = 1
-            }
-
-            NavDivider {
-
-                visible: root.compact
-            }
-
-            Item {
-
-                id: menuSlot
-
+                id: menuRow
                 Layout.fillWidth: true
-                Layout.fillHeight: true
-                implicitHeight: children.length > 0 ? children[0].implicitHeight : 0
+
+                spacing: 0
+
+                NavTextButtonFlat {
+
+                    visible: root.compact
+                    phosphor: "list"
+                    text: qsTr("Show Toolbar")
+                    onClicked: root.menuSwitch = 1
+                }
+
+                NavDivider {
+
+                    visible: root.compact
+                }
+
+                Item {
+
+                    id: menuSlot
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    implicitHeight: children.length > 0 ? children[0].implicitHeight : 0
+                }
             }
         }
 
@@ -162,34 +179,39 @@ Rectangle {
         // Toolbar row
         //
 
-        RowLayout {
+        Rectangle {
 
-            id: toolbarRow
-
-            Layout.fillWidth: true
             visible: root.showToolbar
-            spacing: 0
+            color: Qt.alpha(root.commandBarBg, root.alpha)
+            Layout.fillWidth: true
+            implicitHeight: toolbarRow.implicitHeight
 
-            NavTextButtonFlat {
+            RowLayout {
 
-                visible: root.compact
-                phosphor: "list"
-                text: qsTr("Show Menu")
-                onClicked: root.menuSwitch = 0
-            }
+                id: toolbarRow
+                spacing: 0
 
-            NavDivider {
+                NavTextButtonFlat {
 
-                visible: root.compact
-            }
+                    visible: root.compact
+                    phosphor: "list"
+                    text: qsTr("Show Menu")
+                    onClicked: root.menuSwitch = 0
+                }
 
-            Item {
+                NavDivider {
 
-                id: toolbarSlot
+                    visible: root.compact
+                }
 
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                implicitHeight: children.length > 0 ? children[0].implicitHeight : 0
+                Item {
+
+                    id: toolbarSlot
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    implicitHeight: children.length > 0 ? children[0].implicitHeight : 0
+                }
             }
         }
     }

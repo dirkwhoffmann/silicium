@@ -24,45 +24,22 @@ ApplicationWindow {
     readonly property bool unified: Preferences.titleBar === 1
     readonly property bool compact: Preferences.menuStyle === 1
 
+    readonly property real titleBarInset: contentItem.SafeArea.margins.top
+
     visible: true
     width: 800
     height: 600
     minimumWidth: 400
     minimumHeight: 300
 
-    // Nothing but the toggle stands in the title bar row once the chrome is
-    // hidden, and a name floating over the picture on its own reads as a
-    // caption on it rather than as the window's. What the row is filled with
-    // goes the same way -- see the rectangle that paints it.
-    title: root.toolbarVisible ? "SiAmiga" : ""
+    // title: root.toolbarVisible ? "SiAmiga" : ""
+    title: toolbar.showTitleBar ? "SiAmiga" : ""
     color: "black"
 
-    /* The title bar row belongs to us, always.
-     *
-     * ExpandedClientAreaHint hands us the whole window frame to draw on
-     * (NSWindowStyleMaskFullSizeContentView on macOS) and
-     * NoTitleBarBackgroundHint takes the title bar's own backdrop away, so
-     * what shows up there is ours to paint -- which is what lets the chrome
-     * toggle sit up there whichever way the chrome is arranged. Unlike
-     * FramelessWindowHint this keeps the window buttons, the drag region and
-     * the name the windowing system writes in the row. Neither flag needs a
-     * platform #ifdef: where the window manager cannot honour them they are
-     * ignored, and titleBarInset below then reports nothing to work around.
-     */
+    // Window flags
     flags: Qt.Window | Qt.ExpandedClientAreaHint | Qt.NoTitleBarBackgroundHint
 
-    /* An ApplicationWindow is a Control, and a Control insets its own
-     * contentItem by the safe area. Dropping the padding hands the whole
-     * window to contentItem and leaves the figure itself readable below, so
-     * each item decides for itself whether to honour it -- the picture does
-     * not, the toolbar does.
-     */
     topPadding: 0
-
-    // The row the title bar would have been, which is now ours to draw in.
-    // Nothing at all on a platform that would not hand it over.
-    readonly property real titleBarInset: contentItem.SafeArea.margins.top
-
 
     Palette.appearance: Preferences.appearance
     Palette.theme: Preferences.colorTheme
@@ -71,12 +48,15 @@ ApplicationWindow {
 
         id: canvas
 
-        // Overlaid, it runs the full height of the window, title bar row and
-        // all. Attached, it starts below the strip -- which begins at the top
-        // of the window and takes the title bar row in -- so that no part of
-        // it is ever covered.
+        // Overlaid, it runs the full height of the window: title bar row,
+        // strip and status bar all lie over it. Attached, it stops short of
+        // each of them -- the strip begins at the top of the window and takes
+        // the title bar row in, the status bar sits on the bottom edge -- so
+        // that no part of it is ever covered.
         anchors.fill: parent
-        anchors.topMargin: root.overlaid ? 0 : toolbar.y + toolbar.height
+        anchors.topMargin: root.overlayed ? 0 : toolbar.y + toolbar.height
+        anchors.bottomMargin: root.overlayed || !statusbar.visible
+                              ? 0 : statusbar.height
 
         controller: root.amiga
     }
@@ -419,7 +399,7 @@ ApplicationWindow {
 
                 symbol: "page_header"
                 color: Palette.secondary
-                background: Rectangle { color: "#20000000"; radius: height / 2 }
+                background: Rectangle { color: Qt.alpha(Palette.background, 0.5); radius: height / 2 }
 
                 onClicked: root.toolbarVisible = !root.toolbarVisible
             },
@@ -430,7 +410,7 @@ ApplicationWindow {
 
                 symbol: "page_footer"
                 color: Palette.secondary
-                background: Rectangle { color: "#20000000"; radius: height / 2 }
+                background: Rectangle { color: Qt.alpha(Palette.background, 0.5); radius: height / 2 }
 
                 onClicked: root.statusBarVisible = !root.statusBarVisible
             }
@@ -463,12 +443,28 @@ ApplicationWindow {
         }
     }
 
-    footer: SiAmStatusbar {
+    /* The status bar, arranged the way the chrome at the top is.
+     *
+     * Anchored to the bottom edge rather than handed to 'footer:', because a
+     * footer reserves a slot of its own below the content area and so can
+     * only ever be attached. Sitting in the content area instead lets the
+     * same item be either: overlaid, the picture runs on beneath it and it
+     * takes the strip's fill, translucent like the strip; attached, the
+     * picture stops above it (see the canvas) and it is filled outright.
+     *
+     * Which of the two is not this bar's decision any more than it was the
+     * strip's -- it is the same preference, read once at the top of the file.
+     */
+    SiAmStatusbar {
 
         id: statusbar
-        amiga: root.amiga
 
         visible: root.statusBarVisible
+        anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+        z: 10
+
+        amiga: root.amiga
+        color: root.overlayed ? Qt.alpha(Palette.toolbar, 0.85) : Palette.toolbar
     }
 
     SiAmConfigWindow {
