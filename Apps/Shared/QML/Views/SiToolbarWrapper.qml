@@ -31,10 +31,19 @@ import Silicium.Theme
  * Each goes into a row of its own, after whatever that row already carries,
  * and fills what is left of it.
  *
- * Where the strip sits is the window's business, not this component's: a
- * window that has taken over its title bar row starts it below that row, and
- * an ordinary one has nothing to allow for. So callers anchor it themselves
- * and this only ever settles its own height.
+ * The whole of the chrome's look is settled here, the title bar row included.
+ * A window that has taken over that row says how deep it is and leaves the
+ * rest alone:
+ *
+ *     SiToolbarWrapper {
+ *         anchors { top: parent.top; left: parent.left; right: parent.right }
+ *         titleBarInset: window.titleBarInset
+ *     }
+ *
+ * so the strip reaches from the top of the window down, covering the row on
+ * its way, and what colour any of it comes out is nothing the window needs an
+ * opinion about. Where it sits and how far across it goes stay the caller's:
+ * it anchors the thing and this only ever settles its own height.
  *
  * It is a layout rather than a plain item because everything in it is stacked:
  * the separator, then the strip, then inside that the two rows. Stating that
@@ -50,6 +59,17 @@ ColumnLayout {
 
     // The single switch for the whole strip: when false, neither row shows.
     property bool toolbarVisible: true
+
+    /* How deep the row the windowing system would have put the title in is,
+     * which only the window can know (it reads it off the safe area). Nothing
+     * of ours goes in it -- the window draws the one thing that does -- but
+     * the strip covers it, so that the row and what is under it are painted
+     * by the same hand and cannot come out looking like two decisions.
+     *
+     * Zero where the window kept its title bar, and then the strip simply
+     * starts at its own top edge.
+     */
+    property real titleBarInset: 0
 
     /* Compact mode: only one row at a time, the menu or the icons, swapped
      * by a button at the near end of whichever row is showing. Both the
@@ -127,6 +147,28 @@ ColumnLayout {
     // Main
     //
 
+    /* Paints the title bar row.
+     *
+     * The windowing system has stopped putting a backdrop there, so the row
+     * would otherwise show whatever is behind it, and what goes in it is the
+     * user's choice -- see titleBarFill above.
+     *
+     * With the chrome hidden it paints nothing. There is no strip left for
+     * the row to belong to, so a band of colour across the top would be
+     * chrome standing on its own; clearing it hands the row back to whatever
+     * is behind, which is the picture when the strip is laid over it and the
+     * window's own background when it is not.
+     */
+    Rectangle {
+
+        id: titleRow
+
+        Layout.fillWidth: true
+        Layout.preferredHeight: root.titleBarInset
+
+        color: root.toolbarVisible || Preferences.titleBar === 0 ? root.titleBarFill : "transparent"
+    }
+
     /* Sets the strip off from the title bar row above it.
      *
      * Only the standard fill needs it. Unified gives the row and the strip
@@ -135,10 +177,10 @@ ColumnLayout {
      * this makes the boundary deliberate rather than a place where two
      * greys happen to meet.
      *
-     * It is drawn in the first pixel the strip owns, not in the last one of
-     * the row above, so that nothing of ours reaches into a row the
-     * windowing system still considers its own. Being first in the stack, it
-     * takes its own space rather than covering the rows'.
+     * It is drawn below the title bar row rather than in its last pixel, so
+     * that the row comes out exactly as deep as the windowing system said.
+     * Standing in the stack between the row and the strip, it takes its own
+     * space rather than covering either.
      *
      * It stays when the rows are hidden. What it marks is the foot of the
      * title bar row, and that row is there with or without them; the strip
@@ -155,108 +197,133 @@ ColumnLayout {
         color: Qt.alpha(Palette.background, 0.5)
     }
 
+    /* What the strip stands on.
+     *
+     * The strip may be held off the side edges (see inset), and something has
+     * to be behind it where it is. Attached, that is the same fill again, so
+     * the strip and its surround read as one band of chrome with the picture
+     * starting below all of it. Overlaid there is nothing to put there: the
+     * picture runs on underneath and around the strip, which is what makes it
+     * look laid on top.
+     *
+     * With no inset the two coincide and this is simply never seen.
+     */
     Rectangle {
 
-        id: container
+        id: band
 
         Layout.fillWidth: true
-        Layout.leftMargin: root.inset
-        Layout.rightMargin: root.inset
-
-        // Its rows, plus the padding it holds them off its own edges by.
-        Layout.preferredHeight: layout.implicitHeight + 2 * root.padding
+        Layout.preferredHeight: container.height
 
         visible: root.toolbarVisible
+        color: root.seeThrough ? "transparent" : root.fill
 
-        // radius: Style.radius
-        // border.width: 1
-        // border.color: Palette.overlayBorder
+        Rectangle {
 
-        color: root.fill
+            id: container
 
-        ColumnLayout {
+            anchors {
 
-            id: layout
-
-            anchors.fill: parent
-            anchors.margins: root.padding
-            spacing: 0
-
-            /*
-            Rectangle {
-
-                Layout.fillWidth: true
-                height: 2
-                color: "red"
+                left: parent.left
+                right: parent.right
+                top: parent.top
+                leftMargin: root.inset
+                rightMargin: root.inset
             }
 
-             */
+            // Its rows, plus the padding it holds them off its own edges by.
+            height: layout.implicitHeight + 2 * root.padding
 
-            RowLayout {
+            // radius: Style.radius
+            // border.width: 1
+            // border.color: Palette.overlayBorder
 
-                Layout.fillWidth: true
-                visible: root.showMenu
+            color: root.fill
+
+            ColumnLayout {
+
+                id: layout
+
+                anchors.fill: parent
+                anchors.margins: root.padding
                 spacing: 0
 
-                NavTextButtonFlat {
-
-                    visible: root.compactMenu
-                    phosphor: "list"
-                    text: qsTr("Show Toolbar")
-                    onClicked: root.menuRevealed = false
-                }
-
-                NavDivider {
-
-                    visible: root.compactMenu
-                }
-
-                Item {
-
-                    id: menuSlot
+                /*
+                Rectangle {
 
                     Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    // The content fills this, so its own height says nothing
-                    // about how tall the row wants to be. Its implicit
-                    // height does, so that is what gets passed up.
-                    implicitHeight: children.length > 0
-                                    ? children[0].implicitHeight : 0
-                }
-            }
-
-            RowLayout {
-
-                Layout.fillWidth: true
-                visible: root.showToolbar
-                spacing: 0
-
-                NavTextButtonFlat {
-
-                    visible: root.compactMenu
-                    phosphor: "list"
-                    text: qsTr("Show Menu")
-                    onClicked: root.menuRevealed = true
+                    height: 2
+                    color: "red"
                 }
 
-                NavDivider {
+                 */
 
-                    visible: root.compactMenu
-                }
-
-                Item {
-
-                    id: toolbarSlot
+                RowLayout {
 
                     Layout.fillWidth: true
-                    Layout.fillHeight: true
+                    visible: root.showMenu
+                    spacing: 0
 
-                    // The content fills this, so its own height says nothing
-                    // about how tall the row wants to be. Its implicit
-                    // height does, so that is what gets passed up.
-                    implicitHeight: children.length > 0
-                                    ? children[0].implicitHeight : 0
+                    NavTextButtonFlat {
+
+                        visible: root.compactMenu
+                        phosphor: "list"
+                        text: qsTr("Show Toolbar")
+                        onClicked: root.menuRevealed = false
+                    }
+
+                    NavDivider {
+
+                        visible: root.compactMenu
+                    }
+
+                    Item {
+
+                        id: menuSlot
+
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        // The content fills this, so its own height says nothing
+                        // about how tall the row wants to be. Its implicit
+                        // height does, so that is what gets passed up.
+                        implicitHeight: children.length > 0
+                                        ? children[0].implicitHeight : 0
+                    }
+                }
+
+                RowLayout {
+
+                    Layout.fillWidth: true
+                    visible: root.showToolbar
+                    spacing: 0
+
+                    NavTextButtonFlat {
+
+                        visible: root.compactMenu
+                        phosphor: "list"
+                        text: qsTr("Show Menu")
+                        onClicked: root.menuRevealed = true
+                    }
+
+                    NavDivider {
+
+                        visible: root.compactMenu
+                    }
+
+                    Item {
+
+                        id: toolbarSlot
+
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        // The content fills this, so its own height says nothing
+                        // about how tall the row wants to be. Its implicit
+                        // height does, so that is what gets passed up.
+                        implicitHeight: children.length > 0
+                                        ? children[0].implicitHeight : 0
+                    }
                 }
             }
         }

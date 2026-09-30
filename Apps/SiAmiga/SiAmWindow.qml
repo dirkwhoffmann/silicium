@@ -94,65 +94,13 @@ ApplicationWindow {
         id: canvas
 
         // Overlaid, it runs the full height of the window, title bar row and
-        // all. Attached, it starts below the strip -- which is itself below
-        // the title bar row -- so that no part of it is ever covered.
+        // all. Attached, it starts below the strip -- which begins at the top
+        // of the window and takes the title bar row in -- so that no part of
+        // it is ever covered.
         anchors.fill: parent
         anchors.topMargin: root.overlaid ? 0 : toolbar.y + toolbar.height
 
         controller: root.amiga
-    }
-
-    /* Paints the chrome behind the strip, where the picture does not reach.
-     *
-     * Only in the attached arrangement is there any: the strip is inset from
-     * the edges it was given, and the picture starts below all of it, so the
-     * gap around the strip would otherwise show the window's own black.
-     * Filling it with what the strip is filled with makes the strip and its
-     * surround read as one band of chrome. Overlaid there is nothing to
-     * paint -- the picture runs on underneath and around the strip, which is
-     * what makes it look laid on top.
-     *
-     * With the chrome hidden there is likewise nothing to surround. It has
-     * to go rather than merely be covered: it starts at the top of the
-     * window, so anything left of it would show through the title bar row
-     * the moment that row goes transparent.
-     */
-    Rectangle {
-
-        anchors { left: parent.left; right: parent.right; top: parent.top }
-        height: root.overlaid || !root.toolbarVisible ? 0
-                                                      : toolbar.y + toolbar.height
-        z: 4
-
-        color: toolbar.fill
-    }
-
-    /* Paints the title bar row.
-     *
-     * The windowing system has stopped putting a backdrop up there (see the
-     * flags above), so the row would otherwise show whatever is behind it.
-     * What goes in it is the user's choice -- see titleBarFill in
-     * SiToolbarWrapper, which owns both the colours it picks between.
-     *
-     * It is drawn after the band above, and so over it, because in the
-     * attached arrangement the two overlap: the band starts at the top of
-     * the window and this decides what that first stretch of it looks like.
-     * On a platform that kept its title bar to itself the inset is nothing
-     * and this paints nothing.
-     *
-     * With the chrome hidden it paints nothing either. There is no strip for
-     * the row to belong to, so a band of toolbar colour across the top would
-     * be chrome standing on its own; clearing it hands the row back to
-     * whatever is behind -- the picture, overlaid, and the window's own
-     * black when attached.
-     */
-    Rectangle {
-
-        anchors { left: parent.left; right: parent.right; top: parent.top }
-        height: root.titleBarInset
-        z: 4
-
-        color: root.toolbarVisible ? toolbar.titleBarFill : "transparent"
     }
 
     /* Drags the window by what used to be the title bar.
@@ -168,6 +116,10 @@ ApplicationWindow {
      * thing drawn in this row keeps its clicks and the rest of the row
      * moves the window. The window buttons are the windowing system's own
      * and sit above everything, so they keep theirs too.
+     *
+     * The strip covers this row as well, and stands above it, but it puts
+     * nothing there that takes a press -- a plain rectangle lets one through
+     * to whatever is under it -- so the presses still arrive here.
      */
     MouseArea {
 
@@ -486,10 +438,15 @@ ApplicationWindow {
         id: toolbar
 
         anchors.top: parent.top
-        anchors.topMargin: root.titleBarInset
         anchors.left: parent.left
         anchors.right: parent.right
         z: 10
+
+        // It starts at the very top and covers the title bar row itself, so
+        // that the row and the chrome below it are painted by one hand. All
+        // this says is how deep that row is; what goes in it is the strip's
+        // business.
+        titleBarInset: root.titleBarInset
 
         toolbarVisible: root.toolbarVisible
         compactMenu: root.compactMenu
