@@ -15,19 +15,6 @@ import Silicium.Controllers
 import Silicium.Preferences
 import Silicium.Theme
 
-//
-// Port of SiC64Menu.qml for the Amiga. The C64 menu becomes "Amiga"; Edit and
-// View keep the same items, wired via window.actions.xxx (see SiAmActions.qml)
-// the same way SiC64Menu's are. There's no Datasette or Expansion Port on an
-// Amiga, so those menus are dropped; a Keyboard menu is kept, trimmed to what
-// vAmiga's own menu offers (MainMenu.xib has no C64-style "type this string"
-// shortcuts -- there's no BASIC to type into). RetroShell/Logger live in the
-// Debug menu here rather than the Amiga menu (see that menu below). The
-// file-dialog-backed actions the drive/hard-drive menus trigger (New/Insert/
-// Attach/Export...) aren't wired to a window yet -- SiAmWindow.qml has none
-// of that infrastructure built out yet, same as the About window.
-//
-
 SiMenuBar {
 
     id: root
@@ -36,18 +23,10 @@ SiMenuBar {
     required property SiAmWindow window
     readonly property SiAmConfigController config: amiga.configController
 
-    // Emitted by the Amiga menu's "About" item. The window handles the
-    // actual display (see SiAmAbout.qml). The one menu command with no
-    // SiAmActions entry -- see that file's class comment.
-    signal openAbout()
-
-    // Reflects the current visibility of the toolbar (which now includes the
-    // menu row) and the status bar, so the View menu's checkable items can
-    // show the right state. The window owns the actual visibility and
-    // toggles it in response to the signals below.
     property bool toolbarVisible: true
     property bool statusBarVisible: true
 
+    signal openAbout()
     signal toggleToolbar()
     signal toggleStatusBar()
 

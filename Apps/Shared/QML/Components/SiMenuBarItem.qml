@@ -12,10 +12,7 @@ MenuBarItem {
     leftPadding: Style.mediumSpacing
     rightPadding: Style.mediumSpacing
 
-    // MenuBar's own "highlighted" sticks after the pointer leaves, so derive
-    // the state from hover and the item's menu instead.
-    readonly property bool active: root.hovered || root.pressed
-                                   || (root.menu && root.menu.visible)
+    readonly property bool active: root.hovered || root.pressed || (root.menu && root.menu.visible)
 
     contentItem: SiText {
 
@@ -31,9 +28,9 @@ MenuBarItem {
     background: Rectangle {
 
         anchors.fill: parent
-        anchors.margins: 0
-        implicitWidth: 30
-        implicitHeight: 26
+        // anchors.margins: 0
+        // implicitWidth: 30
+        // implicitHeight: 26
         radius: Style.radius
         color: root.active ? Palette.accent : "transparent"
     }
