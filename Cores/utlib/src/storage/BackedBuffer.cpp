@@ -66,10 +66,6 @@ BackedBuffer::init(isize size)
 
     dealloc();
 
-    /* calloc rather than new[]: for a region of this size the allocator asks
-     * the operating system for fresh pages, which are zero already and are not
-     * backed by memory until they are touched.
-     */
     if (size) {
 
         mem = (u8 *)std::calloc(size_t(size), 1);
@@ -92,7 +88,6 @@ BackedBuffer::init(isize size, const fs::path &path, bool readOnly)
     if (!stream.is_open())
         throw IOError(IOError::FILE_CANT_READ, path);
 
-    // Nothing is allowed to fail after the buffer has been given its memory
     init(size);
 
     file = path;

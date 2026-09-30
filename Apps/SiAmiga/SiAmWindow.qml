@@ -32,7 +32,6 @@ ApplicationWindow {
     minimumWidth: 400
     minimumHeight: 300
 
-    // title: root.toolbarVisible ? "SiAmiga" : ""
     title: toolbar.showTitleBar ? "SiAmiga" : ""
     color: "black"
 
@@ -48,37 +47,13 @@ ApplicationWindow {
 
         id: canvas
 
-        // Overlaid, it runs the full height of the window: title bar row,
-        // strip and status bar all lie over it. Attached, it stops short of
-        // each of them -- the strip begins at the top of the window and takes
-        // the title bar row in, the status bar sits on the bottom edge -- so
-        // that no part of it is ever covered.
         anchors.fill: parent
         anchors.topMargin: root.overlayed ? 0 : toolbar.y + toolbar.height
-        anchors.bottomMargin: root.overlayed || !statusbar.visible
-                              ? 0 : statusbar.height
+        anchors.bottomMargin: root.overlayed || !statusbar.visible ? 0 : statusbar.height
 
         controller: root.amiga
     }
 
-    /* Drags the window by what used to be the title bar.
-     *
-     * Moving a window by its title bar is something the frame does, and the
-     * frame is no longer up there -- the picture is, and a content view
-     * keeps the press to itself. So this strip takes the press and hands it
-     * straight back to the window manager, which then runs its own drag,
-     * snapping and all. It covers exactly the inset the safe area asks for,
-     * which is nothing at all on a platform that left the title bar alone.
-     *
-     * It sits above the picture and below the toggle beside it, so the one
-     * thing drawn in this row keeps its clicks and the rest of the row
-     * moves the window. The window buttons are the windowing system's own
-     * and sit above everything, so they keep theirs too.
-     *
-     * The strip covers this row as well, and stands above it, but it puts
-     * nothing there that takes a press -- a plain rectangle lets one through
-     * to whatever is under it -- so the presses still arrive here.
-     */
     MouseArea {
 
         anchors { left: parent.left; right: parent.right; top: parent.top }
@@ -88,12 +63,6 @@ ApplicationWindow {
         onPressed: root.startSystemMove()
     }
 
-    // Click-to-capture-the-mouse handler, mirroring SiC64Window's
-    // CanvasWrapper-provided MouseArea (see its own header comment). Declared
-    // right after the canvas -- and before SiAmDevPanel below -- so it sits
-    // underneath any interactive foreground content and doesn't swallow its
-    // clicks, while SiAmCanvas itself (a plain Rectangle) accepts no mouse
-    // events and lets clicks fall through to here.
     MouseArea {
 
         anchors.fill: canvas
@@ -442,19 +411,7 @@ ApplicationWindow {
             window: root
         }
     }
-
-    /* The status bar, arranged the way the chrome at the top is.
-     *
-     * Anchored to the bottom edge rather than handed to 'footer:', because a
-     * footer reserves a slot of its own below the content area and so can
-     * only ever be attached. Sitting in the content area instead lets the
-     * same item be either: overlaid, the picture runs on beneath it and it
-     * takes the strip's fill, translucent like the strip; attached, the
-     * picture stops above it (see the canvas) and it is filled outright.
-     *
-     * Which of the two is not this bar's decision any more than it was the
-     * strip's -- it is the same preference, read once at the top of the file.
-     */
+    
     SiAmStatusbar {
 
         id: statusbar

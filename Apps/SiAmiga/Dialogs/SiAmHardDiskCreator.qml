@@ -29,19 +29,15 @@ SiDialog {
     readonly property int ofs: 0   // amiga::FSFormat::OFS
     readonly property int ffs: 1   // amiga::FSFormat::FFS
 
-    /* The capacity being asked for, in MB.
-     *
-     * The value the dialog stands behind, which is not the same thing as
-     * what the field says: the field takes any text at all, and only an
-     * edit that has been finished (Return, Tab, or a pick from the list)
-     * turns into a capacity here. Everything else -- the limits, the hint,
-     * the Attach button -- reads this, so a half-typed number never makes
-     * the dialog flicker.
-     */
+    // The capacity being asked for
     property int megabytes: 8
+
+    // Import folder
+    property url importUrl: ""
 
     // Maximum hard-drive capacity
     readonly property int limit: {
+
         switch (root.driveNr) {
             case 0: return root.amiga.configController.HD0_MB_LIMIT
             case 1: return root.amiga.configController.HD1_MB_LIMIT
@@ -51,35 +47,24 @@ SiDialog {
         return 0
     }
 
-    /* A capacity past what the slot accepts.
-     *
-     * commit() turns one away before it gets this far, so this is only ever
-     * true when the limit itself changed while the dialog stood open. It
-     * gates the Attach button, which is the one place that must not take a
-     * capacity the controller would refuse.
-     */
+    // Computed properties
     readonly property bool tooLarge: root.limit > 0 && root.megabytes > root.limit
-
-    // Maximum hard drive size in MB, OFS and FFS can handle
     readonly property bool formattable: root.megabytes <= 4096
     readonly property bool unformattable: root.megabytes > 4096
 
     // Whether a file system is actually going to be created.
+    /*
     readonly property bool formatted:
         fsCombo.currentIndex !== root.nodos && root.formattable
-
-    // Where the drive's initial contents come from, "" for an empty drive.
-    property url importUrl: ""
+    */
 
     width: 520
 
     onOpened: {
 
-        root.megabytes = 8                  // as vAmiga preselects
-        root.showCapacity()
-        fsCombo.currentIndex = 0            // OFS
+        fsCombo.currentIndex = 0
         nameField.text = qsTr("Hdrv")
-        root.importUrl = ""
+        root.refresh()
     }
 
     /* The number in front of whatever the user typed, or 0 for text that
@@ -113,12 +98,12 @@ SiDialog {
         if (mb > 0 && !refused) root.megabytes = mb
 
         // The old value first, so the dialog appears over a settled field
-        root.showCapacity()
+        root.refresh()
         if (refused) capacityRefused.open()
     }
 
     // Puts the field into the shape the list entries have
-    function showCapacity() {
+    function refresh() {
 
         capacityCombo.editText = root.megabytes + " MB"
     }
@@ -221,7 +206,7 @@ SiDialog {
                 model: [qsTr("None"), qsTr("OFS"), qsTr("FFS")]
                 tags: [root.nodos, root.ofs, root.ffs]
                 enabled: root.formattable
-                onActivated: { if (!root.formatted) root.importUrl = "" }
+                // onActivated: { if (!root.formatted) root.importUrl = "" }
             }
 
             SiControl {
@@ -247,8 +232,6 @@ SiDialog {
                 l: qsTr("Files:")
                 lwidth: root.labelWidth
                 opacity: root.formattable && fsCombo.currentIndex !== root.nodos ? 1.0 : 0.0
-                // visible: root.formatted || root.unformattable
-                // enabled: !root.unformattable
 
                 control: [
 

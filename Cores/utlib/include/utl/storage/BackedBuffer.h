@@ -85,11 +85,7 @@ private:
     // The file the contents come from, empty if there is none
     fs::path file;
 
-    /* The file is read as needed and opened for writing only when something
-     * has to be written, so a file that cannot be written is fine for as long
-     * as nobody tries. Reading happens while handing out a view, which is a
-     * const operation, hence the mutable stream.
-     */
+    // File streams
     mutable std::ifstream in;
     std::fstream out;
 
@@ -134,12 +130,6 @@ public:
 
 public:
 
-    /* Gives the buffer a size, and a file to load from.
-     *
-     * Whatever the buffer held before is dropped, unpersisted. Without a file
-     * every byte reads as zero, and persist() has nowhere to write to; with
-     * one, the file must exist and be readable.
-     */
     void init(isize size);
     void init(isize size, const fs::path &path, bool readOnly = false);
 
