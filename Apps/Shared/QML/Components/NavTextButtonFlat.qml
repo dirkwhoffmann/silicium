@@ -26,7 +26,7 @@ AbstractButton {
      * taller.
      */
     Layout.preferredWidth: 32
-    Layout.preferredHeight: 28
+    Layout.preferredHeight: Style.barItemHeight
     Layout.fillHeight: true
     padding: 0
 
@@ -39,7 +39,7 @@ AbstractButton {
         opacity: 0.8
 
         color: !control.enabled ? Palette.disabled
-            : control.active   ? Palette.accentText
+            : control.active ? Palette.accentText
                 : Palette.primary
     }
 
@@ -51,7 +51,7 @@ AbstractButton {
         // around it, on all four sides.
         anchors.fill: parent
         anchors.margins: 0
-        radius: 0 // Style.radius
+        radius: Style.radius
 
         color: control.enabled && control.active ? Palette.accent : "transparent"
         border.color: "black"

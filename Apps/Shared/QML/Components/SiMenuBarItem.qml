@@ -7,7 +7,7 @@ MenuBarItem {
     id: root
 
     // Same height as NavTextButtonFlat, so both line up in the toolbar row
-    implicitHeight: 28
+    implicitHeight: Style.barItemHeight
     topPadding: 0
     bottomPadding: 0
     leftPadding: Style.mediumSpacing
@@ -29,9 +29,6 @@ MenuBarItem {
     background: Rectangle {
 
         anchors.fill: parent
-        // anchors.margins: 0
-        // implicitWidth: 30
-        // implicitHeight: 26
         radius: Style.radius
         color: root.active ? Palette.accent : "transparent"
     }

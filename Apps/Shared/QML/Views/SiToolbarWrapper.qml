@@ -156,19 +156,15 @@ Item {
 
                 NavTextButtonFlat {
 
-                    Layout.alignment: Qt.AlignVCenter
                     visible: root.compact
                     phosphor: "list"
                     text: qsTr("Show Toolbar")
                     onClicked: root.menuSwitch = 1
-
-                    DebugRect {}
                 }
 
                 NavDivider {
 
                     visible: root.compact
-                    Layout.alignment: Qt.AlignVCenter
                 }
 
                 Item {
@@ -177,12 +173,7 @@ Item {
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.alignment: Qt.AlignVCenter
 
-                    // DebugRect {}
-                    // Follows the tallest child's implicit height. Bound
-                    // explicitly when children arrive, as the content is
-                    // injected after this item has been created.
                     onChildrenChanged: {
 
                         implicitHeight = Qt.binding(() =>
@@ -228,9 +219,7 @@ Item {
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    // Follows the tallest child's implicit height. Bound
-                    // explicitly when children arrive, as the content is
-                    // injected after this item has been created.
+
                     onChildrenChanged: {
 
                         implicitHeight = Qt.binding(() =>

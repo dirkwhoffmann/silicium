@@ -42,7 +42,8 @@ QtObject {
     readonly property int iconHuge: 60
     readonly property int iconEpic: 96
 
-    readonly property int toolbarHeight: 22
+    // Height of one item in the command bar (menu bar item, toolbar button)
+    readonly property int barItemHeight: 28
     readonly property int fontSize: 16
 
     //
