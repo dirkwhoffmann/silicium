@@ -12,13 +12,18 @@ MenuBarItem {
     leftPadding: Style.mediumSpacing
     rightPadding: Style.mediumSpacing
 
+    // MenuBar's own "highlighted" sticks after the pointer leaves, so derive
+    // the state from hover and the item's menu instead.
+    readonly property bool active: root.hovered || root.pressed
+                                   || (root.menu && root.menu.visible)
+
     contentItem: SiText {
 
         // Strip the "&" mnemonic marker -- macOS menus don't show underlined
         // accelerators, so there's nothing useful to render it as.
         text: root.text.replace(/&/g, "")
         font.pixelSize: Style.regular
-        color: root.highlighted || root.pressed ? Palette.accentText : Palette.primary
+        color: root.active ? Palette.accentText : Palette.primary
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
     }
@@ -30,6 +35,6 @@ MenuBarItem {
         implicitWidth: 30
         implicitHeight: 26
         radius: Style.radius
-        color: root.pressed || root.highlighted ? Palette.accent : "transparent"
+        color: root.active ? Palette.accent : "transparent"
     }
 }
