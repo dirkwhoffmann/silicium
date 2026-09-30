@@ -12,25 +12,25 @@ import QtQuick.Layouts
 import Silicium.Preferences
 import Silicium.Theme
 
-/* This component embeds the title bar and the command bar (the toolbar and the
+/* This component embeds the title bar and the command bar (the toolbar and
  * menu strip). Its appearance is controlled by three major options:
  *
  * overlayed:
  *
- *   If true, the command bar is drawn on top of the canvas with a
- *   subtle transparany effect. If false, the command bar is drawn solid, above
- *   the canvas.
+ *   If true, the command bar is drawn on top of the canvas with a subtle
+ *   transparency effect. If false, the command bar is drawn as a solid bar
+ *   above the canvas.
  *
  * unified:
  *
- *   If true, the title bar and the command bar are drawn as a visually unified
- *   object. When the command bar hides, the title bar hides, too.
+ *   If true, the title bar and command bar are drawn as a visually unified
+ *   element. When the command bar is hidden, the title bar is hidden as well.
  *
  * compact:
  *
- *   If true, the command bar appears as single line of items, either showing
- *   the toolbar items or the menu strip. An additions icon is shown that
- *   allows the user to switch between the toolbar and the menu strip.
+ *   If true, the command bar appears as a single line of items, showing either
+ *   the toolbar items or the menu strip. An additional icon allows the user
+ *   to switch between the toolbar and the menu strip.
  */
 
 Rectangle {
@@ -65,7 +65,7 @@ Rectangle {
     // Colors
     readonly property color commandBarBg: root.hidden ?
         "transparent" :
-        root.overlayed ? Qt.alpha(Palette.toolbar, 0.9) : Palette.toolbar
+        root.overlayed ? Qt.alpha(Palette.toolbar, 0.85) : Palette.toolbar
 
     readonly property color titleBarBg: root.unified
         ? "transparent"
