@@ -15,20 +15,6 @@ import Silicium.Controllers
 import Silicium.Preferences
 import Silicium.Theme
 
-/* What the icon row holds.
- *
- * Only its contents: the strip's height, which of its rows are on show, what
- * it is filled with and the compact-mode button that swaps the rows over all
- * belong to the SiToolbarWrapper this is handed to, which is the same for
- * every emulator. The menu row is SiAmMenu, handed to the same wrapper
- * alongside this one.
- *
- * Port of SiC64Toolbar.qml, trimmed the same way SiAmMenu.qml was trimmed
- * relative to SiC64Menu.qml: the workspace/snapshot save/load buttons aren't
- * wired to anything because that subsystem doesn't exist in SiAmiga yet.
- * Every other button is wired via root.window.actions (see SiAmActions.qml),
- * same as SiC64Toolbar's window.actions.* calls.
- */
 Item {
 
     id: root

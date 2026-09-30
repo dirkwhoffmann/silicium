@@ -442,15 +442,14 @@ ApplicationWindow {
         anchors.right: parent.right
         z: 10
 
-        // It starts at the very top and covers the title bar row itself, so
-        // that the row and the chrome below it are painted by one hand. All
-        // this says is how deep that row is; what goes in it is the strip's
-        // business.
+        // Visual style
+        overlayed: Preferences.menuType === 1
+        unified: Preferences.titleBar === 1
+        compact: Preferences.menuStyle === 1
+        hidden: !root.toolbarVisible
+
         titleBarInset: root.titleBarInset
 
-        toolbarVisible: root.toolbarVisible
-        compactMenu: root.compactMenu
-        
         menuContent: SiAmMenu {
 
             anchors.fill: parent
