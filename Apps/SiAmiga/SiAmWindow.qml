@@ -16,48 +16,26 @@ ApplicationWindow {
 
     property bool toolbarVisible: true
     property bool statusBarVisible: true
-
-    // Set once the machine has been put away and the app is on its way out,
-    // so the close this window asks for a second time is let through.
     property bool shutdownInProgress: false
-
-    // Whether the Logger overlay is showing, mirroring SiC64Window's own
-    // loggerOpen -- RetroShell has its own visibility on SiAmController
-    // (amiga.retroShell) since, unlike the Logger, other things also care
-    // whether it's open (e.g. a future physical-keyboard passthrough would
-    // need to stop routing keys to the emulator while it's up). The two are
-    // mutually exclusive -- see the toolbar's RetroShell/Logger buttons.
     property bool loggerOpen: false
+    // readonly property bool compactMenu: Preferences.menuStyle === 1
 
-    // Compact-menu mode (JetBrains style): the menu bar stays hidden and the
-    // toolbar shows a hamburger button instead. SiAmToolbar owns which row is
-    // currently revealed; this only says whether the mode is on. SiC64 gets
-    // the same binding from VMWindow, which this window does not derive from.
-    readonly property bool compactMenu: Preferences.menuStyle === 1
+    readonly property bool overlayed: Preferences.menuType === 1
+    readonly property bool unified: Preferences.titleBar === 1
+    readonly property bool compact: Preferences.menuStyle === 1
 
     visible: true
     width: 800
     height: 600
     minimumWidth: 400
     minimumHeight: 300
+
     // Nothing but the toggle stands in the title bar row once the chrome is
     // hidden, and a name floating over the picture on its own reads as a
     // caption on it rather than as the window's. What the row is filled with
     // goes the same way -- see the rectangle that paints it.
     title: root.toolbarVisible ? "SiAmiga" : ""
     color: "black"
-
-    /* The two ways of arranging the chrome (Preferences.menuType).
-     *
-     * Attached keeps the picture clear of the chrome: the menu and toolbar
-     * have a strip of their own and the picture starts below it. Overlaid
-     * lets the picture fill the window and lays the strip over it, in the
-     * same place it would otherwise have been.
-     *
-     * The title bar row is ours either way -- see the flags below -- so this
-     * decides only what happens underneath it.
-     */
-    readonly property bool overlaid: Preferences.menuType === 1
 
     /* The title bar row belongs to us, always.
      *
@@ -128,22 +106,6 @@ ApplicationWindow {
         z: 5
 
         onPressed: root.startSystemMove()
-    }
-
-    // Hides and shows the menu and toolbar
-    SiSymbolButton {
-
-        id: chromeToggle
-
-        anchors.right: parent.right
-        anchors.rightMargin: Style.mediumSpacing
-        y: (root.titleBarInset - height) / 2
-        z: 20
-        phosphor: "list"
-        color: "white" // "#888888"
-        background: Rectangle { color: "#20000000"; radius: height / 2 }
-
-        onClicked: root.toolbarVisible = !root.toolbarVisible
     }
 
     // Click-to-capture-the-mouse handler, mirroring SiC64Window's
@@ -442,13 +404,37 @@ ApplicationWindow {
         anchors.right: parent.right
         z: 10
 
-        // Visual style
-        overlayed: Preferences.menuType === 1
-        unified: Preferences.titleBar === 1
-        compact: Preferences.menuStyle === 1
+        overlayed: root.overlayed
+        unified: root.unified
+        compact: root.compact
         hidden: !root.toolbarVisible
 
         titleBarInset: root.titleBarInset
+
+        titleBarContent: [
+
+            SiSymbolButton {
+
+                id: chromeToggle
+
+                symbol: "page_header"
+                color: Palette.secondary
+                background: Rectangle { color: "#20000000"; radius: height / 2 }
+
+                onClicked: root.toolbarVisible = !root.toolbarVisible
+            },
+
+            SiSymbolButton {
+
+                id: statusBarToggle
+
+                symbol: "page_footer"
+                color: Palette.secondary
+                background: Rectangle { color: "#20000000"; radius: height / 2 }
+
+                onClicked: root.statusBarVisible = !root.statusBarVisible
+            }
+        ]
 
         menuContent: SiAmMenu {
 

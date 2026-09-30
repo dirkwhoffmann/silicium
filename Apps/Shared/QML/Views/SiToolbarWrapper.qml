@@ -43,6 +43,7 @@ Rectangle {
     // Content
     property alias menuContent: menuSlot.data
     property alias toolbarContent: toolbarSlot.data
+    property alias titleBarContent: titleBarSlot.data
 
     // Visual style
     required property bool overlayed
@@ -94,6 +95,17 @@ Rectangle {
             Layout.preferredHeight: root.titleBarInset
 
             color: root.titleBarBg
+
+            Row {
+
+                id: titleBarSlot
+
+                anchors.right: parent.right
+                anchors.rightMargin: Style.mediumSpacing
+                anchors.verticalCenter: parent.verticalCenter
+
+                spacing: Style.smallSpacing
+            }
         }
 
         //
