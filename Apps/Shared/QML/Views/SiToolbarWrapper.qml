@@ -60,7 +60,7 @@ ColumnLayout {
     // Colors
     readonly property color commandBarBg: root.hidden ?
         "transparent" :
-        root.overlayed ? "red" : "blue" // Qt.alpha(Palette.toolbar, 0.9) : Palette.toolbar
+        root.overlayed ? Qt.alpha(Palette.toolbar, 0.9) : Palette.toolbar
 
     readonly property color titleBarBg: root.unified
         ? commandBarBg
@@ -121,11 +121,13 @@ ColumnLayout {
         Layout.preferredHeight: container.height
 
         visible: !root.hidden
-        color: "green" // root.commandBarBg
+        color: root.commandBarBg
 
         Rectangle {
 
             id: container
+
+            color: "transparent"
 
             anchors {
 
