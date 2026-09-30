@@ -885,11 +885,114 @@ SiAmController::capsLock(bool state)
 }
 
 void
+SiAmController::setDx(float value)
+{
+    if (m_dx != value) {
+
+        m_dx = value;
+        emit dxChanged();
+    }
+}
+
+void
+SiAmController::setDy(float value)
+{
+    if (m_dy != value) {
+
+        m_dy = value;
+        emit dyChanged();
+    }
+}
+
+void
+SiAmController::setMbLeft(bool value)
+{
+    if (m_mb_left != value) {
+
+        m_mb_left = value;
+        emit mbLeftChanged();
+    }
+}
+
+void
+SiAmController::setMbMiddle(bool value)
+{
+    if (m_mb_middle != value) {
+
+        m_mb_middle = value;
+        emit mbMiddleChanged();
+    }
+}
+
+void
+SiAmController::setMbRight(bool value)
+{
+    if (m_mb_right != value) {
+
+        m_mb_right = value;
+        emit mbRightChanged();
+    }
+}
+
+void
+SiAmController::setJoyUp(bool value)
+{
+    if (m_joy_up != value) {
+
+        m_joy_up = value;
+        emit joyUpChanged();
+    }
+}
+
+void
+SiAmController::setJoyDown(bool value)
+{
+    if (m_joy_down != value) {
+
+        m_joy_down = value;
+        emit joyDownChanged();
+    }
+}
+
+void
+SiAmController::setJoyLeft(bool value)
+{
+    if (m_joy_left != value) {
+
+        m_joy_left = value;
+        emit joyLeftChanged();
+    }
+}
+
+void
+SiAmController::setJoyRight(bool value)
+{
+    if (m_joy_right != value) {
+
+        m_joy_right = value;
+        emit joyRightChanged();
+    }
+}
+
+void
+SiAmController::setJoyFire(bool value)
+{
+    if (m_joy_fire != value) {
+
+        m_joy_fire = value;
+        emit joyFireChanged();
+    }
+}
+
+void
 SiAmController::mouseDxDy(int port, u64 timestamp, float dx, float dy)
 {
     auto &cp = port == 0 ? core().controlPort1 : core().controlPort2;
 
     cp.mouse.setDxDy(dx, dy);
+
+    setDx(dx);
+    setDy(dy);
 }
 
 void
@@ -899,6 +1002,25 @@ SiAmController::mouseButton(int port, u64 timestamp, int button, bool down)
     auto action = button == 0 ? GamePadAction::PRESS_LEFT : GamePadAction::PRESS_RIGHT;
 
     cp.mouse.trigger(action);
+
+    // Buttons are numbered 0 (left), 1 (middle), 2 (right)
+    switch (button) {
+
+        case 0: setMbLeft(down); break;
+        case 1: setMbMiddle(down); break;
+        case 2: setMbRight(down); break;
+    }
+}
+
+void
+SiAmController::joystickMotionEvent(int port, u64 timestamp, bool state[5])
+{
+    // The state is ordered up, down, left, right, fire
+    setJoyUp(state[0]);
+    setJoyDown(state[1]);
+    setJoyLeft(state[2]);
+    setJoyRight(state[3]);
+    setJoyFire(state[4]);
 }
 
 bool

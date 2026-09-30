@@ -15,20 +15,6 @@ import Silicium.Controllers
 import Silicium.Preferences
 import Silicium.Theme
 
-// Port of SiC64DevPanel.qml: a draggable, semi-transparent debug overlay
-// shown over the canvas while Preferences.developerMode and
-// SiAmController.debugPanel are both on (see SiAmWindow.qml). SiC64's
-// "Input" category reads dx/dy/mbLeft/mbMiddle/mbRight/joyUp/joyDown/
-// joyLeft/joyRight/joyFire straight off C64Controller, which tracks them by
-// overriding InputManagerDelegate's mouseDxDy()/mouseButton()/
-// joystickMotionEvent(). SiAmController doesn't override any of those yet --
-// mouse/joystick passthrough to the emulated Amiga hasn't been built, the
-// same gap noted in SiAmKeyboardController for the physical keyboard -- so
-// this panel's Input category is trimmed to the one thing that already
-// works identically on both apps: AppController.inputManager's raw
-// qKey/pKey/sKey/mods readout (InputManager itself, not a per-app
-// controller, tracks those). The dx/dy/button/joystick rows return once
-// SiAmController grows the same InputManagerDelegate overrides.
 Rectangle {
 
     id: root
@@ -180,6 +166,29 @@ Rectangle {
 
             width: parent.width
             visible: categoryCombo.currentText === "Input"
+
+            KeyValue {
+                key: "Mouse"
+                value: "dx = " + Math.round(controller.dx) + "  dy = " + Math.round(controller.dy)
+            }
+
+            KeyValue {
+                key: "Mouse buttons"
+                value: controller.mbLeft + "  " + controller.mbMiddle + "  " + controller.mbRight
+            }
+
+            KeyValue {
+                key: "Joystick axis"
+                value: controller.joyUp + "  "
+                    + controller.joyDown + "  "
+                    + controller.joyLeft + "  "
+                    + controller.joyRight
+            }
+
+            KeyValue {
+                key: "Joy button"
+                value: controller.joyFire
+            }
 
             KeyValue {
                 key: "qKey"
