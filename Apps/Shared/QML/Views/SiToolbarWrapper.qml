@@ -53,6 +53,10 @@ Item {
     // Title bar height
     required property real titleBarInset
 
+    // Window title, drawn in QML. The native title is not used, because
+    // its view swallows mouse clicks and so blocks dragging the window.
+    property string titleText: ""
+
     // Shows or hides the command bar
     property bool hidden: false
 
@@ -68,19 +72,6 @@ Item {
     readonly property real alpha: root.overlay ? 0.85 : 1.0
     readonly property color commandBarBg: Palette.toolbar
     readonly property color titleBarBg: root.unified ? Palette.toolbar : Palette.background
-
-    // readonly property color titleBarOverlayBg: root.unified ? Qt.alpha(titleBarAttachedBg, 0.85)
-
-    /*
-    readonly property color commandBarBg: root.hidden ?
-        "transparent" :
-        root.overlayed ? Qt.alpha(Palette.toolbar, 0.85) : Palette.toolbar
-
-    readonly property color titleBarBg: (root.unified && !root.hidden)
-        ? commandBarBg :
-        "transparent"
-        : Palette.background
-    */
 
     //
     // Main
@@ -105,6 +96,18 @@ Item {
             Layout.preferredHeight: root.titleBarInset
 
             color: showTitleBar ? Qt.alpha(root.titleBarBg, root.alpha) : "transparent"
+
+            Text {
+
+                anchors.centerIn: parent
+                visible: root.showTitleBar
+                text: root.titleText
+                color: Palette.secondary
+                font.bold: true
+                elide: Text.ElideRight
+                width: Math.min(implicitWidth, parent.width / 2)
+                horizontalAlignment: Text.AlignHCenter
+            }
 
             Row {
 

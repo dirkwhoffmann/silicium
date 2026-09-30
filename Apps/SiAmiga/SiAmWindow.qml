@@ -18,7 +18,6 @@ ApplicationWindow {
     property bool statusBarVisible: true
     property bool shutdownInProgress: false
     property bool loggerOpen: false
-    // readonly property bool compactMenu: Preferences.menuStyle === 1
 
     readonly property bool overlayed: Preferences.menuType === 1
     readonly property bool unified: Preferences.titleBar === 1
@@ -32,7 +31,8 @@ ApplicationWindow {
     minimumWidth: 400
     minimumHeight: 300
 
-    title: toolbar.showTitleBar ? "SiAmiga" : ""
+    // Drawn by the toolbar wrapper; the native title would block window dragging
+    title: ""
     color: "black"
 
     // Window flags
@@ -359,6 +359,7 @@ ApplicationWindow {
         hidden: !root.toolbarVisible
 
         titleBarInset: root.titleBarInset
+        titleText: "SiAmiga"
 
         titleBarContent: [
 
@@ -411,7 +412,7 @@ ApplicationWindow {
             window: root
         }
     }
-    
+
     SiAmStatusbar {
 
         id: statusbar
