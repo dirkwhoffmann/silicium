@@ -14,6 +14,7 @@
 #include <QList>
 #include <QMouseEvent>
 #include <QObject>
+#include <QTimer>
 
 class VirtualMachine;
 class QQuickWindow;
@@ -112,6 +113,12 @@ class InputManager : public QObject, SiObject, SDLManagerDelegate {
     int ctrlAltR = 0;
     int ctrlMetaL = 0;
     int ctrlMetaR = 0;
+
+    /* Reads the relative mouse motion while the mouse is captured (macOS).
+     * The cursor is detached from the mouse then, which makes Qt stop
+     * delivering move events, so the hardware deltas are polled instead.
+     */
+    QTimer m_mousePollTimer;
 
     // Capturing modes
     bool m_captureMouse = false;
@@ -234,6 +241,9 @@ public:
 
     bool eventFilter(QObject *obj, QEvent *event) override;
     bool mouseEventFilter(QObject *obj, QMouseEvent *event);
+
+    // Forwards relative mouse motion to the delegate
+    void dispatchMouseMotion(u64 timestamp, float x, float y, float dx, float dy);
     bool mouseButtonEventFilter(QObject *obj, QMouseEvent *event);
     bool keyDownEventFilter(QObject *obj, QKeyEvent *event);
     bool keyUpEventFilter(QObject *obj, QKeyEvent *event);

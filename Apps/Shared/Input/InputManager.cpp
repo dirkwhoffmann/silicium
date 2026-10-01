@@ -12,6 +12,7 @@
 #include "Assets.h"
 #include "Logger.h"
 #include <QCursor>
+#include <QDateTime>
 #include <QGuiApplication>
 #include <QInputMethod>
 #include <QQuickWindow>
@@ -111,6 +112,22 @@ InputManager::physicalKeyCode(QKeyEvent *event)
 
 InputManager::InputManager() : QObject()
 {
+#ifdef __APPLE__
+    m_mousePollTimer.setTimerType(Qt::PreciseTimer);
+    m_mousePollTimer.setInterval(2);
+    connect(&m_mousePollTimer, &QTimer::timeout, this, [this]() {
+
+        int32_t dx = 0, dy = 0;
+        CGGetLastMouseDelta(&dx, &dy);
+
+        if (delegate && (dx != 0 || dy != 0)) {
+
+            auto pos = QCursor::pos();
+            dispatchMouseMotion(QDateTime::currentMSecsSinceEpoch(),
+                                pos.x(), pos.y(), dx, dy);
+        }
+    });
+#endif
 
 }
 
@@ -180,14 +197,28 @@ InputManager::setCaptureMouse(bool value)
 #ifdef __APPLE__
         // A Qt window/item cursor is not enough on macOS: QQuickWindow
         // recomputes the cursor on every mouse move (the hovered MouseArea
-        // reclaims its own cursor, and warpToCenter()'s QCursor::setPos()
-        // forces a recompute too), so a blanked Qt cursor reappears the
+        // reclaims its own cursor), so a blanked Qt cursor reappears the
         // instant the mouse moves. CGDisplayHideCursor() hides the cursor
         // below Qt's cursor-rect layer via a hide-count that survives those
         // recomputes; it must be balanced 1:1 with CGDisplayShowCursor().
+        //
+        // The cursor is also detached from the mouse while captured, so it
+        // stays where it is and the motion is read as hardware deltas (see
+        // mouseEventFilter()). That replaces warping it back to the window
+        // center, whose echo event would cancel the motion. The association
+        // must be restored on release, or the mouse stays dead.
         if (value) {
             CGDisplayHideCursor(kCGDirectMainDisplay);
+            CGAssociateMouseAndMouseCursorPosition(false);
+
+            // The delta accumulated so far predates the capture; read it
+            // away so the first event doesn't jump.
+            int32_t dx, dy;
+            CGGetLastMouseDelta(&dx, &dy);
+            m_mousePollTimer.start();
         } else {
+            m_mousePollTimer.stop();
+            CGAssociateMouseAndMouseCursorPosition(true);
             CGDisplayShowCursor(kCGDirectMainDisplay);
         }
 #else
@@ -278,12 +309,51 @@ InputManager::eventFilter(QObject *object, QEvent *event)
     return QObject::eventFilter(object, event);
 }
 
+void
+InputManager::dispatchMouseMotion(u64 timestamp, float x, float y, float dx, float dy)
+{
+    if (!delegate) return;
+
+    if (delegate->detectShakeDxDy(dx, dy)) {
+        delegate->shakeDetected();
+    }
+
+    /* Apply the sensitivity to the relative motion only.
+     *
+     * mouseXY() gets the unscaled position: it is an absolute screen
+     * coordinate, and scaling it would displace the pointer rather than
+     * speed it up. Shake detection above stays on the raw deltas too, so
+     * the setting cannot make "shake to release the mouse" easier or
+     * harder to trigger than it is with the pointer itself.
+     */
+    auto sens = preferences().getMouseSensitivity();
+    auto sdx  = sens * dx;
+    auto sdy  = sens * dy;
+
+    if (auto *device = getPort0Device(); device->type == GamepadType::Mouse) {
+
+        delegate->mouseXY(0, timestamp, x, y);
+        delegate->mouseDxDy(0, timestamp, sdx, sdy);
+    }
+
+    if (auto *device = getPort1Device(); device->type == GamepadType::Mouse) {
+
+        delegate->mouseXY(1, timestamp, x, y);
+        delegate->mouseDxDy(1, timestamp, sdx, sdy);
+    }
+}
+
 bool
 InputManager::mouseEventFilter(QObject *object, QMouseEvent *event)
 {
     static QPointF lastPos = event->globalPosition();
 
     if (delegate) {
+
+#ifdef __APPLE__
+        // While captured, the motion is polled (see m_mousePollTimer)
+        if (m_captureMouse) return true;
+#endif
 
         auto current = event->globalPosition();
         auto x       = static_cast<float>(current.x());
@@ -293,39 +363,15 @@ InputManager::mouseEventFilter(QObject *object, QMouseEvent *event)
 
         lastPos = current;
 
-        if (delegate->detectShakeDxDy(dx, dy)) {
-            delegate->shakeDetected();
-        }
+        dispatchMouseMotion(event->timestamp(), x, y, dx, dy);
 
-        /* Apply the sensitivity to the relative motion only.
-         *
-         * mouseXY() gets the unscaled position: it is an absolute screen
-         * coordinate, and scaling it would displace the pointer rather than
-         * speed it up. Shake detection above stays on the raw deltas too, so
-         * the setting cannot make "shake to release the mouse" easier or
-         * harder to trigger than it is with the pointer itself.
-         */
-        auto sens = preferences().getMouseSensitivity();
-        auto sdx  = sens * dx;
-        auto sdy  = sens * dy;
-
-        if (auto *device = getPort0Device(); device->type == GamepadType::Mouse) {
-
-            delegate->mouseXY(0, event->timestamp(), x, y);
-            delegate->mouseDxDy(0, event->timestamp(), sdx, sdy);
-        }
-
-        if (auto *device = getPort1Device(); device->type == GamepadType::Mouse) {
-
-            delegate->mouseXY(1, event->timestamp(), x, y);
-            delegate->mouseDxDy(1, event->timestamp(), sdx, sdy);
-        }
-
+#ifndef __APPLE__
         if (m_captureMouse) {
 
             delegate->warpToCenter();
             return true;
         }
+#endif
     }
 
     return QObject::eventFilter(object, event);
@@ -849,6 +895,10 @@ InputManager::stop()
     if (m_running) {
 
         LogTask task("Stopping InputManager...");
+
+        // Gives the cursor back (see setCaptureMouse())
+        setCaptureMouse(false);
+
         sdlManager.stop();
 
         m_running = false;
