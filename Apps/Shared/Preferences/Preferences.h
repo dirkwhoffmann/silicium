@@ -48,9 +48,9 @@ class Preferences : public QObject {
     //
 
     //
-    int menuStyle;
-    int menuType;
-    int titleBar;
+    int chromeLayout;
+    int chromePlacement;
+    int chromeTitleBar;
     int statusbar;
     int resizeMode;
 
@@ -272,9 +272,9 @@ class Preferences : public QObject {
 
   public:
 
-    Q_PROPERTY(int menuStyle READ getMenuStyle WRITE setMenuStyle NOTIFY appearancePrefsChanged)
-    Q_PROPERTY(int menuType READ getMenuType WRITE setMenuType NOTIFY appearancePrefsChanged)
-    Q_PROPERTY(int titleBar READ getTitleBar WRITE setTitleBar NOTIFY appearancePrefsChanged)
+    Q_PROPERTY(int chromeLayout READ getChromeLayout WRITE setChromeLayout NOTIFY appearancePrefsChanged)
+    Q_PROPERTY(int chromePlacement READ getChromePlacement WRITE setChromePlacement NOTIFY appearancePrefsChanged)
+    Q_PROPERTY(int chromeTitleBar READ getChromeTitleBar WRITE setChromeTitleBar NOTIFY appearancePrefsChanged)
     Q_PROPERTY(int statusbar READ getStatusbar WRITE setStatusbar NOTIFY appearancePrefsChanged)
     Q_PROPERTY(int resizeMode READ getResizeMode WRITE setResizeMode NOTIFY appearancePrefsChanged)
 
@@ -283,12 +283,12 @@ class Preferences : public QObject {
     Q_PROPERTY(int fontTheme READ getFontTheme WRITE setFontTheme NOTIFY appearancePrefsChanged)
     Q_PROPERTY(int monoFontTheme READ getMonoFontTheme WRITE setMonoFontTheme NOTIFY appearancePrefsChanged)
 
-    int getMenuStyle() const { return menuStyle; }
-    void setMenuStyle(int value) { setAppearanceProperty(menuStyle, value); }
-    int getMenuType() const { return menuType; }
-    void setMenuType(int value) { setAppearanceProperty(menuType, value); }
-    int getTitleBar() const { return titleBar; }
-    void setTitleBar(int value) { setAppearanceProperty(titleBar, value); }
+    int getChromeLayout() const { return chromeLayout; }
+    void setChromeLayout(int value) { setAppearanceProperty(chromeLayout, value); }
+    int getChromePlacement() const { return chromePlacement; }
+    void setChromePlacement(int value) { setAppearanceProperty(chromePlacement, value); }
+    int getChromeTitleBar() const { return chromeTitleBar; }
+    void setChromeTitleBar(int value) { setAppearanceProperty(chromeTitleBar, value); }
     int getStatusbar() const { return statusbar; }
     void setStatusbar(int value) { setAppearanceProperty(statusbar, value); }
     int getResizeMode() const { return resizeMode; }

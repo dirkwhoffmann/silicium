@@ -198,11 +198,8 @@ SiAmController::parseArguments(const QCoreApplication &app)
 
     execCommands.clear();
     for (const QString &command : parser.values(execOption)) {
-        printf("Argument: %s\n", command.toStdString().c_str());
         execCommands.push_back(command.toStdString());
     }
-
-    printf("SVM: %s\n", svmPath.toStdString().c_str());
 
     if (svmPath.isEmpty()) {
         errorMessage = "No SVM file specified";
@@ -979,7 +976,6 @@ SiAmController::mouseDxDy(int port, u64 timestamp, float dx, float dy)
     if (mouseCaptured()) {
 
         auto &cp = port == 0 ? core().controlPort1 : core().controlPort2;
-        printf("Dx: %f Dy: %f\n", dx, dy);
         cp.mouse.setDxDy(dx, dy);
     }
 
@@ -994,7 +990,6 @@ SiAmController::mouseButton(int port, u64 timestamp, int button, bool down)
 
         auto &cp = port == 0 ? core().controlPort1 : core().controlPort2;
 
-        printf("Port: %d button: %d down: %d\n", port, button, down);
         switch (button) {
 
             case 0: cp.mouse.trigger(down ? GamePadAction::PRESS_LEFT : GamePadAction::RELEASE_LEFT); break;

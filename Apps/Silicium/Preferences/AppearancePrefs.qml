@@ -197,27 +197,27 @@ PrefPage {
 
     PrefSection {
 
-        header: "MENU AND TOOLBAR"
+        header: "CHROME"
 
         HelpWrapper {
 
             SiComboBoxControl {
 
-                id: menuType
-                l: "Menu Type:"
+                id: chromePlacement
+                l: "Placement:"
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
                 model: [
-                    "Attach",
-                    "Overlay"
+                    "Attached",
+                    "Overlayed"
                 ]
 
-                currentIndex: Preferences.menuType
-                onCurrentIndexChanged: Preferences.menuType = currentIndex
+                currentIndex: Preferences.chromePlacement
+                onCurrentIndexChanged: Preferences.chromePlacement = currentIndex
 
                 SiHelpButton {
 
-                    id: menuTypeHelp
+                    id: chromePlacementHelp
                     checkable: true
                     alignment: Qt.AlignLeft
                 }
@@ -227,7 +227,7 @@ PrefPage {
 
             HelpBox {
 
-                visibleTarget: menuTypeHelp.checked
+                visibleTarget: chromePlacementHelp.checked
                 text: "\"Attach\" gives the window its usual title bar, with the menu and toolbar below it and the emulated screen below that, so all of the screen stays visible. \"Overlay\" drops the title bar, leaving only the window buttons, and lets the screen fill the whole window with the menu and toolbar laid over it in the same place as before. The button at the right-hand end of that row then hides and shows them."
             }
         }
@@ -236,7 +236,7 @@ PrefPage {
 
             SiComboBoxControl {
 
-                id: titleBar
+                id: chromeTitleBar
                 l: "Title Bar:"
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
@@ -245,12 +245,12 @@ PrefPage {
                     "Unified"
                 ]
 
-                currentIndex: Preferences.titleBar
-                onCurrentIndexChanged: Preferences.titleBar = currentIndex
+                currentIndex: Preferences.chromeTitleBar
+                onCurrentIndexChanged: Preferences.chromeTitleBar = currentIndex
 
                 SiHelpButton {
 
-                    id: titleBarHelp
+                    id: chromeTitleBarHelp
                     checkable: true
                     alignment: Qt.AlignLeft
                 }
@@ -260,7 +260,7 @@ PrefPage {
 
             HelpBox {
 
-                visibleTarget: titleBarHelp.checked
+                visibleTarget: chromeTitleBarHelp.checked
                 text: "How the title bar row is filled. \"Standard\" gives it the usual title bar background, so the menu and toolbar read as something separate below it. \"Unified\" gives it the same colour as the menu and toolbar, so the whole thing reads as one block of chrome."
             }
         }
@@ -269,8 +269,8 @@ PrefPage {
 
             SiComboBoxControl {
 
-                id: menuStyle
-                l: "Menu Style:"
+                id: chromeLayout
+                l: "Controls:"
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
                 model: [
@@ -278,12 +278,12 @@ PrefPage {
                     "Compact"
                 ]
 
-                currentIndex: Preferences.menuStyle
-                onCurrentIndexChanged: Preferences.menuStyle = currentIndex
+                currentIndex: Preferences.chromeLayout
+                onCurrentIndexChanged: Preferences.chromeLayout = currentIndex
 
                 SiHelpButton {
 
-                    id: menuStyleHelp
+                    id: chromeLayoutHelp
                     checkable: true
                     alignment: Qt.AlignLeft
                 }
@@ -293,7 +293,7 @@ PrefPage {
 
             HelpBox {
 
-                visibleTarget: menuStyleHelp.checked
+                visibleTarget: chromeLayoutHelp.checked
                 text: "\"Standard\" shows the menu bar and the icon toolbar together at all times. \"Compact\" shows only one row at a time and lets you switch between them with a button embedded in the row, saving vertical space."
             }
         }

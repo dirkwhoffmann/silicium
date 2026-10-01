@@ -143,11 +143,13 @@ Preferences::loadAppearanceSettings()
     // every existing installation's RetroShell and debugger views.
     monoFontTheme = s.value("monoFontTheme", 1).toInt();
 
-    menuStyle    = s.value("menuStyle", 0).toInt();
+    // Stored under "menuStyle" and "titleBar" before these settings were renamed
+    chromeLayout = s.value("chromeLayout", s.value("menuStyle", 0)).toInt();
     // Defaults to an attached menu in an ordinary window, so installations
     // that never touch these look as they did before they existed.
-    menuType     = s.value("menuType", 0).toInt();
-    titleBar     = s.value("titleBar", 0).toInt();
+    // Stored under "menuType" before the setting was renamed
+    chromePlacement = s.value("chromePlacement", s.value("menuType", 0)).toInt();
+    chromeTitleBar = s.value("chromeTitleBar", s.value("titleBar", 0)).toInt();
     statusbar    = s.value("statusbar", 1).toInt();
     resizeMode   = s.value("resizeMode", 0).toInt();
 
@@ -424,9 +426,9 @@ Preferences::saveAppearanceSettings()
     s.setValue("fontTheme", fontTheme);
     s.setValue("monoFontTheme", monoFontTheme);
 
-    s.setValue("menuStyle", menuStyle);
-    s.setValue("menuType", menuType);
-    s.setValue("titleBar", titleBar);
+    s.setValue("chromeLayout", chromeLayout);
+    s.setValue("chromePlacement", chromePlacement);
+    s.setValue("chromeTitleBar", chromeTitleBar);
     s.setValue("statusbar", statusbar);
     s.setValue("resizeMode", resizeMode);
 

@@ -19,9 +19,9 @@ ApplicationWindow {
     property bool shutdownInProgress: false
     property bool loggerOpen: false
 
-    readonly property bool overlayed: Preferences.menuType === 1
-    readonly property bool unified: Preferences.titleBar === 1
-    readonly property bool compact: Preferences.menuStyle === 1
+    readonly property bool overlayed: Preferences.chromePlacement === 1
+    readonly property bool unified: Preferences.chromeTitleBar === 1
+    readonly property bool compact: Preferences.chromeLayout === 1
 
     readonly property real titleBarInset: contentItem.SafeArea.margins.top
 

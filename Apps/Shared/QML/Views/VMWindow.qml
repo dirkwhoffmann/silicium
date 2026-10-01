@@ -210,7 +210,7 @@ ApplicationWindow {
     // row for the menu bar; the menu bar's close button swaps back. Which row
     // is currently revealed is a presentation detail owned by the concrete
     // header component (e.g. SiC64Toolbar), not by this window.
-    readonly property bool compactMenu: Preferences.menuStyle === 1
+    readonly property bool compactMenu: Preferences.chromeLayout === 1
 
     // No default header here -- each concrete window supplies its own,
     // combining its app-specific menu with its own window actions (see

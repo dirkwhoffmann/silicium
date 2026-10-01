@@ -77,7 +77,7 @@ VMWindow {
 
     // Floats over the canvas (z above it) instead of using header:, which
     // reserves its own layout slot above the content area. An overlaid menu
-    // type (see Preferences.menuType) lets the canvas extend behind it,
+    // type (see Preferences.chromePlacement) lets the canvas extend behind it,
     // while a standard one anchors the canvas below it -- the same
     // reserved-space layout header: used to give.
     //
@@ -379,7 +379,7 @@ VMWindow {
         // Overlaid: extends behind the toolbar, which is laid over it.
         // Standard: starts below the toolbar instead -- no reason to let it
         // hide part of the picture permanently.
-        anchors.top: Preferences.menuType === 1 ? parent.top : toolbar.bottom
+        anchors.top: Preferences.chromePlacement === 1 ? parent.top : toolbar.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
