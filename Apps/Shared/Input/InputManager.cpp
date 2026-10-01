@@ -391,8 +391,6 @@ InputManager::mouseButtonEventFilter(QObject *obj, QMouseEvent *event)
             return -1;
         };
 
-        printf("mouseButtonEventFilter: %d %d mapped: %d\n", event->type(), down, mappedButton(event->button()));
-
         if (auto button = mappedButton(event->button()); button != -1) {
 
             if (auto *device = getPort0Device(); device->type == GamepadType::Mouse) {
