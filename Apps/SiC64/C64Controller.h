@@ -515,7 +515,6 @@ signals:
     void port1Changed();
     void debugPanelChanged();
     void captureChanged();
-    void mouseWasCaptured();
     void shutdown();
     void dxChanged();
     void dyChanged();

@@ -72,9 +72,6 @@ ApplicationWindow {
         onPressed: {
 
             if (Preferences.retainMouseByClicking && !overlayPanel.visible) {
-                // Route through the controller (not the InputManager
-                // directly) so the capture hint gets shown via
-                // mouseWasCaptured().
                 root.amiga.captureMouse()
             }
         }
@@ -226,6 +223,53 @@ ApplicationWindow {
         maxHeight: root.height - 2 * Style.largeSpacing
         watchdog: 0
         z: 999
+    }
+
+    //
+    // Hints
+    //
+
+    SiBanner {
+
+        id: hintBanner
+
+        anchors.fill: parent
+        z: 2
+    }
+
+    // Shows the banner with the given message for a few seconds, as VMWindow
+    // does for SiC64.
+    function showHint(message) {
+
+        // Readable, and gone again three seconds later without being told
+        hintBanner.show(message, 500, 3000)
+    }
+
+    // When the mouse is captured, briefly tell the user how to get it back.
+    // Which release methods are mentioned depends on the Controls
+    // preferences; if none are enabled, no hint is shown.
+    Connections {
+
+        target: AppController.inputManager
+
+        function onCaptureMouseChanged() {
+
+            // Only the capturing is of interest here, not the release
+            if (!AppController.inputManager.captureMouse) return
+
+            const key = Shortcuts.nativeText(Preferences.mouseHotkey)
+            const byPressing = Preferences.releaseMouseByPressing
+            const byShaking = Preferences.releaseMouseByShaking
+
+            if (byPressing && byShaking) {
+                root.showHint(qsTr("Release mouse by pressing %1 or shaking").arg(key))
+            } else if (byPressing) {
+                root.showHint(qsTr("Release mouse by pressing %1").arg(key))
+            } else if (byShaking) {
+                root.showHint(qsTr("Release mouse by shaking"))
+            }
+            // else: no release method configured -- nothing useful to show.
+        }
     }
 
     //

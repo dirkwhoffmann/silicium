@@ -336,7 +336,7 @@ InputManager::mouseButtonEventFilter(QObject *obj, QMouseEvent *event)
 {
     if (delegate) {
 
-        bool down = (event->type() == QEvent::MouseButtonPress);
+        bool down = event->type() == QEvent::MouseButtonPress;
 
         auto mappedButton = [](Qt::MouseButton btn) -> int {
             if (btn == Qt::LeftButton) return 0;
@@ -344,6 +344,8 @@ InputManager::mouseButtonEventFilter(QObject *obj, QMouseEvent *event)
             if (btn == Qt::RightButton) return 2;
             return -1;
         };
+
+        printf("mouseButtonEventFilter: %d %d mapped: %d\n", event->type(), down, mappedButton(event->button()));
 
         if (auto button = mappedButton(event->button()); button != -1) {
 

@@ -277,7 +277,6 @@ void
 C64Controller::captureMouse()
 {
     inputManager.setCaptureMouse(true);
-    emit mouseWasCaptured();
 }
 
 void

@@ -392,16 +392,12 @@ VMWindow {
 
             if (Preferences.retainMouseByClicking && !overlayPanel.visible) {
                 console.log("Capture mouse")
-                // Route through the controller (not the InputManager directly)
-                // so the capture hint gets shown via mouseWasCaptured().
                 root.c64.captureMouse()
             }
         }
 
         onDoubleClicked: {
             if (Preferences.retainMouseByDoubleClicking && !overlayPanel.visible) {
-                // Route through the controller (not the InputManager directly)
-                // so the capture hint gets shown via mouseWasCaptured().
                 root.c64.captureMouse()
             }
         }

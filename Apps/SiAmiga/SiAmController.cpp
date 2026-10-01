@@ -820,7 +820,6 @@ void
 SiAmController::captureMouse()
 {
     inputManager.setCaptureMouse(true);
-    emit mouseWasCaptured();
 }
 
 void
@@ -846,25 +845,15 @@ SiAmController::keyDown(QKeyEvent *event, KeyModifier modifiers)
 void
 SiAmController::keyUp(QKeyEvent *event, KeyModifier modifiers)
 {
-    /* Deliberately ungated, unlike keyDown() above.
-     *
-     * Capture can be withdrawn between a press and its release -- opening
-     * RetroShell with a key held down does exactly that -- and dropping the
-     * release would leave that key stuck down inside the Amiga with nothing
-     * left to lift it. Releasing a key the machine never saw pressed is
-     * harmless by comparison, which is the same reasoning that makes
-     * InputManager::keyUpEventFilter forward releases regardless of capture.
-     */
+    // Always release the key, independent of the capture state. Otherwise,
+    // keys can get stuck, e.g., when opening RetroShell with a key held down.
+
     m_keyboardController->keyUp(event, modifiers);
 }
 
 void
 SiAmController::keyCombo(KeyCombo combo, int count)
 {
-    // Gated on the keyboard, not the mouse: for the Amiga these chords are
-    // ordinary keystrokes (Alt and the Amiga keys, see
-    // SiAmKeyboardController::keyCombo), so they belong to whoever owns the
-    // keyboard.
     if (keyboardCaptured()) {
         m_keyboardController->keyCombo(combo, count);
     }
@@ -987,9 +976,12 @@ SiAmController::setJoyFire(bool value)
 void
 SiAmController::mouseDxDy(int port, u64 timestamp, float dx, float dy)
 {
-    auto &cp = port == 0 ? core().controlPort1 : core().controlPort2;
+    if (mouseCaptured()) {
 
-    cp.mouse.setDxDy(dx, dy);
+        auto &cp = port == 0 ? core().controlPort1 : core().controlPort2;
+        printf("Dx: %f Dy: %f\n", dx, dy);
+        cp.mouse.setDxDy(dx, dy);
+    }
 
     setDx(dx);
     setDy(dy);
@@ -998,17 +990,30 @@ SiAmController::mouseDxDy(int port, u64 timestamp, float dx, float dy)
 void
 SiAmController::mouseButton(int port, u64 timestamp, int button, bool down)
 {
-    auto &cp = port == 0 ? core().controlPort1 : core().controlPort2;
-    auto action = button == 0 ? GamePadAction::PRESS_LEFT : GamePadAction::PRESS_RIGHT;
+    if (mouseCaptured()) {
 
-    cp.mouse.trigger(action);
+        auto &cp = port == 0 ? core().controlPort1 : core().controlPort2;
 
-    // Buttons are numbered 0 (left), 1 (middle), 2 (right)
+        printf("Port: %d button: %d down: %d\n", port, button, down);
+        switch (button) {
+
+            case 0: cp.mouse.trigger(down ? GamePadAction::PRESS_LEFT : GamePadAction::RELEASE_LEFT); break;
+            case 1: cp.mouse.trigger(down ? GamePadAction::PRESS_MIDDLE : GamePadAction::RELEASE_MIDDLE); break;
+            case 2: cp.mouse.trigger(down ? GamePadAction::PRESS_RIGHT : GamePadAction::RELEASE_RIGHT); break;
+
+            default:
+                break;
+        }
+    }
+
     switch (button) {
 
         case 0: setMbLeft(down); break;
         case 1: setMbMiddle(down); break;
         case 2: setMbRight(down); break;
+
+        default:
+            break;
     }
 }
 

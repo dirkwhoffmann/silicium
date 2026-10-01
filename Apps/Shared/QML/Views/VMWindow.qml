@@ -267,9 +267,12 @@ ApplicationWindow {
 
     Connections {
 
-        target: vmc
+        target: AppController.inputManager
 
-        function onMouseWasCaptured() {
+        function onCaptureMouseChanged() {
+
+            // Only the capturing is of interest here, not the release
+            if (!AppController.inputManager.captureMouse) return
 
             const key = Shortcuts.nativeText(Preferences.mouseHotkey)
             const byPressing = Preferences.releaseMouseByPressing
@@ -284,6 +287,11 @@ ApplicationWindow {
             }
             // else: no release method configured -- nothing useful to show.
         }
+    }
+
+    Connections {
+
+        target: vmc
 
         function onShutdown() {
 

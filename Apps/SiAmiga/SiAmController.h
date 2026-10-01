@@ -533,7 +533,6 @@ signals:
     void rendererChanged();
     void shutdown();
     void captureChanged();
-    void mouseWasCaptured();
     void dxChanged();
     void dyChanged();
     void mbLeftChanged();
