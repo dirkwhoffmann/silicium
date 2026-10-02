@@ -47,7 +47,7 @@ ApplicationWindow {
     Palette.theme: Preferences.colorTheme
 
     //
-    // Emulator canvas
+    // Canvas
     //
 
     SiAmCanvas {
@@ -60,7 +60,7 @@ ApplicationWindow {
         // with the chrome.
         anchors.topMargin: !root.overlayed ? toolbar.y + toolbar.height
                          : root.unified    ? 0
-                                           : titleBar.y + titleBar.height
+                                           : root.titleBarInset
         anchors.bottomMargin: root.overlayed || !statusbar.visible ? 0 : statusbar.height
 
         controller: root.amiga
@@ -384,24 +384,30 @@ ApplicationWindow {
     // individual actions via window.actions.xxx (e.g. window.actions.reset).
     property alias actions: siActions
 
-    // The title bar row. Drawn here, as the native one would block dragging.
-    SiTitleBar {
+    // Sits below the title bar row rather than using header:, which would
+    // reserve its own layout slot above the content area -- see
+    // SiC64Window.qml for the full rationale. That row is the window's own
+    // in a standard window and nothing at all in an overlaid one, so the
+    // same offset puts this in the same place either way; what changes is
+    // only whether the picture runs on underneath it.
+    SiToolbarWrapper {
 
-        id: titleBar
+        id: toolbar
 
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        height: root.titleBarInset
         z: 10
 
         overlayed: root.overlayed
         unified: root.unified
+        compact: root.compact
         hidden: !root.toolbarVisible
 
-        title: "SiAmiga"
+        titleBarInset: root.titleBarInset
+        titleText: "SiAmiga"
 
-        content: [
+        titleBarContent: [
 
             SiSymbolButton {
 
@@ -425,27 +431,6 @@ ApplicationWindow {
                 onClicked: root.statusBarVisible = !root.statusBarVisible
             }
         ]
-    }
-
-    // Sits below the title bar row rather than using header:, which would
-    // reserve its own layout slot above the content area -- see
-    // SiC64Window.qml for the full rationale. That row is the window's own
-    // in a standard window and nothing at all in an overlaid one, so the
-    // same offset puts this in the same place either way; what changes is
-    // only whether the picture runs on underneath it.
-    SiToolbarWrapper {
-
-        id: toolbar
-
-        anchors.top: titleBar.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        z: 10
-
-        overlayed: root.overlayed
-        unified: root.unified
-        compact: root.compact
-        hidden: !root.toolbarVisible
 
         menuContent: SiAmMenu {
 
