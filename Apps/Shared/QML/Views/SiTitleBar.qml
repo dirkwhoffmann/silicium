@@ -10,25 +10,6 @@
 import QtQuick
 import Silicium.Theme
 
-/* The window's title bar row, drawn in QML. The native title is not used,
- * because its view swallows mouse clicks and so blocks dragging the window.
- *
- * Dragging the bar moves the window.
- *
- * The component is as tall as it is told to be (set 'height' to the title bar
- * inset of the window) and doesn't position itself.
- *
- * unified:
- *
- *   If true, the title bar gets the same colour as the command bar, so both
- *   read as one block of chrome. If false, it gets the window background.
- *
- * hidden:
- *
- *   True if the command bar is hidden. A unified title bar then disappears
- *   with it, leaving only the window buttons.
- */
-
 Rectangle {
 
     id: root
@@ -39,8 +20,6 @@ Rectangle {
     // Visual style
     required property bool overlayed
     required property bool unified
-
-    // Shows or hides the command bar
     required property bool hidden
 
     // Items placed at the right-hand side of the bar
@@ -55,13 +34,19 @@ Rectangle {
 
     color: hideTitleBar ? "transparent" : Qt.alpha(root.titleBarBg, root.alpha)
 
-    // Dragging the title bar moves the window. Declared first, so that the
-    // items on top of it (the title and the content) get their clicks.
+    //
+    // Mouse area
+    //
+
     MouseArea {
 
         anchors.fill: parent
         onPressed: Window.window.startSystemMove()
     }
+
+    //
+    // Main
+    //
 
     Text {
 
@@ -84,5 +69,29 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
 
         spacing: Style.smallSpacing
+    }
+
+    //
+    // Separator
+    //
+
+    Rectangle {
+
+        anchors { left: parent.left; right: parent.right; bottom: parent.bottom; bottomMargin: 0 }
+        height: 1
+
+        visible: !root.hideTitleBar
+        // color: Qt.alpha(Palette.backdrop, root.alpha)
+        color: Qt.alpha(Palette.toolbar.lighter(1.05), root.alpha)
+    }
+
+    Rectangle {
+
+        anchors { left: parent.left; right: parent.right; bottom: parent.bottom; bottomMargin: 1 }
+        height: 1
+
+        visible: !root.hideTitleBar
+        // color: Palette.toolbar.darker(1.1)
+        color: Qt.alpha(Palette.toolbar.darker(1.1), root.alpha)
     }
 }

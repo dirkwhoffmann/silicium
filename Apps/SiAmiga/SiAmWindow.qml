@@ -23,6 +23,9 @@ ApplicationWindow {
     readonly property bool unified: Preferences.chromeTitleBar === 1
     readonly property bool compact: Preferences.chromeLayout === 1
 
+    readonly property bool overlayTitleBar: overlayed && unified
+    readonly property bool overlayCommandBar: overlayed
+
     readonly property real titleBarInset: contentItem.SafeArea.margins.top
 
     visible: true

@@ -75,21 +75,6 @@ Item {
         spacing: 0
 
         //
-        // Separator line
-        //
-
-        Rectangle {
-
-            id: separator
-
-            Layout.fillWidth: true
-            Layout.preferredHeight: 1
-
-            visible: !root.unified
-            color: Qt.alpha(root.commandBarBg, 0.5)
-        }
-
-        //
         // Menu row
         //
 
@@ -180,6 +165,30 @@ Item {
                     }
                 }
             }
+        }
+
+        //
+        // Separator
+        //
+
+        Rectangle {
+
+            Layout.fillWidth: true
+            // anchors { left: parent.left; right: parent.right; bottom: parent.bottom; bottomMargin: 0 }
+            height: 1
+
+            visible: !root.hidden
+            color: Palette.toolbar.lighter(1.05)
+        }
+
+        Rectangle {
+
+            Layout.fillWidth: true
+            // anchors { left: parent.left; right: parent.right; bottom: parent.bottom; bottomMargin: 1 }
+            height: 1
+
+            visible: !root.hidden
+            color: Palette.toolbar.darker(1.1)
         }
     }
 }
