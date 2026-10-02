@@ -33,32 +33,6 @@ protected:
     // C64 key (nr) currently awaiting a physical key press, or -1 if none
     int m_selectedKey = -1;
 
-    // Active joystick axis / buttons
-    bool m_up = false;
-    bool m_down = false;
-    bool m_left = false;
-    bool m_right = false;
-    bool m_fire = false;
-
-    // Active mouse buttons
-    bool m_mb_left = false;
-    bool m_mb_middle = false;
-    bool m_mb_right = false;
-
-    // Captured mouse coordinates
-    float m_dx = 0;
-    float m_dy = 0;
-
-    /* Returns the captured coordinates to rest.
-     *
-     * dx/dy hold the delta of the most recent motion event, so once the events
-     * stop they keep describing a movement that is over and the axis readout
-     * stays lit. That happens when the pointer leaves the window, and equally
-     * when it simply stops moving inside it. Restarted on every motion event,
-     * so it only ever fires once the mouse has gone quiet.
-     */
-    QTimer m_restTimer;
-
 
     //
     // Methods
@@ -135,18 +109,23 @@ public:
     Q_PROPERTY(int device READ getDevice WRITE setDevice NOTIFY deviceChanged)
     Q_PROPERTY(int keymap READ getKeymap NOTIFY deviceChanged)
 
-    Q_PROPERTY(bool joyUp READ getUp WRITE setUp NOTIFY upChanged)
-    Q_PROPERTY(bool joyDown READ getDown WRITE setDown NOTIFY downChanged)
-    Q_PROPERTY(bool joyLeft READ getLeft WRITE setLeft NOTIFY leftChanged)
-    Q_PROPERTY(bool joyRight READ getRight WRITE setRight NOTIFY rightChanged)
-    Q_PROPERTY(bool joyFire READ getFire WRITE setFire NOTIFY fireChanged)
+    /* The activity of the device in control port 1, which is where the
+     * preview of the selected device is mapped (see
+     * registerAsInputManagerDelegate()). The state itself is kept by the
+     * input manager.
+     */
+    Q_PROPERTY(bool joyUp READ getUp NOTIFY joystickStateChanged)
+    Q_PROPERTY(bool joyDown READ getDown NOTIFY joystickStateChanged)
+    Q_PROPERTY(bool joyLeft READ getLeft NOTIFY joystickStateChanged)
+    Q_PROPERTY(bool joyRight READ getRight NOTIFY joystickStateChanged)
+    Q_PROPERTY(bool joyFire READ getFire NOTIFY joystickStateChanged)
 
-    Q_PROPERTY(bool mbLeft READ getMbLeft WRITE setMbLeft NOTIFY mbLeftChanged)
-    Q_PROPERTY(bool mbMiddle READ getMbMiddle WRITE setMbMiddle NOTIFY mbMiddleChanged)
-    Q_PROPERTY(bool mbRight READ getMbRight WRITE setMbRight NOTIFY mbRightChanged)
+    Q_PROPERTY(bool mbLeft READ getMbLeft NOTIFY mouseStateChanged)
+    Q_PROPERTY(bool mbMiddle READ getMbMiddle NOTIFY mouseStateChanged)
+    Q_PROPERTY(bool mbRight READ getMbRight NOTIFY mouseStateChanged)
 
-    Q_PROPERTY(float dx READ getDx WRITE setDx NOTIFY dxChanged)
-    Q_PROPERTY(float dy READ getDy WRITE setDy NOTIFY dyChanged)
+    Q_PROPERTY(float dx READ getDx NOTIFY mouseStateChanged)
+    Q_PROPERTY(float dy READ getDy NOTIFY mouseStateChanged)
 
     Q_INVOKABLE void setJoyKeyset0(int nr, int key, int virtualKey);
     Q_INVOKABLE void setJoyKeyset1(int nr, int key, int virtualKey);
@@ -165,35 +144,18 @@ private:
 
     int getKeymap() const { return m_device == 2 ? 0 : m_device == 3 ? 1 : -1; }
 
-    bool getUp() const { return m_up; }
-    void setUp(bool value);
+    bool getUp() const { return inputManager.portState(0).joy[0]; }
+    bool getDown() const { return inputManager.portState(0).joy[1]; }
+    bool getLeft() const { return inputManager.portState(0).joy[2]; }
+    bool getRight() const { return inputManager.portState(0).joy[3]; }
+    bool getFire() const { return inputManager.portState(0).joy[4]; }
 
-    bool getDown() const { return m_down; }
-    void setDown(bool value);
+    bool getMbLeft() const { return inputManager.portState(0).mb[0]; }
+    bool getMbMiddle() const { return inputManager.portState(0).mb[1]; }
+    bool getMbRight() const { return inputManager.portState(0).mb[2]; }
 
-    bool getLeft() const { return m_left; }
-    void setLeft(bool value);
-
-    bool getRight() const { return m_right; }
-    void setRight(bool value);
-
-    bool getFire() const { return m_fire; }
-    void setFire(bool value);
-
-    bool getMbLeft() const { return m_mb_left; }
-    void setMbLeft(bool value);
-
-    bool getMbMiddle() const { return m_mb_middle; }
-    void setMbMiddle(bool value);
-
-    bool getMbRight() const { return m_mb_right; }
-    void setMbRight(bool value);
-
-    float getDx() const { return m_dx; }
-    void setDx(float value);
-
-    float getDy() const { return m_dy; }
-    void setDy(float value);
+    float getDx() const { return inputManager.portState(0).dx; }
+    float getDy() const { return inputManager.portState(0).dy; }
 
 
     //
@@ -205,10 +167,7 @@ private:
     void keyDown(QKeyEvent *even, KeyModifier modifiers) override { };
     void keyUp(QKeyEvent *even, KeyModifier modifiers) override { };
     void keyCombo(KeyCombo combo, int count) override { };
-    void mouseDxDy(int port, u64 timestamp, float dx, float dy) override;
-    void mouseButton(int port, u64 timestamp, int button, bool down) override;
     void warpToCenter() override;
-    void joystickMotionEvent(int port, u64 timestamp, bool state[5], bool prev[5]) override;
 
 
     //
@@ -219,17 +178,9 @@ private:
 
     void windowChanged();
     void deviceChanged();
-    void upChanged();
-    void downChanged();
-    void leftChanged();
-    void rightChanged();
-    void fireChanged();
-    void mbLeftChanged();
-    void mbMiddleChanged();
-    void mbRightChanged();
     void deviceInfoChanged();
-    void dxChanged();
-    void dyChanged();
+    void mouseStateChanged();
+    void joystickStateChanged();
     void recordingChanged();
     void selectedKeyChanged();
 };

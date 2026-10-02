@@ -113,6 +113,14 @@ InputManager::physicalKeyCode(QKeyEvent *event)
 
 InputManager::InputManager() : QObject()
 {
+    m_mouseRestTimer.setSingleShot(true);
+    m_mouseRestTimer.setInterval(100);
+    connect(&m_mouseRestTimer, &QTimer::timeout, this, [this] {
+
+        for (auto &s : m_portState) s.dx = s.dy = 0;
+        emit mouseStateChanged();
+    });
+
 #ifdef __APPLE__
     m_mousePollTimer.setTimerType(Qt::PreciseTimer);
     m_mousePollTimer.setInterval(2);
@@ -348,6 +356,8 @@ InputManager::dispatchMouseMotion(u64 timestamp, float x, float y, float dx, flo
         emit mouseStateChanged();
         delegate->mouseDxDy(1, timestamp, sdx, sdy);
     }
+
+    m_mouseRestTimer.start();
 }
 
 void

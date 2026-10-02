@@ -15,14 +15,11 @@ PrefController::PrefController()
 {
     m_keyModel = new C64KeyModel(this);
 
-    // Let the axis readout fall back to zero once the mouse goes quiet
-    m_restTimer.setSingleShot(true);
-    m_restTimer.setInterval(100);
-    connect(&m_restTimer, &QTimer::timeout, this, [this] {
-
-        setDx(0.0f);
-        setDy(0.0f);
-    });
+    // The state lives in the input manager; pass its change signals on
+    connect(&inputManager, &InputManager::mouseStateChanged,
+            this, &PrefController::mouseStateChanged);
+    connect(&inputManager, &InputManager::joystickStateChanged,
+            this, &PrefController::joystickStateChanged);
 }
 
 PrefController::~PrefController()
@@ -89,98 +86,6 @@ PrefController::setDevice(int index)
 
         m_device = index;
         emit deviceChanged();
-    }
-}
-
-void
-PrefController::setUp(bool value)
-{
-    if (m_up != value) {
-        m_up = value;
-        emit upChanged();
-    }
-}
-
-void
-PrefController::setDown(bool value)
-{
-    if (m_down != value) {
-        m_down = value;
-        emit downChanged();
-    }
-}
-
-void
-PrefController::setLeft(bool value)
-{
-    if (m_left != value) {
-        m_left = value;
-        emit leftChanged();
-    }
-}
-
-void
-PrefController::setRight(bool value)
-{
-    if (m_right != value) {
-        m_right = value;
-        emit rightChanged();
-    }
-}
-
-void
-PrefController::setFire(bool value)
-{
-    if (m_fire != value) {
-        m_fire = value;
-        emit fireChanged();
-    }
-}
-
-void
-PrefController::setMbLeft(bool value)
-{
-    if (m_mb_left != value) {
-        m_mb_left = value;
-        emit mbLeftChanged();
-    }
-}
-
-void
-PrefController::setMbMiddle(bool value)
-{
-    if (m_mb_middle != value) {
-        m_mb_middle = value;
-        emit mbMiddleChanged();
-    }
-}
-
-void
-PrefController::setMbRight(bool value)
-{
-    if (m_mb_right != value) {
-        m_mb_right = value;
-        emit mbRightChanged();
-    }
-}
-
-void
-PrefController::setDx(float value)
-{
-    if (m_dx != value) {
-
-        m_dx = value;
-        emit dxChanged();
-    }
-}
-
-void
-PrefController::setDy(float value)
-{
-    if (m_dy != value) {
-
-        m_dy = value;
-        emit dyChanged();
     }
 }
 
@@ -296,22 +201,6 @@ PrefController::captureKey(uint scancode)
 }
 
 void
-PrefController::mouseDxDy(int port, u64 timestamp, float dx, float dy)
-{
-    setDx(dx);
-    setDy(dy);
-    m_restTimer.start();
-}
-
-void
-PrefController::mouseButton(int port, u64 timestamp, int button, bool down)
-{
-    if (button == 0) { setMbLeft(down); }
-    else if (button == 1) { setMbMiddle(down); }
-    else if (button == 2) { setMbRight(down); }
-}
-
-void
 PrefController::warpToCenter()
 {
     if (m_window) {
@@ -325,14 +214,4 @@ PrefController::warpToCenter()
         // Warp the cursor back to the center
         QCursor::setPos(globalCenter);
     }
-}
-
-void
-PrefController::joystickMotionEvent(int port, u64 timestamp, bool state[5], bool prev[5])
-{
-    setUp(state[0]);
-    setDown(state[1]);
-    setLeft(state[2]);
-    setRight(state[3]);
-    setFire(state[4]);
 }

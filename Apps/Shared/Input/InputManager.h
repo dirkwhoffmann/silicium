@@ -129,9 +129,12 @@ class InputManager : public QObject, SiObject, SDLManagerDelegate {
      * (see mouseState and joystickState). Kept here, and not in the
      * controllers, because it describes the devices, not the virtual machine.
      */
+  public:
+
     struct PortState {
 
-        // Mouse: latest (scaled) motion and the three buttons
+        // Mouse: latest (scaled) motion and the three buttons. The motion
+        // falls back to zero once the mouse stops moving.
         float dx = 0;
         float dy = 0;
         bool mb[3] = {};
@@ -140,7 +143,19 @@ class InputManager : public QObject, SiObject, SDLManagerDelegate {
         bool joy[5] = {};
     };
 
+  private:
+
     PortState m_portState[2];
+
+    /* Returns the motion to rest.
+     *
+     * dx/dy hold the delta of the most recent motion event, so once the events
+     * stop they keep describing a movement that is over. That happens when the
+     * pointer leaves the window, and equally when it simply stops moving inside
+     * it. Restarted on every motion event, so it only fires once the mouse has
+     * gone quiet.
+     */
+    QTimer m_mouseRestTimer;
 
     // Capturing modes
     bool m_captureMouse = false;
@@ -302,6 +317,8 @@ public:
   public:
 
     QVariantList deviceList() const;
+
+    const PortState &portState(int port) const { return m_portState[port]; }
 
     QVariantList getMouseState() const;
     QVariantList getJoystickState() const;
