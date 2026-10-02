@@ -90,14 +90,16 @@ Item {
 
             Layout.fillWidth: true
             Layout.preferredHeight: 1
-            color: Palette.toolbar.lighter(1.05)
+            // color: Palette.toolbar.lighter(1.05)
+            color: Qt.alpha(Palette.toolbar.darker(1.1), root.alpha)
         }
 
         Rectangle {
 
             Layout.fillWidth: true
             Layout.preferredHeight: 1
-            color: Palette.toolbar.darker(1.1)
+            // color: Palette.toolbar.darker(1.1)
+            color: Qt.alpha(Palette.toolbar.lighter(1.05), root.alpha)
         }
     }
 
@@ -156,16 +158,17 @@ Item {
 
                 spacing: Style.smallSpacing
             }
+        }
 
-            // Separates the title bar from what is below it
-            Rectangle {
+        //
+        // Separator (optional)
+        //
 
-                anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-                height: 1
+        Separator {
 
-                visible: !root.unified
-                color: "red"
-            }
+            Layout.fillWidth: true
+            // anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+            //visible: !root.unified
         }
 
         //
