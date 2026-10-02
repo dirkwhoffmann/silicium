@@ -31,9 +31,6 @@ normalizeAxis(int16_t value)
 
 SDLManager::SDLManager(QObject *parent) : QObject(parent)
 {
-    connect(&timer, &QTimer::timeout, this, QOverload<>::of(&SDLManager::update));
-    timer.setTimerType(Qt::TimerType::PreciseTimer);
-    timer.setSingleShot(true);
 }
 
 SDLManager::~SDLManager()
@@ -56,9 +53,6 @@ SDLManager::start()
 
         // Load device database
         loadDB();
-
-        // Fire timer
-        timer.start();
 
         running = true;
     }
@@ -119,8 +113,10 @@ SDLManager::loadDB()
 }
 
 void
-SDLManager::update()
+SDLManager::poll()
 {
+    if (!running) return;
+
     SDL_Event event;
 
     // Process all pending events
@@ -178,11 +174,6 @@ SDLManager::update()
                 break;
             }
         }
-    }
-
-    // Restart the timer
-    if (running) {
-        timer.start(TIMER_INTERVAL_MSEC);
     }
 }
 

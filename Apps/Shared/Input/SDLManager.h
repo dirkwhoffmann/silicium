@@ -12,7 +12,6 @@
 #include "Gamepad.h"
 #include <QMap>
 #include <QObject>
-#include <QTimer>
 #include <atomic>
 #include <thread>
 
@@ -39,12 +38,6 @@ class SDLManager : public QObject {
     //
     // std::vector<SDL_Gamepad *> controllers;
 
-    // Polling interval for SDL events
-    static constexpr int TIMER_INTERVAL_MSEC = 10;
-
-    // Polling timer
-    QTimer timer = QTimer(this);
-
     // Currently available SDL game pads
     QMap<int, Gamepad> m_gamePads;
 
@@ -64,6 +57,9 @@ class SDLManager : public QObject {
 
     void start();
     void stop();
+
+    // Processes all pending SDL events. Driven by the input manager.
+    void poll();
 
   private:
 
@@ -90,8 +86,4 @@ class SDLManager : public QObject {
      */
     void applyStoredMapping(Gamepad &pad);
     void applyStoredMappings();
-
-  private slots:
-
-    void update();
 };

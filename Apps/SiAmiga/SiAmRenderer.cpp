@@ -9,6 +9,7 @@
 
 #include "SiAmRenderer.h"
 #include "Logger.h"
+#include "AppServices.h"
 #include "Constants.h"
 #include "SiAmMergeNode.h"
 #include "VAmiga.h"
@@ -62,6 +63,9 @@ SiAmRenderer::start()
         tick();
         update();
     });
+
+    // This renderer polls the input devices once per frame (see tick())
+    AppServices::inputManager.setAutoPoll(false);
 }
 
 void
@@ -73,6 +77,9 @@ SiAmRenderer::stop()
 
         disconnect(m_frameConnection);
         m_frameConnection = QMetaObject::Connection();
+
+        // Back to polling by timer
+        AppServices::inputManager.setAutoPoll(true);
     }
 
     setFlag(ItemHasContents, false);
@@ -106,6 +113,10 @@ SiAmRenderer::tick()
 
     // Grab the current frame
     updateTexture();
+
+    // Sample the input devices as late as possible, so that the emulator
+    // sees the latest state when it computes the next frame
+    AppServices::inputManager.poll();
 
     // Let the emulator compute the next frame
     core.wakeUp();

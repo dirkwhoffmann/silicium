@@ -11,6 +11,7 @@
 
 #include "SDLManager.h"
 #include "SiObject.h"
+#include <QElapsedTimer>
 #include <QList>
 #include <QMouseEvent>
 #include <QObject>
@@ -119,11 +120,28 @@ class InputManager : public QObject, SiObject, SDLManagerDelegate {
     int ctrlMetaL = 0;
     int ctrlMetaR = 0;
 
-    /* Reads the relative mouse motion while the mouse is captured (macOS).
-     * The cursor is detached from the mouse then, which makes Qt stop
-     * delivering move events, so the hardware deltas are polled instead.
+    /* Polling
+     *
+     * Some input sources can't tell us when something happens and have to be
+     * asked: the SDL game pads, and the mouse while it is captured (macOS: the
+     * cursor is detached from the mouse then, which makes Qt stop delivering
+     * move events, so the hardware deltas are read instead). poll() does that.
+     *
+     * Who calls it is configurable. By default a timer does, which is what an
+     * application without an emulator window needs. A window that draws
+     * frames can drive it itself (see setAutoPoll()), right before it lets the
+     * emulator compute the next frame, which gives the shortest possible delay
+     * between an input and the core seeing it.
      */
-    QTimer m_mousePollTimer;
+    static constexpr int AUTO_POLL_MSEC = 10;
+    static constexpr int WATCHDOG_MSEC  = 50;
+
+    QTimer m_pollTimer;
+    QElapsedTimer m_sincePoll;
+    bool m_autoPoll = true;
+
+    // Reads the relative mouse motion while the mouse is captured
+    void pollMouse();
 
     /* What the input devices attached to the two control ports did last
      * (see mouseState and joystickState). Kept here, and not in the
@@ -317,6 +335,17 @@ public:
   public:
 
     QVariantList deviceList() const;
+
+    /* Polls the input devices that can't report events by themselves.
+     *
+     * In auto mode (the default) a timer calls this. When a frame-driven
+     * client takes over (setAutoPoll(false)), it must call this once per
+     * frame. A slow watchdog timer keeps polling for as long as nobody does,
+     * e.g., while the window is hidden, so game pads still show up and the
+     * preferences keep working.
+     */
+    void poll();
+    void setAutoPoll(bool value);
 
     const PortState &portState(int port) const { return m_portState[port]; }
 

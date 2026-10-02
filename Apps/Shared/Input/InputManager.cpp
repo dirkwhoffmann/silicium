@@ -121,22 +121,14 @@ InputManager::InputManager() : QObject()
         emit mouseStateChanged();
     });
 
-#ifdef __APPLE__
-    m_mousePollTimer.setTimerType(Qt::PreciseTimer);
-    m_mousePollTimer.setInterval(2);
-    connect(&m_mousePollTimer, &QTimer::timeout, this, [this]() {
+    m_sincePoll.start();
+    m_pollTimer.setTimerType(Qt::PreciseTimer);
+    m_pollTimer.setInterval(AUTO_POLL_MSEC);
+    connect(&m_pollTimer, &QTimer::timeout, this, [this]() {
 
-        int32_t dx = 0, dy = 0;
-        CGGetLastMouseDelta(&dx, &dy);
-
-        if (delegate && (dx != 0 || dy != 0)) {
-
-            auto pos = QCursor::pos();
-            dispatchMouseMotion(QDateTime::currentMSecsSinceEpoch(),
-                                pos.x(), pos.y(), dx, dy);
-        }
+        // In manual mode this is only a watchdog: step in if nobody polled
+        if (m_autoPoll || m_sincePoll.elapsed() >= WATCHDOG_MSEC - 10) poll();
     });
-#endif
 
 }
 
@@ -224,9 +216,7 @@ InputManager::setCaptureMouse(bool value)
             // away so the first event doesn't jump.
             int32_t dx, dy;
             CGGetLastMouseDelta(&dx, &dy);
-            m_mousePollTimer.start();
         } else {
-            m_mousePollTimer.stop();
             CGAssociateMouseAndMouseCursorPosition(true);
             CGDisplayShowCursor(kCGDirectMainDisplay);
         }
@@ -361,6 +351,40 @@ InputManager::dispatchMouseMotion(u64 timestamp, float x, float y, float dx, flo
 }
 
 void
+InputManager::poll()
+{
+    m_sincePoll.restart();
+
+    sdlManager.poll();
+    pollMouse();
+}
+
+void
+InputManager::setAutoPoll(bool value)
+{
+    m_autoPoll = value;
+    m_pollTimer.setInterval(value ? AUTO_POLL_MSEC : WATCHDOG_MSEC);
+}
+
+void
+InputManager::pollMouse()
+{
+#ifdef __APPLE__
+    if (!m_captureMouse) return;
+
+    int32_t dx = 0, dy = 0;
+    CGGetLastMouseDelta(&dx, &dy);
+
+    if (delegate && (dx != 0 || dy != 0)) {
+
+        auto pos = QCursor::pos();
+        dispatchMouseMotion(QDateTime::currentMSecsSinceEpoch(),
+                            pos.x(), pos.y(), dx, dy);
+    }
+#endif
+}
+
+void
 InputManager::sendMouseButton(int port, u64 timestamp, int button, bool down)
 {
     if (button >= 0 && button < 3) {
@@ -430,7 +454,7 @@ InputManager::mouseEventFilter(QObject *object, QMouseEvent *event)
     if (delegate) {
 
 #ifdef __APPLE__
-        // While captured, the motion is polled (see m_mousePollTimer)
+        // While captured, the motion is polled (see poll())
         if (m_captureMouse) return true;
 #endif
 
@@ -962,6 +986,9 @@ InputManager::start()
         sdlManager.setDelegate(this);
         sdlManager.start();
 
+        m_sincePoll.restart();
+        m_pollTimer.start();
+
         m_running = true;
     }
 }
@@ -976,6 +1003,7 @@ InputManager::stop()
         // Gives the cursor back (see setCaptureMouse())
         setCaptureMouse(false);
 
+        m_pollTimer.stop();
         sdlManager.stop();
 
         m_running = false;

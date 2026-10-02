@@ -9,6 +9,7 @@
 
 #include "SiC64Renderer.h"
 #include "Logger.h"
+#include "AppServices.h"
 #include "VCCore/Infrastructure/Constants.h"
 #include "VirtualC64.h"
 
@@ -56,6 +57,9 @@ SiC64Renderer::start()
         tick();
         update();
     });
+
+    // This renderer polls the input devices once per frame (see tick())
+    AppServices::inputManager.setAutoPoll(false);
 }
 
 void
@@ -91,6 +95,9 @@ SiC64Renderer::stop()
 
         disconnect(m_frameConnection);
         m_frameConnection = QMetaObject::Connection();
+
+        // Back to polling by timer
+        AppServices::inputManager.setAutoPoll(true);
     }
 
     // Optional: stop rendering
@@ -122,6 +129,10 @@ SiC64Renderer::tick()
     core.videoPort.lockTexture();
     tex = const_cast<u32 *>(core.videoPort.getTexture(&nr, &width, &height));
     core.videoPort.unlockTexture();
+
+    // Sample the input devices as late as possible, so that the emulator
+    // sees the latest state when it computes the next frame
+    AppServices::inputManager.poll();
 
     // Let the emulator compute the next frame
     core.wakeUp();
