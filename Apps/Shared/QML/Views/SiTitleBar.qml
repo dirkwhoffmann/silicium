@@ -37,20 +37,23 @@ Rectangle {
     property string title: ""
 
     // Visual style
-    property bool unified: false
-    property bool hidden: false
+    required property bool overlayed
+    required property bool unified
+
+    // Shows or hides the command bar
+    required property bool hidden
 
     // Items placed at the right-hand side of the bar
     property alias content: slot.data
 
     // Computed properties
-    readonly property bool showTitleBar: !root.hidden || !root.unified
+    readonly property bool hideTitleBar: hidden && overlayed && unified
 
     // Colors
-    readonly property real alpha: 1.0
-    readonly property color titleBarBg: root.unified ? Palette.toolbar : Palette.background
+    readonly property real alpha: overlayed && unified ? 0.9 : 1.0
+    readonly property color titleBarBg: unified ? Palette.toolbar : Palette.background
 
-    color: showTitleBar ? Qt.alpha(root.titleBarBg, root.alpha) : "transparent"
+    color: hideTitleBar ? "transparent" : Qt.alpha(root.titleBarBg, root.alpha)
 
     // Dragging the title bar moves the window. Declared first, so that the
     // items on top of it (the title and the content) get their clicks.
@@ -63,7 +66,7 @@ Rectangle {
     Text {
 
         anchors.centerIn: parent
-        visible: root.showTitleBar
+        visible: !root.hideTitleBar
         text: root.title
         color: Palette.secondary
         font.bold: true

@@ -392,8 +392,10 @@ ApplicationWindow {
         height: root.titleBarInset
         z: 10
 
+        overlayed: root.overlayed
         unified: root.unified
         hidden: !root.toolbarVisible
+
         title: "SiAmiga"
 
         content: [

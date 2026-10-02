@@ -60,7 +60,7 @@ Item {
     readonly property bool showToolbar: !root.hidden && (!root.compact || menuSwitch === 1)
 
     // Colors
-    readonly property real alpha: root.overlay ? 0.85 : 1.0
+    readonly property real alpha: root.overlayed ? 0.9 : 1.0
     readonly property color commandBarBg: Palette.toolbar
 
     //
