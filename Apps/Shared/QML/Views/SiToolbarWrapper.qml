@@ -61,7 +61,11 @@ Item {
     property int menuSwitch: 0
 
     // Computed properties
+    readonly property bool titleBarOverlayed: root.overlayed && root.unified
+    readonly property bool commandBarOverlayed: root.overlayed
+
     readonly property bool showTitleBar: !root.hidden || !root.unified
+    readonly property bool showCommandBar: !root.hidden
     readonly property bool showMenu: !root.hidden && (!root.compact || menuSwitch === 0)
     readonly property bool showToolbar: !root.hidden && (!root.compact || menuSwitch === 1)
 
@@ -71,7 +75,8 @@ Item {
                                                         : root.titleBarInset
 
     // Colors
-    readonly property real alpha: root.overlayed ? 0.9 : 1.0
+    readonly property real titleBarAlpha: titleBarOverlayed ? 0.9 : 1.0
+    readonly property real commandBarAlpha: commandBarOverlayed ? 0.9 : 1.0
     readonly property color commandBarBg: Palette.toolbar
     readonly property color titleBarBg: root.unified ? Palette.toolbar : Palette.background
 
@@ -81,7 +86,10 @@ Item {
 
     // A two pixel line, a light one on top of a dark one, which closes off the
     // command bar. Not drawn while the command bar is hidden.
+    /*
     component Separator: ColumnLayout {
+
+        property real alpha
 
         spacing: 0
         visible: !root.hidden
@@ -91,7 +99,7 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 1
             // color: Palette.toolbar.lighter(1.05)
-            color: Qt.alpha(Palette.toolbar.darker(1.1), root.alpha)
+            color: Qt.alpha(Palette.toolbar.darker(1.1), alpha)
         }
 
         Rectangle {
@@ -99,9 +107,11 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 1
             // color: Palette.toolbar.darker(1.1)
-            color: Qt.alpha(Palette.toolbar.lighter(1.05), root.alpha)
+            color: Qt.alpha(Palette.toolbar.lighter(1.05), alpha)
         }
     }
+
+     */
 
     //
     // Main
@@ -125,7 +135,7 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: root.titleBarInset
 
-            color: showTitleBar ? Qt.alpha(root.titleBarBg, root.alpha) : "transparent"
+            color: showTitleBar ? Qt.alpha(root.titleBarBg, root.titleBarAlpha) : "transparent"
 
             // Dragging the title bar moves the window. Declared first, so that
             // the items on top of it (the title and the content) get their
@@ -158,18 +168,48 @@ Item {
 
                 spacing: Style.smallSpacing
             }
+
+            Rectangle {
+
+                visible: root.showTitleBar
+                anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+                Layout.fillWidth: true
+                height: 1
+                // Layout.preferredHeight: 1
+                color: Qt.alpha(root.titleBarBg.darker(1.1), root.titleBarAlpha)
+            }
+
         }
 
         //
         // Separator (optional)
         //
 
+        /*
+        Rectangle {
+
+            visible: root.showTitleBar
+            Layout.fillWidth: true
+            Layout.preferredHeight: 1
+            color: Qt.alpha(root.titleBarBg.darker(1.1), root.titleBarAlpha)
+        }
+
+         */
+
+        Rectangle {
+
+            visible: root.showCommandBar
+            Layout.fillWidth: true
+            Layout.preferredHeight: 1
+            color: Qt.alpha(root.commandBarBg.lighter(1.05), root.commandBarAlpha)
+        }
+
+        /*
         Separator {
 
             Layout.fillWidth: true
-            // anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-            //visible: !root.unified
         }
+        */
 
         //
         // Menu row
@@ -178,7 +218,7 @@ Item {
         Rectangle {
 
             visible: root.showMenu
-            color: Qt.alpha(root.commandBarBg, root.alpha)
+            color: Qt.alpha(root.commandBarBg, root.commandBarAlpha)
             Layout.fillWidth: true
             implicitHeight: menuRow.implicitHeight
 
@@ -225,7 +265,7 @@ Item {
         Rectangle {
 
             visible: root.showToolbar
-            color: Qt.alpha(root.commandBarBg, root.alpha)
+            color: Qt.alpha(root.commandBarBg, root.commandBarAlpha)
             Layout.fillWidth: true
             implicitHeight: toolbarRow.implicitHeight
 
@@ -268,9 +308,20 @@ Item {
         // Separator
         //
 
+        Rectangle {
+
+            visible: root.showCommandBar
+            Layout.fillWidth: true
+            Layout.preferredHeight: 1
+            color: Qt.alpha(root.commandBarBg.darker(1.1), root.commandBarAlpha)
+        }
+
+        /*
         Separator {
 
             Layout.fillWidth: true
         }
+
+         */
     }
 }
