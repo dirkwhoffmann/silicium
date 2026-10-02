@@ -99,7 +99,7 @@ Rectangle {
 
         KeyLabel {
             id: keyLabel
-            Layout.preferredWidth: 100
+            Layout.preferredWidth: 120
         }
         SiText {
             text: ":"
@@ -138,7 +138,7 @@ Rectangle {
             KeyLabel {
                 id: keyLabel
                 text: "Category"
-                Layout.preferredWidth: 100
+                Layout.preferredWidth: 120
             }
 
             SiText {
@@ -164,6 +164,16 @@ Rectangle {
 
             width: parent.width
             visible: root.category === 0
+
+            KeyValue {
+                key: "Capture mouse"
+                value: AppController.inputManager.captureMouse
+            }
+
+            KeyValue {
+                key: "Capture keyboard"
+                value: AppController.inputManager.captureKeyboard
+            }
 
             // Latest activity of the devices in control port 1 | port 2
             KeyValue {
