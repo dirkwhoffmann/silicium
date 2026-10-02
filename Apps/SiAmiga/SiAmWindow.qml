@@ -97,7 +97,6 @@ ApplicationWindow {
 
     SiAmDevPanel {
 
-        controller: root.amiga
         x: 20
         // Unlike SiC64Window's canvas (which starts below the toolbar
         // unless auto-hide is on), SiAmToolbar always floats above the

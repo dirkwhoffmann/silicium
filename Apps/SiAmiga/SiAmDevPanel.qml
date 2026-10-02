@@ -19,10 +19,13 @@ Rectangle {
 
     id: root
 
-    required property SiAmController controller
+    readonly property SiAmController controller: SiAmController
+    readonly property SiAmInfoController info: controller.info
 
     property real startX: 0
     property real startY: 0
+
+    property int category: 0
 
     x: 0
     y: 0
@@ -60,13 +63,6 @@ Rectangle {
 
             if (dragArea.pressed) {
 
-                /* Keep the whole panel inside its parent: the lower bound holds
-                 * the left and top edges in, the upper bound the right and
-                 * bottom ones. Clamping the limits at zero matters when the
-                 * parent is smaller than the panel -- a negative limit would
-                 * otherwise fight the lower bound and pull the panel off the
-                 * opposite side.
-                 */
                 const maxX = Math.max(0.0, root.parent.width - root.width)
                 const maxY = Math.max(0.0, root.parent.height - root.height)
 
@@ -155,6 +151,8 @@ Rectangle {
                 Layout.fillWidth: true
                 focusable: Qt.NoFocus
                 model: ["Input", "Window"]
+                currentIndex: root.category
+                onCurrentIndexChanged: root.category = currentIndex
             }
         }
 
@@ -165,7 +163,7 @@ Rectangle {
         ColumnLayout {
 
             width: parent.width
-            visible: categoryCombo.currentText === "Input"
+            visible: root.category === 0
 
             KeyValue {
                 key: "Mouse"
@@ -218,7 +216,7 @@ Rectangle {
         ColumnLayout {
 
             width: parent.width
-            visible: categoryCombo.currentText === "Window"
+            visible: root.category === 0
 
             KeyValue {
                 key: "Size"
