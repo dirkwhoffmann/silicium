@@ -218,7 +218,7 @@ Rectangle {
         ColumnLayout {
 
             width: parent.width
-            visible: root.category === 0
+            visible: root.category === 1
 
             KeyValue {
                 key: "Size"

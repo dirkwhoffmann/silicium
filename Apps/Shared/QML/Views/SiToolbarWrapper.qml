@@ -43,19 +43,11 @@ Item {
     // Content
     property alias menuContent: menuSlot.data
     property alias toolbarContent: toolbarSlot.data
-    property alias titleBarContent: titleBarSlot.data
 
     // Visual style
     required property bool overlayed
     required property bool unified
     required property bool compact
-
-    // Title bar height
-    required property real titleBarInset
-
-    // Window title, drawn in QML. The native title is not used, because
-    // its view swallows mouse clicks and so blocks dragging the window.
-    property string titleText: ""
 
     // Shows or hides the command bar
     property bool hidden: false
@@ -64,14 +56,12 @@ Item {
     property int menuSwitch: 0
 
     // Computed properties
-    readonly property bool showTitleBar: !root.hidden || !root.unified
     readonly property bool showMenu: !root.hidden && (!root.compact || menuSwitch === 0)
     readonly property bool showToolbar: !root.hidden && (!root.compact || menuSwitch === 1)
 
     // Colors
     readonly property real alpha: root.overlay ? 0.85 : 1.0
     readonly property color commandBarBg: Palette.toolbar
-    readonly property color titleBarBg: root.unified ? Palette.toolbar : Palette.background
 
     //
     // Main
@@ -83,43 +73,6 @@ Item {
 
         anchors { left: parent.left; right: parent.right; top: parent.top }
         spacing: 0
-
-        //
-        // Title bar
-        //
-
-        Rectangle {
-
-            id: titleRow
-
-            Layout.fillWidth: true
-            Layout.preferredHeight: root.titleBarInset
-
-            color: showTitleBar ? Qt.alpha(root.titleBarBg, root.alpha) : "transparent"
-
-            Text {
-
-                anchors.centerIn: parent
-                visible: root.showTitleBar
-                text: root.titleText
-                color: Palette.secondary
-                font.bold: true
-                elide: Text.ElideRight
-                width: Math.min(implicitWidth, parent.width / 2)
-                horizontalAlignment: Text.AlignHCenter
-            }
-
-            Row {
-
-                id: titleBarSlot
-
-                anchors.right: parent.right
-                anchors.rightMargin: Style.mediumSpacing
-                anchors.verticalCenter: parent.verticalCenter
-
-                spacing: Style.smallSpacing
-            }
-        }
 
         //
         // Separator line
