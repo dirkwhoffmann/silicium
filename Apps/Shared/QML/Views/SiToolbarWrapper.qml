@@ -81,39 +81,6 @@ Item {
     readonly property color titleBarBg: root.unified ? Palette.toolbar : Palette.background
 
     //
-    // Components
-    //
-
-    // A two pixel line, a light one on top of a dark one, which closes off the
-    // command bar. Not drawn while the command bar is hidden.
-    /*
-    component Separator: ColumnLayout {
-
-        property real alpha
-
-        spacing: 0
-        visible: !root.hidden
-
-        Rectangle {
-
-            Layout.fillWidth: true
-            Layout.preferredHeight: 1
-            // color: Palette.toolbar.lighter(1.05)
-            color: Qt.alpha(Palette.toolbar.darker(1.1), alpha)
-        }
-
-        Rectangle {
-
-            Layout.fillWidth: true
-            Layout.preferredHeight: 1
-            // color: Palette.toolbar.darker(1.1)
-            color: Qt.alpha(Palette.toolbar.lighter(1.05), alpha)
-        }
-    }
-
-     */
-
-    //
     // Main
     //
 
@@ -182,19 +149,8 @@ Item {
         }
 
         //
-        // Separator (optional)
+        // Command bar
         //
-
-        /*
-        Rectangle {
-
-            visible: root.showTitleBar
-            Layout.fillWidth: true
-            Layout.preferredHeight: 1
-            color: Qt.alpha(root.titleBarBg.darker(1.1), root.titleBarAlpha)
-        }
-
-         */
 
         Rectangle {
 
@@ -203,13 +159,6 @@ Item {
             Layout.preferredHeight: 1
             color: Qt.alpha(root.commandBarBg.lighter(1.05), root.commandBarAlpha)
         }
-
-        /*
-        Separator {
-
-            Layout.fillWidth: true
-        }
-        */
 
         //
         // Menu row
