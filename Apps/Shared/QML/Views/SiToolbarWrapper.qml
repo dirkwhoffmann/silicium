@@ -37,18 +37,18 @@ Item {
 
     id: root
 
-    // color: root.commandBarBg
     implicitHeight: content.implicitHeight
 
     // Content
+    property alias titleBarContent: titleBarSlot.data
     property alias menuContent: menuSlot.data
     property alias toolbarContent: toolbarSlot.data
-    property alias titleBarContent: titleBarSlot.data
 
     // Visual style
     required property bool overlayed
     required property bool unified
     required property bool compact
+    required property bool hidden
 
     // Title bar height
     required property real titleBarInset
@@ -56,9 +56,6 @@ Item {
     // Window title, drawn in QML. The native title is not used, because
     // its view swallows mouse clicks and so blocks dragging the window.
     property string titleText: ""
-
-    // Shows or hides the command bar
-    property bool hidden: false
 
     // State of the menu / toolbar switch (0 = menu, 1 = toolbar)
     property int menuSwitch: 0
@@ -68,10 +65,41 @@ Item {
     readonly property bool showMenu: !root.hidden && (!root.compact || menuSwitch === 0)
     readonly property bool showToolbar: !root.hidden && (!root.compact || menuSwitch === 1)
 
+    // Where the picture below the chrome starts
+    readonly property real canvasStart: !root.overlayed ? root.y + root.height
+                                      : root.unified    ? 0
+                                                        : root.titleBarInset
+
     // Colors
     readonly property real alpha: root.overlayed ? 0.9 : 1.0
     readonly property color commandBarBg: Palette.toolbar
     readonly property color titleBarBg: root.unified ? Palette.toolbar : Palette.background
+
+    //
+    // Components
+    //
+
+    // A two pixel line, a light one on top of a dark one, which closes off the
+    // command bar. Not drawn while the command bar is hidden.
+    component Separator: ColumnLayout {
+
+        spacing: 0
+        visible: !root.hidden
+
+        Rectangle {
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: 1
+            color: Palette.toolbar.lighter(1.05)
+        }
+
+        Rectangle {
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: 1
+            color: Palette.toolbar.darker(1.1)
+        }
+    }
 
     //
     // Main
@@ -237,24 +265,9 @@ Item {
         // Separator
         //
 
-        Rectangle {
+        Separator {
 
             Layout.fillWidth: true
-            // anchors { left: parent.left; right: parent.right; bottom: parent.bottom; bottomMargin: 0 }
-            height: 1
-
-            visible: !root.hidden
-            color: Palette.toolbar.lighter(1.05)
-        }
-
-        Rectangle {
-
-            Layout.fillWidth: true
-            // anchors { left: parent.left; right: parent.right; bottom: parent.bottom; bottomMargin: 1 }
-            height: 1
-
-            visible: !root.hidden
-            color: Palette.toolbar.darker(1.1)
         }
     }
 }

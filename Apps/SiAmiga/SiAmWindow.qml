@@ -55,12 +55,7 @@ ApplicationWindow {
         id: canvas
 
         anchors.fill: parent
-        // Below the toolbar, unless the chrome is overlaid. Then the picture
-        // starts below the title bar, or at the very top if that is unified
-        // with the chrome.
-        anchors.topMargin: !root.overlayed ? toolbar.y + toolbar.height
-                         : root.unified    ? 0
-                                           : root.titleBarInset
+        anchors.topMargin: toolbar.canvasStart
         anchors.bottomMargin: root.overlayed || !statusbar.visible ? 0 : statusbar.height
 
         controller: root.amiga
