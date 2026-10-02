@@ -170,27 +170,29 @@ Rectangle {
             width: parent.width
             visible: categoryCombo.currentText === "Input"
 
+            // Latest activity of the devices in control port 1 | port 2
             KeyValue {
-                key: "Mouse"
-                value: "dx = " + Math.round(controller.dx) + "  dy = " + Math.round(controller.dy)
+                key: "Mouse (dx/dy)"
+                value: AppController.inputManager.mouseState
+                    .map(s => Math.round(s.dx) + "/" + Math.round(s.dy)).join("  |  ")
             }
 
             KeyValue {
                 key: "Mouse buttons"
-                value: controller.mbLeft + "  " + controller.mbMiddle + "  " + controller.mbRight
+                value: AppController.inputManager.mouseState
+                    .map(s => (+s.left) + " " + (+s.middle) + " " + (+s.right)).join("  |  ")
             }
 
             KeyValue {
                 key: "Joystick axis"
-                value: controller.joyUp + "  "
-                    + controller.joyDown + "  "
-                    + controller.joyLeft + "  "
-                    + controller.joyRight
+                value: AppController.inputManager.joystickState
+                    .map(s => "" + (+s.up) + (+s.down) + (+s.left) + (+s.right)).join("  |  ")
             }
 
             KeyValue {
                 key: "Joy button"
-                value: controller.joyFire
+                value: AppController.inputManager.joystickState
+                    .map(s => +s.fire).join("  |  ")
             }
 
             KeyValue {

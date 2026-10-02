@@ -375,98 +375,6 @@ C64Controller::setDebugPanel(bool value)
 }
 
 void
-C64Controller::setDx(float value)
-{
-    if (m_dx != value) {
-
-        m_dx = value;
-        emit dxChanged();
-    }
-}
-
-void
-C64Controller::setDy(float value)
-{
-    if (m_dy != value) {
-
-        m_dy = value;
-        emit dyChanged();
-    }
-}
-
-void
-C64Controller::setMbLeft(bool value)
-{
-    if (m_mb_left != value) {
-        m_mb_left = value;
-        emit mbLeftChanged();
-    }
-}
-
-void
-C64Controller::setMbMiddle(bool value)
-{
-    if (m_mb_middle != value) {
-        m_mb_middle = value;
-        emit mbMiddleChanged();
-    }
-}
-
-void
-C64Controller::setMbRight(bool value)
-{
-    if (m_mb_right != value) {
-        m_mb_right = value;
-        emit mbRightChanged();
-    }
-}
-
-void
-C64Controller::setJoyUp(bool value)
-{
-    if (m_joy_up != value) {
-        m_joy_up = value;
-        emit joyUpChanged();
-    }
-}
-
-void
-C64Controller::setJoyDown(bool value)
-{
-    if (m_joy_down != value) {
-        m_joy_down = value;
-        emit joyDownChanged();
-    }
-}
-
-void
-C64Controller::setJoyLeft(bool value)
-{
-    if (m_joy_left != value) {
-        m_joy_left = value;
-        emit joyLeftChanged();
-    }
-}
-
-void
-C64Controller::setJoyRight(bool value)
-{
-    if (m_joy_right != value) {
-        m_joy_right = value;
-        emit joyRightChanged();
-    }
-}
-
-void
-C64Controller::setJoyFire(bool value)
-{
-    if (m_joy_fire != value) {
-        m_joy_fire = value;
-        emit joyFireChanged();
-    }
-}
-
-void
 C64Controller::warpToCenter()
 {
     if (m_window) {
@@ -688,7 +596,7 @@ C64Controller::mouseButton(int port, u64 timestamp, int button, bool down)
 }
 
 void
-C64Controller::joystickMotionEvent(int port, u64 timestamp, bool state[5])
+C64Controller::joystickMotionEvent(int port, u64 timestamp, bool state[5], bool prev[5])
 {
     auto &cp = port == 0 ? core().controlPort1 : core().controlPort2;
 

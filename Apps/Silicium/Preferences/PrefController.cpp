@@ -328,7 +328,7 @@ PrefController::warpToCenter()
 }
 
 void
-PrefController::joystickMotionEvent(int port, u64 timestamp, bool state[5])
+PrefController::joystickMotionEvent(int port, u64 timestamp, bool state[5], bool prev[5])
 {
     setUp(state[0]);
     setDown(state[1]);

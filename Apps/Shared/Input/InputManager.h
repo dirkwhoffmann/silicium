@@ -15,6 +15,8 @@
 #include <QMouseEvent>
 #include <QObject>
 #include <QTimer>
+#include <QVariantList>
+#include <QVariantMap>
 
 class VirtualMachine;
 class QQuickWindow;
@@ -79,7 +81,10 @@ class InputManagerDelegate {
     virtual void shakeDetected() { };
 
     // Gamepad events
-    virtual void joystickMotionEvent(int port, u64 timestamp, bool state[5]) { };
+    // Called when the joystick state of a port changes. Both the new and the
+    // previous state are passed (up, down, left, right, fire), so delegates
+    // that act on transitions don't have to keep a copy of their own.
+    virtual void joystickMotionEvent(int port, u64 timestamp, bool state[5], bool prev[5]) { };
 };
 
 class InputManager : public QObject, SiObject, SDLManagerDelegate {
@@ -119,6 +124,23 @@ class InputManager : public QObject, SiObject, SDLManagerDelegate {
      * delivering move events, so the hardware deltas are polled instead.
      */
     QTimer m_mousePollTimer;
+
+    /* What the input devices attached to the two control ports did last
+     * (see mouseState and joystickState). Kept here, and not in the
+     * controllers, because it describes the devices, not the virtual machine.
+     */
+    struct PortState {
+
+        // Mouse: latest (scaled) motion and the three buttons
+        float dx = 0;
+        float dy = 0;
+        bool mb[3] = {};
+
+        // Joystick: up, down, left, right, fire
+        bool joy[5] = {};
+    };
+
+    PortState m_portState[2];
 
     // Capturing modes
     bool m_captureMouse = false;
@@ -169,6 +191,14 @@ public:
      */
     Q_PROPERTY(QVariantMap port0Info READ getPort0Info NOTIFY port0InfoChanged)
     Q_PROPERTY(QVariantMap port1Info READ getPort1Info NOTIFY port1InfoChanged)
+
+    /* The latest mouse and joystick activity per control port, as lists of
+     * two maps (index = port). Mouse: dx, dy, left, middle, right. Joystick:
+     * up, down, left, right, fire. The dx and dy values are the latest motion
+     * delta, not an accumulated position.
+     */
+    Q_PROPERTY(QVariantList mouseState READ getMouseState NOTIFY mouseStateChanged)
+    Q_PROPERTY(QVariantList joystickState READ getJoystickState NOTIFY joystickStateChanged)
 
     Q_PROPERTY(bool captureMouse READ getCaptureMouse WRITE setCaptureMouse NOTIFY captureMouseChanged)
     Q_PROPERTY(bool captureKeyboard READ getCaptureKeyboard WRITE setCaptureKeyboard NOTIFY captureKeyboardChanged)
@@ -244,6 +274,10 @@ public:
 
     // Forwards relative mouse motion to the delegate
     void dispatchMouseMotion(u64 timestamp, float x, float y, float dx, float dy);
+
+    // Record the new port state and tell the delegate
+    void sendMouseButton(int port, u64 timestamp, int button, bool down);
+    void sendJoystickState(int port, u64 timestamp, const bool state[5]);
     bool mouseButtonEventFilter(QObject *obj, QMouseEvent *event);
     bool keyDownEventFilter(QObject *obj, QKeyEvent *event);
     bool keyUpEventFilter(QObject *obj, QKeyEvent *event);
@@ -269,6 +303,9 @@ public:
 
     QVariantList deviceList() const;
 
+    QVariantList getMouseState() const;
+    QVariantList getJoystickState() const;
+
   signals:
 
     void devicesChanged();
@@ -279,4 +316,6 @@ public:
     void captureMouseChanged();
     void captureKeyboardChanged();
     void keyChanged();
+    void mouseStateChanged();
+    void joystickStateChanged();
 };

@@ -208,7 +208,7 @@ private:
     void mouseDxDy(int port, u64 timestamp, float dx, float dy) override;
     void mouseButton(int port, u64 timestamp, int button, bool down) override;
     void warpToCenter() override;
-    void joystickMotionEvent(int port, u64 timestamp, bool state[5]) override;
+    void joystickMotionEvent(int port, u64 timestamp, bool state[5], bool prev[5]) override;
 
 
     //

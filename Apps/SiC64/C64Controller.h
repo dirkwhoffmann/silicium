@@ -88,20 +88,6 @@ class C64Controller : public Controller {
     int m_port0 = 0;
     int m_port1 = 0;
 
-    // Captured mouse state
-    float m_dx       = 0;
-    float m_dy       = 0;
-    bool m_mb_left   = false;
-    bool m_mb_middle = false;
-    bool m_mb_right  = false;
-
-    // Captured joystick state
-    bool m_joy_up    = false;
-    bool m_joy_down  = false;
-    bool m_joy_left  = false;
-    bool m_joy_right = false;
-    bool m_joy_fire  = false;
-
 
     //
     // Shared inspector state
@@ -323,48 +309,6 @@ public:
     bool mouseCaptured();
     bool keyboardCaptured();
 
-    Q_PROPERTY(float dx READ getDx WRITE setDx NOTIFY dxChanged)
-    Q_PROPERTY(float dy READ getDy WRITE setDy NOTIFY dyChanged)
-    Q_PROPERTY(bool mbLeft READ getMbLeft WRITE setMbLeft NOTIFY mbLeftChanged)
-    Q_PROPERTY(bool mbMiddle READ getMbMiddle WRITE setMbMiddle NOTIFY mbMiddleChanged)
-    Q_PROPERTY(bool mbRight READ getMbRight WRITE setMbRight NOTIFY mbRightChanged)
-    Q_PROPERTY(bool joyUp READ getJoyUp WRITE setJoyUp NOTIFY joyUpChanged)
-    Q_PROPERTY(bool joyDown READ getJoyDown WRITE setJoyDown NOTIFY joyDownChanged)
-    Q_PROPERTY(bool joyLeft READ getJoyLeft WRITE setJoyLeft NOTIFY joyLeftChanged)
-    Q_PROPERTY(bool joyRight READ getJoyRight WRITE setJoyRight NOTIFY joyRightChanged)
-    Q_PROPERTY(bool joyFire READ getJoyFire WRITE setJoyFire NOTIFY joyFireChanged)
-
-    float getDx() const { return m_dx; }
-    void setDx(float value);
-
-    float getDy() const { return m_dy; }
-    void setDy(float value);
-
-    bool getMbLeft() const { return m_mb_left; }
-    void setMbLeft(bool value);
-
-    bool getMbMiddle() const { return m_mb_middle; }
-    void setMbMiddle(bool value);
-
-    bool getMbRight() const { return m_mb_right; }
-    void setMbRight(bool value);
-
-    bool getJoyUp() const { return m_joy_up; }
-    void setJoyUp(bool value);
-
-    bool getJoyDown() const { return m_joy_down; }
-    void setJoyDown(bool value);
-
-    bool getJoyLeft() const { return m_joy_left; }
-    void setJoyLeft(bool value);
-
-    bool getJoyRight() const { return m_joy_right; }
-    void setJoyRight(bool value);
-
-    bool getJoyFire() const { return m_joy_fire; }
-    void setJoyFire(bool value);
-
-
     //
     // Managing the shared display state
     //
@@ -419,7 +363,7 @@ public:
     void shakeDetected() override;
 
     void warpToCenter() override;
-    void joystickMotionEvent(int port, u64 timestamp, bool state[5]) override;
+    void joystickMotionEvent(int port, u64 timestamp, bool state[5], bool prev[5]) override;
 
 
     //
@@ -516,16 +460,6 @@ signals:
     void debugPanelChanged();
     void captureChanged();
     void shutdown();
-    void dxChanged();
-    void dyChanged();
-    void mbLeftChanged();
-    void mbMiddleChanged();
-    void mbRightChanged();
-    void joyUpChanged();
-    void joyDownChanged();
-    void joyLeftChanged();
-    void joyRightChanged();
-    void joyFireChanged();
 
     void cpuStateChanged();
     void retroShellTextChanged();

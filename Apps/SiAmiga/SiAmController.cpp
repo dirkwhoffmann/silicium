@@ -871,106 +871,6 @@ SiAmController::capsLock(bool state)
 }
 
 void
-SiAmController::setDx(float value)
-{
-    if (m_dx != value) {
-
-        m_dx = value;
-        emit dxChanged();
-    }
-}
-
-void
-SiAmController::setDy(float value)
-{
-    if (m_dy != value) {
-
-        m_dy = value;
-        emit dyChanged();
-    }
-}
-
-void
-SiAmController::setMbLeft(bool value)
-{
-    if (m_mb_left != value) {
-
-        m_mb_left = value;
-        emit mbLeftChanged();
-    }
-}
-
-void
-SiAmController::setMbMiddle(bool value)
-{
-    if (m_mb_middle != value) {
-
-        m_mb_middle = value;
-        emit mbMiddleChanged();
-    }
-}
-
-void
-SiAmController::setMbRight(bool value)
-{
-    if (m_mb_right != value) {
-
-        m_mb_right = value;
-        emit mbRightChanged();
-    }
-}
-
-void
-SiAmController::setJoyUp(bool value)
-{
-    if (m_joy_up != value) {
-
-        m_joy_up = value;
-        emit joyUpChanged();
-    }
-}
-
-void
-SiAmController::setJoyDown(bool value)
-{
-    if (m_joy_down != value) {
-
-        m_joy_down = value;
-        emit joyDownChanged();
-    }
-}
-
-void
-SiAmController::setJoyLeft(bool value)
-{
-    if (m_joy_left != value) {
-
-        m_joy_left = value;
-        emit joyLeftChanged();
-    }
-}
-
-void
-SiAmController::setJoyRight(bool value)
-{
-    if (m_joy_right != value) {
-
-        m_joy_right = value;
-        emit joyRightChanged();
-    }
-}
-
-void
-SiAmController::setJoyFire(bool value)
-{
-    if (m_joy_fire != value) {
-
-        m_joy_fire = value;
-        emit joyFireChanged();
-    }
-}
-
-void
 SiAmController::mouseDxDy(int port, u64 timestamp, float dx, float dy)
 {
     if (mouseCaptured()) {
@@ -978,9 +878,6 @@ SiAmController::mouseDxDy(int port, u64 timestamp, float dx, float dy)
         auto &cp = port == 0 ? core().controlPort1 : core().controlPort2;
         cp.mouse.setDxDy(dx, dy);
     }
-
-    setDx(dx);
-    setDy(dy);
 }
 
 void
@@ -1000,51 +897,31 @@ SiAmController::mouseButton(int port, u64 timestamp, int button, bool down)
                 break;
         }
     }
-
-    switch (button) {
-
-        case 0: setMbLeft(down); break;
-        case 1: setMbMiddle(down); break;
-        case 2: setMbRight(down); break;
-
-        default:
-            break;
-    }
 }
 
 void
-SiAmController::joystickMotionEvent(int port, u64 timestamp, bool state[5])
+SiAmController::joystickMotionEvent(int port, u64 timestamp, bool state[5], bool prev[5])
 {
+    if (port != 0 && port != 1) return;
+
     // The state is ordered up, down, left, right, fire. Only changes are
     // forwarded: pressing fire again would toggle autofire, for example.
-    if (port == 0 || port == 1) {
+    auto &joystick = port == 0 ? core().controlPort1.joystick : core().controlPort2.joystick;
 
-        auto &joystick = port == 0 ? core().controlPort1.joystick : core().controlPort2.joystick;
-        auto *prev = m_joy_prev[port];
+    if (state[0] != prev[0] || state[1] != prev[1]) {
 
-        if (state[0] != prev[0] || state[1] != prev[1]) {
-
-            joystick.trigger(state[0] ? GamePadAction::PULL_UP :
-                             state[1] ? GamePadAction::PULL_DOWN : GamePadAction::RELEASE_Y);
-        }
-        if (state[2] != prev[2] || state[3] != prev[3]) {
-
-            joystick.trigger(state[2] ? GamePadAction::PULL_LEFT :
-                             state[3] ? GamePadAction::PULL_RIGHT : GamePadAction::RELEASE_X);
-        }
-        if (state[4] != prev[4]) {
-
-            joystick.trigger(state[4] ? GamePadAction::PRESS_FIRE : GamePadAction::RELEASE_FIRE);
-        }
-        std::copy(state, state + 5, prev);
+        joystick.trigger(state[0] ? GamePadAction::PULL_UP :
+                         state[1] ? GamePadAction::PULL_DOWN : GamePadAction::RELEASE_Y);
     }
+    if (state[2] != prev[2] || state[3] != prev[3]) {
 
-    // Record the state for the dev panel
-    setJoyUp(state[0]);
-    setJoyDown(state[1]);
-    setJoyLeft(state[2]);
-    setJoyRight(state[3]);
-    setJoyFire(state[4]);
+        joystick.trigger(state[2] ? GamePadAction::PULL_LEFT :
+                         state[3] ? GamePadAction::PULL_RIGHT : GamePadAction::RELEASE_X);
+    }
+    if (state[4] != prev[4]) {
+
+        joystick.trigger(state[4] ? GamePadAction::PRESS_FIRE : GamePadAction::RELEASE_FIRE);
+    }
 }
 
 bool

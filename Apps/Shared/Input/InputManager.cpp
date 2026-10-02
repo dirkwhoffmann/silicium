@@ -12,6 +12,7 @@
 #include "Assets.h"
 #include "Logger.h"
 #include <QCursor>
+#include <algorithm>
 #include <QDateTime>
 #include <QGuiApplication>
 #include <QInputMethod>
@@ -333,14 +334,82 @@ InputManager::dispatchMouseMotion(u64 timestamp, float x, float y, float dx, flo
     if (auto *device = getPort0Device(); device->type == GamepadType::Mouse) {
 
         delegate->mouseXY(0, timestamp, x, y);
+        m_portState[0].dx = sdx;
+        m_portState[0].dy = sdy;
+        emit mouseStateChanged();
         delegate->mouseDxDy(0, timestamp, sdx, sdy);
     }
 
     if (auto *device = getPort1Device(); device->type == GamepadType::Mouse) {
 
         delegate->mouseXY(1, timestamp, x, y);
+        m_portState[1].dx = sdx;
+        m_portState[1].dy = sdy;
+        emit mouseStateChanged();
         delegate->mouseDxDy(1, timestamp, sdx, sdy);
     }
+}
+
+void
+InputManager::sendMouseButton(int port, u64 timestamp, int button, bool down)
+{
+    if (button >= 0 && button < 3) {
+
+        m_portState[port].mb[button] = down;
+        emit mouseStateChanged();
+    }
+
+    if (delegate) delegate->mouseButton(port, timestamp, button, down);
+}
+
+void
+InputManager::sendJoystickState(int port, u64 timestamp, const bool state[5])
+{
+    auto &joy = m_portState[port].joy;
+
+    // Key auto-repeat and the like report the same state again and again.
+    // Acting on those could do harm (a second "press" toggles autofire).
+    if (std::equal(state, state + 5, joy)) return;
+
+    bool prev[5];
+    bool next[5];
+    std::copy(joy, joy + 5, prev);
+    std::copy(state, state + 5, next);
+    std::copy(state, state + 5, joy);
+
+    emit joystickStateChanged();
+
+    if (delegate) delegate->joystickMotionEvent(port, timestamp, next, prev);
+}
+
+QVariantList
+InputManager::getMouseState() const
+{
+    QVariantList list;
+
+    for (const auto &s : m_portState) {
+
+        list.append(QVariantMap {
+            { "dx", s.dx }, { "dy", s.dy },
+            { "left", s.mb[0] }, { "middle", s.mb[1] }, { "right", s.mb[2] }
+        });
+    }
+    return list;
+}
+
+QVariantList
+InputManager::getJoystickState() const
+{
+    QVariantList list;
+
+    for (const auto &s : m_portState) {
+
+        list.append(QVariantMap {
+            { "up", s.joy[0] }, { "down", s.joy[1] },
+            { "left", s.joy[2] }, { "right", s.joy[3] }, { "fire", s.joy[4] }
+        });
+    }
+    return list;
 }
 
 bool
@@ -394,10 +463,10 @@ InputManager::mouseButtonEventFilter(QObject *obj, QMouseEvent *event)
         if (auto button = mappedButton(event->button()); button != -1) {
 
             if (auto *device = getPort0Device(); device->type == GamepadType::Mouse) {
-                delegate->mouseButton(0, event->timestamp(), button, down);
+                sendMouseButton(0, event->timestamp(), button, down);
             }
             if (auto *device = getPort1Device(); device->type == GamepadType::Mouse) {
-                delegate->mouseButton(1, event->timestamp(), button, down);
+                sendMouseButton(1, event->timestamp(), button, down);
             }
 
             if (m_captureMouse) return true;
@@ -621,7 +690,7 @@ InputManager::emulationKeyFilter(int port, QKeyEvent *event, bool down)
                     // printf("MOUSE EMULATION KEY %d hit\n", *nr);
 
                     if (*nr < 3) {
-                        if (delegate) delegate->mouseButton(port, time, *nr, down);
+                        sendMouseButton(port, time, *nr, down);
                     }
                     break;
 
@@ -631,7 +700,7 @@ InputManager::emulationKeyFilter(int port, QKeyEvent *event, bool down)
 
                     assert(*nr <= 4);
                     device->state[*nr] = down;
-                    if (delegate) delegate->joystickMotionEvent(port, time, device->state);
+                    sendJoystickState(port, time, device->state);
                     break;
 
                 default:
@@ -950,14 +1019,11 @@ InputManager::sdlAxisEvent(int sdlid, u64 timestamp, int axis, int value, float 
         printf("\n");
         */
 
-        if (delegate) {
+        if (auto *device = getPort0Device(); device->sdlid == sdlid)
+            sendJoystickState(0, timestamp, dev->state);
 
-            if (auto *device = getPort0Device(); device->sdlid == sdlid)
-                delegate->joystickMotionEvent(0, timestamp, dev->state);
-
-            if (auto *device = getPort1Device(); device->sdlid == sdlid)
-                delegate->joystickMotionEvent(1, timestamp, dev->state);
-        }
+        if (auto *device = getPort1Device(); device->sdlid == sdlid)
+            sendJoystickState(1, timestamp, dev->state);
     }
 }
 
@@ -975,13 +1041,10 @@ InputManager::sdlButtonEvent(int sdlid, u64 timestamp, int button, bool down)
 
         dev->state[4] = down;
 
-        if (delegate) {
+        if (auto *device = getPort0Device(); device->sdlid == sdlid)
+            sendJoystickState(0, timestamp, dev->state);
 
-            if (auto *device = getPort0Device(); device->sdlid == sdlid)
-                delegate->joystickMotionEvent(0, timestamp, dev->state);
-
-            if (auto *device = getPort1Device(); device->sdlid == sdlid)
-                delegate->joystickMotionEvent(1, timestamp, dev->state);
-        }
+        if (auto *device = getPort1Device(); device->sdlid == sdlid)
+            sendJoystickState(1, timestamp, dev->state);
     }
 }
