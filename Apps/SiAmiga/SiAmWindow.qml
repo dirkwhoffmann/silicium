@@ -38,6 +38,9 @@ VMWindow {
     Palette.appearance: Preferences.appearance
     Palette.theme: Preferences.colorTheme
 
+    // The chrome the base class hides in fullscreen mode
+    chromeRef: chrome
+
     title: ""
 
     //

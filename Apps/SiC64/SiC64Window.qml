@@ -40,33 +40,10 @@ VMWindow {
     Palette.appearance: Preferences.appearance
     Palette.theme: Preferences.colorTheme
 
+    // The chrome the base class hides in fullscreen mode
+    chromeRef: chrome
+
     title: ""
-
-    //
-    // Fullscreen
-    //
-
-    property bool wasFullScreen: false
-
-    onVisibilityChanged: function(visibility) {
-
-        const isFullScreen = visibility === Window.FullScreen
-
-        if (isFullScreen && !wasFullScreen) {
-
-            // Entering fullscreen: hide the chrome to maximize canvas space
-            chrome.showCommandBar = false
-            chrome.showStatusBar = false
-
-        } else if (!isFullScreen && wasFullScreen) {
-
-            // Leaving fullscreen: bring everything back
-            chrome.showCommandBar = true
-            chrome.showStatusBar = true
-        }
-
-        wasFullScreen = isFullScreen
-    }
 
     // Hiding the toolbar (the shortcut, the View menu, or entering fullscreen)
     // leaves no menu behind to bring it back from -- show a hint so the user
