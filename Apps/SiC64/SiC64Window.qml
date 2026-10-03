@@ -65,9 +65,9 @@ VMWindow {
     SiC64Chrome {
 
         id: chrome
+        window: root
         anchors.fill: parent
         z: 10
-        window: root
     }
 
     CanvasWrapper {

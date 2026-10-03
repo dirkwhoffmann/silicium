@@ -8,12 +8,6 @@ ApplicationWindow {
 
     id: root
 
-    /* The height of the title bar row: the part of the window at the top that
-     * the system reserves for its buttons (the window has an expanded client
-     * area, see its flags). The chrome draws its own title bar of that height.
-     */
-    readonly property real titleBarInset: contentItem.SafeArea.margins.top
-
     // The window's chrome (set by the concrete window)
     property SiChrome chromeRef: null
 

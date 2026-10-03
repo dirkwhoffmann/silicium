@@ -48,9 +48,9 @@ VMWindow {
     SiAmChrome {
 
         id: chrome
+        window: root
         anchors.fill: parent
         z: 10
-        window: root
     }
 
     CanvasWrapper {

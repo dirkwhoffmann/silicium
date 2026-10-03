@@ -25,7 +25,6 @@ SiChrome {
     id: root
 
     property C64Controller c64: C64Controller
-    required property SiC64Window window
 
     // Visual style, from the appearance preferences
     overlayed: Preferences.chromePlacement === 1
@@ -33,7 +32,7 @@ SiChrome {
     compact: Preferences.chromeLayout === 1
 
     // The height of the title bar row, as the window reports it
-    titleBarInset: window.titleBarInset
+    titleBarInset: window.contentItem.SafeArea.margins.top
 
     titleText: c64.name + (Preferences.developerMode ? " - " + c64.uuid : "")
 

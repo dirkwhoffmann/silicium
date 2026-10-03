@@ -38,6 +38,8 @@ Item {
 
     id: root
 
+    required property VMWindow window
+
     // Content
     property alias titleBarContent: titleBarSlot.data
     property alias menuContent: menuSlot.data
