@@ -20,7 +20,6 @@ Item {
 
     id: root
 
-    required property var hostWindow
     required property SiAmController amiga
     required property var configWindowRef
     required property var keyboardWindowRef
@@ -38,6 +37,8 @@ Item {
     required property var eventsInspectorRef
     required property var hardDiskCreatorRef
     required property var userDialogRef
+    required property var diskCreatorRef
+    required property var canvasOverlayRef
     required property var chromeRef
     required property var aboutWindowRef
 
@@ -98,6 +99,36 @@ Item {
     property alias formatHexPadded: formatHexPaddedAction
     property alias formatDecimal: formatDecimalAction
     property alias formatDecimalPadded: formatDecimalPaddedAction
+
+    /* Runs 'proceed', after asking first if the floppy disk in the drive holds
+     * changes that have not been saved (unless the preferences say not to ask).
+     *
+     * A function rather than an Action: it takes the drive it is about.
+     */
+    function proceedWithUnsavedFloppyDisk(driveNr, proceed) {
+
+        if (Preferences.ejectWithoutAsking || !amiga.media.driveModified(driveNr)) {
+            proceed()
+            return
+        }
+
+        const dialog = userDialogRef
+        dialog.titleText = qsTr("Drive df%1 contains an unsaved disk.").arg(driveNr)
+        dialog.bodyText = qsTr("Your changes will be lost if you proceed.")
+        dialog.buttons = Dialog.Cancel | Dialog.Ok
+        dialog.okLabel = qsTr("Proceed")
+        dialog.acceptedCallback = proceed
+        dialog.open()
+    }
+
+    // Asks for a new floppy disk, and warns first where changes are at stake
+    function newDiskAction(driveNr) {
+
+        proceedWithUnsavedFloppyDisk(driveNr, function () {
+            diskCreatorRef.driveNr = driveNr
+            diskCreatorRef.open()
+        })
+    }
 
     /* Asks for a new hard drive, and warns first where one is at stake.
      *
@@ -313,7 +344,7 @@ Item {
     }
 
     // RetroShell and the Logger share a single overlay slot (see
-    // SiAmWindow's "Console overlay" section), so opening one closes the
+    // SiAmCanvasOverlay), so opening one closes the
     // other. Both actions' "checked"/"isOpen" state is read by the toolbar
     // buttons, which stay pressed down for as long as their panel is the
     // one showing.
@@ -326,7 +357,7 @@ Item {
             if (amiga.retroShell) {
                 amiga.retroShell = false
             } else {
-                hostWindow.loggerOpen = false
+                canvasOverlayRef.loggerOpen = false
                 amiga.retroShell = true
             }
         }
@@ -336,16 +367,16 @@ Item {
 
         id: loggerAction
 
-        property bool isOpen: hostWindow.loggerOpen
+        property bool isOpen: canvasOverlayRef.loggerOpen
 
-        text: hostWindow.loggerOpen ? qsTr("Close Logger") : qsTr("Open Logger")
+        text: canvasOverlayRef.loggerOpen ? qsTr("Close Logger") : qsTr("Open Logger")
         onTriggered: {
 
-            if (hostWindow.loggerOpen) {
-                hostWindow.loggerOpen = false
+            if (canvasOverlayRef.loggerOpen) {
+                canvasOverlayRef.loggerOpen = false
             } else {
                 amiga.retroShell = false
-                hostWindow.loggerOpen = true
+                canvasOverlayRef.loggerOpen = true
             }
         }
     }

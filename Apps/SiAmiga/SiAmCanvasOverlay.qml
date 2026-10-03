@@ -21,8 +21,9 @@ Item {
 
     required property SiAmController amiga
 
-    // Whether the logger is to be shown (RetroShell is up to the controller)
-    required property bool loggerOpen
+    // Whether the logger is shown. RetroShell is up to the controller. The
+    // window actions open and close the logger.
+    property bool loggerOpen: false
 
     opacity: (amiga.retroShell || loggerOpen) ? 0.85 : 0.0
     visible: opacity > 0.0

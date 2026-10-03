@@ -16,7 +16,6 @@ ApplicationWindow {
     property alias actions: siActions
 
     property bool shutdownInProgress: false
-    property bool loggerOpen: false
 
     visible: true
     width: 800
@@ -103,7 +102,6 @@ ApplicationWindow {
         anchors.bottomMargin: parent.height - chrome.overlayEnd
 
         amiga: root.amiga
-        loggerOpen: root.loggerOpen
     }
 
     //
@@ -113,11 +111,9 @@ ApplicationWindow {
     SiAmDevPanel {
 
         x: 20
-        // Unlike SiC64Window's canvas (which starts below the toolbar
-        // unless auto-hide is on), SiAmToolbar always floats above the
-        // canvas at z: 10 -- see its own header comment. Anchoring under it
-        // here, rather than reusing SiC64DevPanel's fixed y: 20, keeps this
-        // panel from starting out hidden under that opaque toolbar.
+        // The chrome floats above everything else. Anchoring under it, rather
+        // than using a fixed y, keeps this panel from starting out hidden
+        // under the command bar.
         y: chrome.chromeHeight + Style.mediumSpacing
         visible: root.amiga.debugPanel && Preferences.developerMode
     }
@@ -326,7 +322,6 @@ ApplicationWindow {
     SiAmActions {
 
         id: siActions
-        hostWindow: root
         amiga: root.amiga
         aboutWindowRef: aboutWindow
         configWindowRef: configWindow
@@ -345,6 +340,8 @@ ApplicationWindow {
         eventsInspectorRef: eventsInspectorWindow
         hardDiskCreatorRef: hardDiskCreatorDialog
         userDialogRef: errorDialog
+        diskCreatorRef: diskCreatorDialog
+        canvasOverlayRef: canvasOverlay
         chromeRef: chrome
     }
 
@@ -366,33 +363,6 @@ ApplicationWindow {
 
         id: errorDialog
         sound: true
-    }
-
-    //
-    // Media files
-    //
-
-    function proceedWithUnsavedFloppyDisk(driveNr, proceed) {
-
-        if (Preferences.ejectWithoutAsking || !amiga.media.driveModified(driveNr)) {
-            proceed()
-            return
-        }
-
-        errorDialog.titleText = qsTr("Drive df%1 contains an unsaved disk.").arg(driveNr)
-        errorDialog.bodyText = qsTr("Your changes will be lost if you proceed.")
-        errorDialog.buttons = Dialog.Cancel | Dialog.Ok
-        errorDialog.okLabel = qsTr("Proceed")
-        errorDialog.acceptedCallback = proceed
-        errorDialog.open()
-    }
-
-    function newDiskAction(driveNr) {
-
-        proceedWithUnsavedFloppyDisk(driveNr, function () {
-            diskCreatorDialog.driveNr = driveNr
-            diskCreatorDialog.open()
-        })
     }
 
     //
