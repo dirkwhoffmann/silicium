@@ -32,6 +32,9 @@ SiChrome {
     unified: Preferences.chromeTitleBar === 1
     compact: Preferences.chromeLayout === 1
 
+    // The height of the title bar row, as the window reports it
+    titleBarInset: window.titleBarInset
+
     titleText: c64.name + (Preferences.developerMode ? " - " + c64.uuid : "")
 
     titleBarContent: [

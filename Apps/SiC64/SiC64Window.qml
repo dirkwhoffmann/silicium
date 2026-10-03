@@ -93,12 +93,7 @@ VMWindow {
         anchors.fill: parent
         z: 10
         window: root
-        titleBarInset: root.titleBarInset
     }
-
-    //
-    // Main Canvas
-    //
 
     CanvasWrapper {
 
@@ -108,13 +103,11 @@ VMWindow {
         anchors.bottomMargin: parent.height - chrome.canvasEnd
         aspectRatio: root.aspectRatio
         resizeMode: Preferences.resizeMode
-        fadeIn: true // root.c64.launchWithWorkspace
+        fadeIn: true
 
         onClicked: {
-            console.log("Canvas wrapper clicked")
 
             if (Preferences.retainMouseByClicking && !overlayPanel.visible) {
-                console.log("Capture mouse")
                 root.c64.captureMouse()
             }
         }
@@ -127,7 +120,7 @@ VMWindow {
 
         SiC64Canvas {
 
-            controller: root.c64
+            id: canvas
         }
 
         SiC64DevPanel {
@@ -143,28 +136,10 @@ VMWindow {
     // Pause overlay
     //
 
-    SiOverlayButton {
+    PauseOverlay {
 
-        id: playButton
-        anchors.fill: parent
-        visible: opacity > 0.01
-        size: 220
-        symbol: "play_circle"
-        opacity: c64.isPaused ? 1.0 : 0.0
-        z: 1
-
-        onClicked: {
-
-            c64.run()
-        }
-
-        Behavior on opacity {
-
-            NumberAnimation {
-                duration: 350
-                easing.type: Easing.Linear
-            }
-        }
+        id: pauseOverlay
+        controller: root.c64
     }
 
     //

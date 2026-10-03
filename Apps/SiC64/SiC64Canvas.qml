@@ -10,7 +10,7 @@ Rectangle {
 
     id: canvas
 
-    property C64Controller controller
+    property C64Controller controller: C64Controller
 
     anchors.fill: parent
     color: "black"

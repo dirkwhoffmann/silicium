@@ -49,17 +49,14 @@ VMWindow {
         anchors.fill: parent
         z: 10
         window: root
-        titleBarInset: root.titleBarInset
     }
 
     CanvasWrapper {
 
         id: wrapper
-
         anchors.fill: parent
         anchors.topMargin: chrome.canvasStart
         anchors.bottomMargin: parent.height - chrome.canvasEnd
-
         aspectRatio: root.aspectRatio
         resizeMode: Preferences.resizeMode
         fadeIn: true
@@ -82,6 +79,17 @@ VMWindow {
 
             id: canvas
         }
+    }
+
+    //
+    // Pause overlay
+    //
+
+    PauseOverlay {
+
+        id: pauseOverlay
+        anchors.fill: wrapper
+        controller: root.amiga
     }
 
     //
