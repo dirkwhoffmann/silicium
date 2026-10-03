@@ -38,6 +38,7 @@ Item {
     required property var hardDiskCreatorRef
     required property var userDialogRef
     required property var diskCreatorRef
+    required property var insertDiskDialogRef
     required property var canvasOverlayRef
     required property var chromeRef
     required property var aboutWindowRef
@@ -119,6 +120,16 @@ Item {
         dialog.okLabel = qsTr("Proceed")
         dialog.acceptedCallback = proceed
         dialog.open()
+    }
+
+    // Asks for a disk image to insert, and warns first where changes are at
+    // stake
+    function insertDiskAction(driveNr) {
+
+        proceedWithUnsavedFloppyDisk(driveNr, function () {
+            insertDiskDialogRef.driveNr = driveNr
+            insertDiskDialogRef.open()
+        })
     }
 
     // Asks for a new floppy disk, and warns first where changes are at stake

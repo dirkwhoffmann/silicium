@@ -23,6 +23,8 @@ VMWindow {
 
     readonly property real titleBarInset: contentItem.SafeArea.margins.top
 
+    property alias actions: siActions
+
     // Set while the window is in the background, if the machine was running
     property bool lostFocusWhileRunning: false
 
@@ -403,11 +405,6 @@ VMWindow {
         canvasOverlayRef: canvasOverlay
         aboutWindowRef: aboutWindow
     }
-
-    // Single injection point for every window action. Consumers reach
-    // individual actions via window.actions.xxx (e.g. window.actions.reset)
-    // instead of a dozen separate window-level Action aliases.
-    property alias actions: siActions
 
     //
     // Errors

@@ -9,6 +9,7 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Dialogs
 import Silicium.Controllers
 import Silicium.Preferences
 import Silicium.Theme
@@ -177,6 +178,17 @@ VMWindow {
     // Auxiliary windows
     //
 
+    FileDialog {
+
+        id: insertDiskDialog
+        title: qsTr("Insert Disk")
+        nameFilters: [qsTr("Disk images (*.adf *.dms *.exe *.img *.st *.zip *.gz)"), qsTr("All files (*)")]
+
+        property int driveNr: 0
+
+        onAccepted: root.amiga.media.insertDisk(driveNr, selectedFile)
+    }
+
     SiAmDiskCreator {
 
         id: diskCreatorDialog
@@ -300,6 +312,7 @@ VMWindow {
         hardDiskCreatorRef: hardDiskCreatorDialog
         userDialogRef: errorDialog
         diskCreatorRef: diskCreatorDialog
+        insertDiskDialogRef: insertDiskDialog
         canvasOverlayRef: canvasOverlay
         chromeRef: chrome
     }

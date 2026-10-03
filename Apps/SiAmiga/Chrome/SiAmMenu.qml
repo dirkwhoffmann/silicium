@@ -156,8 +156,8 @@ SiMenuBar {
 
         SiMenuSeparator { visible: connected }
 
-        // insertDiskAction/exportDiskAction are still missing from
-        // SiAmWindow.qml (see SiC64Window.qml for what these look like).
+        // exportDiskAction is still missing (see SiC64Window.qml for what it
+        // looks like).
         SiMenuItem {
             text: qsTr("New...")
             visible: connected
@@ -166,7 +166,7 @@ SiMenuBar {
         SiMenuItem {
             text: qsTr("Insert...")
             visible: connected
-            onTriggered: window.insertDiskAction(driveNr)
+            onTriggered: window.actions.insertDiskAction(driveNr)
         }
         SiMenuSeparator { visible: connected }
         SiMenuItem {
