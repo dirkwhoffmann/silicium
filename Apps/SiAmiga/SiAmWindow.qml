@@ -4,7 +4,7 @@ import Silicium.Controllers
 import Silicium.Preferences
 import Silicium.Theme
 
-ApplicationWindow {
+VMWindow {
 
     id: root
 
