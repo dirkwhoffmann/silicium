@@ -98,6 +98,7 @@ VMWindow {
     PauseOverlay {
 
         id: pauseOverlay
+
         anchors.fill: overlayArea
         controller: root.amiga
     }
@@ -123,7 +124,7 @@ VMWindow {
     }
 
     //
-    // Auxiliary components
+    // Debug panel
     //
 
     SiAmDevPanel {
@@ -132,6 +133,10 @@ VMWindow {
         y: chrome.chromeHeight + Style.mediumSpacing
         visible: root.amiga.debugPanel && Preferences.developerMode
     }
+
+    //
+    // Auxiliary components
+    //
 
     NotificationCenter {
 
@@ -328,16 +333,4 @@ VMWindow {
         id: errorDialog
         sound: true
     }
-
-    //
-    // Closing
-    //
-
-    ShutDownManager {
-
-        id: shutDownManager
-        controller: root.amiga
-    }
-
-    onClosing: function(closeEvent) { shutDownManager.windowClosing(closeEvent) }
 }

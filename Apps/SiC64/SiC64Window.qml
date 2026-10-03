@@ -38,6 +38,9 @@ VMWindow {
     controllerRef: c64
     actionsRef: siActions
 
+    // Hibernating takes a moment: show a progress bar before going away
+    showHibernationProgress: true
+
     title: ""
 
     //
@@ -97,6 +100,7 @@ VMWindow {
     PauseOverlay {
 
         id: pauseOverlay
+
         anchors.fill: overlayArea
         controller: root.c64
     }
@@ -122,7 +126,7 @@ VMWindow {
     }
 
     //
-    // Auxiliary components
+    // Debug panel
     //
 
     SiC64DevPanel {
@@ -131,6 +135,10 @@ VMWindow {
         y: chrome.chromeHeight + Style.mediumSpacing
         visible: root.c64.debugPanel && Preferences.developerMode
     }
+
+    //
+    // Auxiliary components
+    //
 
     NotificationCenter {
 
@@ -190,7 +198,7 @@ VMWindow {
             // persisting the state that just failed makes sense here. The
             // notification above is already on the wire (the stdio transport
             // flushes every packet), so quitting cannot lose it.
-            shutDownManager.byebye()
+            root.byebye()
         }
 
         function onSnapshotSaved(vUUID, sUUID) {
@@ -469,17 +477,4 @@ VMWindow {
                 "regular virtual machine.")
         }
     }
-
-    //
-    // Closing
-    //
-
-    ShutDownManager {
-
-        id: shutDownManager
-        controller: root.c64
-        showProgress: true
-    }
-
-    onClosing: function(closeEvent) { shutDownManager.windowClosing(closeEvent) }
 }

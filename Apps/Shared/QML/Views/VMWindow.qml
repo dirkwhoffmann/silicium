@@ -95,4 +95,29 @@ ApplicationWindow {
             }
         })
     }
+
+    //
+    // Closing
+    //
+
+    // Whether to show a progress bar after hibernating, before going away
+    property bool showHibernationProgress: false
+
+    /* The window refuses the first close and goes away only once the machine
+     * has been put away (see ShutDownManager).
+     */
+    ShutDownManager {
+
+        id: shutDownManager
+        controller: root.controllerRef
+        showProgress: root.showHibernationProgress
+    }
+
+    onClosing: function(closeEvent) { shutDownManager.windowClosing(closeEvent) }
+
+    // Goes away right now, without pausing, asking or hibernating
+    function byebye() {
+
+        shutDownManager.byebye()
+    }
 }

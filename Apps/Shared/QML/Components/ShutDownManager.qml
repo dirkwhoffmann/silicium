@@ -25,7 +25,7 @@ import Silicium.Preferences
  * answer -- and the machine -- with it. To use it, forward the window's
  * closing signal:
  *
- *     ShutDownManager { id: shutDownManager; controller: root.vmc }
+ *     ShutDownManager { id: shutDownManager; controller: root.machine }
  *     onClosing: (closeEvent) => shutDownManager.windowClosing(closeEvent)
  */
 Item {
