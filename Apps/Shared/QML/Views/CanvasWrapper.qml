@@ -181,14 +181,4 @@ Item {
             }
         }
     }
-    // Escape hatch: Press Escape to get your mouse back
-    /*
-    Shortcut {
-        sequence: "Escape"
-        onActivated: {
-            console.log("ESCAPE")
-            AppController.inputManager.captureMouse = false
-        }
-    }
-     */
 }

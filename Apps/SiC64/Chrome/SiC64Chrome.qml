@@ -24,7 +24,7 @@ SiChrome {
 
     id: root
 
-    required property C64Controller c64
+    property C64Controller c64: C64Controller
     required property SiC64Window window
 
     // Visual style, from the appearance preferences

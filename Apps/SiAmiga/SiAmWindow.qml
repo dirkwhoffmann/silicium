@@ -1,3 +1,12 @@
+// -----------------------------------------------------------------------------
+// This file is part of Silicium UI
+//
+// Copyright (C) Dirk W. Hoffmann. www.dirkwhoffmann.de
+// Licensed under the GNU General Public License v3
+//
+// See https://www.gnu.org for license information
+// -----------------------------------------------------------------------------
+
 import QtQuick
 import QtQuick.Controls
 import Silicium.Controllers
@@ -12,6 +21,9 @@ VMWindow {
     readonly property SiAmInfoController info: amiga.info
 
     readonly property real titleBarInset: contentItem.SafeArea.margins.top
+
+    // The proportions of the picture, as on a 4:3 monitor
+    property real aspectRatio: 4.0 / 3.0
 
     property alias actions: siActions
 
@@ -37,31 +49,25 @@ VMWindow {
     SiAmChrome {
 
         id: chrome
-
         anchors.fill: parent
         z: 10
-
         window: root
-
         titleBarInset: root.titleBarInset
     }
 
-    SiAmCanvas {
+    CanvasWrapper {
 
-        id: canvas
+        id: wrapper
 
         anchors.fill: parent
         anchors.topMargin: chrome.canvasStart
         anchors.bottomMargin: parent.height - chrome.canvasEnd
-    }
 
-    MouseArea {
+        aspectRatio: root.aspectRatio
+        resizeMode: Preferences.resizeMode
+        fadeIn: true
 
-        anchors.fill: canvas
-        hoverEnabled: true
-        preventStealing: true
-
-        onPressed: {
+        onClicked: {
 
             if (Preferences.retainMouseByClicking && !canvasOverlay.visible) {
                 root.amiga.captureMouse()
@@ -74,6 +80,11 @@ VMWindow {
                 root.amiga.captureMouse()
             }
         }
+
+        SiAmCanvas {
+
+            id: canvas
+        }
     }
 
     //
@@ -82,7 +93,7 @@ VMWindow {
 
     SiAmDropOverlay {
 
-        anchors.fill: canvas
+        anchors.fill: wrapper
         window: root
     }
 

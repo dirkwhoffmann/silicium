@@ -28,7 +28,6 @@ VMWindow {
     property bool lostFocusWhileRunning: false
 
     // The title is drawn by the chrome, as the native one would block dragging
-    title: ""
     visible: true
     width: 782
     height: 652
@@ -37,9 +36,10 @@ VMWindow {
     topPadding: 0
 
     flags: Qt.Window | Qt.ExpandedClientAreaHint | Qt.NoTitleBarBackgroundHint
-
     Palette.appearance: Preferences.appearance
     Palette.theme: Preferences.colorTheme
+
+    title: ""
 
     //
     // Fullscreen
@@ -87,22 +87,12 @@ VMWindow {
     // Main area
     //
 
-    // The window chrome: title bar, menu, toolbar and status bar. It fills
-    // the window and floats above the canvas rather than using header: and
-    // footer:, which would reserve their own layout slots. Where the picture
-    // starts and ends is up to the chrome (canvasStart, canvasEnd): in a
-    // standard window the chrome frames it, in an overlaid one the picture
-    // runs on underneath.
     SiC64Chrome {
 
         id: chrome
-
         anchors.fill: parent
         z: 10
-
-        c64: root.c64
         window: root
-
         titleBarInset: root.titleBarInset
     }
 
