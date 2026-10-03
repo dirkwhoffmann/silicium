@@ -25,7 +25,7 @@ DropOverlay {
 
     function insertDroppedDisk(driveNr, url) {
 
-        window.proceedWithUnsavedFloppyDisk(driveNr, function () {
+        window.actions.proceedWithUnsavedFloppyDisk(driveNr, function () {
             controller.media.insertDisk(driveNr, url)
         })
     }

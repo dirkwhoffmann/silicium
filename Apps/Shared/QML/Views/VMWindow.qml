@@ -140,18 +140,6 @@ ApplicationWindow {
         notifications.show(title, message)
     }
 
-    Connections {
-
-        target: root.controllerRef
-
-        // Worth saying, not worth interrupting for -- e.g. that a hard drive
-        // just created is too large to travel in a snapshot.
-        function onShowNotification(title, message) {
-
-            root.showNotification(title, message)
-        }
-    }
-
     //
     // Errors
     //
@@ -182,9 +170,20 @@ ApplicationWindow {
         errorDialog.open()
     }
 
+    //
+    // Connections
+    //
+
     Connections {
 
         target: root.controllerRef
+
+        // Worth saying, not worth interrupting for -- e.g. that a hard drive
+        // just created is too large to travel in a snapshot.
+        function onShowNotification(title, message) {
+
+            root.showNotification(title, message)
+        }
 
         // What the machine reports when an action of ours fails, e.g. loading
         // a snapshot from a machine that has none

@@ -226,7 +226,7 @@ SiMenuBar {
                     model: c64.media.recentDisks
                     delegate: SiMenuItem {
                         text: modelData.substring(modelData.lastIndexOf("/") + 1)
-                        onTriggered: window.insertRecentDiskAction(driveNr, index)
+                        onTriggered: window.actions.insertRecentDiskAction(driveNr, index)
                     }
                     onObjectAdded: (index, object) => insertRecentMenu.insertItem(index, object)
                     onObjectRemoved: (index, object) => insertRecentMenu.removeItem(object)
@@ -264,24 +264,24 @@ SiMenuBar {
         SiMenuItem {
             text: qsTr("New")
             visible: connected
-            onTriggered: window.newDiskAction(driveNr)
+            onTriggered: window.actions.newDiskAction(driveNr)
         }
         SiMenuItem {
             text: qsTr("Insert...")
             visible: connected
-            onTriggered: window.insertDiskAction(driveNr)
+            onTriggered: window.actions.insertDiskAction(driveNr)
         }
         SiMenuSeparator { visible: connected }
         SiMenuItem {
             text: qsTr("Eject")
             visible: connected
             enabled: hasDisk
-            onTriggered: window.ejectDiskAction(driveNr)
+            onTriggered: window.actions.ejectDiskAction(driveNr)
         }
         SiMenuItem {
             text: qsTr("Export...")
             visible: connected
-            onTriggered: window.exportDiskAction(driveNr)
+            onTriggered: window.actions.exportDiskAction(driveNr)
         }
         SiMenuSeparator { visible: connected }
         // Action {
@@ -412,7 +412,7 @@ SiMenuBar {
         SiMenuItem {
             text: qsTr("Insert Tape...")
             visible: connected
-            onTriggered: window.insertTapeAction()
+            onTriggered: window.actions.insertTapeAction()
         }
 
         // "Insert Recent" is a nested Menu, and a nested Menu's own 'visible'
@@ -492,7 +492,7 @@ SiMenuBar {
             text: qsTr("Export Tape...")
             visible: connected
             enabled: c64.media.tapeInserted
-            onTriggered: window.exportTapeAction()
+            onTriggered: window.actions.exportTapeAction()
         }
 
         SiMenuSeparator { visible: connected }
@@ -514,7 +514,7 @@ SiMenuBar {
 
         Action {
             text: qsTr("Attach Cartridge...")
-            onTriggered: window.attachCartridgeAction()
+            onTriggered: window.actions.attachCartridgeAction()
         }
 
         SiMenu {
@@ -580,7 +580,7 @@ SiMenuBar {
         Action {
             text: qsTr("Export Cartridge...")
             enabled: c64.media.cartridgeAttached
-            onTriggered: window.exportCartridgeAction()
+            onTriggered: window.actions.exportCartridgeAction()
         }
         Action {
             text: qsTr("Inspect Cartridge...")

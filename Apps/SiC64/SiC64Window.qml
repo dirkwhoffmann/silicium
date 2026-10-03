@@ -156,6 +156,14 @@ VMWindow {
         chromeRef: chrome
         canvasOverlayRef: canvasOverlay
         aboutWindowRef: aboutWindow
+        userDialogRef: userDialog
+        insertDiskDialogRef: insertDiskDialog
+        diskCreatorRef: diskCreatorDialog
+        diskExporterRef: diskExporterDialog
+        insertTapeDialogRef: insertTapeDialog
+        exportTapeDialogRef: exportTapeDialog
+        attachCartridgeDialogRef: attachCartridgeDialog
+        exportCartridgeDialogRef: exportCartridgeDialog
     }
 
     //
@@ -293,77 +301,6 @@ VMWindow {
 
         id: aboutWindow
         visible: false
-    }
-
-    //
-    // Media files
-    //
-
-    function proceedWithUnsavedFloppyDisk(driveNr, proceed) {
-
-        if (Preferences.ejectWithoutAsking || !c64.media.hasModifiedDisk(driveNr)) {
-            proceed()
-            return
-        }
-
-        userDialog.titleText = qsTr("Drive %1 contains an unsaved disk.").arg(driveNr)
-        userDialog.bodyText = qsTr("Your changes will be lost if you proceed.")
-        userDialog.buttons = Dialog.Cancel | Dialog.Ok
-        userDialog.okLabel = qsTr("Proceed")
-        userDialog.acceptedCallback = proceed
-        userDialog.open()
-    }
-
-    function insertDiskAction(driveNr) {
-
-        proceedWithUnsavedFloppyDisk(driveNr, function () {
-            insertDiskDialog.driveNr = driveNr
-            insertDiskDialog.open()
-        })
-    }
-
-    function newDiskAction(driveNr) {
-
-        proceedWithUnsavedFloppyDisk(driveNr, function () {
-            diskCreatorDialog.driveNr = driveNr
-            diskCreatorDialog.open()
-        })
-    }
-
-    function exportDiskAction(driveNr) {
-
-        diskExporterDialog.driveNr = driveNr
-        diskExporterDialog.open()
-    }
-
-    function ejectDiskAction(driveNr) {
-
-        proceedWithUnsavedFloppyDisk(driveNr, function () {
-            c64.media.ejectDisk(driveNr)
-        })
-    }
-
-    function insertRecentDiskAction(driveNr, index) {
-
-        proceedWithUnsavedFloppyDisk(driveNr, function () {
-            c64.media.insertRecentDisk(driveNr, index)
-        })
-    }
-
-    function insertTapeAction() {
-        insertTapeDialog.open()
-    }
-
-    function exportTapeAction() {
-        exportTapeDialog.open()
-    }
-
-    function attachCartridgeAction() {
-        attachCartridgeDialog.open()
-    }
-
-    function exportCartridgeAction() {
-        exportCartridgeDialog.open()
     }
 
     //

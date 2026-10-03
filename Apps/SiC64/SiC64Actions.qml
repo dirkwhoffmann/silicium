@@ -34,6 +34,14 @@ Item {
     required property var chromeRef
     required property var canvasOverlayRef
     required property var aboutWindowRef
+    required property var userDialogRef
+    required property var insertDiskDialogRef
+    required property var diskCreatorRef
+    required property var diskExporterRef
+    required property var insertTapeDialogRef
+    required property var exportTapeDialogRef
+    required property var attachCartridgeDialogRef
+    required property var exportCartridgeDialogRef
 
     // Shortcuts of the View menu items
     readonly property string toolbarShortcut: "Ctrl+Alt+T"
@@ -444,5 +452,82 @@ Item {
             aboutWindowRef.raise()
             aboutWindowRef.requestActivate()
         }
+    }
+
+    //
+    // Media files
+    //
+    // Functions rather than Actions: they take the drive they are about, and
+    // an Action carries no argument. The dialogs they open are the window's.
+    //
+
+    // Runs 'proceed', after asking first if the disk in the drive holds
+    // changes that have not been saved (unless the preferences say not to ask)
+    function proceedWithUnsavedFloppyDisk(driveNr, proceed) {
+
+        if (Preferences.ejectWithoutAsking || !c64.media.hasModifiedDisk(driveNr)) {
+            proceed()
+            return
+        }
+
+        const dialog = userDialogRef
+        dialog.titleText = qsTr("Drive %1 contains an unsaved disk.").arg(driveNr)
+        dialog.bodyText = qsTr("Your changes will be lost if you proceed.")
+        dialog.buttons = Dialog.Cancel | Dialog.Ok
+        dialog.okLabel = qsTr("Proceed")
+        dialog.acceptedCallback = proceed
+        dialog.open()
+    }
+
+    function insertDiskAction(driveNr) {
+
+        proceedWithUnsavedFloppyDisk(driveNr, function () {
+            insertDiskDialogRef.driveNr = driveNr
+            insertDiskDialogRef.open()
+        })
+    }
+
+    function newDiskAction(driveNr) {
+
+        proceedWithUnsavedFloppyDisk(driveNr, function () {
+            diskCreatorRef.driveNr = driveNr
+            diskCreatorRef.open()
+        })
+    }
+
+    function exportDiskAction(driveNr) {
+
+        diskExporterRef.driveNr = driveNr
+        diskExporterRef.open()
+    }
+
+    function ejectDiskAction(driveNr) {
+
+        proceedWithUnsavedFloppyDisk(driveNr, function () {
+            c64.media.ejectDisk(driveNr)
+        })
+    }
+
+    function insertRecentDiskAction(driveNr, index) {
+
+        proceedWithUnsavedFloppyDisk(driveNr, function () {
+            c64.media.insertRecentDisk(driveNr, index)
+        })
+    }
+
+    function insertTapeAction() {
+        insertTapeDialogRef.open()
+    }
+
+    function exportTapeAction() {
+        exportTapeDialogRef.open()
+    }
+
+    function attachCartridgeAction() {
+        attachCartridgeDialogRef.open()
+    }
+
+    function exportCartridgeAction() {
+        exportCartridgeDialogRef.open()
     }
 }
