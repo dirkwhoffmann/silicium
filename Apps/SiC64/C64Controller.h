@@ -16,7 +16,6 @@
 #include "SiC64ConfigController.h"
 #include "SiC64InfoController.h"
 #include "SiC64ActivityController.h"
-#include "SiC64StatusbarController.h"
 #include "C64MediaController.h"
 #include "SiC64Renderer.h"
 #include "Keyboard/SiC64KeyboardController.h"
@@ -67,7 +66,6 @@ class C64Controller : public Controller {
     unique_ptr<SiC64EventController> m_eventController;
     unique_ptr<SiC64InfoController> m_infoController;
     unique_ptr<SiC64KeyboardController> m_keyboardController;
-    unique_ptr<SiC64StatusbarController> m_statusbarController;
     unique_ptr<C64MediaController> m_mediaController;
 
 
@@ -261,7 +259,6 @@ public:
     Q_PROPERTY(SiC64EventController *eventController READ getEventController CONSTANT)
     Q_PROPERTY(SiC64InfoController *info READ getInfoController CONSTANT)
     Q_PROPERTY(SiC64KeyboardController *keyboardController READ getKeyboardController CONSTANT)
-    Q_PROPERTY(SiC64StatusbarController *statusbarController READ getStatusbarController CONSTANT)
     Q_PROPERTY(SiC64Renderer *renderer READ getRenderer WRITE setRenderer NOTIFY rendererChanged)
     Q_PROPERTY(C64MediaController *media READ media CONSTANT)
 
@@ -276,7 +273,6 @@ public:
     SiC64EventController *getEventController() const { return m_eventController.get(); }
     SiC64InfoController *getInfoController() const { return m_infoController.get(); }
     SiC64KeyboardController *getKeyboardController() const { return m_keyboardController.get(); }
-    SiC64StatusbarController *getStatusbarController() const { return m_statusbarController.get(); }
 
     class SiC64Renderer *getRenderer() const { return m_renderer; }
     void setRenderer(class SiC64Renderer *ptr);

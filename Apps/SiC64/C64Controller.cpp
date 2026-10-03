@@ -66,7 +66,6 @@ C64Controller::C64Controller()
     m_configController    = make_unique<SiC64ConfigController>(this);
     m_infoController      = make_unique<SiC64InfoController>(this);
     m_activityController  = make_unique<SiC64ActivityController>(this);
-    m_statusbarController = make_unique<SiC64StatusbarController>(this);
     m_keyboardController  = make_unique<SiC64KeyboardController>(this);
     m_eventController     = make_unique<SiC64EventController>(this);
     m_ciaController       = make_unique<SiC64CIAController>(this);

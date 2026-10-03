@@ -23,7 +23,6 @@ Rectangle {
     readonly property SiC64InfoController info: c64.info
     readonly property SiC64ConfigController config: c64.configController
     readonly property SiC64ActivityController activity: c64.activityController
-    readonly property SiC64StatusbarController statusbar: c64.statusbarController
     readonly property SiC64KeyboardController keyboard: c64.keyboardController
 
     property int metric: 0

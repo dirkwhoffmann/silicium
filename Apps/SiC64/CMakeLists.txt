@@ -13,7 +13,6 @@ target_sources(SiC64 PRIVATE
         Config/SiC64ConfigController.cpp
         SiC64InfoController.cpp
         SiC64ActivityController.cpp
-        Chrome/SiC64StatusbarController.cpp
         Keyboard/SiC64KeyboardController.cpp
         Inspector/SiC64InspectorController.cpp
         Inspector/SiC64EventController.cpp

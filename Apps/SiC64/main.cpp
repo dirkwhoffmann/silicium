@@ -22,7 +22,6 @@
 #include "Inspector/SiC64Heatmap.h"
 #include "Inspector/SiC64Waveform.h"
 #include "SiC64ActivityController.h"
-#include "SiC64StatusbarController.h"
 #include "Keyboard/SiC64KeyboardController.h"
 #include "Shortcuts.h"
 #include <QGuiApplication>
@@ -72,7 +71,6 @@ main(int argc, char *argv[])
     qmlRegisterType<SiC64InspectorController>("Silicium.Controllers", 1, 0, "SiC64InspectorController");
     qmlRegisterType<SiC64InfoController>("Silicium.Controllers", 1, 0, "SiC64InfoController");
     qmlRegisterType<SiC64ActivityController>("Silicium.Controllers", 1, 0, "SiC64ActivityController");
-    qmlRegisterType<SiC64StatusbarController>("Silicium.Controllers", 1, 0, "SiC64StatusbarController");
     qmlRegisterType<SiC64KeyboardController>("Silicium.Controllers", 1, 0, "SiC64KeyboardController");
     qmlRegisterType<SiC64Renderer>("Silicium.Components", 1, 0, "SiC64Renderer");
     qmlRegisterType<SiC64DmaView>("Silicium.Components", 1, 0, "SiC64DmaView");
