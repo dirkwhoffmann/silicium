@@ -64,6 +64,7 @@ VMWindow {
         aspectRatio: root.aspectRatio
         resizeMode: Preferences.resizeMode
         fadeIn: true
+        poweredBySource: Assets.iconUrl(Assets.PoweredByVC)
 
         onClicked: {
 

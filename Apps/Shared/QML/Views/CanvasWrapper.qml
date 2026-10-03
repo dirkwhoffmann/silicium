@@ -16,6 +16,9 @@ Item {
     readonly property int crop: 2
     property bool fadeIn: true
 
+    // The "powered by" picture shown while the canvas fades in
+    required property url poweredBySource
+
     // Background color (for letterboxing)
     property color backgroundColor: "black"
 
@@ -46,7 +49,7 @@ Item {
 
         Image {
 
-            source: Assets.iconUrl(Assets.PoweredByVC)
+            source: root.poweredBySource
             anchors.centerIn: parent
             width: 0.65 * parent.width
             fillMode: Image.PreserveAspectFit
