@@ -275,16 +275,12 @@ ApplicationWindow {
     // Errors
     //
 
-    // Shows a modal error dialog with a single OK button, as SiC64Window
-    // does -- without one, everything the controller reports goes nowhere.
     function showError(title, text) {
 
         errorDialog.titleText = title
         errorDialog.bodyText = text
         errorDialog.buttons = Dialog.Ok
         errorDialog.okLabel = qsTr("OK")
-        // The dialog is shared with proceedWithUnsavedFloppyDisk below, whose
-        // callback would otherwise still be armed when OK is pressed here.
         errorDialog.acceptedCallback = null
         errorDialog.open()
     }
@@ -299,12 +295,6 @@ ApplicationWindow {
     // Media files
     //
 
-    /* Warns before a modified disk is thrown away.
-     *
-     * The port of SiC64Window's function of the same name, down to the
-     * preference that turns it off -- the core has no undo for an ejected
-     * disk, so what has not been exported is gone.
-     */
     function proceedWithUnsavedFloppyDisk(driveNr, proceed) {
 
         if (Preferences.ejectWithoutAsking || !amiga.media.driveModified(driveNr)) {
@@ -326,18 +316,6 @@ ApplicationWindow {
             diskCreatorDialog.driveNr = driveNr
             diskCreatorDialog.open()
         })
-    }
-
-    SiAmDiskCreator {
-
-        id: diskCreatorDialog
-        amiga: root.amiga
-    }
-
-    SiAmHardDiskCreator {
-
-        id: hardDiskCreatorDialog
-        amiga: root.amiga
     }
 
     /* Reached from SiAmActions, where the actions that drive these two live.
@@ -378,6 +356,18 @@ ApplicationWindow {
     //
     // Auxiliary windows
     //
+
+    SiAmDiskCreator {
+
+        id: diskCreatorDialog
+        amiga: root.amiga
+    }
+
+    SiAmHardDiskCreator {
+
+        id: hardDiskCreatorDialog
+        amiga: root.amiga
+    }
 
     SiAmConfigWindow {
 
