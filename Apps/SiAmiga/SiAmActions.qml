@@ -37,6 +37,24 @@ Item {
     required property var portInspectorRef
     required property var eventsInspectorRef
 
+    //
+    // Keyboard shortcuts
+    //
+    // The one place where the shortcuts are managed. The actions below use
+    // them, and so do the menu items that are handled by the window itself and
+    // therefore have no action (Toolbar, Status Bar, Quit).
+    //
+
+    readonly property var configShortcut: StandardKey.Preferences
+    readonly property string keyboardShortcut: "Ctrl+K"
+    readonly property string resetShortcut: "Ctrl+R"
+    readonly property string hardResetShortcut: "Ctrl+Meta+R"
+    readonly property var captureMouseShortcut: Preferences.mouseHotkey
+    readonly property string toggleWarpShortcut: "Meta+Tab"
+    readonly property string toolbarShortcut: "Ctrl+Alt+T"
+    readonly property string statusBarShortcut: "Ctrl+Alt+B"
+    readonly property var quitShortcut: StandardKey.Quit
+
     property alias config: configAction
     property alias openCPUInspector: openCPUInspectorAction
     property alias openLogicAnalyzer: openLogicAnalyzerAction
@@ -122,7 +140,7 @@ Item {
 
         id: configAction
         text: qsTr("Open Configurator")
-        shortcut: StandardKey.Preferences
+        shortcut: root.configShortcut
         onTriggered: configWindowRef.showPage(configWindowRef.currentIndex)
     }
 
@@ -332,7 +350,7 @@ Item {
 
         id: keyboardAction
         text: qsTr("Open Keyboard")
-        shortcut: "Ctrl+K"
+        shortcut: root.keyboardShortcut
         onTriggered: {
 
             keyboardWindowRef.show()
@@ -373,7 +391,7 @@ Item {
 
         id: resetAction
         text: qsTr("Reset")
-        shortcut: "Ctrl+R"
+        shortcut: root.resetShortcut
         onTriggered: amiga.reset()
     }
 
@@ -396,7 +414,7 @@ Item {
 
         id: captureOrReleaseMouseAction
         text: amiga.mouseCaptured ? qsTr("Release Mouse") : qsTr("Capture Mouse")
-        shortcut: Preferences.mouseHotkey
+        shortcut: root.captureMouseShortcut
         onTriggered: amiga.captureOrReleaseMouse()
     }
 
@@ -404,7 +422,7 @@ Item {
 
         id: hardResetAction
         text: qsTr("Hard Reset")
-        shortcut: "Ctrl+Meta+R"
+        shortcut: root.hardResetShortcut
         onTriggered: amiga.reset()
     }
 
@@ -458,7 +476,7 @@ Item {
 
         id: toggleWarpAction
         text: qsTr("Toggle Warp Mode")
-        shortcut: "Meta+Tab"
+        shortcut: root.toggleWarpShortcut
         onTriggered: amiga.toggleWarp()
     }
 

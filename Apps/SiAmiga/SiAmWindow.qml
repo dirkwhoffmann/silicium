@@ -11,9 +11,6 @@ ApplicationWindow {
     property SiAmController amiga: SiAmController
     readonly property SiAmInfoController info: amiga.info
 
-    // Shared with SiAmMenu's "Toolbar" shortcut hint.
-    readonly property string toolbarShortcut: "Ctrl+Alt+T"
-
     property bool toolbarVisible: true
     property bool statusBarVisible: true
     property bool shutdownInProgress: false

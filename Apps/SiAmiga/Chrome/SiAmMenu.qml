@@ -53,7 +53,7 @@ SiMenuBar {
 
         Action {
             text: qsTr("&Quit");
-            shortcut: StandardKey.Quit
+            shortcut: window.actions.quitShortcut
             onTriggered: Qt.quit()
         }
     }
@@ -118,14 +118,14 @@ SiMenuBar {
 
         Action {
             text: qsTr("Toolbar")
-            shortcut: window.toolbarShortcut
+            shortcut: window.actions.toolbarShortcut
             checkable: true
             checked: toolbarVisible
             onTriggered: toggleToolbar()
         }
         Action {
             text: qsTr("Status Bar")
-            shortcut: "Ctrl+Alt+B"
+            shortcut: window.actions.statusBarShortcut
             checkable: true
             checked: statusBarVisible
             onTriggered: toggleStatusBar()
