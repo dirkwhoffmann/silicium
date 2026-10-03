@@ -19,13 +19,8 @@ VMWindow {
     id: root
 
     property SiAmController amiga: SiAmController
-    readonly property SiAmInfoController info: amiga.info
     property real aspectRatio: 4.0 / 3.0
-
-    readonly property real titleBarInset: contentItem.SafeArea.margins.top
-
     property alias actions: siActions
-
 
     visible: true
     width: 800
@@ -40,6 +35,9 @@ VMWindow {
 
     // The chrome the base class hides in fullscreen mode
     chromeRef: chrome
+
+    // The machine the base class pauses while the window is in the background
+    controllerRef: amiga
 
     title: ""
 

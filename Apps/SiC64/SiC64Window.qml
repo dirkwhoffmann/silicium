@@ -20,13 +20,7 @@ VMWindow {
 
     property C64Controller c64: C64Controller
     property real aspectRatio: 800.0 / 614.0
-
-    readonly property real titleBarInset: contentItem.SafeArea.margins.top
-
     property alias actions: siActions
-
-    // Set while the window is in the background, if the machine was running
-    property bool lostFocusWhileRunning: false
 
     // The title is drawn by the chrome, as the native one would block dragging
     visible: true
@@ -42,6 +36,9 @@ VMWindow {
 
     // The chrome the base class hides in fullscreen mode
     chromeRef: chrome
+
+    // The machine the base class pauses while the window is in the background
+    controllerRef: c64
 
     title: ""
 
@@ -493,23 +490,6 @@ VMWindow {
                 "emulator's capabilities. Any changes you make will be lost when the emulator shuts down.\n" +
                 "To save your progress, you can clone this instance in the Central Hub to convert it into a " +
                 "regular virtual machine.")
-        }
-    }
-
-    onActiveChanged: {
-
-        if (active) {
-
-            if (Preferences.pauseWhileInBackground) {
-                if (lostFocusWhileRunning) c64.run()
-            }
-
-        } else {
-
-            lostFocusWhileRunning = c64.isRunning
-            if (Preferences.pauseWhileInBackground) {
-                c64.pause()
-            }
         }
     }
 

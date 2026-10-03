@@ -1,21 +1,25 @@
 import QtQuick
 import QtQuick.Controls
+import Silicium.Preferences
 
 /* The common base of the emulator windows (SiC64Window and SiAmWindow).
- *
- * What the windows have in common is meant to move here step by step. For now
- * it is the fullscreen logic.
  */
 ApplicationWindow {
 
     id: root
 
-    /* The window's chrome, set by the concrete window. The chrome is hidden
-     * while the window is in fullscreen mode. (Named apart from the id it
-     * usually points at: a property whose name is the id it targets resolves
-     * to undefined.)
+    /* The height of the title bar row: the part of the window at the top that
+     * the system reserves for its buttons (the window has an expanded client
+     * area, see its flags). The chrome draws its own title bar of that height.
      */
+    readonly property real titleBarInset: contentItem.SafeArea.margins.top
+
+    // The window's chrome (set by the concrete window)
     property SiChrome chromeRef: null
+
+    // The machine of the window (set by the concrete window). Needs isRunning,
+    // run() and pause().
+    property var controllerRef: null
 
     //
     // Fullscreen
@@ -44,5 +48,33 @@ ApplicationWindow {
         }
 
         wasFullScreen = isFullScreen
+    }
+
+    //
+    // Focus
+    //
+
+    // Set while the window is in the background, if the machine was running
+    property bool lostFocusWhileRunning: false
+
+    // If the preferences say so, the machine pauses while the window is in the
+    // background, and carries on if it was running when the window comes back
+    onActiveChanged: {
+
+        if (!controllerRef) return
+
+        if (active) {
+
+            if (Preferences.pauseWhileInBackground) {
+                if (lostFocusWhileRunning) controllerRef.run()
+            }
+
+        } else {
+
+            lostFocusWhileRunning = controllerRef.isRunning
+            if (Preferences.pauseWhileInBackground) {
+                controllerRef.pause()
+            }
+        }
     }
 }
