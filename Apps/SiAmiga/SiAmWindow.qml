@@ -20,10 +20,6 @@ ApplicationWindow {
     property bool shutdownInProgress: false
     property bool loggerOpen: false
 
-    readonly property bool overlayed: Preferences.chromePlacement === 1
-    readonly property bool unified: Preferences.chromeTitleBar === 1
-    readonly property bool compact: Preferences.chromeLayout === 1
-
     visible: true
     width: 800
     height: 600
@@ -42,81 +38,21 @@ ApplicationWindow {
     // Main area
     //
 
-    SiChrome {
+    SiAmChrome {
 
         id: chrome
 
         anchors.fill: parent
         z: 10
 
-        overlayed: root.overlayed
-        unified: root.unified
-        compact: root.compact
+        amiga: root.amiga
+        window: root
+
         showCommandBar: root.showCommandBar
         showStatusBar: root.showStatusBar
-
         titleBarInset: root.titleBarInset
-        titleText: "SiAmiga"
 
-        titleBarContent: [
-
-            SiSymbolButton {
-
-                id: chromeToggle
-
-                symbol: "page_header"
-                color: Palette.secondary
-                background: Rectangle { color: Qt.alpha(Palette.background, 0.5); radius: height / 2 }
-
-                onClicked: root.showCommandBar = !root.showCommandBar
-            },
-
-            SiSymbolButton {
-
-                id: statusBarToggle
-
-                symbol: "page_footer"
-                color: Palette.secondary
-                background: Rectangle { color: Qt.alpha(Palette.background, 0.5); radius: height / 2 }
-
-                onClicked: root.showStatusBar = !root.showStatusBar
-            }
-        ]
-
-        menuContent: SiAmMenu {
-
-            anchors.fill: parent
-
-            amiga: root.amiga
-            window: root
-
-            onOpenAbout: aboutWindow.show()
-
-            // Lets the View menu's checkable items show the right state; the
-            // window owns the visibility and answers the signals below.
-            toolbarVisible: root.showCommandBar
-            statusBarVisible: root.showStatusBar
-
-            onToggleToolbar: root.showCommandBar = !root.showCommandBar
-            onToggleStatusBar: root.showStatusBar = !root.showStatusBar
-        }
-
-        toolbarContent: SiAmToolbar {
-
-            anchors.fill: parent
-
-            amiga: root.amiga
-            window: root
-        }
-
-        statusBarContent: SiAmStatusbar {
-
-            anchors.fill: parent
-
-            amiga: root.amiga
-            // The background is drawn by the chrome
-            color: "transparent"
-        }
+        onOpenAbout: aboutWindow.show()
     }
 
     SiAmCanvas {
