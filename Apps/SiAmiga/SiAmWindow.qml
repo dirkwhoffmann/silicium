@@ -34,7 +34,7 @@ ApplicationWindow {
     minimumWidth: 400
     minimumHeight: 300
 
-    // Drawn by the toolbar wrapper; the native title would block window dragging
+    // Drawn by the chrome; the native title would block window dragging
     title: ""
     color: "black"
 
@@ -55,8 +55,8 @@ ApplicationWindow {
         id: canvas
 
         anchors.fill: parent
-        anchors.topMargin: toolbar.canvasStart
-        anchors.bottomMargin: parent.height - toolbar.canvasEnd
+        anchors.topMargin: chrome.canvasStart
+        anchors.bottomMargin: parent.height - chrome.canvasEnd
 
         controller: root.amiga
     }
@@ -101,7 +101,7 @@ ApplicationWindow {
         // canvas at z: 10 -- see its own header comment. Anchoring under it
         // here, rather than reusing SiC64DevPanel's fixed y: 20, keeps this
         // panel from starting out hidden under that opaque toolbar.
-        y: toolbar.chromeHeight + Style.mediumSpacing
+        y: chrome.chromeHeight + Style.mediumSpacing
         visible: root.amiga.debugPanel && Preferences.developerMode
     }
 
@@ -383,12 +383,12 @@ ApplicationWindow {
     // the window and floats above the canvas rather than using header:, which
     // would reserve its own layout slot above the content area -- see
     // SiC64Window.qml for the full rationale. Where the picture starts and
-    // ends is up to the wrapper (canvasStart, canvasEnd): in a standard
+    // ends is up to the chrome (canvasStart, canvasEnd): in a standard
     // window the chrome frames it, in an overlaid one the picture runs on
     // underneath.
-    SiToolbarWrapper {
+    SiChrome {
 
-        id: toolbar
+        id: chrome
 
         anchors.fill: parent
         z: 10
@@ -458,7 +458,8 @@ ApplicationWindow {
             anchors.fill: parent
 
             amiga: root.amiga
-            color: root.overlayed ? Qt.alpha(Palette.toolbar, 0.85) : Palette.toolbar
+            // The background is drawn by the chrome
+            color: "transparent"
         }
     }
 

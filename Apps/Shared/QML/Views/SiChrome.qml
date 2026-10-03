@@ -12,8 +12,9 @@ import QtQuick.Layouts
 import Silicium.Preferences
 import Silicium.Theme
 
-/* This component embeds the title bar and the command bar (the toolbar and
- * menu strip). Its appearance is controlled by three major options:
+/* The window chrome: the title bar, the command bar (the toolbar and menu
+ * strip) and the status bar. The component fills its parent and floats above
+ * the canvas. Its appearance is controlled by three major options:
  *
  * overlayed:
  *
@@ -65,6 +66,7 @@ Item {
     // Computed properties
     readonly property bool titleBarOverlayed: root.overlayed && root.unified
     readonly property bool commandBarOverlayed: root.overlayed
+    readonly property bool statusBarOverlayed: root.overlayed
 
     readonly property bool showTitleBar: !root.hidden || !root.unified
     readonly property bool showCommandBar: !root.hidden
@@ -75,7 +77,7 @@ Item {
     readonly property real chromeHeight: content.height
 
     /* Where the picture below the chrome starts and ends, in the coordinates
-     * of the wrapper's parent (which the wrapper fills).
+     * of the parent (which the chrome fills).
      *
      * Start: below the command bar, unless the chrome is overlaid. Then it is
      * below the title bar, or at the very top if that is unified with the
@@ -94,7 +96,9 @@ Item {
     // Colors
     readonly property real titleBarAlpha: titleBarOverlayed ? 0.9 : 1.0
     readonly property real commandBarAlpha: commandBarOverlayed ? 0.9 : 1.0
+    readonly property real statusBarAlpha: statusBarOverlayed ? 0.9 : 1.0
     readonly property color commandBarBg: Palette.toolbar
+    readonly property color statusBarBg: Palette.toolbar
     readonly property color titleBarBg: root.unified ? Palette.toolbar : Palette.background
 
     //
@@ -287,11 +291,12 @@ Item {
     // Status bar
     //
 
-    Item {
+    Rectangle {
 
         id: statusBarSlot
 
         visible: root.statusBarVisible
+        color: Qt.alpha(root.statusBarBg, root.statusBarAlpha)
         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
 
         onChildrenChanged: {
