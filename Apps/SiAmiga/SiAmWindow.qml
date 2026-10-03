@@ -19,11 +19,9 @@ VMWindow {
 
     property SiAmController amiga: SiAmController
     readonly property SiAmInfoController info: amiga.info
+    property real aspectRatio: 4.0 / 3.0
 
     readonly property real titleBarInset: contentItem.SafeArea.margins.top
-
-    // The proportions of the picture, as on a 4:3 monitor
-    property real aspectRatio: 4.0 / 3.0
 
     property alias actions: siActions
 
@@ -40,7 +38,6 @@ VMWindow {
     Palette.theme: Preferences.colorTheme
 
     title: ""
-    color: "black"
 
     //
     // Main area
