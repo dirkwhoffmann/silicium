@@ -188,31 +188,6 @@ VMWindow {
         id: hintBanner
     }
 
-    /* What the machine is busy with, for as long as it is busy (see
-     * Controller::runTask). Unlike a hint, this one is not on a timer: the
-     * job says when it is over by reporting an empty text.
-     */
-    SiBanner {
-
-        id: progressBanner
-
-        anchors.fill: parent
-        z: 2
-        alignment: Qt.AlignBottom
-
-        Connections {
-
-            target: c64
-
-            // The end of the job comes through as an empty text, which the
-            // banner already understands as "nothing to say".
-            function onShowProgress(what, percentage) {
-
-                progressBanner.show(what, undefined, undefined, percentage)
-            }
-        }
-    }
-
     //
     // Connections
     //
@@ -220,14 +195,6 @@ VMWindow {
     Connections {
 
         target: c64
-
-        function onPort0Changed() {
-            AppController.inputManager.port0 = port0
-        }
-
-        function onPort1Changed() {
-            AppController.inputManager.port1 = port1
-        }
 
         function onSnapshotLimitReached() {
 

@@ -542,80 +542,123 @@ Rectangle {
         }
 
         //
-        // Peripherals
+        // Ticker
         //
 
-        FloppyObserver {
+        RowLayout {
 
-            visible: config.DRIVE8_CONNECTED
-            redIcon: root.redIcon8
-            greenIcon: root.greenIcon8
-            diskIcon: root.diskIcon8
-            track: info.track8 ?? 0
-            spinning: info.spinning8 ?? false
-        }
+            visible: myTicker.text !== ""
+            Layout.fillWidth: true
 
-        HSpacer {
-            size: Style.mediumSpacing
-        }
+            BusyIndicator {
 
-        FloppyObserver {
+                visible: root.c64.busy
+                implicitHeight: 22
+                implicitWidth: 22
+                padding: 3
+                running: myTicker.text !== ""
+            }
 
-            visible: config.DRIVE9_CONNECTED
-            redIcon: root.redIcon9
-            greenIcon: root.greenIcon9
-            diskIcon: root.diskIcon9
-            track: info.track9 ?? 0
-            spinning: info.spinning9 ?? false
-        }
+            SiTicker {
 
-        HSpacer {
-            size: Style.mediumSpacing
-        }
+                id: myTicker
+                Layout.fillWidth: true
+                size: Size.small
 
-        TapeObserver {
+                Connections {
 
-            visible: root.config.DAT_CONNECT && root.info.hasTape
-            counter: info.tapeCounter
-            icon: root.tapeIcon
-            busy: info.tapeSpinning
-        }
-
-        HSpacer {
-        }
-
-        CartridgeObserver {
-
-            visible: root.info.hasCrt
-            icon: root.crtIcon
-        }
-
-        HSpacer {
+                    target: root.c64
+                    function onShowProgress(what, percentage) { myTicker.show(what) }
+                    function onShowTicker(what) { myTicker.show(what) }
+                }
+            }
         }
 
         //
-        // Icons
+        // Peripherals and icons, while the ticker has nothing to say
         //
 
-        PictogramIcon {
-            state: keyboard.commodore
-            icon.source: "qrc:/icons/chicken-lips.svg"
-        }
-        Pictogram {
-            state: info.jammed
-            symbol: "back_hand"
-        }
+        RowLayout {
 
-        Pictogram {
-            state: info.tracking
-            symbol: "bug_report"
-        }
-        Pictogram {
-            state: info.mute
-            symbol: "volume_off"
-        }
+            visible: myTicker.text === ""
+            Layout.fillWidth: true
 
-        HSpacer {
+            //
+            // Peripherals
+            //
+
+            FloppyObserver {
+
+                visible: config.DRIVE8_CONNECTED
+                redIcon: root.redIcon8
+                greenIcon: root.greenIcon8
+                diskIcon: root.diskIcon8
+                track: info.track8 ?? 0
+                spinning: info.spinning8 ?? false
+            }
+
+            HSpacer {
+                size: Style.mediumSpacing
+            }
+
+            FloppyObserver {
+
+                visible: config.DRIVE9_CONNECTED
+                redIcon: root.redIcon9
+                greenIcon: root.greenIcon9
+                diskIcon: root.diskIcon9
+                track: info.track9 ?? 0
+                spinning: info.spinning9 ?? false
+            }
+
+            HSpacer {
+                size: Style.mediumSpacing
+            }
+
+            TapeObserver {
+
+                visible: root.config.DAT_CONNECT && root.info.hasTape
+                counter: info.tapeCounter
+                icon: root.tapeIcon
+                busy: info.tapeSpinning
+            }
+
+            HSpacer {
+            }
+
+            CartridgeObserver {
+
+                visible: root.info.hasCrt
+                icon: root.crtIcon
+            }
+
+            HSpacer {
+            }
+
+            //
+            // Icons
+            //
+
+            PictogramIcon {
+                state: keyboard.commodore
+                icon.source: "qrc:/icons/chicken-lips.svg"
+            }
+            Pictogram {
+                state: info.jammed
+                symbol: "back_hand"
+            }
+
+            Pictogram {
+                state: info.tracking
+                symbol: "bug_report"
+            }
+            Pictogram {
+                state: info.mute
+                symbol: "volume_off"
+            }
+
+            HSpacer {
+            }
         }
 
         //

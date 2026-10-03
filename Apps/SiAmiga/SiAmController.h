@@ -94,10 +94,6 @@ class SiAmController : public Controller {
     // Indicates whether the debug panel is visible
     bool m_debugPanel = false;
 
-    // Game port mapping
-    int m_port0 = 0;
-    int m_port1 = 0;
-
     // Sampled once per rendered frame (see update()) rather than read
     // straight off the core, so the status bar's warp icon gets a change
     // notification instead of having to poll.
@@ -258,7 +254,7 @@ public:
     /* Writes the workspace.
      *
      * saveWorkspace() hands the writing to a thread of its own and reports
-     * what it is doing through the window's progress banner, because a
+     * what it is doing through the status bar's ticker, because a
      * machine with hard drives attached takes long enough to freeze the
      * window. saveWorkspaceNow() does the same work on the calling thread,
      * for the two places that cannot wait for a thread: hibernation, which

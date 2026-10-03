@@ -344,26 +344,6 @@ C64Controller::setRetroShell(bool value)
 }
 
 void
-C64Controller::setPort0(int value)
-{
-    if (m_port0 != value) {
-
-        m_port0 = value;
-        emit port0Changed();
-    }
-}
-
-void
-C64Controller::setPort1(int value)
-{
-    if (m_port1 != value) {
-
-        m_port1 = value;
-        emit port1Changed();
-    }
-}
-
-void
 C64Controller::setDebugPanel(bool value)
 {
     if (m_debugPanel != value) {

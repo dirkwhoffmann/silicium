@@ -82,10 +82,6 @@ class C64Controller : public Controller {
     // Indicates whether the debug panel is visible
     bool m_debugPanel = false;
 
-    // Game port mapping
-    int m_port0 = 0;
-    int m_port1 = 0;
-
 
     //
     // Shared inspector state
@@ -239,7 +235,7 @@ public:
     /* Writes the workspace.
      *
      * saveWorkspace() hands the writing to a thread of its own and reports
-     * what it is doing through the window's progress banner. saveWorkspaceNow()
+     * what it is doing through the status bar's ticker. saveWorkspaceNow()
      * does the same work on the calling thread, for hibernation, which is
      * followed by the app quitting and so cannot wait for a thread.
      */
@@ -285,15 +281,6 @@ public:
     //
 
 public:
-
-    Q_PROPERTY(int port0 READ getPort0 WRITE setPort0 NOTIFY port0Changed)
-    Q_PROPERTY(int port1 READ getPort1 WRITE setPort1 NOTIFY port1Changed)
-
-    int getPort0() const { return m_port0; }
-    void setPort0(int value);
-
-    int getPort1() const { return m_port1; }
-    void setPort1(int value);
 
     Q_PROPERTY(bool keyboardCaptured READ keyboardCaptured NOTIFY captureChanged)
     Q_PROPERTY(bool mouseCaptured READ mouseCaptured NOTIFY captureChanged)
@@ -451,8 +438,6 @@ signals:
 
     void stateChanged();
     void retroShellChanged();
-    void port0Changed();
-    void port1Changed();
     void debugPanelChanged();
     void captureChanged();
     void shutdown();
