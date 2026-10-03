@@ -48,8 +48,11 @@ Item {
     required property bool overlayed
     required property bool unified
     required property bool compact
-    required property bool showCommandBar
-    required property bool showStatusBar
+
+    // Shows or hides the command bar and the status bar. The chrome owns this
+    // state; the window actions change it.
+    property bool showCommandBar: true
+    property bool showStatusBar: true
 
     // Title bar height
     required property real titleBarInset

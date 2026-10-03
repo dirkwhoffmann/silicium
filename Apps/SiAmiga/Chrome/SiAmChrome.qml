@@ -19,9 +19,6 @@ SiChrome {
     required property SiAmController amiga
     required property SiAmWindow window
 
-    // Emitted by the Amiga menu's "About" item, which the window handles
-    signal openAbout()
-
     // Visual style, from the appearance preferences
     overlayed: Preferences.chromePlacement === 1
     unified: Preferences.chromeTitleBar === 1
@@ -39,7 +36,7 @@ SiChrome {
             color: Palette.secondary
             background: Rectangle { color: Qt.alpha(Palette.background, 0.5); radius: height / 2 }
 
-            onClicked: root.window.showCommandBar = !root.window.showCommandBar
+            onClicked: root.window.actions.toggleCommandBar.trigger()
         },
 
         SiSymbolButton {
@@ -50,7 +47,7 @@ SiChrome {
             color: Palette.secondary
             background: Rectangle { color: Qt.alpha(Palette.background, 0.5); radius: height / 2 }
 
-            onClicked: root.window.showStatusBar = !root.window.showStatusBar
+            onClicked: root.window.actions.toggleStatusBar.trigger()
         }
     ]
 
@@ -60,16 +57,6 @@ SiChrome {
 
         amiga: root.amiga
         window: root.window
-
-        onOpenAbout: root.openAbout()
-
-        // Lets the View menu's checkable items show the right state; the
-        // window owns the visibility and answers the signals below.
-        toolbarVisible: root.showCommandBar
-        statusBarVisible: root.showStatusBar
-
-        onToggleToolbar: root.window.showCommandBar = !root.window.showCommandBar
-        onToggleStatusBar: root.window.showStatusBar = !root.window.showStatusBar
     }
 
     toolbarContent: SiAmToolbar {

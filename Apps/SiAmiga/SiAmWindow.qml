@@ -15,8 +15,6 @@ ApplicationWindow {
 
     property alias actions: siActions
 
-    property bool showCommandBar: true
-    property bool showStatusBar: true
     property bool shutdownInProgress: false
     property bool loggerOpen: false
 
@@ -48,11 +46,7 @@ ApplicationWindow {
         amiga: root.amiga
         window: root
 
-        showCommandBar: root.showCommandBar
-        showStatusBar: root.showStatusBar
         titleBarInset: root.titleBarInset
-
-        onOpenAbout: aboutWindow.show()
     }
 
     SiAmCanvas {
@@ -334,6 +328,7 @@ ApplicationWindow {
         id: siActions
         hostWindow: root
         amiga: root.amiga
+        aboutWindowRef: aboutWindow
         configWindowRef: configWindow
         keyboardWindowRef: keyboardWindow
         cpuInspectorRef: cpuInspectorWindow
@@ -350,6 +345,7 @@ ApplicationWindow {
         eventsInspectorRef: eventsInspectorWindow
         hardDiskCreatorRef: hardDiskCreatorDialog
         userDialogRef: errorDialog
+        chromeRef: chrome
     }
 
     //

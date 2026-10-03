@@ -38,6 +38,8 @@ Item {
     required property var eventsInspectorRef
     required property var hardDiskCreatorRef
     required property var userDialogRef
+    required property var chromeRef
+    required property var aboutWindowRef
 
     //
     // Keyboard shortcuts
@@ -89,6 +91,9 @@ Item {
     property alias finishLine: finishLineAction
     property alias finishFrame: finishFrameAction
     property alias toggleWarp: toggleWarpAction
+    property alias toggleCommandBar: toggleCommandBarAction
+    property alias toggleStatusBar: toggleStatusBarAction
+    property alias showAbout: showAboutAction
     property alias formatHex: formatHexAction
     property alias formatHexPadded: formatHexPaddedAction
     property alias formatDecimal: formatDecimalAction
@@ -480,6 +485,34 @@ Item {
         text: qsTr("Toggle Warp Mode")
         shortcut: root.toggleWarpShortcut
         onTriggered: amiga.toggleWarp()
+    }
+
+    // View menu commands. The state they toggle belongs to the chrome.
+    Action {
+
+        id: toggleCommandBarAction
+        text: qsTr("Toolbar")
+        shortcut: root.toolbarShortcut
+        checkable: true
+        checked: chromeRef.showCommandBar
+        onTriggered: chromeRef.showCommandBar = !chromeRef.showCommandBar
+    }
+
+    Action {
+
+        id: toggleStatusBarAction
+        text: qsTr("Status Bar")
+        shortcut: root.statusBarShortcut
+        checkable: true
+        checked: chromeRef.showStatusBar
+        onTriggered: chromeRef.showStatusBar = !chromeRef.showStatusBar
+    }
+
+    Action {
+
+        id: showAboutAction
+        text: qsTr("About")
+        onTriggered: aboutWindowRef.show()
     }
 
     // Inspector number format (SiAmInspectorToolbar's format menu). Unlike

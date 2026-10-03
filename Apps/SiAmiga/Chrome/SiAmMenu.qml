@@ -23,13 +23,6 @@ SiMenuBar {
     required property SiAmWindow window
     readonly property SiAmConfigController config: amiga.configController
 
-    property bool toolbarVisible: true
-    property bool statusBarVisible: true
-
-    signal openAbout()
-    signal toggleToolbar()
-    signal toggleStatusBar()
-
     //
     // Amiga menu
     //
@@ -37,9 +30,8 @@ SiMenuBar {
     SiMenu {
         title: qsTr("Amiga")
 
-        Action {
-            text: qsTr("About")
-            onTriggered: openAbout()
+        SiMenuItem {
+            action: window.actions.showAbout
         }
 
         SiMenuSeparator { }
@@ -116,19 +108,11 @@ SiMenuBar {
     SiMenu {
         title: qsTr("&View")
 
-        Action {
-            text: qsTr("Toolbar")
-            shortcut: window.actions.toolbarShortcut
-            checkable: true
-            checked: toolbarVisible
-            onTriggered: toggleToolbar()
+        SiMenuItem {
+            action: window.actions.toggleCommandBar
         }
-        Action {
-            text: qsTr("Status Bar")
-            shortcut: window.actions.statusBarShortcut
-            checkable: true
-            checked: statusBarVisible
-            onTriggered: toggleStatusBar()
+        SiMenuItem {
+            action: window.actions.toggleStatusBar
         }
     }
 
