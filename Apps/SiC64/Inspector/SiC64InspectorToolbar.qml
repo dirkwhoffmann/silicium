@@ -17,7 +17,7 @@ ToolBar {
 
     id: root
 
-    required property C64Controller controller
+    readonly property C64Controller controller: C64Controller
     required property SiC64InspectorController inspectorController
 
     // The main window's shared action set (SiC64Window.actions) -- buttons

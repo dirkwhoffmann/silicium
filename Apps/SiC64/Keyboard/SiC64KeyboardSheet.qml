@@ -23,7 +23,7 @@ Item {
 
     id: root
 
-    required property C64Controller controller
+    readonly property C64Controller controller: C64Controller
     property bool shown: false
 
     // Top edge the sheet slides down from. Set to the canvas top (below the
@@ -74,7 +74,6 @@ Item {
         id: panel
 
         anchors.centerIn: parent
-        controller: root.controller
 
         onKeyActivated: function(button) {
 

@@ -125,7 +125,6 @@ VMWindow {
 
         SiC64DevPanel {
 
-            controller: root.c64
             x: 20
             y: 20
             visible: root.c64.debugPanel && Preferences.developerMode
@@ -139,6 +138,7 @@ VMWindow {
     PauseOverlay {
 
         id: pauseOverlay
+        anchors.fill: wrapper
         controller: root.c64
     }
 
@@ -148,13 +148,7 @@ VMWindow {
 
     SiC64DropOverlay {
 
-        id: overlay
-        // Anchor to the canvas rather than the whole window, so the drop zones
-        // stay clear of the toolbar / menu bar (which otherwise overlap and
-        // hide the top row when the canvas starts below the toolbar).
         anchors.fill: wrapper
-        z: 1
-        controller: c64
         window: root
     }
 
@@ -206,7 +200,6 @@ VMWindow {
 
         id: retroShellComponent
         SiC64RetroShell {
-            controller: root.c64
             blinkingCursor: false
         }
     }
@@ -376,13 +369,11 @@ VMWindow {
     SiC64DiskCreator {
 
         id: diskCreatorDialog
-        c64: root.c64
     }
 
     SiC64DiskExporter {
 
         id: diskExporterDialog
-        c64: root.c64
     }
 
     FileDialog {
@@ -428,13 +419,11 @@ VMWindow {
     SiC64ConfigWindow {
 
         id: configWindow
-        controller: root.c64
     }
 
     SiC64KeyboardSheet {
 
         id: keyboardSheet
-        controller: root.c64
         anchors.horizontalCenter: parent.horizontalCenter
         // Slide down from the canvas top, so the sheet clears the toolbar /
         // menu bar instead of dropping behind them.
@@ -445,55 +434,47 @@ VMWindow {
     SiC64KeyboardWindow {
 
         id: keyboardWindow
-        controller: root.c64
     }
 
     SiC64EventsPanel {
 
         id: eventsInspectorWindow
-        controller: root.c64
         actions: root.actions
     }
 
     SiC64CIAPanel {
 
         id: ciaInspectorWindow
-        controller: root.c64
         actions: root.actions
     }
 
     SiC64VICPanel {
 
         id: vicInspectorWindow
-        controller: root.c64
         actions: root.actions
     }
 
     SiC64SIDPanel {
 
         id: sidInspectorWindow
-        controller: root.c64
         actions: root.actions
     }
 
     SiC64BusPanel {
 
         id: busInspectorWindow
-        controller: root.c64
         actions: root.actions
     }
 
     SiC64CPUPanel {
 
         id: cpuInspectorWindow
-        controller: root.c64
         actions: root.actions
     }
 
     SiC64MemoryPanel {
 
         id: memoryInspectorWindow
-        controller: root.c64
         actions: root.actions
     }
 
@@ -514,7 +495,6 @@ VMWindow {
 
         id: siActions
         hostWindow: root
-        c64: root.c64
         configWindowRef: configWindow
         keyboardSheetRef: keyboardSheet
         keyboardWindowRef: keyboardWindow

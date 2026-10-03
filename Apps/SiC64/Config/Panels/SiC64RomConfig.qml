@@ -19,7 +19,7 @@ import Silicium.Theme
 Item {
 
     id: root
-    required property C64Controller controller
+    readonly property C64Controller controller: C64Controller
     readonly property var cc: controller.configController
 
     readonly property string basicRomTitle: !cc ? "" : !cc.hasBasicRom ? "None" : cc.basicRomTitle

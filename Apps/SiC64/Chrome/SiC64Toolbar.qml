@@ -23,7 +23,7 @@ Item {
 
     id: root
 
-    required property C64Controller c64
+    readonly property C64Controller c64: C64Controller
 
     // The owning window supplies its single "actions" property (see
     // SiC64Window), which the toolbar buttons drive via window.actions.reset,

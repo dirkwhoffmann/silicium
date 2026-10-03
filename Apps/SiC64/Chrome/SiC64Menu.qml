@@ -19,7 +19,7 @@ SiMenuBar {
 
     id: root
 
-    required property C64Controller c64
+    readonly property C64Controller c64: C64Controller
     required property SiC64Window window
     readonly property SiC64ConfigController config: c64.configController
     readonly property var kb: c64.keyboardController

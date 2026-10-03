@@ -19,7 +19,7 @@ Rectangle {
 
     id: root
 
-    required property C64Controller controller
+    readonly property C64Controller controller: C64Controller
     property alias blinkingCursor: fakeCursor.isAnimated
 
     color: "transparent"

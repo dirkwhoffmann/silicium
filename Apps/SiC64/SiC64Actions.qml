@@ -21,7 +21,7 @@ Item {
     id: root
 
     required property var hostWindow
-    required property C64Controller c64
+    readonly property C64Controller c64: C64Controller
     required property var configWindowRef
     required property var keyboardSheetRef
     required property var keyboardWindowRef

@@ -30,7 +30,7 @@ ApplicationWindow {
 
     id: root
 
-    required property C64Controller controller
+    readonly property C64Controller controller: C64Controller
 
     // The main window's shared action set (SiC64Window.actions), forwarded
     // to the toolbar so its buttons trigger the same actions as the main
@@ -54,7 +54,6 @@ ApplicationWindow {
 
     header: SiC64InspectorToolbar {
 
-        controller: root.controller
         actions: root.actions
         inspectorController: root.currentController
     }

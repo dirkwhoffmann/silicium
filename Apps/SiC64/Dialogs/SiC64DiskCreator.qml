@@ -18,7 +18,7 @@ SiDialog {
 
     id: root
 
-    required property C64Controller c64
+    readonly property C64Controller c64: C64Controller
     property int driveNr: 8
     readonly property int labelWidth: 90
     readonly property bool cbmSelected: fsCombo.currentIndex === 1

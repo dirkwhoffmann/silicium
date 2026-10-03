@@ -29,7 +29,7 @@ Window {
         Server
     }
 
-    required property C64Controller controller
+    readonly property C64Controller controller: C64Controller
     readonly property var config: controller.configController
     readonly property var cc: controller.configController
     property int currentIndex: 0
@@ -167,31 +167,24 @@ Window {
             currentIndex: root.currentIndex
 
             SiC64RomConfig {
-                controller: root.controller
             }
 
             SiC64HardwareConfig {
-                controller: root.controller
             }
 
             SiC64DevicesConfig {
-                controller: root.controller
             }
 
             SiC64PerformanceConfig {
-                controller: root.controller
             }
 
             SiC64AudioConfig {
-                controller: root.controller
             }
 
             SiC64VideoConfig {
-                controller: root.controller
             }
 
             SiC64ServerConfig {
-                controller: root.controller
             }
         }
     }

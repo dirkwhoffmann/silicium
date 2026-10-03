@@ -18,7 +18,7 @@ DropOverlay {
 
     id: root
 
-    required property C64Controller controller
+    readonly property C64Controller controller: C64Controller
     required property SiC64Window window
 
     readonly property SiC64ConfigController config: controller.configController

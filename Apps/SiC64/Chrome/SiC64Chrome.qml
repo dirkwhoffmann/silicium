@@ -65,24 +65,18 @@ SiChrome {
     menuContent: SiC64Menu {
 
         anchors.fill: parent
-
-        c64: root.c64
         window: root.window
     }
 
     toolbarContent: SiC64Toolbar {
 
         anchors.fill: parent
-
-        c64: root.c64
         window: root.window
     }
 
     statusBarContent: SiC64Statusbar {
 
         anchors.fill: parent
-
-        c64: root.c64
         // The background is drawn by the chrome
         color: "transparent"
     }

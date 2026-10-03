@@ -19,7 +19,7 @@ SettingsPage {
 
     id: root
 
-    required property C64Controller controller
+    readonly property C64Controller controller: C64Controller
     readonly property var config: controller.configController
     readonly property SiC64InfoController info: controller.info
 

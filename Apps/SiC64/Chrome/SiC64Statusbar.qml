@@ -19,7 +19,7 @@ Rectangle {
 
     id: root
 
-    required property C64Controller c64
+    readonly property C64Controller c64: C64Controller
     readonly property SiC64InfoController info: c64.info
     readonly property SiC64ConfigController config: c64.configController
     readonly property SiC64ActivityController activity: c64.activityController

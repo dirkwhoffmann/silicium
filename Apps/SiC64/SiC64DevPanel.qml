@@ -20,7 +20,7 @@ Rectangle {
 
     id: root
 
-    required property C64Controller controller
+    readonly property C64Controller controller: C64Controller
 
     property real startX: 0
     property real startY: 0
