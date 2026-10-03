@@ -97,10 +97,15 @@ ApplicationWindow {
     // Console overlay (RetroShell / Logger)
     //
 
+    // Runs from the end of the command bar to the start of the status bar, so
+    // the chrome never covers it (and it never reaches under the chrome)
     SiAmCanvasOverlay {
 
         id: canvasOverlay
+
         anchors.fill: parent
+        anchors.topMargin: chrome.overlayStart
+        anchors.bottomMargin: parent.height - chrome.overlayEnd
 
         amiga: root.amiga
         loggerOpen: root.loggerOpen

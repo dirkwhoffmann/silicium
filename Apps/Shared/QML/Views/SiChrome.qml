@@ -90,6 +90,15 @@ Item {
                                       ? root.height - statusBarSlot.height
                                       : root.height
 
+    /* The area between the command bar and the status bar, in the coordinates
+     * of the parent. Independent of the overlay mode, as it is meant for what
+     * must not be covered by the chrome (e.g., the console overlay).
+     */
+    readonly property real overlayStart: root.chromeHeight
+    readonly property real overlayEnd: root.showStatusBar
+                                       ? root.height - statusBarSlot.height
+                                       : root.height
+
     // Colors
     readonly property real titleBarAlpha: titleBarOverlayed ? 0.9 : 1.0
     readonly property real commandBarAlpha: commandBarOverlayed ? 0.9 : 1.0
