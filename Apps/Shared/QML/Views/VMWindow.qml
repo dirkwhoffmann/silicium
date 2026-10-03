@@ -173,54 +173,16 @@ ApplicationWindow {
     //
     // Hint banner
     //
-    //
-    // A small pill-shaped banner used to briefly tell the user how to
-    // recover something they just hid -- e.g. the mouse capture hint below,
-    // or (see SiC64Window) a hint for bringing back a hidden toolbar.
-    // Similar to the "Press Esc to exit" banner browsers show.
-
-    // Shows the banner with the given message for a few seconds. Concrete
-    // windows (e.g. SiC64Window) call this directly for their own hints.
-    function showHint(message) {
-
-        // Readable, and gone again three seconds later without being told
-        hintBanner.show(message, 500, 3000)
-    }
-
-    // When the mouse is captured, briefly tell the user how to get it back.
-    // Which release methods are mentioned depends on the Controls
-    // preferences; if none are enabled, no hint is shown.
-
-    Connections {
-
-        target: AppController.inputManager
-
-        function onCaptureMouseChanged() {
-
-            // Only the capturing is of interest here, not the release
-            if (!AppController.inputManager.captureMouse) return
-
-            const key = Shortcuts.nativeText(Preferences.mouseHotkey)
-            const byPressing = Preferences.releaseMouseByPressing
-            const byShaking = Preferences.releaseMouseByShaking
-
-            if (byPressing && byShaking) {
-                showHint(qsTr("Release mouse by pressing %1 or shaking").arg(key))
-            } else if (byPressing) {
-                showHint(qsTr("Release mouse by pressing %1").arg(key))
-            } else if (byShaking) {
-                showHint(qsTr("Release mouse by shaking"))
-            }
-            // else: no release method configured -- nothing useful to show.
-        }
-    }
-
-    SiBanner {
+    SiHintBanner {
 
         id: hintBanner
+    }
 
-        anchors.fill: parent
-        z: 2
+    // Shows a hint for a few seconds. Concrete windows (e.g. SiC64Window) call
+    // this directly for their own hints.
+    function showHint(message) {
+
+        hintBanner.showHint(message)
     }
 
     /* What the machine is busy with, for as long as it is busy (see

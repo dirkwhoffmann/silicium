@@ -123,44 +123,9 @@ ApplicationWindow {
         z: 999
     }
 
-    SiBanner {
+    SiHintBanner {
 
         id: hintBanner
-
-        anchors.fill: parent
-        z: 2
-    }
-
-    // Shows the banner with the given message for a few seconds, as VMWindow
-    // does for SiC64.
-    function showHint(message) {
-
-        // Readable, and gone again three seconds later without being told
-        hintBanner.show(message, 500, 3000)
-    }
-
-    Connections {
-
-        target: AppController.inputManager
-
-        function onCaptureMouseChanged() {
-
-            // Only the capturing is of interest here, not the release
-            if (!AppController.inputManager.captureMouse) return
-
-            const key = Shortcuts.nativeText(Preferences.mouseHotkey)
-            const byPressing = Preferences.releaseMouseByPressing
-            const byShaking = Preferences.releaseMouseByShaking
-
-            if (byPressing && byShaking) {
-                root.showHint(qsTr("Release mouse by pressing %1 or shaking").arg(key))
-            } else if (byPressing) {
-                root.showHint(qsTr("Release mouse by pressing %1").arg(key))
-            } else if (byShaking) {
-                root.showHint(qsTr("Release mouse by shaking"))
-            }
-            // else: no release method configured -- nothing useful to show.
-        }
     }
 
     //
