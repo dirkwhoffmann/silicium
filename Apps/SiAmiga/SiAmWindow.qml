@@ -13,6 +13,8 @@ ApplicationWindow {
 
     readonly property real titleBarInset: contentItem.SafeArea.margins.top
 
+    property alias actions: siActions
+
     property bool showCommandBar: true
     property bool showStatusBar: true
     property bool shutdownInProgress: false
@@ -37,8 +39,85 @@ ApplicationWindow {
     color: "black"
 
     //
-    // Canvas
+    // Main area
     //
+
+    SiChrome {
+
+        id: chrome
+
+        anchors.fill: parent
+        z: 10
+
+        overlayed: root.overlayed
+        unified: root.unified
+        compact: root.compact
+        showCommandBar: root.showCommandBar
+        showStatusBar: root.showStatusBar
+
+        titleBarInset: root.titleBarInset
+        titleText: "SiAmiga"
+
+        titleBarContent: [
+
+            SiSymbolButton {
+
+                id: chromeToggle
+
+                symbol: "page_header"
+                color: Palette.secondary
+                background: Rectangle { color: Qt.alpha(Palette.background, 0.5); radius: height / 2 }
+
+                onClicked: root.showCommandBar = !root.showCommandBar
+            },
+
+            SiSymbolButton {
+
+                id: statusBarToggle
+
+                symbol: "page_footer"
+                color: Palette.secondary
+                background: Rectangle { color: Qt.alpha(Palette.background, 0.5); radius: height / 2 }
+
+                onClicked: root.showStatusBar = !root.showStatusBar
+            }
+        ]
+
+        menuContent: SiAmMenu {
+
+            anchors.fill: parent
+
+            amiga: root.amiga
+            window: root
+
+            onOpenAbout: aboutWindow.show()
+
+            // Lets the View menu's checkable items show the right state; the
+            // window owns the visibility and answers the signals below.
+            toolbarVisible: root.showCommandBar
+            statusBarVisible: root.showStatusBar
+
+            onToggleToolbar: root.showCommandBar = !root.showCommandBar
+            onToggleStatusBar: root.showStatusBar = !root.showStatusBar
+        }
+
+        toolbarContent: SiAmToolbar {
+
+            anchors.fill: parent
+
+            amiga: root.amiga
+            window: root
+        }
+
+        statusBarContent: SiAmStatusbar {
+
+            anchors.fill: parent
+
+            amiga: root.amiga
+            // The background is drawn by the chrome
+            color: "transparent"
+        }
+    }
 
     SiAmCanvas {
 
@@ -81,6 +160,26 @@ ApplicationWindow {
         window: root
     }
 
+    //
+    // RetroShell / Logger
+    //
+
+    SiAmCanvasOverlay {
+
+        id: canvasOverlay
+
+        anchors.fill: parent
+        anchors.topMargin: chrome.overlayStart
+        anchors.bottomMargin: parent.height - chrome.overlayEnd
+
+        amiga: root.amiga
+        loggerOpen: root.loggerOpen
+    }
+
+    //
+    // Auxiliary components
+    //
+
     SiAmDevPanel {
 
         x: 20
@@ -93,23 +192,58 @@ ApplicationWindow {
         visible: root.amiga.debugPanel && Preferences.developerMode
     }
 
-    //
-    // Console overlay (RetroShell / Logger)
-    //
+    NotificationCenter {
 
-    // Runs from the end of the command bar to the start of the status bar, so
-    // the chrome never covers it (and it never reaches under the chrome)
-    SiAmCanvasOverlay {
+        id: notifications
+        maxWidth: root.width - 2 * Style.largeSpacing
+        maxHeight: root.height - 2 * Style.largeSpacing
+        watchdog: 0
+        z: 999
+    }
 
-        id: canvasOverlay
+    SiBanner {
+
+        id: hintBanner
 
         anchors.fill: parent
-        anchors.topMargin: chrome.overlayStart
-        anchors.bottomMargin: parent.height - chrome.overlayEnd
-
-        amiga: root.amiga
-        loggerOpen: root.loggerOpen
+        z: 2
     }
+
+    // Shows the banner with the given message for a few seconds, as VMWindow
+    // does for SiC64.
+    function showHint(message) {
+
+        // Readable, and gone again three seconds later without being told
+        hintBanner.show(message, 500, 3000)
+    }
+
+    Connections {
+
+        target: AppController.inputManager
+
+        function onCaptureMouseChanged() {
+
+            // Only the capturing is of interest here, not the release
+            if (!AppController.inputManager.captureMouse) return
+
+            const key = Shortcuts.nativeText(Preferences.mouseHotkey)
+            const byPressing = Preferences.releaseMouseByPressing
+            const byShaking = Preferences.releaseMouseByShaking
+
+            if (byPressing && byShaking) {
+                root.showHint(qsTr("Release mouse by pressing %1 or shaking").arg(key))
+            } else if (byPressing) {
+                root.showHint(qsTr("Release mouse by pressing %1").arg(key))
+            } else if (byShaking) {
+                root.showHint(qsTr("Release mouse by shaking"))
+            }
+            // else: no release method configured -- nothing useful to show.
+        }
+    }
+
+    //
+    // Connections
+    //
 
     Connections {
 
@@ -134,62 +268,6 @@ ApplicationWindow {
         function onShowNotification(title, message) {
 
             notifications.show(title, message)
-        }
-    }
-
-    NotificationCenter {
-
-        id: notifications
-        maxWidth: root.width - 2 * Style.largeSpacing
-        maxHeight: root.height - 2 * Style.largeSpacing
-        watchdog: 0
-        z: 999
-    }
-
-    //
-    // Hints
-    //
-
-    SiBanner {
-
-        id: hintBanner
-
-        anchors.fill: parent
-        z: 2
-    }
-
-    // Shows the banner with the given message for a few seconds, as VMWindow
-    // does for SiC64.
-    function showHint(message) {
-
-        // Readable, and gone again three seconds later without being told
-        hintBanner.show(message, 500, 3000)
-    }
-
-    // When the mouse is captured, briefly tell the user how to get it back.
-    // Which release methods are mentioned depends on the Controls
-    // preferences; if none are enabled, no hint is shown.
-    Connections {
-
-        target: AppController.inputManager
-
-        function onCaptureMouseChanged() {
-
-            // Only the capturing is of interest here, not the release
-            if (!AppController.inputManager.captureMouse) return
-
-            const key = Shortcuts.nativeText(Preferences.mouseHotkey)
-            const byPressing = Preferences.releaseMouseByPressing
-            const byShaking = Preferences.releaseMouseByShaking
-
-            if (byPressing && byShaking) {
-                root.showHint(qsTr("Release mouse by pressing %1 or shaking").arg(key))
-            } else if (byPressing) {
-                root.showHint(qsTr("Release mouse by pressing %1").arg(key))
-            } else if (byShaking) {
-                root.showHint(qsTr("Release mouse by shaking"))
-            }
-            // else: no release method configured -- nothing useful to show.
         }
     }
 
@@ -297,93 +375,9 @@ ApplicationWindow {
         eventsInspectorRef: eventsInspectorWindow
     }
 
-    // Single injection point for every window action. Consumers reach
-    // individual actions via window.actions.xxx (e.g. window.actions.reset).
-    property alias actions: siActions
-
-    // The window chrome: title bar, menu, toolbar and status bar. It fills
-    // the window and floats above the canvas rather than using header:, which
-    // would reserve its own layout slot above the content area -- see
-    // SiC64Window.qml for the full rationale. Where the picture starts and
-    // ends is up to the chrome (canvasStart, canvasEnd): in a standard
-    // window the chrome frames it, in an overlaid one the picture runs on
-    // underneath.
-    SiChrome {
-
-        id: chrome
-
-        anchors.fill: parent
-        z: 10
-
-        overlayed: root.overlayed
-        unified: root.unified
-        compact: root.compact
-        showCommandBar: root.showCommandBar
-        showStatusBar: root.showStatusBar
-
-        titleBarInset: root.titleBarInset
-        titleText: "SiAmiga"
-
-        titleBarContent: [
-
-            SiSymbolButton {
-
-                id: chromeToggle
-
-                symbol: "page_header"
-                color: Palette.secondary
-                background: Rectangle { color: Qt.alpha(Palette.background, 0.5); radius: height / 2 }
-
-                onClicked: root.showCommandBar = !root.showCommandBar
-            },
-
-            SiSymbolButton {
-
-                id: statusBarToggle
-
-                symbol: "page_footer"
-                color: Palette.secondary
-                background: Rectangle { color: Qt.alpha(Palette.background, 0.5); radius: height / 2 }
-
-                onClicked: root.showStatusBar = !root.showStatusBar
-            }
-        ]
-
-        menuContent: SiAmMenu {
-
-            anchors.fill: parent
-
-            amiga: root.amiga
-            window: root
-
-            onOpenAbout: aboutWindow.show()
-
-            // Lets the View menu's checkable items show the right state; the
-            // window owns the visibility and answers the signals below.
-            toolbarVisible: root.showCommandBar
-            statusBarVisible: root.showStatusBar
-
-            onToggleToolbar: root.showCommandBar = !root.showCommandBar
-            onToggleStatusBar: root.showStatusBar = !root.showStatusBar
-        }
-
-        toolbarContent: SiAmToolbar {
-
-            anchors.fill: parent
-
-            amiga: root.amiga
-            window: root
-        }
-
-        statusBarContent: SiAmStatusbar {
-
-            anchors.fill: parent
-
-            amiga: root.amiga
-            // The background is drawn by the chrome
-            color: "transparent"
-        }
-    }
+    //
+    // Auxiliary windows
+    //
 
     SiAmConfigWindow {
 
