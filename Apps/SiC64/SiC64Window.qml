@@ -130,6 +130,15 @@ VMWindow {
         }
     }
 
+    Item {
+
+        id: overlayArea
+
+        anchors.fill: parent
+        anchors.topMargin: chrome.overlayStart
+        anchors.bottomMargin: parent.height - chrome.overlayEnd
+    }
+
     //
     // Pause overlay
     //
@@ -137,7 +146,7 @@ VMWindow {
     PauseOverlay {
 
         id: pauseOverlay
-        anchors.fill: wrapper
+        anchors.fill: overlayArea
         controller: root.c64
     }
 
@@ -147,21 +156,18 @@ VMWindow {
 
     SiC64DropOverlay {
 
-        anchors.fill: wrapper
+        anchors.fill: overlayArea
         window: root
     }
 
     //
-    // Console overlay (RetroShell / Logger)
+    // Consoles
     //
 
     SiC64CanvasOverlay {
 
         id: canvasOverlay
-
-        anchors.fill: parent
-        anchors.topMargin: chrome.overlayStart
-        anchors.bottomMargin: parent.height - chrome.overlayEnd
+        anchors.fill: overlayArea
     }
 
     //

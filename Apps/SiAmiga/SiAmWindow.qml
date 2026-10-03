@@ -81,6 +81,15 @@ VMWindow {
         }
     }
 
+    Item {
+
+        id: overlayArea
+
+        anchors.fill: parent
+        anchors.topMargin: chrome.overlayStart
+        anchors.bottomMargin: parent.height - chrome.overlayEnd
+    }
+
     //
     // Pause overlay
     //
@@ -88,7 +97,7 @@ VMWindow {
     PauseOverlay {
 
         id: pauseOverlay
-        anchors.fill: wrapper
+        anchors.fill: overlayArea
         controller: root.amiga
     }
 
@@ -98,22 +107,18 @@ VMWindow {
 
     SiAmDropOverlay {
 
-        anchors.fill: wrapper
+        anchors.fill: overlayArea
         window: root
     }
 
     //
-    // RetroShell / Logger
+    // Consoles
     //
 
     SiAmCanvasOverlay {
 
         id: canvasOverlay
-
-        anchors.fill: parent
-        anchors.topMargin: chrome.overlayStart
-        anchors.bottomMargin: parent.height - chrome.overlayEnd
-
+        anchors.fill: overlayArea
     }
 
     //
