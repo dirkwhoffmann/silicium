@@ -137,65 +137,29 @@ VMWindow {
     }
 
     //
-    // Connections
+    // Actions
     //
 
-    Connections {
+    SiC64Actions {
 
-        target: root.c64
-
-        function onSnapshotLimitReached() {
-
-            userDialog.titleText = qsTr("Snapshot Limit Reached")
-            userDialog.bodyText = qsTr("The snapshot storage has reached maximum capacity. If you continue, the oldest snapshot will be deleted.")
-            userDialog.buttons = Dialog.Cancel | Dialog.Ok
-            userDialog.okLabel = qsTr("OK")
-            userDialog.acceptedCallback = function () {
-
-                c64.shrinkSnapshotStorage(Preferences.maxSnapshots - 1)
-                c64.saveSnapshot()
-            }
-            userDialog.open()
-        }
-
-        //
-        // Error handling
-        //
-
-        // Standard error (shows up in the emulator window)
-        function onShowError(title, text) {
-
-            showError(title, text)
-        }
-
-        // Fatal error (delegated to the hub window)
-        function onShowFatalError(title, text) {
-
-            // Hand the message to the Hub over the RPC link rather than
-            // showing it here: a fatal error means this window is in no state
-            // to be used, and the Hub outlives it. If we were started
-            // standalone there is no Hub listening, so the packet is dropped
-            // and the log line below is all that remains.
-            console.warn("Fatal error:", title, "-", text)
-            c64.notifyFatalError(title, text)
-
-            // Then go away. byebye() rather than close(): close() would run
-            // the normal shutdown sequence, which pauses and then asks
-            // whether to hibernate -- neither a dialog on a dead window nor
-            // persisting the state that just failed makes sense here. The
-            // notification above is already on the wire (the stdio transport
-            // flushes every packet), so quitting cannot lose it.
-            root.byebye()
-        }
-
-        function onSnapshotSaved(vUUID, sUUID) {
-
-            console.log("Snapshot saved", vUUID, sUUID)
-        }
+        id: siActions
+        configWindowRef: configWindow
+        keyboardSheetRef: keyboardSheet
+        keyboardWindowRef: keyboardWindow
+        eventsInspectorRef: eventsInspectorWindow
+        ciaInspectorRef: ciaInspectorWindow
+        busInspectorRef: busInspectorWindow
+        cpuInspectorRef: cpuInspectorWindow
+        memoryInspectorRef: memoryInspectorWindow
+        vicInspectorRef: vicInspectorWindow
+        sidInspectorRef: sidInspectorWindow
+        chromeRef: chrome
+        canvasOverlayRef: canvasOverlay
+        aboutWindowRef: aboutWindow
     }
 
     //
-    // Auxiliary windows
+    // File dialogs
     //
 
     FileDialog {
@@ -207,16 +171,6 @@ VMWindow {
         property int driveNr: 8
 
         onAccepted: root.c64.media.insertDisk(driveNr, selectedFile)
-    }
-
-    SiC64DiskCreator {
-
-        id: diskCreatorDialog
-    }
-
-    SiC64DiskExporter {
-
-        id: diskExporterDialog
     }
 
     FileDialog {
@@ -257,6 +211,20 @@ VMWindow {
         defaultSuffix: "crt"
 
         onAccepted: root.c64.media.exportCartridge(selectedFile)
+    }
+
+    //
+    // Auxiliary windows
+    //
+
+    SiC64DiskCreator {
+
+        id: diskCreatorDialog
+    }
+
+    SiC64DiskExporter {
+
+        id: diskExporterDialog
     }
 
     SiC64ConfigWindow {
@@ -325,31 +293,6 @@ VMWindow {
 
         id: aboutWindow
         visible: false
-    }
-
-    //
-    // Actions
-    //
-
-    // All window actions live in SiC64Actions. SiC64Toolbar and SiC64Menu pull
-    // this window in directly (as SiC64Window, not the generic VMWindow) to
-    // reach them -- VMWindow itself has no notion of actions.
-    SiC64Actions {
-
-        id: siActions
-        configWindowRef: configWindow
-        keyboardSheetRef: keyboardSheet
-        keyboardWindowRef: keyboardWindow
-        eventsInspectorRef: eventsInspectorWindow
-        ciaInspectorRef: ciaInspectorWindow
-        busInspectorRef: busInspectorWindow
-        cpuInspectorRef: cpuInspectorWindow
-        memoryInspectorRef: memoryInspectorWindow
-        vicInspectorRef: vicInspectorWindow
-        sidInspectorRef: sidInspectorWindow
-        chromeRef: chrome
-        canvasOverlayRef: canvasOverlay
-        aboutWindowRef: aboutWindow
     }
 
     //

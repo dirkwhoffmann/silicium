@@ -135,23 +135,41 @@ VMWindow {
     }
 
     //
-    // Connections
+    // Actions
     //
 
-    Connections {
+    //
+    // Actions
+    //
 
-        target: root.amiga
+    SiAmActions {
 
-        // What the controller reports when an action of ours fails, e.g.
-        // loading a snapshot from a machine that has none.
-        function onShowError(title, text) {
-
-            root.showError(title, text)
-        }
+        id: siActions
+        aboutWindowRef: aboutWindow
+        configWindowRef: configWindow
+        keyboardWindowRef: keyboardWindow
+        cpuInspectorRef: cpuInspectorWindow
+        logicAnalyzerRef: logicAnalyzerWindow
+        xrayScannerRef: xrayScannerWindow
+        ciaInspectorRef: ciaInspectorWindow
+        memoryInspectorRef: memoryInspectorWindow
+        agnusInspectorRef: agnusInspectorWindow
+        copperInspectorRef: copperInspectorWindow
+        blitterInspectorRef: blitterInspectorWindow
+        paulaInspectorRef: paulaInspectorWindow
+        deniseInspectorRef: deniseInspectorWindow
+        portInspectorRef: portInspectorWindow
+        eventsInspectorRef: eventsInspectorWindow
+        hardDiskCreatorRef: hardDiskCreatorDialog
+        userDialogRef: userDialog
+        diskCreatorRef: diskCreatorDialog
+        insertDiskDialogRef: insertDiskDialog
+        canvasOverlayRef: canvasOverlay
+        chromeRef: chrome
     }
 
     //
-    // Auxiliary windows
+    // File dialogs
     //
 
     FileDialog {
@@ -164,6 +182,10 @@ VMWindow {
 
         onAccepted: root.amiga.media.insertDisk(driveNr, selectedFile)
     }
+
+    //
+    // Auxiliary windows
+    //
 
     SiAmDiskCreator {
 
@@ -261,35 +283,5 @@ VMWindow {
 
         id: aboutWindow
         visible: false
-    }
-
-    //
-    // Actions
-    //
-
-    SiAmActions {
-
-        id: siActions
-        aboutWindowRef: aboutWindow
-        configWindowRef: configWindow
-        keyboardWindowRef: keyboardWindow
-        cpuInspectorRef: cpuInspectorWindow
-        logicAnalyzerRef: logicAnalyzerWindow
-        xrayScannerRef: xrayScannerWindow
-        ciaInspectorRef: ciaInspectorWindow
-        memoryInspectorRef: memoryInspectorWindow
-        agnusInspectorRef: agnusInspectorWindow
-        copperInspectorRef: copperInspectorWindow
-        blitterInspectorRef: blitterInspectorWindow
-        paulaInspectorRef: paulaInspectorWindow
-        deniseInspectorRef: deniseInspectorWindow
-        portInspectorRef: portInspectorWindow
-        eventsInspectorRef: eventsInspectorWindow
-        hardDiskCreatorRef: hardDiskCreatorDialog
-        userDialogRef: userDialog
-        diskCreatorRef: diskCreatorDialog
-        insertDiskDialogRef: insertDiskDialog
-        canvasOverlayRef: canvasOverlay
-        chromeRef: chrome
     }
 }

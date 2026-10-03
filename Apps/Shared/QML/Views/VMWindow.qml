@@ -181,4 +181,51 @@ ApplicationWindow {
         errorDialog.acceptedCallback = null
         errorDialog.open()
     }
+
+    Connections {
+
+        target: root.controllerRef
+
+        // What the machine reports when an action of ours fails, e.g. loading
+        // a snapshot from a machine that has none
+        function onShowError(title, text) {
+
+            root.showError(title, text)
+        }
+
+        // Fatal error (delegated to the Hub)
+        function onShowFatalError(title, text) {
+
+            // Hand the message to the Hub over the RPC link rather than
+            // showing it here: a fatal error means this window is in no state
+            // to be used, and the Hub outlives it. If we were started
+            // standalone there is no Hub listening, so the packet is dropped
+            // and the log line below is all that remains.
+            console.warn("Fatal error:", title, "-", text)
+            root.controllerRef.notifyFatalError(title, text)
+
+            // Then go away. byebye() rather than close(): close() would run
+            // the normal shutdown sequence, which pauses and then asks
+            // whether to hibernate -- neither a dialog on a dead window nor
+            // persisting the state that just failed makes sense here. The
+            // notification above is already on the wire (the stdio transport
+            // flushes every packet), so quitting cannot lose it.
+            root.byebye()
+        }
+
+        // The snapshot storage is full: ask before the oldest snapshot goes
+        function onSnapshotLimitReached() {
+
+            userDialog.titleText = qsTr("Snapshot Limit Reached")
+            userDialog.bodyText = qsTr("The snapshot storage has reached maximum capacity. If you continue, the oldest snapshot will be deleted.")
+            userDialog.buttons = Dialog.Cancel | Dialog.Ok
+            userDialog.okLabel = qsTr("OK")
+            userDialog.acceptedCallback = function () {
+
+                root.controllerRef.shrinkSnapshotStorage(Preferences.maxSnapshots - 1)
+                root.controllerRef.saveSnapshot()
+            }
+            userDialog.open()
+        }
+    }
 }
