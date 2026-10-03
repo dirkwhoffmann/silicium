@@ -396,8 +396,8 @@ ApplicationWindow {
         overlayed: root.overlayed
         unified: root.unified
         compact: root.compact
-        hidden: !root.toolbarVisible
-        statusBarVisible: root.statusBarVisible
+        showCommandBar: root.toolbarVisible
+        showStatusBar: root.statusBarVisible
 
         titleBarInset: root.titleBarInset
         titleText: "SiAmiga"

@@ -18,9 +18,9 @@ import Silicium.Theme
  *
  * overlayed:
  *
- *   If true, the command bar is drawn on top of the canvas with a subtle
- *   transparency effect. If false, the command bar is drawn as a solid bar
- *   above the canvas.
+ *   If true, the command bar and the status bar are drawn on top of the
+ *   canvas with a subtle transparency effect. If false, the bars are drawn as
+ *   solid bars above and below the canvas.
  *
  * unified:
  *
@@ -48,7 +48,8 @@ Item {
     required property bool overlayed
     required property bool unified
     required property bool compact
-    required property bool hidden
+    required property bool showCommandBar
+    required property bool showStatusBar
 
     // Title bar height
     required property real titleBarInset
@@ -56,9 +57,6 @@ Item {
     // Window title, drawn in QML. The native title is not used, because
     // its view swallows mouse clicks and so blocks dragging the window.
     property string titleText: ""
-
-    // Shows or hides the status bar
-    property bool statusBarVisible: true
 
     // State of the menu / toolbar switch (0 = menu, 1 = toolbar)
     property int menuSwitch: 0
@@ -68,10 +66,9 @@ Item {
     readonly property bool commandBarOverlayed: root.overlayed
     readonly property bool statusBarOverlayed: root.overlayed
 
-    readonly property bool showTitleBar: !root.hidden || !root.unified
-    readonly property bool showCommandBar: !root.hidden
-    readonly property bool showMenu: !root.hidden && (!root.compact || menuSwitch === 0)
-    readonly property bool showToolbar: !root.hidden && (!root.compact || menuSwitch === 1)
+    readonly property bool showTitleBar: root.showCommandBar || !root.unified
+    readonly property bool showMenu: root.showCommandBar && (!root.compact || menuSwitch === 0)
+    readonly property bool showToolbar: root.showCommandBar && (!root.compact || menuSwitch === 1)
 
     // The height of the title bar and the command bar together
     readonly property real chromeHeight: content.height
@@ -89,7 +86,7 @@ Item {
     readonly property real canvasStart: !root.overlayed ? root.chromeHeight
                                       : root.unified    ? 0
                                                         : root.titleBarInset
-    readonly property real canvasEnd: !root.overlayed && root.statusBarVisible
+    readonly property real canvasEnd: !root.overlayed && root.showStatusBar
                                       ? root.height - statusBarSlot.height
                                       : root.height
 
@@ -295,7 +292,7 @@ Item {
 
         id: statusBarSlot
 
-        visible: root.statusBarVisible
+        visible: root.showStatusBar
         color: Qt.alpha(root.statusBarBg, root.statusBarAlpha)
         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
 
