@@ -20,7 +20,6 @@ Item {
 
     id: root
 
-    required property var hostWindow
     readonly property C64Controller c64: C64Controller
     required property var configWindowRef
     required property var keyboardSheetRef
@@ -33,6 +32,7 @@ Item {
     required property var vicInspectorRef
     required property var sidInspectorRef
     required property var chromeRef
+    required property var canvasOverlayRef
     required property var aboutWindowRef
 
     // Shortcuts of the View menu items
@@ -187,7 +187,7 @@ Item {
             if (c64.retroShell) {
                 c64.retroShell = false
             } else {
-                hostWindow.loggerOpen = false
+                canvasOverlayRef.loggerOpen = false
                 c64.retroShell = true
             }
         }
@@ -197,16 +197,16 @@ Item {
 
         id: loggerAction
 
-        property bool isOpen: hostWindow.loggerOpen
+        property bool isOpen: canvasOverlayRef.loggerOpen
 
-        text: hostWindow.loggerOpen ? qsTr("Close Logger") : qsTr("Open Logger")
+        text: canvasOverlayRef.loggerOpen ? qsTr("Close Logger") : qsTr("Open Logger")
         onTriggered: {
 
-            if (hostWindow.loggerOpen) {
-                hostWindow.loggerOpen = false
+            if (canvasOverlayRef.loggerOpen) {
+                canvasOverlayRef.loggerOpen = false
             } else {
                 c64.retroShell = false
-                hostWindow.loggerOpen = true
+                canvasOverlayRef.loggerOpen = true
             }
         }
     }

@@ -20,7 +20,6 @@ VMWindow {
 
     property C64Controller c64: C64Controller
     property real aspectRatio: 800.0 / 614.0
-    property bool loggerOpen: false
 
     readonly property real titleBarInset: contentItem.SafeArea.margins.top
 
@@ -107,13 +106,13 @@ VMWindow {
 
         onClicked: {
 
-            if (Preferences.retainMouseByClicking && !overlayPanel.visible) {
+            if (Preferences.retainMouseByClicking && !canvasOverlay.visible) {
                 root.c64.captureMouse()
             }
         }
 
         onDoubleClicked: {
-            if (Preferences.retainMouseByDoubleClicking && !overlayPanel.visible) {
+            if (Preferences.retainMouseByDoubleClicking && !canvasOverlay.visible) {
                 root.c64.captureMouse()
             }
         }
@@ -156,90 +155,13 @@ VMWindow {
     // Console overlay (RetroShell / Logger)
     //
 
-    // Runs from the end of the command bar to the start of the status bar, so
-    // the chrome never covers it
-    Item {
+    SiC64CanvasOverlay {
 
-        id: overlayPanel
+        id: canvasOverlay
+
         anchors.fill: parent
         anchors.topMargin: chrome.overlayStart
         anchors.bottomMargin: parent.height - chrome.overlayEnd
-        opacity: (root.c64.retroShell || root.loggerOpen) ? 0.85 : 0.0
-        visible: opacity > 0.0
-
-        Behavior on opacity {
-
-            NumberAnimation {
-
-                duration: 500
-                easing.type: Easing.InOutQuad
-            }
-        }
-
-        Rectangle {
-
-            anchors.fill: parent
-            color: "#000000"
-        }
-
-        StackView {
-
-            id: overlayStack
-            anchors.fill: parent
-
-            replaceEnter: Transition {
-                NumberAnimation { property: "opacity"; from: 0; to: 1 }
-            }
-            replaceExit: Transition {
-                NumberAnimation { property: "opacity"; from: 1; to: 0 }
-            }
-        }
-    }
-
-    Component {
-
-        id: retroShellComponent
-        SiC64RetroShell {
-            blinkingCursor: false
-        }
-    }
-
-    Component {
-
-        id: loggerComponent
-        LogView {
-        }
-    }
-
-    property Component currentOverlayComponent: null
-
-    function updateOverlayStack() {
-
-        const targetComponent = root.c64.retroShell ? retroShellComponent
-                               : root.loggerOpen ? loggerComponent
-                               : null
-
-        if (targetComponent && targetComponent !== currentOverlayComponent) {
-
-            if (currentOverlayComponent) {
-                overlayStack.replace(targetComponent)
-            } else {
-                overlayStack.replace(targetComponent, StackView.Immediate)
-            }
-
-            currentOverlayComponent = targetComponent
-        }
-    }
-
-    onLoggerOpenChanged: updateOverlayStack()
-
-    Connections {
-
-        target: root.c64
-
-        function onRetroShellChanged() {
-            updateOverlayStack()
-        }
     }
 
     //
@@ -494,7 +416,6 @@ VMWindow {
     SiC64Actions {
 
         id: siActions
-        hostWindow: root
         configWindowRef: configWindow
         keyboardSheetRef: keyboardSheet
         keyboardWindowRef: keyboardWindow
@@ -506,6 +427,7 @@ VMWindow {
         vicInspectorRef: vicInspectorWindow
         sidInspectorRef: sidInspectorWindow
         chromeRef: chrome
+        canvasOverlayRef: canvasOverlay
         aboutWindowRef: aboutWindow
     }
 
@@ -615,8 +537,6 @@ VMWindow {
     //
 
     Component.onCompleted: {
-
-        updateOverlayStack()
 
         if (c64.readOnly) {
 
