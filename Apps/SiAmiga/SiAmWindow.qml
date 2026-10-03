@@ -11,8 +11,10 @@ ApplicationWindow {
     property SiAmController amiga: SiAmController
     readonly property SiAmInfoController info: amiga.info
 
-    property bool toolbarVisible: true
-    property bool statusBarVisible: true
+    readonly property real titleBarInset: contentItem.SafeArea.margins.top
+
+    property bool showCommandBar: true
+    property bool showStatusBar: true
     property bool shutdownInProgress: false
     property bool loggerOpen: false
 
@@ -20,28 +22,19 @@ ApplicationWindow {
     readonly property bool unified: Preferences.chromeTitleBar === 1
     readonly property bool compact: Preferences.chromeLayout === 1
 
-    readonly property bool overlayTitleBar: overlayed && unified
-    readonly property bool overlayCommandBar: overlayed
-
-    readonly property real titleBarInset: contentItem.SafeArea.margins.top
-
     visible: true
     width: 800
     height: 600
     minimumWidth: 400
     minimumHeight: 300
-
-    // Drawn by the chrome; the native title would block window dragging
-    title: ""
-    color: "black"
-
-    // Window flags
-    flags: Qt.Window | Qt.ExpandedClientAreaHint | Qt.NoTitleBarBackgroundHint
-
     topPadding: 0
 
+    flags: Qt.Window | Qt.ExpandedClientAreaHint | Qt.NoTitleBarBackgroundHint
     Palette.appearance: Preferences.appearance
     Palette.theme: Preferences.colorTheme
+
+    title: ""
+    color: "black"
 
     //
     // Canvas
@@ -54,8 +47,6 @@ ApplicationWindow {
         anchors.fill: parent
         anchors.topMargin: chrome.canvasStart
         anchors.bottomMargin: parent.height - chrome.canvasEnd
-
-        controller: root.amiga
     }
 
     MouseArea {
@@ -66,14 +57,14 @@ ApplicationWindow {
 
         onPressed: {
 
-            if (Preferences.retainMouseByClicking && !overlayPanel.visible) {
+            if (Preferences.retainMouseByClicking && !canvasOverlay.visible) {
                 root.amiga.captureMouse()
             }
         }
 
         onDoubleClicked: {
 
-            if (Preferences.retainMouseByDoubleClicking && !overlayPanel.visible) {
+            if (Preferences.retainMouseByDoubleClicking && !canvasOverlay.visible) {
                 root.amiga.captureMouse()
             }
         }
@@ -106,87 +97,18 @@ ApplicationWindow {
     // Console overlay (RetroShell / Logger)
     //
 
-    Item {
+    SiAmCanvasOverlay {
 
-        id: overlayPanel
+        id: canvasOverlay
         anchors.fill: parent
-        opacity: (root.amiga.retroShell || root.loggerOpen) ? 0.85 : 0.0
-        visible: opacity > 0.0
 
-        Behavior on opacity {
-
-            NumberAnimation {
-
-                duration: 500
-                easing.type: Easing.InOutQuad
-            }
-        }
-
-        Rectangle {
-
-            anchors.fill: parent
-            color: "#000000"
-        }
-
-        StackView {
-
-            id: overlayStack
-            anchors.fill: parent
-
-            replaceEnter: Transition {
-                NumberAnimation { property: "opacity"; from: 0; to: 1 }
-            }
-            replaceExit: Transition {
-                NumberAnimation { property: "opacity"; from: 1; to: 0 }
-            }
-        }
+        amiga: root.amiga
+        loggerOpen: root.loggerOpen
     }
-
-    Component {
-
-        id: retroShellComponent
-        SiAmRetroShell {
-            controller: root.amiga
-            blinkingCursor: false
-        }
-    }
-
-    Component {
-
-        id: loggerComponent
-        LogView {
-        }
-    }
-
-    property Component currentOverlayComponent: null
-
-    function updateOverlayStack() {
-
-        const targetComponent = root.amiga.retroShell ? retroShellComponent
-                               : root.loggerOpen ? loggerComponent
-                               : null
-
-        if (targetComponent && targetComponent !== currentOverlayComponent) {
-
-            if (currentOverlayComponent) {
-                overlayStack.replace(targetComponent)
-            } else {
-                overlayStack.replace(targetComponent, StackView.Immediate)
-            }
-
-            currentOverlayComponent = targetComponent
-        }
-    }
-
-    onLoggerOpenChanged: updateOverlayStack()
 
     Connections {
 
         target: root.amiga
-
-        function onRetroShellChanged() {
-            updateOverlayStack()
-        }
 
         function onShutdown() {
 
@@ -342,8 +264,6 @@ ApplicationWindow {
     property alias hardDiskCreator: hardDiskCreatorDialog
     property alias userDialog: errorDialog
 
-    Component.onCompleted: updateOverlayStack()
-
     //
     // Actions
     //
@@ -393,8 +313,8 @@ ApplicationWindow {
         overlayed: root.overlayed
         unified: root.unified
         compact: root.compact
-        showCommandBar: root.toolbarVisible
-        showStatusBar: root.statusBarVisible
+        showCommandBar: root.showCommandBar
+        showStatusBar: root.showStatusBar
 
         titleBarInset: root.titleBarInset
         titleText: "SiAmiga"
@@ -409,7 +329,7 @@ ApplicationWindow {
                 color: Palette.secondary
                 background: Rectangle { color: Qt.alpha(Palette.background, 0.5); radius: height / 2 }
 
-                onClicked: root.toolbarVisible = !root.toolbarVisible
+                onClicked: root.showCommandBar = !root.showCommandBar
             },
 
             SiSymbolButton {
@@ -420,7 +340,7 @@ ApplicationWindow {
                 color: Palette.secondary
                 background: Rectangle { color: Qt.alpha(Palette.background, 0.5); radius: height / 2 }
 
-                onClicked: root.statusBarVisible = !root.statusBarVisible
+                onClicked: root.showStatusBar = !root.showStatusBar
             }
         ]
 
@@ -435,11 +355,11 @@ ApplicationWindow {
 
             // Lets the View menu's checkable items show the right state; the
             // window owns the visibility and answers the signals below.
-            toolbarVisible: root.toolbarVisible
-            statusBarVisible: root.statusBarVisible
+            toolbarVisible: root.showCommandBar
+            statusBarVisible: root.showStatusBar
 
-            onToggleToolbar: root.toolbarVisible = !root.toolbarVisible
-            onToggleStatusBar: root.statusBarVisible = !root.statusBarVisible
+            onToggleToolbar: root.showCommandBar = !root.showCommandBar
+            onToggleStatusBar: root.showStatusBar = !root.showStatusBar
         }
 
         toolbarContent: SiAmToolbar {

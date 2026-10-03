@@ -5,7 +5,7 @@ Rectangle {
 
     id: canvas
 
-    property SiAmController controller
+    property SiAmController controller: SiAmController
 
     anchors.fill: parent
     color: "black"
