@@ -33,13 +33,9 @@ VMWindow {
     Palette.appearance: Preferences.appearance
     Palette.theme: Preferences.colorTheme
 
-    // The chrome the base class hides in fullscreen mode
+    // References from VMWindow
     chromeRef: chrome
-
-    // The machine the base class pauses while the window is in the background
     controllerRef: amiga
-
-    // The actions the base class needs the shortcuts of
     actionsRef: siActions
 
     title: ""
@@ -133,9 +129,6 @@ VMWindow {
     SiAmDevPanel {
 
         x: 20
-        // The chrome floats above everything else. Anchoring under it, rather
-        // than using a fixed y, keeps this panel from starting out hidden
-        // under the command bar.
         y: chrome.chromeHeight + Style.mediumSpacing
         visible: root.amiga.debugPanel && Preferences.developerMode
     }

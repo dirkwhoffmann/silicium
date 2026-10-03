@@ -33,13 +33,9 @@ VMWindow {
     Palette.appearance: Preferences.appearance
     Palette.theme: Preferences.colorTheme
 
-    // The chrome the base class hides in fullscreen mode
+    // References from VMWindow
     chromeRef: chrome
-
-    // The machine the base class pauses while the window is in the background
     controllerRef: c64
-
-    // The actions the base class needs the shortcuts of
     actionsRef: siActions
 
     title: ""
@@ -82,13 +78,6 @@ VMWindow {
         SiC64Canvas {
 
             id: canvas
-        }
-
-        SiC64DevPanel {
-
-            x: 20
-            y: 20
-            visible: root.c64.debugPanel && Preferences.developerMode
         }
     }
 
@@ -136,6 +125,13 @@ VMWindow {
     // Auxiliary components
     //
 
+    SiC64DevPanel {
+
+        x: 20
+        y: chrome.chromeHeight + Style.mediumSpacing
+        visible: root.c64.debugPanel && Preferences.developerMode
+    }
+
     NotificationCenter {
 
         id: notifications
@@ -151,7 +147,7 @@ VMWindow {
 
     Connections {
 
-        target: c64
+        target: root.c64
 
         function onSnapshotLimitReached() {
 
