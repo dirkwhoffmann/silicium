@@ -110,6 +110,7 @@ SiMenuBar {
 
         SiMenuItem {
             action: window.actions.toggleCommandBar
+            onTriggered: window.showToolbarHint()
         }
         SiMenuItem {
             action: window.actions.toggleStatusBar

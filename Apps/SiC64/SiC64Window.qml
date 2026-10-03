@@ -39,23 +39,10 @@ VMWindow {
     // The machine the base class pauses while the window is in the background
     controllerRef: c64
 
+    // The actions the base class needs the shortcuts of
+    actionsRef: siActions
+
     title: ""
-
-    // Hiding the toolbar (the shortcut, the View menu, or entering fullscreen)
-    // leaves no menu behind to bring it back from -- show a hint so the user
-    // isn't stuck having to remember the shortcut.
-    Connections {
-
-        target: chrome
-
-        function onShowCommandBarChanged() {
-
-            if (!chrome.showCommandBar) {
-                hintBanner.showHint(qsTr("Recover toolbar by pressing %1")
-                    .arg(Shortcuts.nativeText(siActions.toolbarShortcut)))
-            }
-        }
-    }
 
     //
     // Main area
@@ -156,11 +143,6 @@ VMWindow {
         maxHeight: wrapper.height - 2 * Style.largeSpacing
         watchdog: 0
         z: 999
-    }
-
-    SiHintBanner {
-
-        id: hintBanner
     }
 
     //

@@ -39,6 +39,9 @@ VMWindow {
     // The machine the base class pauses while the window is in the background
     controllerRef: amiga
 
+    // The actions the base class needs the shortcuts of
+    actionsRef: siActions
+
     title: ""
 
     //
@@ -144,11 +147,6 @@ VMWindow {
         maxHeight: root.height - 2 * Style.largeSpacing
         watchdog: 0
         z: 999
-    }
-
-    SiHintBanner {
-
-        id: hintBanner
     }
 
     //

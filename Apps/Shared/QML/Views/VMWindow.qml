@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import Silicium.Preferences
+import Silicium.Theme
 
 /* The common base of the emulator windows (SiC64Window and SiAmWindow).
  */
@@ -14,6 +15,9 @@ ApplicationWindow {
     // The machine of the window (set by the concrete window). Needs isRunning,
     // run() and pause().
     property var controllerRef: null
+
+    // The window's actions (set by the concrete window). Needs toolbarShortcut.
+    property var actionsRef: null
 
     //
     // Fullscreen
@@ -70,5 +74,25 @@ ApplicationWindow {
                 controllerRef.pause()
             }
         }
+    }
+
+    //
+    // Hints
+    //
+
+    SiHintBanner {
+
+        id: hintBanner
+    }
+
+    function showToolbarHint() {
+
+        Qt.callLater(function () {
+
+            if (!chromeRef.showCommandBar) {
+                hintBanner.showHint(qsTr("Recover toolbar by pressing %1")
+                    .arg(Shortcuts.nativeText(actionsRef.toolbarShortcut)))
+            }
+        })
     }
 }
