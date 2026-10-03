@@ -36,6 +36,8 @@ Item {
     required property var deniseInspectorRef
     required property var portInspectorRef
     required property var eventsInspectorRef
+    required property var hardDiskCreatorRef
+    required property var userDialogRef
 
     //
     // Keyboard shortcuts
@@ -112,7 +114,7 @@ Item {
         // itself is empty.
         const existing = amiga.media.hdExistingImage(driveNr)
 
-        const creator = hostWindow.hardDiskCreator
+        const creator = hardDiskCreatorRef
 
         if (!hasDisk && existing === "") {
             creator.driveNr = driveNr
@@ -120,7 +122,7 @@ Item {
             return
         }
 
-        const dialog = hostWindow.userDialog
+        const dialog = userDialogRef
         dialog.titleText = hasDisk ?
             qsTr("Hd%1 already holds a hard drive.").arg(driveNr) :
             qsTr("The machine folder already holds %1.").arg(existing)

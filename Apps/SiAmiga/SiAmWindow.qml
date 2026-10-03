@@ -272,88 +272,6 @@ ApplicationWindow {
     }
 
     //
-    // Errors
-    //
-
-    function showError(title, text) {
-
-        errorDialog.titleText = title
-        errorDialog.bodyText = text
-        errorDialog.buttons = Dialog.Ok
-        errorDialog.okLabel = qsTr("OK")
-        errorDialog.acceptedCallback = null
-        errorDialog.open()
-    }
-
-    SiUserDialog {
-
-        id: errorDialog
-        sound: true
-    }
-
-    //
-    // Media files
-    //
-
-    function proceedWithUnsavedFloppyDisk(driveNr, proceed) {
-
-        if (Preferences.ejectWithoutAsking || !amiga.media.driveModified(driveNr)) {
-            proceed()
-            return
-        }
-
-        errorDialog.titleText = qsTr("Drive df%1 contains an unsaved disk.").arg(driveNr)
-        errorDialog.bodyText = qsTr("Your changes will be lost if you proceed.")
-        errorDialog.buttons = Dialog.Cancel | Dialog.Ok
-        errorDialog.okLabel = qsTr("Proceed")
-        errorDialog.acceptedCallback = proceed
-        errorDialog.open()
-    }
-
-    function newDiskAction(driveNr) {
-
-        proceedWithUnsavedFloppyDisk(driveNr, function () {
-            diskCreatorDialog.driveNr = driveNr
-            diskCreatorDialog.open()
-        })
-    }
-
-    /* Reached from SiAmActions, where the actions that drive these two live.
-     * Named apart from the ids they point at: an alias whose name is the id
-     * it targets resolves to undefined.
-     */
-    property alias hardDiskCreator: hardDiskCreatorDialog
-    property alias userDialog: errorDialog
-
-    //
-    // Actions
-    //
-
-    // All window actions live in SiAmActions. SiAmToolbar and SiAmMenu pull
-    // this window in directly (as SiAmWindow, not a generic base) to reach
-    // them -- mirrors SiC64Window's own actions wiring.
-    SiAmActions {
-
-        id: siActions
-        hostWindow: root
-        amiga: root.amiga
-        configWindowRef: configWindow
-        keyboardWindowRef: keyboardWindow
-        cpuInspectorRef: cpuInspectorWindow
-        logicAnalyzerRef: logicAnalyzerWindow
-        xrayScannerRef: xrayScannerWindow
-        ciaInspectorRef: ciaInspectorWindow
-        memoryInspectorRef: memoryInspectorWindow
-        agnusInspectorRef: agnusInspectorWindow
-        copperInspectorRef: copperInspectorWindow
-        blitterInspectorRef: blitterInspectorWindow
-        paulaInspectorRef: paulaInspectorWindow
-        deniseInspectorRef: deniseInspectorWindow
-        portInspectorRef: portInspectorWindow
-        eventsInspectorRef: eventsInspectorWindow
-    }
-
-    //
     // Auxiliary windows
     //
 
@@ -469,6 +387,80 @@ ApplicationWindow {
 
         id: aboutWindow
         visible: false
+    }
+
+    //
+    // Actions
+    //
+
+    SiAmActions {
+
+        id: siActions
+        hostWindow: root
+        amiga: root.amiga
+        configWindowRef: configWindow
+        keyboardWindowRef: keyboardWindow
+        cpuInspectorRef: cpuInspectorWindow
+        logicAnalyzerRef: logicAnalyzerWindow
+        xrayScannerRef: xrayScannerWindow
+        ciaInspectorRef: ciaInspectorWindow
+        memoryInspectorRef: memoryInspectorWindow
+        agnusInspectorRef: agnusInspectorWindow
+        copperInspectorRef: copperInspectorWindow
+        blitterInspectorRef: blitterInspectorWindow
+        paulaInspectorRef: paulaInspectorWindow
+        deniseInspectorRef: deniseInspectorWindow
+        portInspectorRef: portInspectorWindow
+        eventsInspectorRef: eventsInspectorWindow
+        hardDiskCreatorRef: hardDiskCreatorDialog
+        userDialogRef: errorDialog
+    }
+
+    //
+    // Errors
+    //
+
+    function showError(title, text) {
+
+        errorDialog.titleText = title
+        errorDialog.bodyText = text
+        errorDialog.buttons = Dialog.Ok
+        errorDialog.okLabel = qsTr("OK")
+        errorDialog.acceptedCallback = null
+        errorDialog.open()
+    }
+
+    SiUserDialog {
+
+        id: errorDialog
+        sound: true
+    }
+
+    //
+    // Media files
+    //
+
+    function proceedWithUnsavedFloppyDisk(driveNr, proceed) {
+
+        if (Preferences.ejectWithoutAsking || !amiga.media.driveModified(driveNr)) {
+            proceed()
+            return
+        }
+
+        errorDialog.titleText = qsTr("Drive df%1 contains an unsaved disk.").arg(driveNr)
+        errorDialog.bodyText = qsTr("Your changes will be lost if you proceed.")
+        errorDialog.buttons = Dialog.Cancel | Dialog.Ok
+        errorDialog.okLabel = qsTr("Proceed")
+        errorDialog.acceptedCallback = proceed
+        errorDialog.open()
+    }
+
+    function newDiskAction(driveNr) {
+
+        proceedWithUnsavedFloppyDisk(driveNr, function () {
+            diskCreatorDialog.driveNr = driveNr
+            diskCreatorDialog.open()
+        })
     }
 
     //
