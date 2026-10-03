@@ -19,7 +19,7 @@ SiDialog {
 
     id: root
 
-    required property SiAmController amiga
+    readonly property SiAmController amiga: SiAmController
     readonly property SiAmInfoController info: amiga.info
 
     property int driveNr: 0

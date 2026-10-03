@@ -34,7 +34,7 @@ ColumnLayout {
 
     id: root
 
-    required property SiAmController controller
+    readonly property SiAmController controller: SiAmController
     readonly property var kc: controller.keyboardController
 
     // AmigaKeyModel's positions/sizes are already in pixels (lifted

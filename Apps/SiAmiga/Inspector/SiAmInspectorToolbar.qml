@@ -28,7 +28,7 @@ ToolBar {
 
     id: root
 
-    required property SiAmController amiga
+    readonly property SiAmController amiga: SiAmController
     required property SiAmActions actions
 
     // Untyped: SiAmInspectorController isn't registered as a QML type

@@ -34,7 +34,7 @@ Window {
         Server
     }
 
-    required property SiAmController controller
+    readonly property SiAmController controller: SiAmController
     readonly property var config: controller.configController
     readonly property var cc: controller.configController
     property int currentIndex: 0
@@ -173,35 +173,27 @@ Window {
             currentIndex: root.currentIndex
 
             SiAmRomConfig {
-                controller: root.controller
             }
 
             SiAmHardwareConfig {
-                controller: root.controller
             }
 
             SiAmDevicesConfig {
-                controller: root.controller
             }
 
             SiAmPerformanceConfig {
-                controller: root.controller
             }
 
             SiAmCompatibilityConfig {
-                controller: root.controller
             }
 
             SiAmAudioConfig {
-                controller: root.controller
             }
 
             SiAmVideoConfig {
-                controller: root.controller
             }
 
             SiAmServerConfig {
-                controller: root.controller
             }
         }
     }

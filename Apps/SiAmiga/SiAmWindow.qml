@@ -41,7 +41,6 @@ ApplicationWindow {
         anchors.fill: parent
         z: 10
 
-        amiga: root.amiga
         window: root
 
         titleBarInset: root.titleBarInset
@@ -84,7 +83,6 @@ ApplicationWindow {
     SiAmDropOverlay {
 
         anchors.fill: canvas
-        controller: root.amiga
         window: root
     }
 
@@ -100,7 +98,6 @@ ApplicationWindow {
         anchors.topMargin: chrome.overlayStart
         anchors.bottomMargin: parent.height - chrome.overlayEnd
 
-        amiga: root.amiga
     }
 
     //
@@ -197,108 +194,92 @@ ApplicationWindow {
     SiAmDiskCreator {
 
         id: diskCreatorDialog
-        amiga: root.amiga
     }
 
     SiAmHardDiskCreator {
 
         id: hardDiskCreatorDialog
-        amiga: root.amiga
     }
 
     SiAmConfigWindow {
 
         id: configWindow
-        controller: root.amiga
     }
 
     SiAmKeyboardWindow {
 
         id: keyboardWindow
-        controller: root.amiga
     }
 
     SiAmCPUPanel {
 
         id: cpuInspectorWindow
-        controller: root.amiga
         actions: root.actions
     }
 
     SiAmLogicAnalyzerPanel {
 
         id: logicAnalyzerWindow
-        controller: root.amiga
         actions: root.actions
     }
 
     SiAmXRayPanel {
 
         id: xrayScannerWindow
-        controller: root.amiga
         actions: root.actions
     }
 
     SiAmCIAPanel {
 
         id: ciaInspectorWindow
-        controller: root.amiga
         actions: root.actions
     }
 
     SiAmMemoryPanel {
 
         id: memoryInspectorWindow
-        controller: root.amiga
         actions: root.actions
     }
 
     SiAmAgnusPanel {
 
         id: agnusInspectorWindow
-        controller: root.amiga
         actions: root.actions
     }
 
     SiAmCopperPanel {
 
         id: copperInspectorWindow
-        controller: root.amiga
         actions: root.actions
     }
 
     SiAmBlitterPanel {
 
         id: blitterInspectorWindow
-        controller: root.amiga
         actions: root.actions
     }
 
     SiAmPaulaPanel {
 
         id: paulaInspectorWindow
-        controller: root.amiga
         actions: root.actions
     }
 
     SiAmDenisePanel {
 
         id: deniseInspectorWindow
-        controller: root.amiga
         actions: root.actions
     }
 
     SiAmPortPanel {
 
         id: portInspectorWindow
-        controller: root.amiga
         actions: root.actions
     }
 
     SiAmEventsPanel {
 
         id: eventsInspectorWindow
-        controller: root.amiga
         actions: root.actions
     }
 
@@ -315,7 +296,6 @@ ApplicationWindow {
     SiAmActions {
 
         id: siActions
-        amiga: root.amiga
         aboutWindowRef: aboutWindow
         configWindowRef: configWindow
         keyboardWindowRef: keyboardWindow

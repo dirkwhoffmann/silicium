@@ -19,7 +19,7 @@ SiMenuBar {
 
     id: root
 
-    required property SiAmController amiga
+    readonly property SiAmController amiga: SiAmController
     required property SiAmWindow window
     readonly property SiAmConfigController config: amiga.configController
 

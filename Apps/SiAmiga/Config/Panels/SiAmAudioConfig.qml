@@ -37,7 +37,7 @@ SettingsPage {
 
     id: root
 
-    required property SiAmController controller
+    readonly property SiAmController controller: SiAmController
     readonly property var config: controller.configController
 
     readonly property int labelWidth: 100

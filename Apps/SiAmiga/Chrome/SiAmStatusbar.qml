@@ -19,7 +19,7 @@ Rectangle {
 
     id: root
 
-    required property SiAmController amiga
+    readonly property SiAmController amiga: SiAmController
     readonly property SiAmConfigController config: amiga.configController
     readonly property SiAmActivityController activity: amiga.activityController
     readonly property SiAmInfoController info: amiga.info

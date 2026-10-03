@@ -18,7 +18,7 @@ SiDialog {
 
     id: root
 
-    required property SiAmController amiga
+    readonly property SiAmController amiga: SiAmController
     property int driveNr: 0
     readonly property int labelWidth: 90
 

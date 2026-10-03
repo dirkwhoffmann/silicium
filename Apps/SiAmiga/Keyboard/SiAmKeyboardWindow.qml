@@ -16,7 +16,7 @@ Window {
 
     id: root
 
-    required property SiAmController controller
+    readonly property SiAmController controller: SiAmController
     readonly property var kc: controller.keyboardController
 
     readonly property int nativeWidth: panel.implicitWidth + 2 * Style.largeSpacing
@@ -42,6 +42,5 @@ Window {
 
         anchors.fill: parent
         anchors.margins: Style.largeSpacing
-        controller: root.controller
     }
 }

@@ -31,7 +31,7 @@ Item {
 
     id: root
 
-    required property SiAmController controller
+    readonly property SiAmController controller: SiAmController
     readonly property var cc: controller.configController
 
     readonly property bool locked: controller.isPoweredOn

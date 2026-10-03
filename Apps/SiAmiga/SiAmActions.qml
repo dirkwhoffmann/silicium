@@ -20,7 +20,7 @@ Item {
 
     id: root
 
-    required property SiAmController amiga
+    readonly property SiAmController amiga: SiAmController
     required property var configWindowRef
     required property var keyboardWindowRef
     required property var cpuInspectorRef

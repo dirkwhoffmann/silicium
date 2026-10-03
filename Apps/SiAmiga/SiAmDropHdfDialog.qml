@@ -27,8 +27,7 @@ SiUserDialog {
 
     id: root
 
-    required property SiAmController controller
-
+    readonly property SiAmController controller: SiAmController
     // Which slot the image was dropped on, and what was dropped there.
     property int driveNr: 0
     property string fileUrl: ""

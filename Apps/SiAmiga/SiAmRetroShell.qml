@@ -18,7 +18,7 @@ Rectangle {
 
     id: root
 
-    required property SiAmController controller
+    readonly property SiAmController controller: SiAmController
     property alias blinkingCursor: fakeCursor.isAnimated
 
     color: "transparent"

@@ -19,8 +19,7 @@ Item {
 
     id: root
 
-    required property SiAmController amiga
-
+    readonly property SiAmController amiga: SiAmController
     // Whether the logger is shown. RetroShell is up to the controller. The
     // window actions open and close the logger.
     property bool loggerOpen: false
@@ -60,7 +59,6 @@ Item {
 
         id: retroShellComponent
         SiAmRetroShell {
-            controller: root.amiga
             blinkingCursor: false
         }
     }

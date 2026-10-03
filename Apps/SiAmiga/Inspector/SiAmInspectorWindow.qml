@@ -29,7 +29,7 @@ ApplicationWindow {
 
     id: root
 
-    required property SiAmController controller
+    readonly property SiAmController controller: SiAmController
     required property SiAmActions actions
 
     // Set by the specialized window to the sub-controller its content panel
@@ -49,7 +49,6 @@ ApplicationWindow {
 
     header: SiAmInspectorToolbar {
 
-        amiga: root.controller
         actions: root.actions
         inspectorController: root.currentController
     }

@@ -39,7 +39,7 @@ DropOverlay {
 
     id: root
 
-    required property SiAmController controller
+    readonly property SiAmController controller: SiAmController
     required property SiAmWindow window
 
     readonly property SiAmConfigController config: controller.configController
@@ -73,7 +73,6 @@ DropOverlay {
 
         id: hdDialog
 
-        controller: root.controller
 
         // Parented to the window rather than to this overlay: the overlay is
         // anchored to the canvas and disappears the moment the drag ends,

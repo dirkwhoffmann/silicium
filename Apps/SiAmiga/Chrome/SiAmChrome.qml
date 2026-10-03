@@ -16,7 +16,7 @@ SiChrome {
 
     id: root
 
-    required property SiAmController amiga
+    readonly property SiAmController amiga: SiAmController
     required property SiAmWindow window
 
     // Visual style, from the appearance preferences
@@ -55,7 +55,6 @@ SiChrome {
 
         anchors.fill: parent
 
-        amiga: root.amiga
         window: root.window
     }
 
@@ -63,7 +62,6 @@ SiChrome {
 
         anchors.fill: parent
 
-        amiga: root.amiga
         window: root.window
     }
 
@@ -71,7 +69,6 @@ SiChrome {
 
         anchors.fill: parent
 
-        amiga: root.amiga
         // The background is drawn by the chrome
         color: "transparent"
     }
