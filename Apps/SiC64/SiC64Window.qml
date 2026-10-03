@@ -20,29 +20,23 @@ VMWindow {
 
     property C64Controller c64: C64Controller
     property real aspectRatio: 800.0 / 614.0
-    property bool statusbarVisible: true
     property bool loggerOpen: false
 
-    // Whether the toolbar is currently shown. Exposed so the View menu can
-    // offer a "Toolbar" visibility toggle.
-    property bool toolbarVisible: true
-
-    // Compact-menu mode (JetBrains style): the menu bar stays hidden and the
-    // toolbar shows a hamburger button instead. Clicking it swaps the toolbar
-    // row for the menu bar; the menu bar's close button swaps back. Which row
-    // is currently revealed is a presentation detail owned by the toolbar
-    // (SiC64Toolbar), not by this window.
-    readonly property bool compactMenu: Preferences.chromeLayout === 1
+    readonly property real titleBarInset: contentItem.SafeArea.margins.top
 
     // Set while the window is in the background, if the machine was running
     property bool lostFocusWhileRunning: false
 
-    title: c64.name + (Preferences.developerMode ? " - " + c64.uuid : "")
+    // The title is drawn by the chrome, as the native one would block dragging
+    title: ""
     visible: true
     width: 782
     height: 652
     minimumWidth: 400
     minimumHeight: 200
+    topPadding: 0
+
+    flags: Qt.Window | Qt.ExpandedClientAreaHint | Qt.NoTitleBarBackgroundHint
 
     Palette.appearance: Preferences.appearance
     Palette.theme: Preferences.colorTheme
@@ -60,29 +54,32 @@ VMWindow {
         if (isFullScreen && !wasFullScreen) {
 
             // Entering fullscreen: hide the chrome to maximize canvas space
-            toolbarVisible = false
-            statusbarVisible = false
+            chrome.showCommandBar = false
+            chrome.showStatusBar = false
 
         } else if (!isFullScreen && wasFullScreen) {
 
             // Leaving fullscreen: bring everything back
-            toolbarVisible = true
-            statusbarVisible = true
+            chrome.showCommandBar = true
+            chrome.showStatusBar = true
         }
 
         wasFullScreen = isFullScreen
     }
 
-    // Shared with SiC64Menu's "Toolbar" shortcut, so the item and the hint
-    // below can never drift out of sync with each other.
-    readonly property string toolbarShortcut: "Ctrl+Alt+T"
+    // Hiding the toolbar (the shortcut, the View menu, or entering fullscreen)
+    // leaves no menu behind to bring it back from -- show a hint so the user
+    // isn't stuck having to remember the shortcut.
+    Connections {
 
-    // Hiding the toolbar (the shortcut above, the View menu, or entering
-    // fullscreen) leaves no menu behind to bring it back from -- show a
-    // hint so the user isn't stuck having to remember the shortcut.
-    onToolbarVisibleChanged: {
-        if (!toolbarVisible) {
-            hintBanner.showHint(qsTr("Recover toolbar by pressing %1").arg(Shortcuts.nativeText(toolbarShortcut)))
+        target: chrome
+
+        function onShowCommandBarChanged() {
+
+            if (!chrome.showCommandBar) {
+                hintBanner.showHint(qsTr("Recover toolbar by pressing %1")
+                    .arg(Shortcuts.nativeText(siActions.toolbarShortcut)))
+            }
         }
     }
 
@@ -90,54 +87,23 @@ VMWindow {
     // Main area
     //
 
-    // Floats over the canvas (z above it) instead of using header:, which
-    // reserves its own layout slot above the content area. An overlaid menu
-    // type (see Preferences.chromePlacement) lets the canvas extend behind it,
-    // while a standard one anchors the canvas below it -- the same
-    // reserved-space layout header: used to give.
-    //
-    // SiAmiga additionally drops the window's title bar in the overlay
-    // types and offers a toggle beside the window buttons; this window has
-    // neither yet, so here the setting reaches the canvas and the
-    // toolbar's own fill, and nothing else.
-    SiC64Toolbar {
+    // The window chrome: title bar, menu, toolbar and status bar. It fills
+    // the window and floats above the canvas rather than using header: and
+    // footer:, which would reserve their own layout slots. Where the picture
+    // starts and ends is up to the chrome (canvasStart, canvasEnd): in a
+    // standard window the chrome frames it, in an overlaid one the picture
+    // runs on underneath.
+    SiC64Chrome {
 
-        id: toolbar
+        id: chrome
 
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.fill: parent
         z: 10
 
         c64: root.c64
-        onOpenConfigurator: (page) => configWindow.showPage(page)
-        onOpenAbout: {
-            aboutWindow.show()
-            aboutWindow.raise()
-            aboutWindow.requestActivate()
-        }
-
-        compactMenu: root.compactMenu
-
-        toolbarVisible: root.toolbarVisible
-        statusBarVisible: root.statusbarVisible
-
-        onToggleToolbar: root.toolbarVisible = !root.toolbarVisible
-        onToggleStatusBar: root.statusbarVisible = !root.statusbarVisible
-
         window: root
-    }
 
-    //
-    // Status bar
-    //
-
-    footer: SiC64Statusbar {
-
-        id: statusbar
-        c64: root.c64
-
-        visible: root.statusbarVisible
+        titleBarInset: root.titleBarInset
     }
 
     //
@@ -147,13 +113,9 @@ VMWindow {
     CanvasWrapper {
 
         id: wrapper
-        // Overlaid: extends behind the toolbar, which is laid over it.
-        // Standard: starts below the toolbar instead -- no reason to let it
-        // hide part of the picture permanently.
-        anchors.top: Preferences.chromePlacement === 1 ? parent.top : toolbar.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        anchors.fill: parent
+        anchors.topMargin: chrome.canvasStart
+        anchors.bottomMargin: parent.height - chrome.canvasEnd
         aspectRatio: root.aspectRatio
         resizeMode: Preferences.resizeMode
         fadeIn: true // root.c64.launchWithWorkspace
@@ -235,10 +197,14 @@ VMWindow {
     // Console overlay (RetroShell / Logger)
     //
 
+    // Runs from the end of the command bar to the start of the status bar, so
+    // the chrome never covers it
     Item {
 
         id: overlayPanel
         anchors.fill: parent
+        anchors.topMargin: chrome.overlayStart
+        anchors.bottomMargin: parent.height - chrome.overlayEnd
         opacity: (root.c64.retroShell || root.loggerOpen) ? 0.85 : 0.0
         visible: opacity > 0.0
 
@@ -594,6 +560,8 @@ VMWindow {
         memoryInspectorRef: memoryInspectorWindow
         vicInspectorRef: vicInspectorWindow
         sidInspectorRef: sidInspectorWindow
+        chromeRef: chrome
+        aboutWindowRef: aboutWindow
     }
 
     // Single injection point for every window action. Consumers reach

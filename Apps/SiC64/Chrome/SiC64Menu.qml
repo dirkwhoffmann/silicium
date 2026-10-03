@@ -24,24 +24,6 @@ SiMenuBar {
     readonly property SiC64ConfigController config: c64.configController
     readonly property var kb: c64.keyboardController
 
-    // Emitted when a menu item wants to open the Configurator on a specific
-    // page (see SiC64ConfigWindow.Page). The window handles the actual display.
-    signal openConfigurator(int page)
-
-    // Emitted by the C64 menu's "About" item. The window handles the actual
-    // display (see About.qml).
-    signal openAbout()
-
-    // Reflects the current visibility of the toolbar (which now includes the
-    // menu row) and the status bar, so the View menu's checkable items can
-    // show the right state. The window owns the actual visibility and
-    // toggles it in response to the signals below.
-    property bool toolbarVisible: true
-    property bool statusBarVisible: true
-
-    signal toggleToolbar()
-    signal toggleStatusBar()
-
     //
     // C64 menu
     //
@@ -49,9 +31,8 @@ SiMenuBar {
     SiMenu {
         title: qsTr("C64")
 
-        Action {
-            text: qsTr("About")
-            onTriggered: openAbout()
+        SiMenuItem {
+            action: window.actions.showAbout
         }
 
         SiMenuSeparator { }
@@ -164,19 +145,11 @@ SiMenuBar {
     SiMenu {
         title: qsTr("&View")
 
-        Action {
-            text: qsTr("Toolbar")
-            shortcut: window.toolbarShortcut
-            checkable: true
-            checked: toolbarVisible
-            onTriggered: toggleToolbar()
+        SiMenuItem {
+            action: window.actions.toggleCommandBar
         }
-        Action {
-            text: qsTr("Status Bar")
-            shortcut: "Ctrl+Alt+B"
-            checkable: true
-            checked: statusBarVisible
-            onTriggered: toggleStatusBar()
+        SiMenuItem {
+            action: window.actions.toggleStatusBar
         }
     }
 

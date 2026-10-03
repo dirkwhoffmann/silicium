@@ -32,8 +32,17 @@ Item {
     required property var memoryInspectorRef
     required property var vicInspectorRef
     required property var sidInspectorRef
+    required property var chromeRef
+    required property var aboutWindowRef
+
+    // Shortcuts of the View menu items
+    readonly property string toolbarShortcut: "Ctrl+Alt+T"
+    readonly property string statusBarShortcut: "Ctrl+Alt+B"
 
     property alias config: configAction
+    property alias toggleCommandBar: toggleCommandBarAction
+    property alias toggleStatusBar: toggleStatusBarAction
+    property alias showAbout: showAboutAction
     property alias openEventsInspector: openEventsInspectorAction
     property alias openCIAInspector: openCIAInspectorAction
     property alias openBusInspector: openBusInspectorAction
@@ -402,5 +411,38 @@ Item {
         checkable: true
         checked: c64.format === 3
         onTriggered: c64.format = 3
+    }
+
+    // View menu commands. The state they toggle belongs to the chrome.
+    Action {
+
+        id: toggleCommandBarAction
+        text: qsTr("Toolbar")
+        shortcut: root.toolbarShortcut
+        checkable: true
+        checked: chromeRef.showCommandBar
+        onTriggered: chromeRef.showCommandBar = !chromeRef.showCommandBar
+    }
+
+    Action {
+
+        id: toggleStatusBarAction
+        text: qsTr("Status Bar")
+        shortcut: root.statusBarShortcut
+        checkable: true
+        checked: chromeRef.showStatusBar
+        onTriggered: chromeRef.showStatusBar = !chromeRef.showStatusBar
+    }
+
+    Action {
+
+        id: showAboutAction
+        text: qsTr("About")
+        onTriggered: {
+
+            aboutWindowRef.show()
+            aboutWindowRef.raise()
+            aboutWindowRef.requestActivate()
+        }
     }
 }
