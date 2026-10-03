@@ -14,7 +14,6 @@ ApplicationWindow {
 
     property string uuid: ""
     property bool lostFocusWhileRunning : false
-    property bool shutdownInProgress: false
 
     readonly property int centerX: width / 2
     readonly property int centerY: height / 2
@@ -106,95 +105,22 @@ ApplicationWindow {
     }
 
     //
-    // Dialogs
-    //
-
-    SiHibernationDialog {
-
-        id: hibernationDialog
-        onConfirmed: (snapshot, workspace) => hibernate(snapshot, workspace)
-    }
-
-    SiProgressDialog {
-
-        id: hibernationProgressDialog
-        text: "Hibernating virtual machine..."
-
-        onVisibleChanged: {
-
-            if (visible) {
-                hibernationProgressDialog.progress = 0.0;
-                fakeAnim.start();
-            } else {
-                fakeAnim.stop();
-            }
-        }
-
-        NumberAnimation {
-
-            id: fakeAnim
-            target: hibernationProgressDialog
-            property: "progress"
-            from: 0.0
-            to: 1.0
-            duration: 1200.0
-            easing.type: Easing.Linear
-
-            onFinished: byebye();
-        }
-    }
-
-    //
     // Closing
     //
 
-    // Closing sequence...
-    //
-    //    1. Pause emulator
-    //    2. Optional: Show hibernation dialog
-    //    3. hibernate()
-    //    4. Optional: Show hibernation progress bar
-    //    5. byebye()
+    ShutDownManager {
 
-    onClosing: function(closeEvent) {
-
-        console.log("onClosing: ", closeEvent, vmc.readOnly)
-
-        if (!shutdownInProgress) {
-
-            // Prevent the window from closing immediately
-            closeEvent.accepted = false;
-
-            vmc.pause()
-
-            if (vmc.readOnly) {
-                byebye()
-            } else if (Preferences.showHibernationDialog) {
-                hibernationDialog.open()
-            } else {
-                hibernate(Preferences.hibernateSnapshot, Preferences.hibernateWorkspace)
-            }
-        }
+        id: shutDownManager
+        controller: root.vmc
+        showProgress: true
     }
 
-    function hibernate(hibernateSnapshot, hibernateWorkspace) {
+    onClosing: function(closeEvent) { shutDownManager.windowClosing(closeEvent) }
 
-        if (hibernateSnapshot || hibernateWorkspace) {
-
-            vmc.hibernate(hibernateSnapshot, hibernateWorkspace);
-            hibernationProgressDialog.open()
-            return
-        }
-
-        byebye()
-    }
-
+    // For the windows built on this one (see SiC64Window)
     function byebye() {
 
-        console.log("Bye bye")
-        vmc.shutdown()
-
-        // HubController.closeWindow(uuid);
+        shutDownManager.byebye()
     }
 
     //
@@ -286,17 +212,6 @@ ApplicationWindow {
                 showHint(qsTr("Release mouse by shaking"))
             }
             // else: no release method configured -- nothing useful to show.
-        }
-    }
-
-    Connections {
-
-        target: vmc
-
-        function onShutdown() {
-
-            shutdownInProgress = true
-            Qt.quit()
         }
     }
 

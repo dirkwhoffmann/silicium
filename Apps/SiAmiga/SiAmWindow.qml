@@ -15,7 +15,6 @@ ApplicationWindow {
 
     property alias actions: siActions
 
-    property bool shutdownInProgress: false
 
     visible: true
     width: 800
@@ -174,12 +173,6 @@ ApplicationWindow {
     Connections {
 
         target: root.amiga
-
-        function onShutdown() {
-
-            root.shutdownInProgress = true
-            Qt.quit()
-        }
 
         // What the controller reports when an action of ours fails, e.g.
         // loading a snapshot from a machine that has none.
@@ -369,49 +362,11 @@ ApplicationWindow {
     // Closing
     //
 
-    /* Closing sequence, mirroring SiC64's (see VMWindow.qml):
-     *
-     *    1. Pause the emulator
-     *    2. Optional: ask what to save
-     *    3. hibernate()
-     *    4. byebye()
-     *
-     * The window refuses the first close and goes away only once the machine
-     * has been put away, because everything from here on is asynchronous:
-     * a dialog is waiting for an answer, and a window that closed underneath
-     * it would take the answer -- and the machine -- with it.
-     */
-    onClosing: function(closeEvent) {
+    ShutDownManager {
 
-        if (shutdownInProgress) return
-
-        closeEvent.accepted = false
-        amiga.pause()
-
-        if (amiga.readOnly) {
-            byebye()
-        } else if (Preferences.showHibernationDialog) {
-            hibernationDialog.open()
-        } else {
-            hibernate(Preferences.hibernateSnapshot, Preferences.hibernateWorkspace)
-        }
+        id: shutDownManager
+        controller: root.amiga
     }
 
-    SiHibernationDialog {
-
-        id: hibernationDialog
-        onConfirmed: (snapshot, workspace) => root.hibernate(snapshot, workspace)
-    }
-
-    function hibernate(snapshot, workspace) {
-
-        if (snapshot || workspace) amiga.hibernate(snapshot, workspace)
-        byebye()
-    }
-
-    function byebye() {
-
-        // Tells the controller to wind down, which comes back as onShutdown
-        amiga.shutdown()
-    }
+    onClosing: function(closeEvent) { shutDownManager.windowClosing(closeEvent) }
 }
