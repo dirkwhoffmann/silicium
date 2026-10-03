@@ -120,4 +120,65 @@ ApplicationWindow {
 
         shutDownManager.byebye()
     }
+
+    //
+    // Notifications
+    //
+
+    NotificationCenter {
+
+        id: notifications
+        maxWidth: root.width - 2 * Style.largeSpacing
+        maxHeight: root.height - 2 * Style.largeSpacing
+        watchdog: 0
+        z: 999
+    }
+
+    // Shows a notification. The machine's own notifications arrive here too.
+    function showNotification(title, message) {
+
+        notifications.show(title, message)
+    }
+
+    Connections {
+
+        target: root.controllerRef
+
+        // Worth saying, not worth interrupting for -- e.g. that a hard drive
+        // just created is too large to travel in a snapshot.
+        function onShowNotification(title, message) {
+
+            root.showNotification(title, message)
+        }
+    }
+
+    //
+    // Errors
+    //
+
+    SiUserDialog {
+
+        id: errorDialog
+        sound: true
+    }
+
+    // The dialog, for the windows that use it for other questions as well.
+    // (Named apart from the id: an alias whose name is the id it targets
+    // resolves to undefined.)
+    property alias userDialog: errorDialog
+
+    // Shows a modal error dialog with a single OK button. Used for errors
+    // reported by the machine and for actions that can't be carried out.
+    function showError(title, text) {
+
+        errorDialog.titleText = title
+        errorDialog.bodyText = text
+        errorDialog.buttons = Dialog.Ok
+        errorDialog.okLabel = qsTr("OK")
+
+        // Clear any callback left over from a previous use of the dialog --
+        // a plain error has no accept action
+        errorDialog.acceptedCallback = null
+        errorDialog.open()
+    }
 }

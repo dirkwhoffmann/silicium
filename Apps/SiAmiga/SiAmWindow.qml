@@ -135,19 +135,6 @@ VMWindow {
     }
 
     //
-    // Auxiliary components
-    //
-
-    NotificationCenter {
-
-        id: notifications
-        maxWidth: root.width - 2 * Style.largeSpacing
-        maxHeight: root.height - 2 * Style.largeSpacing
-        watchdog: 0
-        z: 999
-    }
-
-    //
     // Connections
     //
 
@@ -160,14 +147,6 @@ VMWindow {
         function onShowError(title, text) {
 
             root.showError(title, text)
-        }
-
-        // Worth saying, not worth interrupting for -- e.g. that a hard drive
-        // just created is too large to travel in a snapshot. VMWindow does
-        // the same for SiC64.
-        function onShowNotification(title, message) {
-
-            notifications.show(title, message)
         }
     }
 
@@ -307,30 +286,10 @@ VMWindow {
         portInspectorRef: portInspectorWindow
         eventsInspectorRef: eventsInspectorWindow
         hardDiskCreatorRef: hardDiskCreatorDialog
-        userDialogRef: errorDialog
+        userDialogRef: userDialog
         diskCreatorRef: diskCreatorDialog
         insertDiskDialogRef: insertDiskDialog
         canvasOverlayRef: canvasOverlay
         chromeRef: chrome
-    }
-
-    //
-    // Errors
-    //
-
-    function showError(title, text) {
-
-        errorDialog.titleText = title
-        errorDialog.bodyText = text
-        errorDialog.buttons = Dialog.Ok
-        errorDialog.okLabel = qsTr("OK")
-        errorDialog.acceptedCallback = null
-        errorDialog.open()
-    }
-
-    SiUserDialog {
-
-        id: errorDialog
-        sound: true
     }
 }

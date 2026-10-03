@@ -137,19 +137,6 @@ VMWindow {
     }
 
     //
-    // Auxiliary components
-    //
-
-    NotificationCenter {
-
-        id: notifications
-        maxWidth: wrapper.width - 2 * Style.largeSpacing
-        maxHeight: wrapper.height - 2 * Style.largeSpacing
-        watchdog: 0
-        z: 999
-    }
-
-    //
     // Connections
     //
 
@@ -159,16 +146,16 @@ VMWindow {
 
         function onSnapshotLimitReached() {
 
-            errorDialog.titleText = qsTr("Snapshot Limit Reached")
-            errorDialog.bodyText = qsTr("The snapshot storage has reached maximum capacity. If you continue, the oldest snapshot will be deleted.")
-            errorDialog.buttons = Dialog.Cancel | Dialog.Ok
-            errorDialog.okLabel = qsTr("OK")
-            errorDialog.acceptedCallback = function () {
+            userDialog.titleText = qsTr("Snapshot Limit Reached")
+            userDialog.bodyText = qsTr("The snapshot storage has reached maximum capacity. If you continue, the oldest snapshot will be deleted.")
+            userDialog.buttons = Dialog.Cancel | Dialog.Ok
+            userDialog.okLabel = qsTr("OK")
+            userDialog.acceptedCallback = function () {
 
                 c64.shrinkSnapshotStorage(Preferences.maxSnapshots - 1)
                 c64.saveSnapshot()
             }
-            errorDialog.open()
+            userDialog.open()
         }
 
         //
@@ -366,31 +353,6 @@ VMWindow {
     }
 
     //
-    // Errors
-    //
-
-    // Shows a modal error dialog with a single OK button. Used both for
-    // errors reported by the emulator core (see onShowError below) and for
-    // actions that aren't implemented yet (see SiC64Actions' inspectAction).
-    function showError(title, text) {
-
-        errorDialog.titleText = title
-        errorDialog.bodyText = text
-        errorDialog.buttons = Dialog.Ok
-        errorDialog.okLabel = qsTr("OK")
-        // Clear any callback left over from a previous errorDialog use (e.g.
-        // onSnapshotLimitReached below) -- a plain error has no accept action.
-        errorDialog.acceptedCallback = null
-        errorDialog.open()
-    }
-
-    SiUserDialog {
-
-        id: errorDialog
-        sound: true
-    }
-
-    //
     // Media files
     //
 
@@ -401,12 +363,12 @@ VMWindow {
             return
         }
 
-        errorDialog.titleText = qsTr("Drive %1 contains an unsaved disk.").arg(driveNr)
-        errorDialog.bodyText = qsTr("Your changes will be lost if you proceed.")
-        errorDialog.buttons = Dialog.Cancel | Dialog.Ok
-        errorDialog.okLabel = qsTr("Proceed")
-        errorDialog.acceptedCallback = proceed
-        errorDialog.open()
+        userDialog.titleText = qsTr("Drive %1 contains an unsaved disk.").arg(driveNr)
+        userDialog.bodyText = qsTr("Your changes will be lost if you proceed.")
+        userDialog.buttons = Dialog.Cancel | Dialog.Ok
+        userDialog.okLabel = qsTr("Proceed")
+        userDialog.acceptedCallback = proceed
+        userDialog.open()
     }
 
     function insertDiskAction(driveNr) {
@@ -469,7 +431,7 @@ VMWindow {
 
         if (c64.readOnly) {
 
-            notifications.show(
+            showNotification(
                 "Read-only Virtual Machine",
                 "This preconfigured virtual machine is a temporary showcase designed to demonstrate the " +
                 "emulator's capabilities. Any changes you make will be lost when the emulator shuts down.\n" +
