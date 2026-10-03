@@ -225,6 +225,12 @@ VMWindow {
     // Auxiliary windows
     //
 
+    SiC64About {
+
+        id: aboutWindow
+        visible: false
+    }
+
     SiC64DiskCreator {
 
         id: diskCreatorDialog
@@ -244,9 +250,7 @@ VMWindow {
 
         id: keyboardSheet
         anchors.horizontalCenter: parent.horizontalCenter
-        // Slide down from the canvas top, so the sheet clears the toolbar /
-        // menu bar instead of dropping behind them.
-        slideTop: wrapper.y
+        slideTop: overlayArea.y
         z: 2
     }
 
@@ -295,28 +299,5 @@ VMWindow {
 
         id: memoryInspectorWindow
         actions: root.actions
-    }
-
-    SiC64About {
-
-        id: aboutWindow
-        visible: false
-    }
-
-    //
-    // Lifetime
-    //
-
-    Component.onCompleted: {
-
-        if (c64.readOnly) {
-
-            showNotification(
-                "Read-only Virtual Machine",
-                "This preconfigured virtual machine is a temporary showcase designed to demonstrate the " +
-                "emulator's capabilities. Any changes you make will be lost when the emulator shuts down.\n" +
-                "To save your progress, you can clone this instance in the Central Hub to convert it into a " +
-                "regular virtual machine.")
-        }
     }
 }

@@ -187,6 +187,12 @@ VMWindow {
     // Auxiliary windows
     //
 
+    SiAmAbout {
+
+        id: aboutWindow
+        visible: false
+    }
+
     SiAmDiskCreator {
 
         id: diskCreatorDialog
@@ -277,11 +283,5 @@ VMWindow {
 
         id: eventsInspectorWindow
         actions: root.actions
-    }
-
-    SiAmAbout {
-
-        id: aboutWindow
-        visible: false
     }
 }

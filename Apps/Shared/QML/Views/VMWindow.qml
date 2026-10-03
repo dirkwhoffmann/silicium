@@ -171,6 +171,26 @@ ApplicationWindow {
     }
 
     //
+    // Lifetime
+    //
+
+    // A read-only machine is a temporary showcase: say so, once, when the
+    // window is up. (The machine is set by the concrete window, whose bindings
+    // are in place by now.)
+    Component.onCompleted: {
+
+        if (controllerRef && controllerRef.readOnly) {
+
+            showNotification(
+                "Read-only Virtual Machine",
+                "This preconfigured virtual machine is a temporary showcase designed to demonstrate the " +
+                "emulator's capabilities. Any changes you make will be lost when the emulator shuts down.\n" +
+                "To save your progress, you can clone this instance in the Central Hub to convert it into a " +
+                "regular virtual machine.")
+        }
+    }
+
+    //
     // Connections
     //
 
