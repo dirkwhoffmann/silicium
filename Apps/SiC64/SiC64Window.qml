@@ -22,7 +22,6 @@ VMWindow {
     property real aspectRatio: 800.0 / 614.0
     property alias actions: siActions
 
-    // The title is drawn by the chrome, as the native one would block dragging
     visible: true
     width: 782
     height: 652
