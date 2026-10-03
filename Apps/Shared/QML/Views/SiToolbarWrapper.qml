@@ -37,12 +37,11 @@ Item {
 
     id: root
 
-    implicitHeight: content.implicitHeight
-
     // Content
     property alias titleBarContent: titleBarSlot.data
     property alias menuContent: menuSlot.data
     property alias toolbarContent: toolbarSlot.data
+    property alias statusBarContent: statusBarSlot.data
 
     // Visual style
     required property bool overlayed
@@ -57,6 +56,9 @@ Item {
     // its view swallows mouse clicks and so blocks dragging the window.
     property string titleText: ""
 
+    // Shows or hides the status bar
+    property bool statusBarVisible: true
+
     // State of the menu / toolbar switch (0 = menu, 1 = toolbar)
     property int menuSwitch: 0
 
@@ -69,10 +71,25 @@ Item {
     readonly property bool showMenu: !root.hidden && (!root.compact || menuSwitch === 0)
     readonly property bool showToolbar: !root.hidden && (!root.compact || menuSwitch === 1)
 
-    // Where the picture below the chrome starts
-    readonly property real canvasStart: !root.overlayed ? root.y + root.height
+    // The height of the title bar and the command bar together
+    readonly property real chromeHeight: content.height
+
+    /* Where the picture below the chrome starts and ends, in the coordinates
+     * of the wrapper's parent (which the wrapper fills).
+     *
+     * Start: below the command bar, unless the chrome is overlaid. Then it is
+     * below the title bar, or at the very top if that is unified with the
+     * chrome.
+     *
+     * End: above the status bar, unless the chrome is overlaid. Then the
+     * status bar is drawn over the picture, which runs down to the bottom.
+     */
+    readonly property real canvasStart: !root.overlayed ? root.chromeHeight
                                       : root.unified    ? 0
                                                         : root.titleBarInset
+    readonly property real canvasEnd: !root.overlayed && root.statusBarVisible
+                                      ? root.height - statusBarSlot.height
+                                      : root.height
 
     // Colors
     readonly property real titleBarAlpha: titleBarOverlayed ? 0.9 : 1.0
@@ -264,13 +281,23 @@ Item {
             Layout.preferredHeight: 1
             color: Qt.alpha(root.commandBarBg.darker(1.1), root.commandBarAlpha)
         }
+    }
 
-        /*
-        Separator {
+    //
+    // Status bar
+    //
 
-            Layout.fillWidth: true
+    Item {
+
+        id: statusBarSlot
+
+        visible: root.statusBarVisible
+        anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+
+        onChildrenChanged: {
+
+            height = Qt.binding(() =>
+                Math.max(0, ...Array.from(children, c => c.implicitHeight)))
         }
-
-         */
     }
 }

@@ -56,7 +56,7 @@ ApplicationWindow {
 
         anchors.fill: parent
         anchors.topMargin: toolbar.canvasStart
-        anchors.bottomMargin: root.overlayed || !statusbar.visible ? 0 : statusbar.height
+        anchors.bottomMargin: parent.height - toolbar.canvasEnd
 
         controller: root.amiga
     }
@@ -101,7 +101,7 @@ ApplicationWindow {
         // canvas at z: 10 -- see its own header comment. Anchoring under it
         // here, rather than reusing SiC64DevPanel's fixed y: 20, keeps this
         // panel from starting out hidden under that opaque toolbar.
-        y: toolbar.y + toolbar.height + Style.mediumSpacing
+        y: toolbar.chromeHeight + Style.mediumSpacing
         visible: root.amiga.debugPanel && Preferences.developerMode
     }
 
@@ -379,25 +379,25 @@ ApplicationWindow {
     // individual actions via window.actions.xxx (e.g. window.actions.reset).
     property alias actions: siActions
 
-    // Sits below the title bar row rather than using header:, which would
-    // reserve its own layout slot above the content area -- see
-    // SiC64Window.qml for the full rationale. That row is the window's own
-    // in a standard window and nothing at all in an overlaid one, so the
-    // same offset puts this in the same place either way; what changes is
-    // only whether the picture runs on underneath it.
+    // The window chrome: title bar, menu, toolbar and status bar. It fills
+    // the window and floats above the canvas rather than using header:, which
+    // would reserve its own layout slot above the content area -- see
+    // SiC64Window.qml for the full rationale. Where the picture starts and
+    // ends is up to the wrapper (canvasStart, canvasEnd): in a standard
+    // window the chrome frames it, in an overlaid one the picture runs on
+    // underneath.
     SiToolbarWrapper {
 
         id: toolbar
 
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.fill: parent
         z: 10
 
         overlayed: root.overlayed
         unified: root.unified
         compact: root.compact
         hidden: !root.toolbarVisible
+        statusBarVisible: root.statusBarVisible
 
         titleBarInset: root.titleBarInset
         titleText: "SiAmiga"
@@ -452,18 +452,14 @@ ApplicationWindow {
             amiga: root.amiga
             window: root
         }
-    }
 
-    SiAmStatusbar {
+        statusBarContent: SiAmStatusbar {
 
-        id: statusbar
+            anchors.fill: parent
 
-        visible: root.statusBarVisible
-        anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-        z: 10
-
-        amiga: root.amiga
-        color: root.overlayed ? Qt.alpha(Palette.toolbar, 0.85) : Palette.toolbar
+            amiga: root.amiga
+            color: root.overlayed ? Qt.alpha(Palette.toolbar, 0.85) : Palette.toolbar
+        }
     }
 
     SiAmConfigWindow {
