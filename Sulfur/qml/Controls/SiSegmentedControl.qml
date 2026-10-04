@@ -7,14 +7,29 @@ import Sulfur
 // gradient / border / bevel / shadow) split into clickable segments by thin
 // dividers, with the selected segment highlighted in the accent color.
 //
-// Driven by a plain string-list model plus a currentIndex, so one instance
-// covers any number of segments:
+// Driven by a plain list model plus a currentIndex, so one instance covers any
+// number of segments:
 //
 //   SiSegmentedControl {
 //       model: [qsTr("CIA 1"), qsTr("CIA 2")]
 //       currentIndex: cia.selectedCia
 //       onActivated: (index) => cia.selectedCia = index
 //   }
+//
+// An entry is either a caption string or an object with these optional keys:
+//
+//   text      caption (used when no icon is given)
+//   symbol    icon from the Material symbols font
+//   phosphor  icon from the Phosphor font
+//   awesome   icon from the Awesome font
+//   tooltip   tooltip text
+//   enabled   false disables the segment (default true)
+//
+//   model: [ { symbol: "info", tooltip: qsTr("Show Info") },
+//            { phosphor: "clipboard", tooltip: qsTr("Open Logger"), enabled: ok } ]
+//
+// currentIndex may be -1 (nothing selected). Clicks never change it; the
+// caller decides how to react, e.g. deselecting on a second click.
 //
 Item {
 
@@ -105,11 +120,20 @@ Item {
                 required property int index
                 required property var modelData
 
+                // Entry normalized to an object
+                readonly property var entry: typeof modelData === "string"
+                    ? { text: modelData } : (modelData ?? {})
+                readonly property string symbol: entry.symbol ?? ""
+                readonly property string phosphor: entry.phosphor ?? ""
+                readonly property string awesome: entry.awesome ?? ""
+                readonly property bool hasIcon: symbol !== "" || phosphor !== "" || awesome !== ""
+
                 readonly property bool selected: root.currentIndex === index
                 readonly property bool isFirst: index === 0
                 readonly property bool isLast: index === root.count - 1
 
                 height: row.height
+                enabled: entry.enabled ?? true
                 leftPadding: [8, 10, 12][root.size]
                 rightPadding: [8, 10, 12][root.size]
                 implicitWidth: root.segmentWidth > 0
@@ -117,6 +141,10 @@ Item {
                     : Math.max(label.implicitWidth + leftPadding + rightPadding, root.minSegmentWidth)
 
                 onClicked: root.activated(index)
+
+                SiToolTip {
+                    text: seg.entry.tooltip ?? ""
+                }
 
                 background: Item {
 
@@ -167,8 +195,16 @@ Item {
 
                 contentItem: SiText {
                     id: label
-                    text: seg.modelData
-                    font.pixelSize: Size.fontSize(root.size)
+                    text: seg.symbol ? seg.symbol
+                        : seg.phosphor ? seg.phosphor + Fonts.phosphorSuffix
+                        : seg.awesome ? seg.awesome
+                        : (seg.entry.text ?? "")
+                    font.family: seg.symbol ? Fonts.symbols
+                        : seg.phosphor ? Fonts.phosphor
+                        : seg.awesome ? Fonts.awesome
+                        : Fonts.main
+                    font.pixelSize: seg.hasIcon ? Size.fontSize(root.size) + 6 : Size.fontSize(root.size)
+                    opacity: seg.enabled ? 1 : 0.4
                     color: seg.selected ? root.accentText : root.primary
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter

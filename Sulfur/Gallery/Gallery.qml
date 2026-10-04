@@ -289,6 +289,21 @@ ApplicationWindow {
                     }
 
                     Sample {
+                        caption: "icon segments"
+                        SiSegmentedControl {
+                            minSegmentWidth: 34
+                            currentIndex: -1
+                            model: [
+                                { symbol: "info", tooltip: "Info" },
+                                { phosphor: "clipboard", tooltip: "Logger" },
+                                { symbol: "settings", tooltip: "Disabled", enabled: false }
+                            ]
+                            // A second click on the selected segment deselects it
+                            onActivated: (index) => currentIndex = currentIndex === index ? -1 : index
+                        }
+                    }
+
+                    Sample {
                         caption: "SiComboBox"
                         SiComboBox { model: ["Amiga", "Commodore 64", "Atari ST"]; implicitWidth: 160 }
                     }

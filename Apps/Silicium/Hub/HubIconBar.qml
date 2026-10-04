@@ -90,34 +90,23 @@ ToolBar {
         HSpacer {
         }
 
-        NavBarGroup {
+        SiSegmentedControl {
 
-
-            NavTextButton {
-
-                id: infoButton
-                action: actions.info
-                enabled: HubController.selected !== ""
-                symbol: "info"
-                checkable: true
-                checked: HubController.overlay == "info"
-                SiToolTip {
-                    text: infoButton.checked ? "Hide Info" : "Show Info"
+            minSegmentWidth: 34
+            model: [
+                {
+                    symbol: "info",
+                    enabled: HubController.selected !== "",
+                    tooltip: HubController.overlay === "info" ? qsTr("Hide Info") : qsTr("Show Info")
+                },
+                {
+                    phosphor: "clipboard",
+                    tooltip: HubController.overlay === "logger" ? qsTr("Close Logger") : qsTr("Open Logger")
                 }
-            }
-
-            NavTextButton {
-
-                id: loggerButton
-                action: actions.logger
-                // symbol: "list_alt"
-                phosphor: "clipboard"
-                checkable: true
-                checked: HubController.overlay == "logger"
-                SiToolTip {
-                    text: loggerButton.checked ? "Close Logger" : "Open Logger"
-                }
-            }
+            ]
+            currentIndex: HubController.overlay === "info" ? 0
+                : HubController.overlay === "logger" ? 1 : -1
+            onActivated: (index) => (index === 0 ? actions.info : actions.logger).trigger()
         }
     }
 }
