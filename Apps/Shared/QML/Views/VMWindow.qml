@@ -144,7 +144,7 @@ ApplicationWindow {
     // Errors
     //
 
-    SiUserDialog {
+    SuUserDialog {
 
         id: errorDialog
         sound: true

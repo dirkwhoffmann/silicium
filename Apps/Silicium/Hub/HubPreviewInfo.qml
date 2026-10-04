@@ -39,7 +39,7 @@ Rectangle {
         // Left button
         //
 
-        SiOverlayButton {
+        SuOverlayButton {
 
             size: 72
             symbol: leftAction?.icon.name ?? ""
@@ -90,7 +90,7 @@ Rectangle {
 
                     RowLayout {
 
-                        SiOverlayButton {
+                        SuOverlayButton {
 
                             symbol: prevAction.icon.name
                             enabled: prevAction.enabled
@@ -100,7 +100,7 @@ Rectangle {
                             onClicked: prevAction.trigger()
                         }
 
-                        SiText {
+                        SuText {
 
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignHCenter
@@ -111,7 +111,7 @@ Rectangle {
                             font.bold: true
                         }
 
-                        SiOverlayButton {
+                        SuOverlayButton {
 
                             symbol: nextAction.icon.name
                             enabled:  nextAction.enabled
@@ -125,7 +125,7 @@ Rectangle {
                     HLine {
                     }
 
-                    SiText {
+                    SuText {
 
                         Layout.alignment: Qt.AlignHCenter
                         horizontalAlignment: Text.AlignHCenter
@@ -150,7 +150,7 @@ Rectangle {
         // Right button
         //
 
-        SiOverlayButton {
+        SuOverlayButton {
 
             size: 72
             symbol: rightAction?.icon.name ?? ""

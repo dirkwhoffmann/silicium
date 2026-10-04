@@ -70,13 +70,13 @@ ToolBar {
             anchors.rightMargin: Style.mediumSpacing
             spacing: Style.smallSpacing
 
-            SiButton {
+            SuButton {
 
                 action: root.actions.pause
                 symbol: root.amiga.isPaused ? "play_circle" : "pause_circle"
             }
 
-            SiSegmentedControl {
+            SuSegmentedControl {
 
                 minSegmentWidth: 34
                 currentIndex: -1   // momentary: nothing stays selected
@@ -99,7 +99,7 @@ ToolBar {
                 border.color: Palette.controlBorder
                 radius: 12
 
-                SiText {
+                SuText {
 
                     anchors.centerIn: parent
                     text: root.inspectorController.beamPosition
@@ -109,7 +109,7 @@ ToolBar {
                 }
             }
 
-            SiButton {
+            SuButton {
 
                 id: formatButton
                 symbol: "list"
@@ -117,21 +117,21 @@ ToolBar {
 
                 onClicked: formatMenu.open()
 
-                SiMenu {
+                SuMenu {
 
                     id: formatMenu
                     y: formatButton.height
 
-                    SiMenuItem {
+                    SuMenuItem {
                         action: root.actions.formatHex
                     }
-                    SiMenuItem {
+                    SuMenuItem {
                         action: root.actions.formatHexPadded
                     }
-                    SiMenuItem {
+                    SuMenuItem {
                         action: root.actions.formatDecimal
                     }
-                    SiMenuItem {
+                    SuMenuItem {
                         action: root.actions.formatDecimalPadded
                     }
                 }

@@ -74,37 +74,37 @@ SiAmInspectorWindow {
             ProgressBox {
 
                 title: qsTr("CPU Progress")
-                SiText { text: ec.cpuProgress; font.family: Fonts.mono }
-                SiText { text: qsTr("Master Cycles") }
-                SiText { text: ec.cpuProgress2; font.family: Fonts.mono }
-                SiText { text: qsTr("CPU Cycles") }
+                SuText { text: ec.cpuProgress; font.family: Fonts.mono }
+                SuText { text: qsTr("Master Cycles") }
+                SuText { text: ec.cpuProgress2; font.family: Fonts.mono }
+                SuText { text: qsTr("CPU Cycles") }
             }
 
             ProgressBox {
 
                 title: qsTr("Agnus Progress")
-                SiText { text: ec.agnusProgress; font.family: Fonts.mono }
-                SiText { text: qsTr("Master Cycles") }
-                SiText { text: ec.agnusProgress2; font.family: Fonts.mono }
-                SiText { text: qsTr("DMA Cycles") }
+                SuText { text: ec.agnusProgress; font.family: Fonts.mono }
+                SuText { text: qsTr("Master Cycles") }
+                SuText { text: ec.agnusProgress2; font.family: Fonts.mono }
+                SuText { text: qsTr("DMA Cycles") }
             }
 
             ProgressBox {
 
                 title: qsTr("CIA A Progress")
-                SiText { text: ec.ciaAProgress; font.family: Fonts.mono }
-                SiText { text: qsTr("Master Cycles") }
-                SiText { text: ec.ciaAProgress2; font.family: Fonts.mono }
-                SiText { text: qsTr("CIA Cycles") }
+                SuText { text: ec.ciaAProgress; font.family: Fonts.mono }
+                SuText { text: qsTr("Master Cycles") }
+                SuText { text: ec.ciaAProgress2; font.family: Fonts.mono }
+                SuText { text: qsTr("CIA Cycles") }
             }
 
             ProgressBox {
 
                 title: qsTr("CIA B Progress")
-                SiText { text: ec.ciaBProgress; font.family: Fonts.mono }
-                SiText { text: qsTr("Master Cycles") }
-                SiText { text: ec.ciaBProgress2; font.family: Fonts.mono }
-                SiText { text: qsTr("CIA Cycles") }
+                SuText { text: ec.ciaBProgress; font.family: Fonts.mono }
+                SuText { text: qsTr("Master Cycles") }
+                SuText { text: ec.ciaBProgress2; font.family: Fonts.mono }
+                SuText { text: qsTr("CIA Cycles") }
             }
         }
 
@@ -123,7 +123,7 @@ SiAmInspectorWindow {
             readonly property int hpos: 70
         }
 
-        component HeaderLabel: SiLabel {
+        component HeaderLabel: SuLabel {
 
             topPadding: 2
             bottomPadding: 2
@@ -131,7 +131,7 @@ SiAmInspectorWindow {
             elide: Text.ElideRight
         }
 
-        component Cell: SiLabel {
+        component Cell: SuLabel {
 
             property bool pending: true
 

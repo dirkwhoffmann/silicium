@@ -44,7 +44,7 @@ Item {
 
             checkable: true
 
-            contentItem: SiText {
+            contentItem: SuText {
 
                 text: toggle.text
                 font.pixelSize: Style.small

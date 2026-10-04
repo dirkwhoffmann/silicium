@@ -22,7 +22,7 @@ import Sulfur
  * shown whenever the mouse gets captured, and mentions the release methods
  * enabled in the Controls preferences (none enabled, no hint).
  */
-SiBanner {
+SuBanner {
 
     id: root
 

@@ -35,7 +35,7 @@ PrefPage {
 
         heading: "Appearance Settings"
         menuContent: [
-            SiMenuItem {
+            SuMenuItem {
                 text: "Restore factory defaults..."
                 onTriggered: Preferences.resetAppearanceSettings()
             }
@@ -52,7 +52,7 @@ PrefPage {
 
         header: "THEMES"
 
-        SiLabeledComboBox {
+        SuLabeledComboBox {
 
             l: "Color Theme:"
             lwidth: root.labelWidth
@@ -68,7 +68,7 @@ PrefPage {
             }
         }
 
-        SiLabeledComboBox {
+        SuLabeledComboBox {
 
             Layout.preferredWidth: root.comboWidth + root.labelWidth
             Layout.fillWidth: false
@@ -86,7 +86,7 @@ PrefPage {
             }
         }
 
-        SiLabeledComboBox {
+        SuLabeledComboBox {
 
             l: "Fonts:"
             lwidth: root.labelWidth
@@ -104,7 +104,7 @@ PrefPage {
             }
         }
 
-        SiLabeledComboBox {
+        SuLabeledComboBox {
 
             l: "Monospaced:"
             lwidth: root.labelWidth
@@ -127,7 +127,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 id: resizeMode
                 l: "Resizing:"
@@ -142,7 +142,7 @@ PrefPage {
                 currentIndex: Preferences.resizeMode
                 onCurrentIndexChanged: Preferences.resizeMode = currentIndex
 
-                SiHelpButton {
+                SuHelpButton {
 
                     id: resizeModeHelp
                     checkable: true
@@ -161,7 +161,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 id: statusbar
                 l: "Statusbar:"
@@ -177,7 +177,7 @@ PrefPage {
                 currentIndex: Preferences.statusbar
                 onCurrentIndexChanged: Preferences.statusbar = currentIndex
 
-                SiHelpButton {
+                SuHelpButton {
 
                     id: statusbarHelp
                     checkable: true
@@ -201,7 +201,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 id: chromePlacement
                 l: "Placement:"
@@ -215,7 +215,7 @@ PrefPage {
                 currentIndex: Preferences.chromePlacement
                 onCurrentIndexChanged: Preferences.chromePlacement = currentIndex
 
-                SiHelpButton {
+                SuHelpButton {
 
                     id: chromePlacementHelp
                     checkable: true
@@ -234,7 +234,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 id: chromeTitleBar
                 l: "Title Bar:"
@@ -248,7 +248,7 @@ PrefPage {
                 currentIndex: Preferences.chromeTitleBar
                 onCurrentIndexChanged: Preferences.chromeTitleBar = currentIndex
 
-                SiHelpButton {
+                SuHelpButton {
 
                     id: chromeTitleBarHelp
                     checkable: true
@@ -267,7 +267,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 id: chromeLayout
                 l: "Controls:"
@@ -281,7 +281,7 @@ PrefPage {
                 currentIndex: Preferences.chromeLayout
                 onCurrentIndexChanged: Preferences.chromeLayout = currentIndex
 
-                SiHelpButton {
+                SuHelpButton {
 
                     id: chromeLayoutHelp
                     checkable: true

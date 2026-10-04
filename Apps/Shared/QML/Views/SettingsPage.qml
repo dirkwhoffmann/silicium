@@ -47,7 +47,7 @@ Item {
 
     default property alias content: contentColumn.data
 
-    // Covers the page with a rendered markdown file (see SiHelpButton).
+    // Covers the page with a rendered markdown file (see SuHelpButton).
     function help(file) {
 
         helpOverlay.showMarkdown(file)

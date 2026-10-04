@@ -58,7 +58,7 @@ SettingsPage {
             header: "WARP MODE"
             size: root.sectionWidth
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 l: "Activation:"
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -67,7 +67,7 @@ SettingsPage {
                 onCurrentIndexChanged: config.AMIGA_WARP_MODE = currentIndex
             }
 
-            SiLabeledNumberInput {
+            SuLabeledNumberInput {
                 l: "Boot for"
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -87,19 +87,19 @@ SettingsPage {
             header: "SPEED BOOSTERS"
             size: root.sectionWidth
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
                 r: "Put idle CIAs to sleep"
                 checked: config.CIA_A_IDLE_SLEEP
                 onClicked: root.setCiaIdleSleep(checked)
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
                 r: "Put idle audio backend to sleep"
                 checked: config.AUD_FASTPATH
                 onClicked: config.AUD_FASTPATH = checked
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
                 r: "Reduce frame rate in warp mode"
                 checked: config.DENISE_FRAME_SKIPPING > 0
                 onClicked: config.DENISE_FRAME_SKIPPING = checked ? 16 : 0
@@ -115,7 +115,7 @@ SettingsPage {
             header: "THREADING"
             size: root.sectionWidth
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
                 l: "Sync mode:"
                 lwidth: root.labelWidth
                 r: "VSYNC"
@@ -123,7 +123,7 @@ SettingsPage {
                 onClicked: config.AMIGA_VSYNC = checked
             }
 
-            SiLabeledSlider {
+            SuLabeledSlider {
                 l: "Speed:"
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -137,7 +137,7 @@ SettingsPage {
                 onMoved: (value) => config.AMIGA_SPEED_BOOST = value
             }
 
-            SiLabeledSlider {
+            SuLabeledSlider {
                 l: config.AMIGA_RUN_AHEAD < 0 ? "Run behind:" : "Run ahead:"
                 lwidth: root.labelWidth
                 Layout.fillWidth: true

@@ -28,7 +28,7 @@ SiBox {
     readonly property int dataColW: 90
     readonly property int instrColW: 200
 
-    component Value: SiLabel {
+    component Value: SuLabel {
 
         size: Size.small
         font.weight: 500
@@ -38,7 +38,7 @@ SiBox {
         elide: Text.ElideRight
     }
 
-    component HeaderLabel: SiLabel {
+    component HeaderLabel: SuLabel {
 
         topPadding: 2
         bottomPadding: 2
@@ -50,7 +50,7 @@ SiBox {
     // Controls
     //
 
-    SiLabeledSearch {
+    SuLabeledSearch {
 
         controlWidth: 100
         size: Size.small
@@ -125,7 +125,7 @@ SiBox {
                         width: parent.width
                         spacing: Style.smallSpacing
 
-                        SiSymbol {
+                        SuSymbol {
 
                             Layout.preferredWidth: root.markerColW
                             Layout.alignment: Qt.AlignVCenter

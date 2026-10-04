@@ -4,7 +4,7 @@ pragma Singleton
 
 // Control-size scale, analogous to Cocoa's controlSize (regular / small / mini).
 //
-// A component's size is a per-instance property (see SiLabeled.size); this
+// A component's size is a per-instance property (see SuLabeled.size); this
 // singleton only maps a chosen level to the concrete metrics every sized
 // component should use, so the font/height/padding relationships live in one
 // place. Regular deliberately maps to the app's existing defaults, so adding a
@@ -12,7 +12,7 @@ pragma Singleton
 //
 // Usage:
 //
-//   SiLabeledNumberView { size: Size.small; ... }
+//   SuLabeledNumberView { size: Size.small; ... }
 //
 QtObject {
 
@@ -32,7 +32,7 @@ QtObject {
     // Square indicator size (e.g. a checkbox box)
     function indicatorSize(s) { return [12, 14, 16, 20, 24][s] }
 
-    // Square icon glyph size (SiSymbol / SiSymbolButton). Regular deliberately
+    // Square icon glyph size (SuSymbol / SuSymbolButton). Regular deliberately
     // maps to the components' historical 20px default.
     function iconSize(s) { return [16, 18, 20, 24, 30][s] }
 }

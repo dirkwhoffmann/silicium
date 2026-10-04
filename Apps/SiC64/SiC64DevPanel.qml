@@ -81,7 +81,7 @@ Rectangle {
     // Components
     //
 
-    component KeyLabel: SiText {
+    component KeyLabel: SuText {
 
         color: "white"
         font.bold: true
@@ -89,7 +89,7 @@ Rectangle {
         Layout.alignment: Qt.AlignRight
     }
 
-    component ValueLabel: SiText {
+    component ValueLabel: SuText {
 
         color: "white"
         font.bold: true
@@ -106,7 +106,7 @@ Rectangle {
             id: keyLabel
             Layout.preferredWidth: 100
         }
-        SiText {
+        SuText {
             text: ":"
         }
         ValueLabel {
@@ -148,11 +148,11 @@ Rectangle {
                 Layout.preferredWidth: 100
             }
 
-            SiText {
+            SuText {
                 text: ":"
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 id: categoryCombo
                 Layout.fillWidth: true

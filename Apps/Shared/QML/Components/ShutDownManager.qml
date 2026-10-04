@@ -105,7 +105,7 @@ Item {
         onConfirmed: (snapshot, workspace) => root.hibernate(snapshot, workspace)
     }
 
-    SiProgressDialog {
+    SuProgressDialog {
 
         id: progressDialog
         parent: Overlay.overlay

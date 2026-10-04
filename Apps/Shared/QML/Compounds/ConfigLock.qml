@@ -35,7 +35,7 @@ Item {
             visible: root.lockText
             spacing: Style.zeroTextSpacing
 
-            SiText {
+            SuText {
 
                 DebugRect {}
                 text: "Some options are locked."
@@ -45,7 +45,7 @@ Item {
                 horizontalAlignment: Text.AlignRight
                 width: contentWidth
             }
-            SiText {
+            SuText {
 
                 DebugRect {}
                 text: "Click to power down and unlock."
@@ -56,7 +56,7 @@ Item {
             }
         }
 
-        SiSymbolButton {
+        SuSymbolButton {
 
             Layout.preferredWidth: Style.iconLarge
             Layout.preferredHeight: Style.iconLarge

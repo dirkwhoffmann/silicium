@@ -28,7 +28,7 @@ SiBox {
     readonly property int flagsColW: 90
     readonly property int instrColW: 200
 
-    component HeaderLabel: SiLabel {
+    component HeaderLabel: SuLabel {
 
         topPadding: 2
         bottomPadding: 2
@@ -36,7 +36,7 @@ SiBox {
         elide: Text.ElideRight
     }
 
-    component Value: SiLabel {
+    component Value: SuLabel {
 
         size: Size.small
         topPadding: 1
@@ -55,7 +55,7 @@ SiBox {
         Layout.fillWidth: true
         HSpacer { }
 
-        SiButton {
+        SuButton {
 
             size: Size.small
             text: qsTr("Clear")

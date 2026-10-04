@@ -129,8 +129,8 @@ SettingsPage {
 
         ColumnLayout {
             spacing: 0
-            SiLabel { text: title; color: Palette.primary; size: Size.regular; font.bold: false }
-            SiLabel { text: subtitle; color: Palette.secondary; size: Size.small; visible: subtitle !== "" }
+            SuLabel { text: title; color: Palette.primary; size: Size.regular; font.bold: false }
+            SuLabel { text: subtitle; color: Palette.secondary; size: Size.small; visible: subtitle !== "" }
         }
     }
 
@@ -185,7 +185,7 @@ SettingsPage {
                 title: root.cpuInfo(config.CPU_REVISION)[0]
                 subtitle: root.cpuInfo(config.CPU_REVISION)[1]
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     l: "CPU:"
                     lwidth: root.labelWidth
@@ -194,7 +194,7 @@ SettingsPage {
                     onCurrentIndexChanged: config.CPU_REVISION = currentIndex
                 }
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     controlWidth: 90
 
@@ -216,7 +216,7 @@ SettingsPage {
                 title: root.agnusInfo(config.AGNUS_REVISION, config.AMIGA_VIDEO_FORMAT === 0)[0]
                 subtitle: root.agnusInfo(config.AGNUS_REVISION, config.AMIGA_VIDEO_FORMAT === 0)[1]
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     l: "Agnus:"
                     lwidth: root.labelWidth
@@ -226,7 +226,7 @@ SettingsPage {
                     onCurrentIndexChanged: config.AGNUS_REVISION = currentIndex
                 }
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     controlWidth: 90
                     model: ["PAL", "NTSC"]
@@ -240,7 +240,7 @@ SettingsPage {
                 title: root.deniseInfo(config.DENISE_REVISION)[0]
                 subtitle: root.deniseInfo(config.DENISE_REVISION)[1]
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     l: "Denise:"
                     lwidth: root.labelWidth
@@ -255,7 +255,7 @@ SettingsPage {
                 title: root.ciaInfo(config.CIA_A_REVISION)[0]
                 subtitle: root.ciaInfo(config.CIA_A_REVISION)[1]
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     l: "CIAs:"
                     lwidth: root.labelWidth
@@ -271,7 +271,7 @@ SettingsPage {
                 title: root.rtcInfo(config.RTC_MODEL)[0]
                 subtitle: root.rtcInfo(config.RTC_MODEL)[1]
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     l: "RTC:"
                     lwidth: root.labelWidth
@@ -307,7 +307,7 @@ SettingsPage {
                 title: "DRAM"
                 subtitle: "%1 - %2".arg(formatAddr(0)).arg(formatAddr(config.MEM_CHIP_RAM * 1024 - 1))
 
-                SiSymbol {
+                SuSymbol {
                     visible: root.badAgnus
                     symbol: "warning"
                     color: Palette.warning
@@ -318,7 +318,7 @@ SettingsPage {
                     }
                 }
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     l: "Chip RAM:"
                     lwidth: root.labelWidth
@@ -335,7 +335,7 @@ SettingsPage {
                 subtitle: "%1 - %2".arg(formatAddr(0xC00000)).arg(formatAddr(0xC00000 + config.MEM_SLOW_RAM * 1024 - 1))
                 showInfo: config.MEM_SLOW_RAM > 0
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     l: "Slow RAM:"
                     lwidth: root.labelWidth
@@ -352,7 +352,7 @@ SettingsPage {
                 subtitle: "%1 - %2".arg(formatAddr(0x200000)).arg(formatAddr(0x200000 + config.MEM_FAST_RAM * 1024 - 1))
                 showInfo: config.MEM_FAST_RAM > 0
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     l: "Fast RAM:"
                     lwidth: root.labelWidth
@@ -369,7 +369,7 @@ SettingsPage {
             size: root.sectionWidth
             Layout.fillHeight: true
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Bus width:"
                 lwidth: root.labelWidth
@@ -378,7 +378,7 @@ SettingsPage {
                 onCurrentIndexChanged: config.MEM_BUS_WIDTH = currentIndex === 1 ? 32 : 16
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Bank map:"
                 lwidth: root.labelWidth
@@ -387,7 +387,7 @@ SettingsPage {
                 onCurrentIndexChanged: config.MEM_BANKMAP = currentIndex
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Init Pattern:"
                 lwidth: root.labelWidth
@@ -396,7 +396,7 @@ SettingsPage {
                 onCurrentIndexChanged: config.MEM_RAM_INIT_PATTERN = currentIndex
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Unmapped:"
                 lwidth: root.labelWidth

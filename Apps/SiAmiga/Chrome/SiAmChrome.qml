@@ -30,7 +30,7 @@ SiChrome {
 
     titleBarContent: [
 
-        SiSymbolButton {
+        SuSymbolButton {
 
             id: chromeToggle
 
@@ -41,7 +41,7 @@ SiChrome {
             onClicked: root.window.actions.toggleCommandBar.trigger()
         },
 
-        SiSymbolButton {
+        SuSymbolButton {
 
             id: statusBarToggle
 

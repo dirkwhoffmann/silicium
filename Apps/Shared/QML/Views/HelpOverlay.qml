@@ -77,7 +77,7 @@ Rectangle {
             }
         }
 
-        SiSymbolButton {
+        SuSymbolButton {
 
             anchors.top: parent.top
             anchors.right: parent.right

@@ -50,7 +50,7 @@ SiC64InspectorWindow {
     // 0 = Data view, 1 = Heatmap
     property int view: 0
 
-    component HeaderLabel: SiLabel {
+    component HeaderLabel: SuLabel {
 
         topPadding: 2
         bottomPadding: 2
@@ -58,7 +58,7 @@ SiC64InspectorWindow {
         elide: Text.ElideRight
     }
 
-    component Value: SiLabel {
+    component Value: SuLabel {
 
         size: Size.small
         topPadding: 1
@@ -80,7 +80,7 @@ SiC64InspectorWindow {
         8: "#33AA33"  // PP
     })
 
-    component TypeInfo: SiLabeled {
+    component TypeInfo: SuLabeled {
 
         id: typeInfo
 
@@ -161,9 +161,9 @@ SiC64InspectorWindow {
             Layout.fillWidth: true
             spacing: Style.mediumSpacing
 
-            SiLabel { text: qsTr("Inspect") }
+            SuLabel { text: qsTr("Inspect") }
 
-            SiComboBox {
+            SuComboBox {
                 
                 Layout.preferredWidth: 190
                 model: [
@@ -179,15 +179,15 @@ SiC64InspectorWindow {
 
             Item { Layout.fillWidth: true }
 
-            SiLabeledCheckBox { size: Size.small; checked: mem.exrom; r: qsTr("EXROM") }
-            SiLabeledCheckBox { size: Size.small; checked: mem.game; r: qsTr("GAME") }
-            SiLabeledCheckBox { size: Size.small; checked: mem.charen; r: qsTr("CHAREN") }
-            SiLabeledCheckBox { size: Size.small; checked: mem.loram; r: qsTr("LORAM") }
-            SiLabeledCheckBox { size: Size.small; checked: mem.hiram; r: qsTr("HIRAM") }
+            SuLabeledCheckBox { size: Size.small; checked: mem.exrom; r: qsTr("EXROM") }
+            SuLabeledCheckBox { size: Size.small; checked: mem.game; r: qsTr("GAME") }
+            SuLabeledCheckBox { size: Size.small; checked: mem.charen; r: qsTr("CHAREN") }
+            SuLabeledCheckBox { size: Size.small; checked: mem.loram; r: qsTr("LORAM") }
+            SuLabeledCheckBox { size: Size.small; checked: mem.hiram; r: qsTr("HIRAM") }
 
             Item { Layout.fillWidth: true }
 
-            SiLabeledSearch {
+            SuLabeledSearch {
 
                 controlWidth: 160
                 base: root.numBase
@@ -217,7 +217,7 @@ SiC64InspectorWindow {
                 Layout.rightMargin: 7
             }
 
-            SiSlider {
+            SuSlider {
 
                 id: navSlider
 
@@ -270,7 +270,7 @@ SiC64InspectorWindow {
 
             Item { Layout.fillWidth: true }
 
-            SiSegmentedControl {
+            SuSegmentedControl {
 
                 model: [qsTr("Data View"), qsTr("Heatmap")]
                 currentIndex: root.view

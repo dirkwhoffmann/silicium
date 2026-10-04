@@ -15,7 +15,7 @@ import Silicium.Controllers
 import Silicium.Preferences
 import Sulfur
 
-SiMenuBar {
+SuMenuBar {
 
     id: root
 
@@ -28,57 +28,57 @@ SiMenuBar {
     // C64 menu
     //
 
-    SiMenu {
+    SuMenu {
         title: qsTr("C64")
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.showAbout
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.config
             text: qsTr("Settings...")
         }
 
-        SiMenu {
+        SuMenu {
             title: qsTr("Inspector")
 
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openCPUInspector
             }
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openMemoryInspector
             }
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openBusInspector
             }
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openCIAInspector
             }
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openVICInspector
             }
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openSIDInspector
             }
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openEventsInspector
             }
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.retroShell
         }
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.logger
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
         Action {
             text: qsTr("&Quit");
@@ -91,49 +91,49 @@ SiMenuBar {
     // Edit Menu (partial: Grab Mouse … Toggle Warp Mode)
     //
 
-    SiMenu {
+    SuMenu {
         title: qsTr("&Edit")
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.captureOrReleaseMouse
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.pause
         }
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.hardReset
         }
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.softReset
         }
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.power
         }
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.brk
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.stepOver
         }
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.stepInto
         }
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.finishLine
         }
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.finishFrame
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.toggleWarp
         }
     }
@@ -142,14 +142,14 @@ SiMenuBar {
     // View Menu
     //
 
-    SiMenu {
+    SuMenu {
         title: qsTr("&View")
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.toggleCommandBar
             onTriggered: window.showToolbarHint()
         }
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.toggleStatusBar
         }
     }
@@ -158,7 +158,7 @@ SiMenuBar {
     // Drive Menu (reusable inline component, instantiated for drive 8 and 9)
     //
 
-    component DriveMenu: SiMenu {
+    component DriveMenu: SuMenu {
 
         id: driveMenu
 
@@ -174,7 +174,7 @@ SiMenuBar {
         // hardware that isn't part of the current setup, so every other item
         // is hidden and only the toggle remains -- keeping the menu focused
         // instead of showing a wall of items that would just error out.
-        SiMenuItem {
+        SuMenuItem {
             text: connected ? qsTr("Disconnect") : qsTr("Connect")
             onTriggered: {
 
@@ -193,7 +193,7 @@ SiMenuBar {
             }
         }
 
-        SiMenuSeparator { visible: connected }
+        SuMenuSeparator { visible: connected }
 
         // "Insert Recent" is a nested Menu, and a nested Menu's own 'visible'
         // property does not hide its row in the parent (verified empirically
@@ -205,7 +205,7 @@ SiMenuBar {
 
             id: insertRecentComponent
 
-            SiMenu {
+            SuMenu {
 
                 id: insertRecentMenu
                 title: qsTr("Insert Recent")
@@ -224,7 +224,7 @@ SiMenuBar {
                 // it, inserting/removing items as the list changes.
                 Instantiator {
                     model: c64.media.recentDisks
-                    delegate: SiMenuItem {
+                    delegate: SuMenuItem {
                         text: modelData.substring(modelData.lastIndexOf("/") + 1)
                         onTriggered: window.actions.insertRecentDiskAction(driveNr, index)
                     }
@@ -232,7 +232,7 @@ SiMenuBar {
                     onObjectRemoved: (index, object) => insertRecentMenu.removeItem(object)
                 }
 
-                SiMenuSeparator { }
+                SuMenuSeparator { }
                 Action {
                     text: qsTr("Clear Menu")
                     onTriggered: c64.media.clearRecentlyInsertedDisks()
@@ -261,34 +261,34 @@ SiMenuBar {
         Component.onCompleted: updateInsertRecent()
         onConnectedChanged: updateInsertRecent()
 
-        SiMenuItem {
+        SuMenuItem {
             text: qsTr("New")
             visible: connected
             onTriggered: window.actions.newDiskAction(driveNr)
         }
-        SiMenuItem {
+        SuMenuItem {
             text: qsTr("Insert...")
             visible: connected
             onTriggered: window.actions.insertDiskAction(driveNr)
         }
-        SiMenuSeparator { visible: connected }
-        SiMenuItem {
+        SuMenuSeparator { visible: connected }
+        SuMenuItem {
             text: qsTr("Eject")
             visible: connected
             enabled: hasDisk
             onTriggered: window.actions.ejectDiskAction(driveNr)
         }
-        SiMenuItem {
+        SuMenuItem {
             text: qsTr("Export...")
             visible: connected
             onTriggered: window.actions.exportDiskAction(driveNr)
         }
-        SiMenuSeparator { visible: connected }
+        SuMenuSeparator { visible: connected }
         // Action {
         //     text: qsTr("Inspect Disk...")
         //     onTriggered: c64.inspectDisk(driveNr)
         // }
-        SiMenuItem {
+        SuMenuItem {
             text: qsTr("Write Protected")
             checkable: true
             visible: connected
@@ -297,7 +297,7 @@ SiMenuBar {
             onTriggered: c64.media.toggleWriteProtection(driveNr)
         }
 
-        SiMenuItem {
+        SuMenuItem {
             text: qsTr("Modified")
             checkable: true
             visible: connected && Preferences.developerMode
@@ -305,9 +305,9 @@ SiMenuBar {
             checked: modified
             onTriggered: c64.media.toggleUnsavedState(driveNr)
         }
-        SiMenuSeparator { visible: connected }
+        SuMenuSeparator { visible: connected }
 
-        SiMenuItem {
+        SuMenuItem {
             text: poweredOn ? qsTr("Switch Off") : qsTr("Switch On")
             visible: connected
             onTriggered: c64.media.toggleDrivePower(driveNr)
@@ -391,7 +391,7 @@ SiMenuBar {
     // Datasette Menu (instantiated dynamically, see updatePeripheralMenus)
     //
 
-    component DatasetteMenu: SiMenu {
+    component DatasetteMenu: SuMenu {
 
         title: qsTr("&Datasette")
 
@@ -402,14 +402,14 @@ SiMenuBar {
         // While disconnected, there's nothing to insert/eject/export for
         // hardware that isn't part of the current setup, so every other item
         // is hidden and only the toggle remains.
-        SiMenuItem {
+        SuMenuItem {
             text: connected ? qsTr("Disconnect") : qsTr("Connect")
             onTriggered: config.DAT_CONNECT = !connected
         }
 
-        SiMenuSeparator { visible: connected }
+        SuMenuSeparator { visible: connected }
 
-        SiMenuItem {
+        SuMenuItem {
             text: qsTr("Insert Tape...")
             visible: connected
             onTriggered: window.actions.insertTapeAction()
@@ -424,7 +424,7 @@ SiMenuBar {
         Component {
             id: insertRecentTapeComponent
 
-            SiMenu {
+            SuMenu {
                 id: insertRecentTapeMenu
                 title: qsTr("Insert Recent")
 
@@ -434,7 +434,7 @@ SiMenuBar {
                 // Dynamically generate one MenuItem per recently inserted tape.
                 Instantiator {
                     model: c64.media.recentTapes
-                    delegate: SiMenuItem {
+                    delegate: SuMenuItem {
                         text: modelData.substring(modelData.lastIndexOf("/") + 1)
                         onTriggered: c64.media.insertRecentTape(index)
                     }
@@ -442,7 +442,7 @@ SiMenuBar {
                     onObjectRemoved: (index, object) => insertRecentTapeMenu.removeItem(object)
                 }
 
-                SiMenuSeparator { }
+                SuMenuSeparator { }
                 Action {
                     text: qsTr("Clear Menu")
                     onTriggered: c64.media.clearRecentlyInsertedTapes()
@@ -471,33 +471,33 @@ SiMenuBar {
         Component.onCompleted: updateInsertRecentTape()
         onConnectedChanged: updateInsertRecentTape()
 
-        SiMenuSeparator { visible: connected }
+        SuMenuSeparator { visible: connected }
 
-        SiMenuItem {
+        SuMenuItem {
             text: qsTr("Eject Tape")
             visible: connected
             enabled: c64.media.tapeInserted
             onTriggered: c64.media.ejectTape()
         }
-        SiMenuItem {
+        SuMenuItem {
             text: qsTr("Rewind Tape")
             visible: connected
             enabled: c64.media.tapeInserted
             onTriggered: c64.media.rewindTape()
         }
 
-        SiMenuSeparator { visible: connected }
+        SuMenuSeparator { visible: connected }
 
-        SiMenuItem {
+        SuMenuItem {
             text: qsTr("Export Tape...")
             visible: connected
             enabled: c64.media.tapeInserted
             onTriggered: window.actions.exportTapeAction()
         }
 
-        SiMenuSeparator { visible: connected }
+        SuMenuSeparator { visible: connected }
 
-        SiMenuItem {
+        SuMenuItem {
             text: c64.media.tapePlaying ? qsTr("Press Stop Key") : qsTr("Press Play On Tape")
             visible: connected
             enabled: c64.media.tapeInserted
@@ -509,7 +509,7 @@ SiMenuBar {
     // Expansion (Cartridge) Menu
     //
 
-    SiMenu {
+    SuMenu {
         title: qsTr("E&xpansion")
 
         Action {
@@ -517,7 +517,7 @@ SiMenuBar {
             onTriggered: window.actions.attachCartridgeAction()
         }
 
-        SiMenu {
+        SuMenu {
             id: attachRecentMenu
             title: qsTr("Attach Recent")
 
@@ -527,7 +527,7 @@ SiMenuBar {
             // Dynamically generate one MenuItem per recently attached cartridge.
             Instantiator {
                 model: c64.media.recentCartridges
-                delegate: SiMenuItem {
+                delegate: SuMenuItem {
                     text: modelData.substring(modelData.lastIndexOf("/") + 1)
                     onTriggered: c64.media.attachRecentCartridge(index)
                 }
@@ -535,14 +535,14 @@ SiMenuBar {
                 onObjectRemoved: (index, object) => attachRecentMenu.removeItem(object)
             }
 
-            SiMenuSeparator { }
+            SuMenuSeparator { }
             Action {
                 text: qsTr("Clear Menu")
                 onTriggered: c64.media.clearRecentlyAttachedCartridges()
             }
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
         Action {
             text: qsTr("Detach Cartridge")
@@ -550,9 +550,9 @@ SiMenuBar {
             onTriggered: c64.media.detachCartridge()
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
-        SiMenu {
+        SuMenu {
             title: qsTr("Attach REU")
             Action { text: qsTr("REU 1700 (128 KB)");     checkable: true; checked: c64.media.cartridgeIsReu && c64.media.cartridgeMemory === 128;  onTriggered: c64.media.attachReu(128)  }
             Action { text: qsTr("REU 1764 (256 KB)");     checkable: true; checked: c64.media.cartridgeIsReu && c64.media.cartridgeMemory === 256;  onTriggered: c64.media.attachReu(256)  }
@@ -560,7 +560,7 @@ SiMenuBar {
             Action { text: qsTr("REU 1750 XL (2048 KB)"); checkable: true; checked: c64.media.cartridgeIsReu && c64.media.cartridgeMemory === 2048; onTriggered: c64.media.attachReu(2048) }
         }
 
-        SiMenu {
+        SuMenu {
             title: qsTr("Attach GEO/NEO Ram")
             Action { text: qsTr("GEO RAM (512 KB)");  checkable: true; checked: c64.media.cartridgeIsGeoRam && c64.media.cartridgeMemory === 512;  onTriggered: c64.media.attachGeoRam(512)  }
             Action { text: qsTr("NEO RAM (1024 KB)"); checkable: true; checked: c64.media.cartridgeIsGeoRam && c64.media.cartridgeMemory === 1024; onTriggered: c64.media.attachGeoRam(1024) }
@@ -575,7 +575,7 @@ SiMenuBar {
             onTriggered: c64.media.attachIsepic()
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
         Action {
             text: qsTr("Export Cartridge...")
@@ -587,16 +587,16 @@ SiMenuBar {
             onTriggered: c64.inspectCartridge()
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
-        SiMenu {
+        SuMenu {
             title: qsTr("Buttons")
             enabled: c64.media.cartridgeButtons > 0
             Action { text: qsTr("Press Button 1"); onTriggered: c64.media.pressCartridgeButton(1) }
             Action { text: qsTr("Press Button 2"); onTriggered: c64.media.pressCartridgeButton(2) }
         }
 
-        SiMenu {
+        SuMenu {
             title: qsTr("Switch")
             enabled: c64.media.cartridgeSwitches > 0
             Action { text: qsTr("Pull Left");    checkable: true; checked: c64.media.cartridgeSwitchPos < 0;  onTriggered: c64.media.setCartridgeSwitch(-1) }
@@ -609,7 +609,7 @@ SiMenuBar {
     // Keyboard Menu
     //
 
-    SiMenu {
+    SuMenu {
         title: qsTr("&Keyboard")
 
         Action {
@@ -618,9 +618,9 @@ SiMenuBar {
             onTriggered: window.actions.keyboardWindowAction.trigger()
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
-        SiMenu {
+        SuMenu {
             title: qsTr("Press")
 
             Action { text: qsTr("COMMODORE");      onTriggered: kb.type(49) }
@@ -628,20 +628,20 @@ SiMenuBar {
             Action { text: qsTr("RESTORE");        onTriggered: kb.type(31) }
             Action { text: qsTr("RUNSTOP RESTORE");onTriggered: kb.typeRunStopRestore() }
 
-            SiMenuSeparator { }
+            SuMenuSeparator { }
 
             Action { text: qsTr("HOME");           onTriggered: kb.type(14) }
             Action { text: qsTr("CLR");            onTriggered: kb.type(14, true)  }
             Action { text: qsTr("INST");           onTriggered: kb.type(15) }
             Action { text: qsTr("DEL");            onTriggered: kb.type(15, true)  }
 
-            SiMenuSeparator { }
+            SuMenuSeparator { }
 
             Action { text: qsTr("LEFT ARROW");     onTriggered: kb.type(0) }
             Action { text: qsTr("UP ARROW");       onTriggered: kb.type(30) }
             Action { text: qsTr("POUND");          onTriggered: kb.type(13) }
 
-            SiMenuSeparator { }
+            SuMenuSeparator { }
 
             Action { text: qsTr("F1");  onTriggered: kb.type(16) }
             Action { text: qsTr("F2");  onTriggered: kb.type(16, true)  }
@@ -659,7 +659,7 @@ SiMenuBar {
             onTriggered: kb.toggle(34)
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
         Action {
             text: qsTr("Load Directory")
@@ -684,7 +684,7 @@ SiMenuBar {
             onTriggered: kb.type("open 1,8,15,\"n:test, id\": close 1\n:")
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
         Action {
             text: qsTr("Reset Keyboard Matrix")

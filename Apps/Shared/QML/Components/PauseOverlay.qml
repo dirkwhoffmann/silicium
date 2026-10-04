@@ -16,7 +16,7 @@ import Sulfur
  * Fills its parent by default (anchor it to something else to cover less) and
  * floats above its siblings.
  */
-SiOverlayButton {
+SuOverlayButton {
 
     id: root
 

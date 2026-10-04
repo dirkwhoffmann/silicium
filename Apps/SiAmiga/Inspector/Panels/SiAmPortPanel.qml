@@ -37,12 +37,12 @@ SiAmInspectorWindow {
     // Subcomponents
     //
 
-    component Si1: SiLabeledBitView {
+    component Si1: SuLabeledBitView {
 
         size: Size.tiny
     }
 
-    component Si8: SiLabeledByteView {
+    component Si8: SuLabeledByteView {
 
         size: Size.small
         controlWidth: 36
@@ -50,7 +50,7 @@ SiAmInspectorWindow {
         padded: root.numPadded
     }
 
-    component Si16: SiLabeledWordView {
+    component Si16: SuLabeledWordView {
 
         size: Size.small
         controlWidth: 44
@@ -59,10 +59,10 @@ SiAmInspectorWindow {
     }
 
 
-    // SiLabeledWordView (Apps/Shared/QML/Compounds) holds the structural
+    // SuLabeledWordView (Apps/Shared/QML/Compounds) holds the structural
     // bits; this panel only adds the width override and the hex/decimal
     // toggle binding.
-    component SiHex16: SiLabeledWordView {
+    component SiHex16: SuLabeledWordView {
 
         controlWidth: 64
         base: root.numBase
@@ -70,9 +70,9 @@ SiAmInspectorWindow {
     }
 
     // A single potgo/potgor bit -- a bare, unlabeled checkbox (the row's own
-    // SiLabel carries the name), matching PortPanel.swift's compact
+    // SuLabel carries the name), matching PortPanel.swift's compact
     // OUTxy/DATxy/DATxyR triplets.
-    component Bit: SiLabeledCheckBox {
+    component Bit: SuLabeledCheckBox {
 
         readOnly: true
         implicitWidth: Size.controlHeight(Size.regular)
@@ -242,10 +242,10 @@ SiAmInspectorWindow {
                     Si16 {
                         size: Size.small; l: qsTr("SERDAT"); lwidth: 128; value: po.serper
                     }
-                    SiText {
+                    SuText {
                         text: ""; Layout.preferredWidth: 32
                     }
-                    SiLabeledCheckBox {
+                    SuLabeledCheckBox {
                         size: Size.small; readOnly: true; checked: po.long_; r: qsTr("LONG, %1 Baud").arg(po.baudRate)
                     }
                     HSpacer {
@@ -263,7 +263,7 @@ SiAmInspectorWindow {
                     Si16 {
                         size: Size.small; l: qsTr("Receive shift register"); lwidth: 128; value: po.receiveShiftReg
                     }
-                    SiText {
+                    SuText {
                         text: "→"; Layout.preferredWidth: 32
                     }
                     Si16 {
@@ -284,7 +284,7 @@ SiAmInspectorWindow {
                     Si16 {
                         size: Size.small; l: qsTr("Transmit shift register"); lwidth: 128; value: po.transmitShiftReg
                     }
-                    SiText {
+                    SuText {
                         text: "→"; Layout.preferredWidth: 32
                     }
                     Si16 {
@@ -301,7 +301,7 @@ SiAmInspectorWindow {
                 }
             }
 
-            SiSegmentedControl {
+            SuSegmentedControl {
 
                 Layout.topMargin: Style.smallSpacing
                 Layout.alignment: Qt.AlignHCenter // Left

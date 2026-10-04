@@ -139,7 +139,7 @@ Pane {
             anchors.fill: parent
             spacing: 0
 
-            SiOverlayButton {
+            SuOverlayButton {
 
                 id: warningButton
                 Layout.alignment: Qt.AlignVCenter
@@ -149,7 +149,7 @@ Pane {
                 symbol: "do_not_touch"
             }
 
-            SiText {
+            SuText {
                 id: warningText
                 anchors.margins: 10
                 Layout.fillWidth: true

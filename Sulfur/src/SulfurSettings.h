@@ -43,7 +43,7 @@ class SulfurSettings : public QObject {
     // Draws layout debug aids (see DebugRect, HSpacer, VSpacer)
     Q_PROPERTY(bool debug READ debug WRITE setDebug NOTIFY changed)
 
-    // The pictures a message dialog (SiUserDialog) shows: the icon of the
+    // The pictures a message dialog (SuUserDialog) shows: the icon of the
     // application, and the badge in its corner
     Q_PROPERTY(QUrl dialogIcon READ dialogIcon WRITE setDialogIcon NOTIFY changed)
     Q_PROPERTY(QUrl dialogBadge READ dialogBadge WRITE setDialogBadge NOTIFY changed)

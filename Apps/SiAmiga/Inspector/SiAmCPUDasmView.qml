@@ -36,7 +36,7 @@ SiBox {
     readonly property var syntaxNames: [qsTr("Motorola"), qsTr("Motorola (MIT)"), qsTr("GNU"), qsTr("GNU (MIT)"), qsTr("Musashi")]
     readonly property var revisionNames: ["68000", "68010", "68EC020", "68020", "68EC030", "68030", "68EC040", "68LC040", "68040"]
 
-    component Value: SiLabel {
+    component Value: SuLabel {
 
         size: Size.small
         font.weight: 500
@@ -46,7 +46,7 @@ SiBox {
         elide: Text.ElideRight
     }
 
-    component HeaderLabel: SiLabel {
+    component HeaderLabel: SuLabel {
 
         topPadding: 2
         bottomPadding: 2
@@ -63,7 +63,7 @@ SiBox {
         Layout.fillWidth: true
         spacing: Style.smallSpacing
 
-        SiLabeledSearch {
+        SuLabeledSearch {
 
             controlWidth: 100
             size: Size.small
@@ -76,9 +76,9 @@ SiBox {
 
         HSpacer { }
 
-        SiLabel { text: qsTr("Syntax:") }
+        SuLabel { text: qsTr("Syntax:") }
 
-        SiLabeledComboBox {
+        SuLabeledComboBox {
 
             size: Size.small
             model: root.syntaxNames
@@ -86,7 +86,7 @@ SiBox {
             onCurrentIndexChanged: cc.CPU_DASM_SYNTAX = currentIndex
         }
 
-        SiLabeledComboBox {
+        SuLabeledComboBox {
 
             size: Size.small
             model: root.revisionNames
@@ -166,7 +166,7 @@ SiBox {
                         width: parent.width
                         spacing: Style.smallSpacing
 
-                        SiSymbol {
+                        SuSymbol {
 
                             Layout.preferredWidth: root.markerColW
                             Layout.alignment: Qt.AlignVCenter

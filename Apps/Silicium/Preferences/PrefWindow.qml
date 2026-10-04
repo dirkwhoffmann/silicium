@@ -120,7 +120,7 @@ Window {
 
                         spacing: Style.mediumSpacing
 
-                        SiText {
+                        SuText {
 
                             Layout.alignment: Qt.AlignVCenter
                             text: symbol
@@ -129,7 +129,7 @@ Window {
                             color: highlighted ? Palette.accentText : Palette.accent
                         }
 
-                        SiText {
+                        SuText {
 
                             Layout.alignment: Qt.AlignVCenter
                             Layout.fillWidth: true

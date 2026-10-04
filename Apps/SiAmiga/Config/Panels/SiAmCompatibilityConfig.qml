@@ -65,7 +65,7 @@ SettingsPage {
             header: "FLOPPY DRIVES"
             size: root.sectionWidth
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Speed:"
                 lwidth: root.labelWidth
@@ -75,7 +75,7 @@ SettingsPage {
                 onCurrentIndexChanged: config.DC_SPEED = root.driveSpeeds[currentIndex]
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 r: "Emulate mechanical delays"
@@ -83,7 +83,7 @@ SettingsPage {
                 onClicked: config.DRIVE_MECHANICS = checked
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 l: "Piracy:"
                 lwidth: root.labelWidth
@@ -92,7 +92,7 @@ SettingsPage {
                 onClicked: config.DC_LOCK_DSKSYNC = checked
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 r: "Always find a SYNC mark"
@@ -110,21 +110,21 @@ SettingsPage {
             header: "CHIPSET FEATURES"
             size: root.sectionWidth
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 r: "Emulate Slow Ram mirror"
                 checked: config.MEM_SLOW_RAM_MIRROR
                 onClicked: config.MEM_SLOW_RAM_MIRROR = checked
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 r: "Emulate TOD bug"
                 checked: config.CIA_A_TODBUG !== 0
                 onClicked: root.setCiaTodBug(checked)
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 r: "Emulate dropped register writes"
                 checked: config.AGNUS_PTR_DROPS
@@ -141,7 +141,7 @@ SettingsPage {
             header: "KEYBOARD"
             size: root.sectionWidth
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 l: "Protocol:"
                 lwidth: root.labelWidth
@@ -160,14 +160,14 @@ SettingsPage {
             header: "TIMING"
             size: root.sectionWidth
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 r: "Sync CIA accesses with E-clock"
                 checked: config.CIA_A_ECLOCK_SYNCING
                 onClicked: root.setCiaEClockSyncing(checked)
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
                 
                 r: "Emulate Slow Ram bus delays"
                 checked: config.MEM_SLOW_RAM_DELAY
@@ -201,12 +201,12 @@ SettingsPage {
                     Layout.preferredHeight: bltSlider.height
                     Layout.alignment: Qt.AlignVCenter
 
-                    SiLabel { id: tick2; text: "2"; anchors.horizontalCenter: parent.horizontalCenter; y: 0 }
-                    SiLabel { text: "1"; anchors.horizontalCenter: parent.horizontalCenter; y: (parent.height - height) / 2 }
-                    SiLabel { text: "0"; anchors.horizontalCenter: parent.horizontalCenter; y: parent.height - height }
+                    SuLabel { id: tick2; text: "2"; anchors.horizontalCenter: parent.horizontalCenter; y: 0 }
+                    SuLabel { text: "1"; anchors.horizontalCenter: parent.horizontalCenter; y: (parent.height - height) / 2 }
+                    SuLabel { text: "0"; anchors.horizontalCenter: parent.horizontalCenter; y: parent.height - height }
                 }
 
-                SiSlider {
+                SuSlider {
 
                     id: bltSlider
                     orientation: Qt.Vertical
@@ -226,13 +226,13 @@ SettingsPage {
                     Layout.preferredHeight: bltSlider.height
                     Layout.alignment: Qt.AlignVCenter
 
-                    SiLabel {
+                    SuLabel {
                         text: "Move data word by word"
                         y: bltSlider.height * 0.25 - height / 2
                         color: config.BLITTER_ACCURACY >= 2 ? Palette.primary : Palette.tertiary
                     }
 
-                    SiLabel {
+                    SuLabel {
                         text: "Use up bus cycles"
                         y: bltSlider.height * 0.75 - height / 2
                         color: config.BLITTER_ACCURACY >= 1 ? Palette.primary : Palette.tertiary
@@ -250,19 +250,19 @@ SettingsPage {
             header: "SPRITES"
             size: root.sectionWidth
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
                 r: "Detect Sprite-Sprite collisions"
                 checked: config.DENISE_CLX_SPR_SPR
                 onClicked: config.DENISE_CLX_SPR_SPR = checked
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
                 r: "Detect Sprite-Playfield collisions"
                 checked: config.DENISE_CLX_SPR_PLF
                 onClicked: config.DENISE_CLX_SPR_PLF = checked
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
                 r: "Detect Playfield-Playfield collisions"
                 checked: config.DENISE_CLX_PLF_PLF
                 onClicked: config.DENISE_CLX_PLF_PLF = checked

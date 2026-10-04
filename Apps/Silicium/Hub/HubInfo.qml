@@ -38,7 +38,7 @@ Pane {
         Layout.preferredHeight: 48
         color: "transparent"
 
-        SiText {
+        SuText {
 
             id: label
             anchors.centerIn: parent
@@ -48,7 +48,7 @@ Pane {
         }
     }
 
-    component KeyLabel : SiText {
+    component KeyLabel : SuText {
 
         horizontalAlignment: Text.AlignRight
         Layout.alignment: Qt.AlignRight | Qt.AlignTop
@@ -59,7 +59,7 @@ Pane {
         opacity: 0.7
     }
 
-    component ValueLabel : SiText {
+    component ValueLabel : SuText {
 
         horizontalAlignment: Text.AlignLeft
         Layout.fillWidth: true

@@ -43,7 +43,7 @@ Pane {
 
         readonly property color textColor: enabled ? Palette.primary : Palette.tertiary
 
-        contentItem: SiText {
+        contentItem: SuText {
 
             text: root.text
             font: root.font

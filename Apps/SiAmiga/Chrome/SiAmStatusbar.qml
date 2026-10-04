@@ -194,7 +194,7 @@ Rectangle {
     // Pictogram
     //
 
-    component Pictogram: SiSymbolButton {
+    component Pictogram: SuSymbolButton {
 
         property bool state: true
 
@@ -202,7 +202,7 @@ Rectangle {
         color: Palette.tertiary
     }
 
-    component PictogramIcon: SiImageButton {
+    component PictogramIcon: SuImageButton {
 
         property bool state: true
 
@@ -261,7 +261,7 @@ Rectangle {
                 }
             }
 
-            SiText {
+            SuText {
 
                 text: track ? track : ""
                 font.pixelSize: Style.small
@@ -331,7 +331,7 @@ Rectangle {
                 }
             }
 
-            SiText {
+            SuText {
 
                 text: cylinder ? cylinder : ""
                 font.pixelSize: Style.small
@@ -390,7 +390,7 @@ Rectangle {
                 Layout.preferredHeight: 12
             }
 
-            SiText {
+            SuText {
 
                 text: label
                 font.pixelSize: Style.small
@@ -398,7 +398,7 @@ Rectangle {
                 Layout.fillWidth: true
             }
 
-            SiText {
+            SuText {
 
                 text: info.serverStateName(srvState)
                 font.pixelSize: Style.tiny
@@ -436,7 +436,7 @@ Rectangle {
 
                 spacing: 0
 
-                SiText {
+                SuText {
 
                     Layout.preferredWidth: 64
                     horizontalAlignment: Text.AlignRight
@@ -474,18 +474,18 @@ Rectangle {
                     onClicked: contextMenu.open()
                     background: Rectangle { color: "transparent" }
 
-                    SiMenu {
+                    SuMenu {
 
                         id: contextMenu
                         y: menuButton.height
 
-                        SiMenuItem {
+                        SuMenuItem {
                             text: "Emulator Frequency"
                             checkable: true
                             checked: metric === 0
                             onClicked: metric = 0
                         }
-                        SiMenuItem {
+                        SuMenuItem {
                             text: "Emulator Refresh Rate"
                             checkable: true
                             checked: metric === 1
@@ -493,13 +493,13 @@ Rectangle {
                         }
                         MenuSeparator {
                         }
-                        SiMenuItem {
+                        SuMenuItem {
                             text: "Host CPU Load"
                             checkable: true
                             checked: metric === 2
                             onClicked: metric = 2
                         }
-                        SiMenuItem {
+                        SuMenuItem {
                             text: "Host Refresh Rate"
                             checkable: true
                             checked: metric === 3
@@ -507,7 +507,7 @@ Rectangle {
                         }
                         MenuSeparator {
                         }
-                        SiMenuItem {
+                        SuMenuItem {
                             text: "Audio Buffer Fill Level"
                             checkable: true
                             checked: metric === 4
@@ -542,21 +542,21 @@ Rectangle {
                     id: gaugeRow
                     anchors.fill: parent
 
-                    SiBarGauge {
+                    SuBarGauge {
 
                         visible: metric === 0
                         maxValue: 2.0 * 7.0 * activity.overclocking
                         value: activity.amigaMhz
                     }
 
-                    SiBarGauge {
+                    SuBarGauge {
 
                         visible: metric === 1
                         maxValue: 120
                         value: activity.amigaFps
                     }
 
-                    SiBarGauge {
+                    SuBarGauge {
 
                         visible: metric === 2
                         value: activity.hostLoad
@@ -567,7 +567,7 @@ Rectangle {
                         ]
                     }
 
-                    SiBarGauge {
+                    SuBarGauge {
 
                         visible: metric === 3
                         maxValue: 120
@@ -580,7 +580,7 @@ Rectangle {
                         ]
                     }
 
-                    SiBarGauge {
+                    SuBarGauge {
 
                         visible: metric === 4
                         maxValue: 1.0
@@ -619,7 +619,7 @@ Rectangle {
 
                         spacing: Style.smallSpacing
 
-                        SiSlider {
+                        SuSlider {
 
                             id: speedSlider
 
@@ -635,7 +635,7 @@ Rectangle {
                             onMoved: config.AMIGA_SPEED_BOOST = value
                         }
 
-                        SiText {
+                        SuText {
                             // Fixed width -- and centered within it -- so the
                             // digit count changing (e.g. "50" vs "200") doesn't
                             // reflow the popup and jitter the slider under the
@@ -693,7 +693,7 @@ Rectangle {
                 running: myTicker.text !== ""
             }
 
-            SiTicker {
+            SuTicker {
 
                 id: myTicker
                 Layout.fillWidth: true

@@ -37,7 +37,7 @@ AbstractButton {
 
     onClicked: menu.open()
 
-    contentItem: SiSymbol {
+    contentItem: SuSymbol {
 
         symbol: control.currentDevice ? control.currentDevice.icon : ""
         scale: 0.7
@@ -57,12 +57,12 @@ AbstractButton {
         color: control.enabled && control.active ? Palette.accent : "transparent"
     }
 
-    SiToolTip {
+    SuToolTip {
 
         text: (!control.currentDevice || control.currentDevice.type === 0) ? port : control.currentDevice.name
     }
 
-    SiMenu {
+    SuMenu {
 
         id: menu
         y: control.height
@@ -71,7 +71,7 @@ AbstractButton {
 
             model: control.deviceModel
 
-            delegate: SiMenuItem {
+            delegate: SuMenuItem {
 
                 action: Action {
 

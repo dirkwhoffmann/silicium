@@ -42,7 +42,7 @@ Item {
             // Layout.preferredHeight: closeSymbol.implicitHeight
             spacing: Style.mediumSpacing
 
-            SiSymbol {
+            SuSymbol {
 
                 Layout.alignment: Qt.AlignVCenter
                 symbol: root.severity === 0 ? "info-circle" : "circle-exclamation";
@@ -52,7 +52,7 @@ Item {
                 color: root.severity === 0 ? Palette.accent : Palette.error;
             }
 
-            SiText {
+            SuText {
 
                 id: title
                 Layout.fillWidth: true
@@ -63,7 +63,7 @@ Item {
             }
 
             /*
-            SiSymbolButton {
+            SuSymbolButton {
 
                 id: closeSymbol
                 visible: hoverHandler.hovered
@@ -80,7 +80,7 @@ Item {
         // Second row
         //
 
-        SiText {
+        SuText {
 
             id: message
             Layout.fillWidth: true

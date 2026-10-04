@@ -54,7 +54,7 @@ Pane {
             }
         }
 
-        SiText {
+        SuText {
             id: descriptionText
             width: parent.width
             padding: 0

@@ -92,12 +92,12 @@ Item {
 
                 heading: "ROM Settings"
                 menuContent: [
-                    SiMenuItem {
+                    SuMenuItem {
                         text: "Install OpenROMs"
                         enabled: !root.locked
                         onTriggered: cc.installOpenRoms()
                     },
-                    SiMenuItem {
+                    SuMenuItem {
                         text: "Load most recently used custom ROMs"
                         enabled: !root.locked && root.hasRecentRoms
                         onTriggered: cc.loadMostRecentRoms()
@@ -220,13 +220,13 @@ Item {
                 Layout.alignment: Qt.AlignHCenter
                 spacing: 0
 
-                SiText {
+                SuText {
                     text: "To add a Rom, drag a Rom image file onto one of the four chip icons, or click an icon to select a file."
                     Layout.alignment: Qt.AlignHCenter
                     font.bold: true
                     color: Palette.primary
                 }
-                SiText {
+                SuText {
                     text: "Original Roms are protected by copyright. Please obey legal regulations."
                     Layout.alignment: Qt.AlignHCenter
                     font.bold: false

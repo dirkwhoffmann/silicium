@@ -74,7 +74,7 @@ SiAmInspectorWindow {
     // current selection (probeLabel()) and accepts input the two ways
     // BusPanel.swift's NSComboButton did -- picking a preset from the
     // dropdown, or typing a custom hex address directly into the field.
-    component ProbeSelector : SiLabeledComboInput {
+    component ProbeSelector : SuLabeledComboInput {
 
         id: sel
 
@@ -90,7 +90,7 @@ SiAmInspectorWindow {
 
         /* The label is the probe's, not the field's: what the user types is
          * an instruction to change the probe, and the field shows whatever
-         * the probe says afterwards. SiLabeledComboInput puts it back in
+         * the probe says afterwards. SuLabeledComboInput puts it back in
          * step on its own, so an address selectAddress() refuses leaves the
          * old label on screen with nothing to restore here.
          */
@@ -107,14 +107,14 @@ SiAmInspectorWindow {
      * the block centred on them -- which is the whole point of laying this
      * out as a grid rather than as one newline-separated string.
      */
-    component TipKey: SiText {
+    component TipKey: SuText {
 
         font.pixelSize: Style.small
         horizontalAlignment: Text.AlignRight
         Layout.alignment: Qt.AlignRight
     }
 
-    component TipValue: SiText {
+    component TipValue: SuText {
 
         font.pixelSize: Style.small
         leftPadding: 4
@@ -123,7 +123,7 @@ SiAmInspectorWindow {
 
     // Plain row label for the left column, matching SiAmLogicView's own
     // Address Bus / Data Bus rows (which carry no selector of their own).
-    component RowLabel: SiLabel {
+    component RowLabel: SuLabel {
 
         Layout.fillWidth: true
         Layout.fillHeight: true
@@ -155,7 +155,7 @@ SiAmInspectorWindow {
                 Layout.leftMargin: leftColumn.width + Style.smallSpacing
                 spacing: Style.smallSpacing
 
-                SiLabeledCheckBox {
+                SuLabeledCheckBox {
 
                     checked: root.cc.LA_CONNECT
                     onClicked: root.cc.LA_CONNECT = checked
@@ -164,13 +164,13 @@ SiAmInspectorWindow {
 
                 HSpacer { size: Style.largeSpacing }
 
-                SiSymbol {
+                SuSymbol {
                     size: Size.small
                     phosphor: "minus-symbol"
                     // phosphor: "minus-circle"
                 }
 
-                SiLabeledSlider {
+                SuLabeledSlider {
 
                     // l: qsTr("Zoom")
                     // l: "-"
@@ -182,7 +182,7 @@ SiAmInspectorWindow {
                     onMoved: (value) => root.zoom = value
                 }
 
-                SiSymbol {
+                SuSymbol {
                     size: Size.small
                     phosphor: "plus-symbol"
                     // phosphor: "plus-circle"
@@ -190,7 +190,7 @@ SiAmInspectorWindow {
 
                 HSpacer { size: Style.largeSpacing }
 
-                SiLabeledCheckBox {
+                SuLabeledCheckBox {
 
                     id: symbolicBox
                     r: qsTr("Symbolic")
@@ -334,7 +334,7 @@ SiAmInspectorWindow {
                                 }
                             }
 
-                            SiToolTip {
+                            SuToolTip {
 
                                 id: sampleTip
 

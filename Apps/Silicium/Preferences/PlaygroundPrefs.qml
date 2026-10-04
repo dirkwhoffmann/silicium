@@ -53,21 +53,21 @@ PrefPage {
 
             header: "FIXED WIDTH"
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 lwidth: root.labelWidth
                 r: "Ipsum"
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 r: "Ipsum"
@@ -75,64 +75,64 @@ PrefPage {
                 model: ["Item 1", "Item 2", "Item 3"]
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiHelpButton {}
+                SuHelpButton {}
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 lwidth: root.labelWidth
                 r: "Ipsum"
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiHelpButton {}
+                SuHelpButton {}
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 r: "Ipsum"
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiHelpButton {}
+                SuHelpButton {}
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiHelpButton {
+                SuHelpButton {
                     alignment: Qt.AlignLeft
                 }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 lwidth: root.labelWidth
                 r: "Ipsum"
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiHelpButton {
+                SuHelpButton {
                     alignment: Qt.AlignLeft
                 }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 r: "Ipsum"
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiHelpButton {
+                SuHelpButton {
                     alignment: Qt.AlignLeft
                 }
             }
@@ -146,77 +146,77 @@ PrefPage {
 
             header: "FLEX WIDTH"
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 model: ["Item 1", "Item 2", "Item 3"]
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 lwidth: root.labelWidth
                 r: "Ipsum"
                 model: ["Item 1", "Item 2", "Item 3"]
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 r: "Ipsum"
                 model: ["Item 1", "Item 2", "Item 3"]
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiHelpButton {}
+                SuHelpButton {}
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 lwidth: root.labelWidth
                 r: "Ipsum"
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiHelpButton {}
+                SuHelpButton {}
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 r: "Ipsum"
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiHelpButton {}
+                SuHelpButton {}
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiHelpButton {
+                SuHelpButton {
                     alignment: Qt.AlignLeft
                 }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 lwidth: root.labelWidth
                 r: "Ipsum"
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiHelpButton {
+                SuHelpButton {
                     alignment: Qt.AlignLeft
                 }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 r: "Ipsum"
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiHelpButton {
+                SuHelpButton {
                     alignment: Qt.AlignLeft
                 }
             }
@@ -230,77 +230,77 @@ PrefPage {
 
             header: "FIXED WIDTH + ATTACHMENTS"
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 lwidth: root.labelWidth
                 l: "Lorem: "
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiLabeledCheckBox {
+                SuLabeledCheckBox {
                     l: "A"
                 }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiLabeledCheckBox {
+                SuLabeledCheckBox {
                     r: "B"
                 }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiLabeledCheckBox {
+                SuLabeledCheckBox {
                     l: "A"
                     r: "B"
                 }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 lwidth: root.labelWidth
                 l: "Lorem: "
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiLabeledCheckBox {
+                SuLabeledCheckBox {
                     l: "A"
 
-                    SiHelpButton {
+                    SuHelpButton {
                         alignment: Qt.AlignLeft
                     }
                 }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiLabeledCheckBox {
+                SuLabeledCheckBox {
                     r: "B"
 
-                    SiHelpButton {
+                    SuHelpButton {
                         alignment: Qt.AlignLeft
                     }
                 }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiLabeledCheckBox {
+                SuLabeledCheckBox {
                     l: "A"
                     r: "B"
 
-                    SiHelpButton {
+                    SuHelpButton {
                         alignment: Qt.AlignLeft
                     }
                 }
@@ -315,71 +315,71 @@ PrefPage {
 
             header: "FLEX WIDTH + ATTACHMENTS"
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 lwidth: root.labelWidth
                 l: "Lorem: "
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiLabeledCheckBox {
+                SuLabeledCheckBox {
                     l: "A"
                 }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 lwidth: root.labelWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiLabeledCheckBox {
+                SuLabeledCheckBox {
                     r: "B"
                 }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 lwidth: root.labelWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiLabeledCheckBox {
+                SuLabeledCheckBox {
                     l: "A"
                     r: "B"
                 }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 lwidth: root.labelWidth
                 l: "Lorem: "
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiLabeledCheckBox {
+                SuLabeledCheckBox {
                     l: "A"
 
-                    SiHelpButton {
+                    SuHelpButton {
                         alignment: Qt.AlignLeft
                     }
                 }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 lwidth: root.labelWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiLabeledCheckBox {
+                SuLabeledCheckBox {
                     r: "B"
 
-                    SiHelpButton {
+                    SuHelpButton {
                         alignment: Qt.AlignLeft
                     }
                 }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 lwidth: root.labelWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiLabeledCheckBox {
+                SuLabeledCheckBox {
                     l: "A"
                     r: "B"
 
-                    SiHelpButton {
+                    SuHelpButton {
                         alignment: Qt.AlignLeft
                     }
                 }

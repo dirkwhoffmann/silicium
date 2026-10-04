@@ -33,7 +33,7 @@ class SiC64VICController : public SiC64InspectorController {
 
     int m_selectedSprite = 0;
 
-    // Counters -- raw ints so the panel's SiNumberView can format them per
+    // Counters -- raw ints so the panel's SuNumberView can format them per
     // the shared display format.
     int m_yCounter = 0, m_xCounter = 0, m_vc = 0, m_vcBase = 0, m_rc = 0, m_vmli = 0;
 

@@ -319,7 +319,7 @@ SettingsPage {
                 header: "SAMPLING"
                 size: root.sectionWidth
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     id: samplingCombo
                     l: "Sampling:"
@@ -341,7 +341,7 @@ SettingsPage {
                             : "Computes a value between two neighboring samples for smoother output. Increases computation slightly but reduces artifacts and improves fidelity."
                 }
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     l: "Sample rate:"
                     lwidth: root.labelWidth
@@ -360,7 +360,7 @@ SettingsPage {
                         : "Synthesizes audio at a constant sampling rate, ignoring drift between emulated and real-time playback rates. This may cause buffer underflows and overflows over time, leading to audio stutter or glitches."
                 }
 
-                SiLabeledSlider {
+                SuLabeledSlider {
 
                     l: "Capacity:"
                     lwidth: root.labelWidth
@@ -383,7 +383,7 @@ SettingsPage {
                 header: "AUDIO FILTER"
                 size: root.sectionWidth
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     l: "Type:"
                     lwidth: root.labelWidth

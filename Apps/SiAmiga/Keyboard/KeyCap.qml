@@ -117,7 +117,7 @@ Item {
         slabInset: root.borderWidth
     }
 
-    SiText {
+    SuText {
 
         anchors.centerIn: parent
         anchors.verticalCenterOffset: root.labelVerticalOffset

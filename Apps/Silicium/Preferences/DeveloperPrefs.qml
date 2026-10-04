@@ -29,7 +29,7 @@ PrefPage {
 
         heading: "Developer Settings"
         menuContent: [
-            SiMenuItem {
+            SuMenuItem {
                 text: "Restore factory defaults..."
                 onTriggered: Preferences.resetDeveloperSettings()
             }
@@ -46,7 +46,7 @@ PrefPage {
 
         header: "DEBUGGING"
 
-        SiLabeledCheckBox {
+        SuLabeledCheckBox {
 
             indent: root.labelWidth
             r: "Developer Mode"
@@ -54,7 +54,7 @@ PrefPage {
             onCheckedChanged: Preferences.developerMode = checked
         }
 
-        SiLabeledCheckBox {
+        SuLabeledCheckBox {
 
             indent: root.labelWidth
             r: "Qt Layout Hints"
@@ -67,7 +67,7 @@ PrefPage {
 
         header: "LOGGING"
 
-        SiLabeledCheckBox {
+        SuLabeledCheckBox {
 
             indent: root.labelWidth
             r: "Include debug messages"

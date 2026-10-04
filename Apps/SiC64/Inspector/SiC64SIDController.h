@@ -40,7 +40,7 @@ class SiC64SIDController : public SiC64InspectorController {
 
     QVariantList m_voices;
 
-    // Raw ints so the panel's SiNumberView can format them per the shared
+    // Raw ints so the panel's SuNumberView can format them per the shared
     // display format.
     int m_volume = 0, m_potX = 0, m_potY = 0;
 

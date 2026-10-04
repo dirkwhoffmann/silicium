@@ -95,8 +95,8 @@ SettingsPage {
 
         ColumnLayout {
             spacing: 0
-            SiLabel { text: title; color: Palette.primary; size: Size.regular; font.bold: false }
-            SiLabel { text: subtitle; color: Palette.secondary; size: Size.small; visible: subtitle !== "" }
+            SuLabel { text: title; color: Palette.primary; size: Size.regular; font.bold: false }
+            SuLabel { text: subtitle; color: Palette.secondary; size: Size.small; visible: subtitle !== "" }
         }
     }
 
@@ -141,7 +141,7 @@ SettingsPage {
             size: root.sectionWidth
             rowSpacing: Style.smallSpacing
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -150,17 +150,17 @@ SettingsPage {
                 checked: true
                 hide: true
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     controlEnabled: !root.locked
                     model: root.driveTypeNames
                     currentIndex: config.DF0_TYPE
                     onCurrentIndexChanged: config.DF0_TYPE = currentIndex
-                    SiHelpButton { onClicked: root.help("") }
+                    SuHelpButton { onClicked: root.help("") }
                 }
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -172,17 +172,17 @@ SettingsPage {
                     if (!checked) { config.DF2_CONNECTED = false; config.DF3_CONNECTED = false }
                 }
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     controlEnabled: !root.locked
                     model: root.driveTypeNames
                     currentIndex: config.DF1_TYPE
                     onCurrentIndexChanged: config.DF1_TYPE = currentIndex
-                    SiHelpButton { opacity: 0 }
+                    SuHelpButton { opacity: 0 }
                 }
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -194,18 +194,18 @@ SettingsPage {
                     if (!checked) { config.DF3_CONNECTED = false }
                 }
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     controlEnabled: !root.locked && config.DF2_CONNECTED
                     model: root.driveTypeNames
                     currentIndex: config.DF2_TYPE
                     onCurrentIndexChanged: config.DF2_TYPE = currentIndex
 
-                    SiHelpButton { opacity: 0 }
+                    SuHelpButton { opacity: 0 }
                 }
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -216,13 +216,13 @@ SettingsPage {
                     config.DF3_CONNECTED = checked
                 }
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     controlEnabled: !root.locked && config.DF3_CONNECTED
                     model: root.driveTypeNames
                     currentIndex: config.DF3_TYPE
                     onCurrentIndexChanged: config.DF3_TYPE = currentIndex
-                    SiHelpButton { opacity: 0 }
+                    SuHelpButton { opacity: 0 }
                 }
             }
         }
@@ -237,7 +237,7 @@ SettingsPage {
             size: root.sectionWidth
             rowSpacing: Style.smallSpacing
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -246,17 +246,17 @@ SettingsPage {
                 checked: config.HD0_CONNECTED
                 onClicked: config.HD0_CONNECTED = checked
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     controlEnabled: !root.locked && config.HD0_CONNECTED
                     model: root.hdTypeNames
                     currentIndex: config.HD0_TYPE
                     onCurrentIndexChanged: config.HD0_TYPE = currentIndex
-                    SiHelpButton { onClicked: root.help("") }
+                    SuHelpButton { onClicked: root.help("") }
                 }
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -265,17 +265,17 @@ SettingsPage {
                 checked: config.HD1_CONNECTED
                 onClicked: config.HD1_CONNECTED = checked
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     controlEnabled: !root.locked && config.HD1_CONNECTED
                     model: root.hdTypeNames
                     currentIndex: config.HD1_TYPE
                     onCurrentIndexChanged: config.HD1_TYPE = currentIndex
-                    SiHelpButton { opacity: 0 }
+                    SuHelpButton { opacity: 0 }
                 }
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -284,17 +284,17 @@ SettingsPage {
                 checked: config.HD2_CONNECTED
                 onClicked: config.HD2_CONNECTED = checked
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     enabled: !root.locked && config.HD2_CONNECTED
                     model: root.hdTypeNames
                     currentIndex: config.HD2_TYPE
                     onCurrentIndexChanged: config.HD2_TYPE = currentIndex
-                    SiHelpButton { opacity: 0 }
+                    SuHelpButton { opacity: 0 }
                 }
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -303,13 +303,13 @@ SettingsPage {
                 checked: config.HD3_CONNECTED
                 onClicked: config.HD3_CONNECTED = checked
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     enabled: !root.locked && config.HD3_CONNECTED
                     model: root.hdTypeNames
                     currentIndex: config.HD3_TYPE
                     onCurrentIndexChanged: config.HD3_TYPE = currentIndex
-                    SiHelpButton { opacity: 0 }
+                    SuHelpButton { opacity: 0 }
                 }
             }
         }
@@ -323,24 +323,24 @@ SettingsPage {
             header: "GAME PORTS"
             size: root.sectionWidth
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Game 1:"
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 model: ["No device"]
                 currentIndex: 0
-                SiHelpButton { onClicked: root.help("") }
+                SuHelpButton { onClicked: root.help("") }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Game 2:"
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 model: ["No device"]
                 currentIndex: 0
-                SiHelpButton { opacity: 0 }
+                SuHelpButton { opacity: 0 }
             }
         }
 
@@ -353,13 +353,13 @@ SettingsPage {
             header: "JOYSTICK"
             size: root.sectionWidth
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 l: "Auto-fire:"
                 lwidth: root.labelWidth
-                // SiLabeledCheckBox overrides hasFlexControl to false, which
+                // SuLabeledCheckBox overrides hasFlexControl to false, which
                 // is what makes accessoryContainer (holding the slider
-                // below) flex in the first place -- see SiLabeled.qml's
+                // below) flex in the first place -- see SuLabeled.qml's
                 // 'Layout.fillWidth: !hasFlexControl' on it. But that same
                 // override also makes *this* row's own default
                 // Layout.fillWidth ('hasFlexControl') false, so without this
@@ -370,7 +370,7 @@ SettingsPage {
                 checked: config.JOY1_AUTOFIRE
                 onClicked: root.setAutofire(checked)
 
-                SiLabeledSlider {
+                SuLabeledSlider {
 
                     // l: "-"
                     // r: "+"
@@ -379,11 +379,11 @@ SettingsPage {
                     controlEnabled: config.JOY1_AUTOFIRE
                     value: config.JOY1_AUTOFIRE_DELAY
                     onMoved: (value) => root.setAutofireDelay(Math.round(value))
-                    SiHelpButton { onClicked: root.help("") }
+                    SuHelpButton { onClicked: root.help("") }
                 }
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 l: "Burst Mode:"
                 lwidth: root.labelWidth
@@ -392,7 +392,7 @@ SettingsPage {
 
                 Layout.fillWidth: true
 
-                SiLabeledNumberInput {
+                SuLabeledNumberInput {
 
                     Layout.fillWidth: true
                     controlEnabled: config.JOY1_AUTOFIRE_BURSTS
@@ -403,7 +403,7 @@ SettingsPage {
                 }
 
                 HSpacer {}
-                SiHelpButton { onClicked: root.help("") }
+                SuHelpButton { onClicked: root.help("") }
             }
         }
 
@@ -416,7 +416,7 @@ SettingsPage {
             header: "SERIAL PORT"
             size: root.sectionWidth
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Serial:"
                 lwidth: root.labelWidth
@@ -424,7 +424,7 @@ SettingsPage {
                 model: root.serialDeviceNames
                 currentIndex: config.SER_DEVICE
                 onCurrentIndexChanged: config.SER_DEVICE = currentIndex
-                SiHelpButton { onClicked: root.help("") }
+                SuHelpButton { onClicked: root.help("") }
             }
         }
     }

@@ -9,7 +9,7 @@ Rectangle {
 
     id: rootRect
 
-    component KeyLabel : SiText {
+    component KeyLabel : SuText {
 
         horizontalAlignment: Text.AlignRight
         Layout.alignment: Qt.AlignRight
@@ -17,7 +17,7 @@ Rectangle {
         font.bold: true
     }
 
-    component ValueLabel : SiText {
+    component ValueLabel : SuText {
 
         horizontalAlignment: Text.AlignLeft
         Layout.alignment: Qt.AlignLeft

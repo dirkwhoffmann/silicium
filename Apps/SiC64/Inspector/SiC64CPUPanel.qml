@@ -32,7 +32,7 @@ SiC64InspectorWindow {
     // side), 1 = Debug (breakpoints + watchpoints side by side).
     property int page: 0
 
-    component SiLabeledByteView: SiLabeledNumberView {
+    component SuLabeledByteView: SuLabeledNumberView {
 
         size: Size.small
         font.weight: 500
@@ -49,14 +49,14 @@ SiC64InspectorWindow {
 
         spacing: 1
 
-        SiCheckBox {
+        SuCheckBox {
 
             Layout.alignment: Qt.AlignHCenter
             checked: on
             readOnly: true
         }
 
-        SiText {
+        SuText {
 
             Layout.alignment: Qt.AlignHCenter
             text: label
@@ -186,7 +186,7 @@ SiC64InspectorWindow {
                         }
                     }
 
-                    SiSegmentedControl {
+                    SuSegmentedControl {
 
                         id: segControl
                         anchors.horizontalCenter: stackBox.horizontalCenter
@@ -220,9 +220,9 @@ SiC64InspectorWindow {
 
                             Layout.fillWidth: true
 
-                            SiLabeledByteView { l: qsTr("PC:"); lwidth: grid.lw; bits: 16; controlWidth: 46; value: info.pc }
+                            SuLabeledByteView { l: qsTr("PC:"); lwidth: grid.lw; bits: 16; controlWidth: 46; value: info.pc }
 
-                            SiText {
+                            SuText {
 
                                 Layout.columnSpan: 2
                                 // visible: info.pcWarning
@@ -245,9 +245,9 @@ SiC64InspectorWindow {
                             readonly property int lw: 28
 
                             /*
-                            SiLabeledByteView { l: qsTr("PC:"); lwidth: grid.lw; bits: 16; controlWidth: 46; value: info.pc }
+                            SuLabeledByteView { l: qsTr("PC:"); lwidth: grid.lw; bits: 16; controlWidth: 46; value: info.pc }
 
-                            SiText {
+                            SuText {
 
                                 Layout.columnSpan: 2
                                 // visible: info.pcWarning
@@ -259,13 +259,13 @@ SiC64InspectorWindow {
 
                              */
 
-                            SiLabeledByteView { l: qsTr("A:"); lwidth: grid.lw; value: info.a }
-                            SiLabeledByteView { l: qsTr("X:"); lwidth: grid.lw; value: info.x }
-                            SiLabeledByteView { l: qsTr("Y:"); lwidth: grid.lw; value: info.y }
+                            SuLabeledByteView { l: qsTr("A:"); lwidth: grid.lw; value: info.a }
+                            SuLabeledByteView { l: qsTr("X:"); lwidth: grid.lw; value: info.x }
+                            SuLabeledByteView { l: qsTr("Y:"); lwidth: grid.lw; value: info.y }
 
-                            SiLabeledByteView { l: qsTr("SP:"); lwidth: grid.lw; value: info.sp }
-                            SiLabeledByteView { l: qsTr("PP:"); lwidth: grid.lw; value: info.portReg }
-                            SiLabeledByteView { l: "↔:"; lwidth: grid.lw; value: info.portDir }
+                            SuLabeledByteView { l: qsTr("SP:"); lwidth: grid.lw; value: info.sp }
+                            SuLabeledByteView { l: qsTr("PP:"); lwidth: grid.lw; value: info.portReg }
+                            SuLabeledByteView { l: "↔:"; lwidth: grid.lw; value: info.portDir }
 
                             Item { }
 
@@ -310,17 +310,17 @@ SiC64InspectorWindow {
                             columnSpacing: Style.mediumSpacing
                             rowSpacing: Style.smallSpacing
 
-                            SiLabeledCheckBox { size: Size.small; readOnly: true; checked: info.irq; r: qsTr("IRQ") }
-                            SiLabeledCheckBox { size: Size.tiny; indent: 2; readOnly: true; checked: info.irqCIA; r: qsTr("CIA 1") }
-                            SiLabeledCheckBox { size: Size.tiny; indent: 2; readOnly: true; checked: info.irqVIC; r: qsTr("VICII") }
-                            SiLabeledCheckBox { size: Size.tiny; indent: 2; readOnly: true; checked: info.irqEXP; r: qsTr("EPort") }
+                            SuLabeledCheckBox { size: Size.small; readOnly: true; checked: info.irq; r: qsTr("IRQ") }
+                            SuLabeledCheckBox { size: Size.tiny; indent: 2; readOnly: true; checked: info.irqCIA; r: qsTr("CIA 1") }
+                            SuLabeledCheckBox { size: Size.tiny; indent: 2; readOnly: true; checked: info.irqVIC; r: qsTr("VICII") }
+                            SuLabeledCheckBox { size: Size.tiny; indent: 2; readOnly: true; checked: info.irqEXP; r: qsTr("EPort") }
 
-                            SiLabeledCheckBox { size: Size.small; readOnly: true; checked: info.nmi; r: qsTr("NMI") }
-                            SiLabeledCheckBox { size: Size.tiny; indent: 2; readOnly: true; checked: info.nmiCIA; r: qsTr("CIA 2") }
-                            SiLabeledCheckBox { size: Size.tiny; indent: 2; readOnly: true; checked: info.nmiKBD; r: qsTr("Keyboard") }
-                            SiLabeledCheckBox { size: Size.tiny; indent: 2; readOnly: true; checked: info.nmiEXP; r: qsTr("EPort") }
+                            SuLabeledCheckBox { size: Size.small; readOnly: true; checked: info.nmi; r: qsTr("NMI") }
+                            SuLabeledCheckBox { size: Size.tiny; indent: 2; readOnly: true; checked: info.nmiCIA; r: qsTr("CIA 2") }
+                            SuLabeledCheckBox { size: Size.tiny; indent: 2; readOnly: true; checked: info.nmiKBD; r: qsTr("Keyboard") }
+                            SuLabeledCheckBox { size: Size.tiny; indent: 2; readOnly: true; checked: info.nmiEXP; r: qsTr("EPort") }
 
-                            SiLabeledCheckBox { size: Size.small; readOnly: true; checked: info.rdy; r: qsTr("RDY") }
+                            SuLabeledCheckBox { size: Size.small; readOnly: true; checked: info.rdy; r: qsTr("RDY") }
                         }
 
                         VSpacer { }

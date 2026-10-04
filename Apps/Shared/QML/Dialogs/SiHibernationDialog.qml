@@ -23,7 +23,7 @@ import Sulfur
  * Both apps hibernate the same way and ask the same question, so they ask it
  * with this one component (see VMWindow and SiAmWindow).
  */
-SiUserDialog {
+SuUserDialog {
 
     id: root
 
@@ -35,13 +35,13 @@ SiUserDialog {
     bodyText: qsTr("The virtual machine is about to hibernate. " +
                    "Would you like to save your current changes?")
 
-    SiLabeledCheckBox {
+    SuLabeledCheckBox {
         id: snapshotBox
         r: qsTr("Save machine state as a snapshot")
         checked: Preferences.hibernateSnapshot
     }
 
-    SiLabeledCheckBox {
+    SuLabeledCheckBox {
         id: workspaceBox
         r: qsTr("Save current workspace")
         checked: Preferences.hibernateWorkspace

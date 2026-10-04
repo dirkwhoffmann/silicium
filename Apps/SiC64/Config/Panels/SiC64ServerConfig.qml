@@ -64,7 +64,7 @@ SettingsPage {
 
         // Forwarded from the port field. Write the port back from here rather
         // than from onPortChanged: 'port' is bound to a config option, and
-        // assigning it would destroy that binding (see SiLabeledNumberInput).
+        // assigning it would destroy that binding (see SuLabeledNumberInput).
         signal portEdited(int value)
 
         columns: 2
@@ -74,7 +74,7 @@ SettingsPage {
         // Row 1
         //
 
-        SiLabeledCheckBox {
+        SuLabeledCheckBox {
 
             id: checkBox
             // Layout.preferredWidth: 150
@@ -87,7 +87,7 @@ SettingsPage {
 
         RowLayout {
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 id: comboBox
                 // Layout.fillWidth: false
@@ -95,7 +95,7 @@ SettingsPage {
                 model: [ "STDIO", "TCP", "HTTP" ]
             }
 
-            SiLabeledNumberInput {
+            SuLabeledNumberInput {
 
                 id: numberBox
                 // Layout.fillWidth: false
@@ -107,7 +107,7 @@ SettingsPage {
                 onValueEdited: (value) => server.portEdited(value)
             }
 
-            SiText {
+            SuText {
 
                 visible: comboBox.model[comboBox.currentIndex] === "HTTP"
                 text: "/ " + endPoint
@@ -124,7 +124,7 @@ SettingsPage {
 
             Layout.alignment: Qt.AlignTop
 
-            SiSymbolButton {
+            SuSymbolButton {
 
                 Layout.leftMargin: 20
                 Layout.fillWidth: false
@@ -133,7 +133,7 @@ SettingsPage {
                 font.pixelSize: Style.large
             }
 
-            SiText {
+            SuText {
 
                 Layout.fillWidth: false
                 Layout.alignment: Qt.AlignVCenter

@@ -56,7 +56,7 @@ RowLayout {
             Layout.bottomMargin: Style.mediumSpacing
         }
 
-        SiMinMaxSlider {
+        SuMinMaxSlider {
 
             Layout.alignment: Qt.AlignHCenter
             bottomText: "Sensitivity"
@@ -71,7 +71,7 @@ RowLayout {
 
         VSpacer { }
 
-        SiLabeledCheckBox {
+        SuLabeledCheckBox {
 
             r: "Disconnect emulation keys from keyboard"
             checked: Preferences.disconnectEmulationKeys

@@ -51,7 +51,7 @@ ToolBar {
         id: contentRow
         anchors.fill: parent
 
-        SiSymbolButton {
+        SuSymbolButton {
 
             id: menuButton
             symbol: "Menu"
@@ -63,14 +63,14 @@ ToolBar {
 
             onClicked: burgerMenu.open()
 
-            SiMenu {
+            SuMenu {
 
                 id: burgerMenu
                 y: menuButton.height
             }
         }
 
-        SiText {
+        SuText {
 
             id: headingText
             font.bold: true

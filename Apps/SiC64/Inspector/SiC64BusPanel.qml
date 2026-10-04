@@ -43,7 +43,7 @@ SiC64InspectorWindow {
         Layout.fillWidth: true
         spacing: Style.mediumSpacing
 
-        SiLabeledCheckBox {
+        SuLabeledCheckBox {
 
             Layout.fillWidth: true
             indent: tab
@@ -55,7 +55,7 @@ SiC64InspectorWindow {
 
         HSpacer { }
 
-        SiColorWell {
+        SuColorWell {
 
             value: chRow.swatch
             onPicked: (value) => chRow.colorPicked(value)
@@ -87,7 +87,7 @@ SiC64InspectorWindow {
                 Layout.preferredWidth: 280
                 spacing: Style.tinySpacing
 
-                SiLabeledCheckBox {
+                SuLabeledCheckBox {
 
                     checked: cc.XRAY_MODE === xrayDma
                     onClicked: cc.XRAY_MODE = checked ? xrayDma : xrayNone
@@ -144,7 +144,7 @@ SiC64InspectorWindow {
 
                 VSpacer { size: Style.mediumSpacing }
 
-                SiLabeledCheckBox {
+                SuLabeledCheckBox {
 
                     indent: tab
                     enabled: cc.XRAY_MODE !== xrayNone
@@ -153,7 +153,7 @@ SiC64InspectorWindow {
                     r: qsTr("Show as overlay")
                 }
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     indent: tabtab
                     Layout.fillWidth: true
@@ -163,7 +163,7 @@ SiC64InspectorWindow {
                     onCurrentIndexChanged: cc.XRAY_OVERLAY_STYLE = currentIndex
                 }
 
-                SiLabeledSlider {
+                SuLabeledSlider {
 
                     enabled: cc.XRAY_MODE !== xrayNone && cc.XRAY_OVERLAY
                     indent: tabtab
@@ -221,7 +221,7 @@ SiC64InspectorWindow {
                     Layout.fillHeight: true
                     visible: cc.XRAY_MODE === xrayNone
 
-                    SiSymbol {
+                    SuSymbol {
 
                         anchors.centerIn: parent
                         phosphor: "island"

@@ -49,7 +49,7 @@ SiBox {
         return parseInt(s, b)
     }
 
-    component HeaderLabel: SiLabel {
+    component HeaderLabel: SuLabel {
 
         topPadding: 2
         bottomPadding: 2
@@ -57,7 +57,7 @@ SiBox {
         elide: Text.ElideRight
     }
 
-    component Value: SiLabel {
+    component Value: SuLabel {
 
         topPadding: 1
         bottomPadding: 1
@@ -151,7 +151,7 @@ SiBox {
                                     TapHandler { onTapped: list.addingNew = true }
                                 }
 
-                                SiTextField {
+                                SuTextField {
 
                                     Layout.fillWidth: true
                                     visible: list.addingNew
@@ -216,7 +216,7 @@ SiBox {
                             anchors.fill: parent
                             spacing: Style.smallSpacing
 
-                            SiSymbol {
+                            SuSymbol {
 
                                 Layout.preferredWidth: 20
                                 Layout.alignment: Qt.AlignVCenter
@@ -237,7 +237,7 @@ SiBox {
                                 TapHandler { onTapped: list.editingRow = guardDelegate.index }
                             }
 
-                            SiTextField {
+                            SuTextField {
 
                                 Layout.fillWidth: true
                                 visible: list.editingRow === guardDelegate.index
@@ -256,7 +256,7 @@ SiBox {
                             }
 
                             Rectangle { Layout.preferredWidth: 1; Layout.fillHeight: true; color: Palette.surfaceBorder }
-                            SiSymbol {
+                            SuSymbol {
 
                                 Layout.preferredWidth: 20
                                 Layout.alignment: Qt.AlignVCenter

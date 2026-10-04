@@ -80,7 +80,7 @@ Item {
 
             readonly property bool alignRight: root.orientation === Qt.RightToLeft
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 Layout.fillWidth: true
 
@@ -98,7 +98,7 @@ Item {
 
             VSpacer {}
 
-            SiText {
+            SuText {
 
                 text: root.subtitle
                 font.pixelSize: Style.small
@@ -107,7 +107,7 @@ Item {
                 horizontalAlignment: parent.alignRight ? Text.AlignRight : Text.AlignLeft
             }
 
-            SiText {
+            SuText {
 
                 text: root.details
                 font.pixelSize: Style.small
@@ -120,7 +120,7 @@ Item {
 
             VSpacer {}
 
-            SiSymbolButton {
+            SuSymbolButton {
 
                 symbol: "delete"
                 scale: 1.0

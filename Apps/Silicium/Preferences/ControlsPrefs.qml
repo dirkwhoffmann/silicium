@@ -39,7 +39,7 @@ PrefPage {
 
         heading: "Controls Settings"
         menuContent: [
-            SiMenuItem {
+            SuMenuItem {
                 text: "Restore factory defaults..."
                 onTriggered: Preferences.resetControlsSettings()
             }
@@ -56,7 +56,7 @@ PrefPage {
 
         header: "MOUSE"
 
-        SiLabeledComboBox {
+        SuLabeledComboBox {
 
             l: "Hotkey:"
             lwidth: labelWidth
@@ -73,7 +73,7 @@ PrefPage {
             size: Style.mediumSpacing
         }
 
-        SiLabeledCheckBox {
+        SuLabeledCheckBox {
 
             id: mouseRetainEnable
             l: "Retain"
@@ -83,7 +83,7 @@ PrefPage {
             onCheckedChanged: Preferences.retainMouseByPressing = checked
         }
 
-        SiLabeledCheckBox {
+        SuLabeledCheckBox {
 
             lwidth: labelWidth
             r: "by clicking inside the emulator"
@@ -91,7 +91,7 @@ PrefPage {
             onCheckedChanged: Preferences.retainMouseByClicking = checked
         }
 
-        SiLabeledCheckBox {
+        SuLabeledCheckBox {
 
             lwidth: labelWidth
             r: "by double-clicking inside the emulator"
@@ -103,7 +103,7 @@ PrefPage {
             size: Style.mediumSpacing
         }
 
-        SiLabeledCheckBox {
+        SuLabeledCheckBox {
 
             id: mouseReleaseEnable
             l: "Release"
@@ -113,7 +113,7 @@ PrefPage {
             onCheckedChanged: Preferences.releaseMouseByPressing = checked
         }
 
-        SiLabeledCheckBox {
+        SuLabeledCheckBox {
 
             r: "by shaking"
             lwidth: labelWidth
@@ -130,7 +130,7 @@ PrefPage {
 
         header: "HOTKEYS"
 
-        SiLabeledComboBox {
+        SuLabeledComboBox {
 
             l: "Caps Lock:"
             lwidth: labelWidth
@@ -158,7 +158,7 @@ PrefPage {
 
         header: "C64 KEYBOARD"
 
-        SiLabeledComboBox {
+        SuLabeledComboBox {
 
             id: keyMapScheme
             l: "Key mapping:"
@@ -171,7 +171,7 @@ PrefPage {
             currentIndex: Preferences.c64KeyMapScheme
             onCurrentIndexChanged: Preferences.c64KeyMapScheme = currentIndex
 
-            SiAccessoryButton {
+            SuAccessoryButton {
 
                 symbol: "edit"
                 visible: Preferences.c64KeyMapScheme === 0
@@ -181,7 +181,7 @@ PrefPage {
                     keyRecorderWindow.requestActivate()
                 }
 
-                SiToolTip {
+                SuToolTip {
 
                     visible: parent.hovered
                     text: "Record key mappings"
@@ -191,7 +191,7 @@ PrefPage {
             HSpacer {}
         }
 
-        SiLabeledCheckBox {
+        SuLabeledCheckBox {
 
             r: "Auto-release keys"
             enabled: Preferences.c64KeyMapScheme === 1
@@ -200,7 +200,7 @@ PrefPage {
             onCheckedChanged: Preferences.c64AutoReleaseKeys = checked
         }
 
-        SiLabeledComboBox {
+        SuLabeledComboBox {
 
             id: ctrlAltCombo
             l: controller.ctrlSymbol + "L" + controller.altSymbol + ":"
@@ -211,7 +211,7 @@ PrefPage {
             onCurrentIndexChanged: Preferences.c64CtrlLeftAlt = currentIndex
         }
 
-        SiLabeledComboBox {
+        SuLabeledComboBox {
 
             id: ctrlRightAltCombo
             l: controller.ctrlSymbol + "R" + controller.altSymbol + ":"
@@ -222,7 +222,7 @@ PrefPage {
             onCurrentIndexChanged: Preferences.c64CtrlRightAlt = currentIndex
         }
 
-        SiLabeledComboBox {
+        SuLabeledComboBox {
 
             id: ctrlLeftMetaCombo
             l: controller.ctrlSymbol + "L" + controller.metaSymbol + ":"
@@ -233,7 +233,7 @@ PrefPage {
             onCurrentIndexChanged: Preferences.c64CtrlLeftMeta = currentIndex
         }
 
-        SiLabeledComboBox {
+        SuLabeledComboBox {
 
             id: ctrlRightMetaCombo
             l: controller.ctrlSymbol + "R" + controller.metaSymbol + ":"

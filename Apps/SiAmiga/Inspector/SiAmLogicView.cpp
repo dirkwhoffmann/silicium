@@ -308,7 +308,7 @@ SiAmLogicView::formatValue(int value, int bits) const
      * Hex used to be padded unconditionally here, which made the grid
      * disagree with the format the toolbar was showing. The width is the
      * natural one for a 'bits'-wide value in this base -- the same
-     * derivation SiNumberView.qml's padWidth uses, so a value reads the
+     * derivation SuNumberView.qml's padWidth uses, so a value reads the
      * same here as in every other panel.
      */
     if (m_padded) {

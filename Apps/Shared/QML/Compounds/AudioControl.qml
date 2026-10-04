@@ -46,7 +46,7 @@ Item {
         anchors.fill: parent
         spacing: Style.smallSpacing
 
-        SiText {
+        SuText {
 
             id: mainLabel
             visible: text !== ""

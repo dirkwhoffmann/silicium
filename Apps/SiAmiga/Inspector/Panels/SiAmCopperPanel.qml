@@ -40,7 +40,7 @@ SiAmInspectorWindow {
     readonly property int numBase: ic.hex ? 16 : 10
     readonly property bool numPadded: ic.padded
 
-    // SiLabeledWordView (Apps/Shared/QML/Compounds) is used directly below
+    // SuLabeledWordView (Apps/Shared/QML/Compounds) is used directly below
     // for COPxINS -- widened per usage rather than via a local alias (which
     // would collide with the shared component's own name), with base/
     // padded bound the same way.
@@ -48,14 +48,14 @@ SiAmInspectorWindow {
     // COPPC/COPxLC are 24-bit (a Copper list pointer is a chip-RAM
     // address), unlike CIA's 8/16-bit registers -- see SiAmCIAPanel's own
     // SiLabeledTOD for the same bits:24 pattern.
-    component SiLabeledLongView: SiLabeledWord24View {
+    component SiLabeledLongView: SuLabeledWord24View {
 
         controlWidth: 72
         base: root.numBase
         padded: root.numPadded
     }
 
-    component HeaderLabel: SiLabel {
+    component HeaderLabel: SuLabel {
 
         topPadding: 2
         bottomPadding: 2
@@ -63,7 +63,7 @@ SiAmInspectorWindow {
         elide: Text.ElideRight
     }
 
-    component Value: SiLabel {
+    component Value: SuLabel {
 
         size: Size.small
         topPadding: 1
@@ -113,7 +113,7 @@ SiAmInspectorWindow {
             Layout.fillHeight: true
             spacing: Style.mediumSpacing
 
-            SiSegmentedControl {
+            SuSegmentedControl {
 
                 id: seg
                 Layout.alignment: Qt.AlignHCenter
@@ -213,11 +213,11 @@ SiAmInspectorWindow {
                 Layout.alignment: Qt.AlignRight
                 spacing: Style.smallSpacing
 
-                SiSymbolButton {
+                SuSymbolButton {
                     symbol: "remove"
                     onClicked: listNr === 1 ? copper.shrinkList1() : copper.shrinkList2()
                 }
-                SiSymbolButton {
+                SuSymbolButton {
                     symbol: "add"
                     onClicked: listNr === 1 ? copper.expandList1() : copper.expandList2()
                 }
@@ -294,7 +294,7 @@ SiAmInspectorWindow {
                             value: copper.coppc0
                         }
 
-                        SiSymbolButton {
+                        SuSymbolButton {
                             symbol: "search"
                             onClicked: copper.jumpToPC()
                         }
@@ -312,11 +312,11 @@ SiAmInspectorWindow {
 
                         spacing: Style.smallSpacing
 
-                        SiLabeledWordView { controlWidth: 56; base: root.numBase; padded: root.numPadded; l: qsTr("COPxINS:"); lwidth: 55; value: copper.cop1ins }
-                        SiLabeledWordView { controlWidth: 56; base: root.numBase; padded: root.numPadded; value: copper.cop2ins }
+                        SuLabeledWordView { controlWidth: 56; base: root.numBase; padded: root.numPadded; l: qsTr("COPxINS:"); lwidth: 55; value: copper.cop1ins }
+                        SuLabeledWordView { controlWidth: 56; base: root.numBase; padded: root.numPadded; value: copper.cop2ins }
                     }
 
-                    SiLabeledCheckBox {
+                    SuLabeledCheckBox {
 
                         size: Size.small
                         indent: 55

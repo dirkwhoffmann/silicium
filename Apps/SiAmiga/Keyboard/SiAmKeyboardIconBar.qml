@@ -53,7 +53,7 @@ Item {
 
             checkable: true
 
-            contentItem: SiText {
+            contentItem: SuText {
 
                 text: radio.text
                 font.pixelSize: Style.small

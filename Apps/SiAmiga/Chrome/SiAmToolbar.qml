@@ -33,71 +33,71 @@ Item {
         anchors.fill: parent
         spacing: 0
 
-        SiBarButton {
+        SuBarButton {
 
             phosphor: "gear"
             action: root.window.actions.config
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
 
             id: inspectButton
             phosphor: "magnifying-glass"
             text: qsTr("Inspector")
             onClicked: inspectMenu.open()
 
-            SiMenu {
+            SuMenu {
 
                 id: inspectMenu
                 y: inspectButton.height
 
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openCPUInspector
                 }
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openCIAInspector
                 }
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openMemoryInspector
                 }
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openAgnusInspector
                 }
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openCopperInspector
                 }
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openBlitterInspector
                 }
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openPaulaInspector
                 }
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openDeniseInspector
                 }
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openPortInspector
                 }
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openEventsInspector
                 }
-                SiMenuSeparator {
+                SuMenuSeparator {
 
                 }
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openLogicAnalyzer
                 }
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openXRayScanner
                 }
             }
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
 
             phosphor: "terminal-window"
             action: root.window.actions.retroShell
@@ -105,9 +105,9 @@ Item {
             checked: root.amiga.retroShell
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
 
             phosphor: "clipboard"
             action: root.window.actions.logger
@@ -115,36 +115,36 @@ Item {
             checked: root.window.actions.logger.isOpen
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
         HSpacer {}
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
             phosphor: "database"
             action: root.window.actions.saveWorkspace
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
             phosphor: "download-simple"
             action: root.window.actions.saveSnapshot
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
             phosphor: "upload-simple"
             action: root.window.actions.loadSnapshot
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
         HSpacer {}
 
-        SiBarDivider {}
+        SuBarDivider {}
 
         DeviceSelectorFlat {
 
@@ -155,7 +155,7 @@ Item {
             onDeviceSelected: (index) => AppController.inputManager.port0 = index
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
         DeviceSelectorFlat {
 
@@ -166,24 +166,24 @@ Item {
             onDeviceSelected: (index) => AppController.inputManager.port1 = index
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
         HSpacer {}
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
             phosphor: "keyboard"
             action: root.window.actions.keyboard
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
         HSpacer {}
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
             visible: Preferences.developerMode
             phosphor: "bug-beetle"
             action: root.window.actions.debug
@@ -191,23 +191,23 @@ Item {
             checked: root.amiga.debugPanel
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
             phosphor: root.amiga.isPaused ? "play-circle" : "pause-circle"
             action: root.window.actions.pause
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
             phosphor: "arrows-clockwise"
             action: root.window.actions.reset
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
             phosphor: "power"
             action: root.window.actions.power
         }

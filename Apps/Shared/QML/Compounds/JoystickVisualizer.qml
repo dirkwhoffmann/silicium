@@ -84,7 +84,7 @@ Item {
             Layout.preferredWidth: 40
             Layout.preferredHeight: 40
 
-            SiText {
+            SuText {
                 anchors.centerIn: parent
                 text: "gamepad"
                 font.family: Fonts.symbols

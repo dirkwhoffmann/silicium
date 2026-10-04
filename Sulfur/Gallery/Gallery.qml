@@ -50,7 +50,7 @@ ApplicationWindow {
         Layout.fillWidth: true
         spacing: Style.mediumSpacing
 
-        SiText {
+        SuText {
             text: section.title
             font.bold: true
             font.pixelSize: Style.large
@@ -83,7 +83,7 @@ ApplicationWindow {
             Layout.alignment: Qt.AlignHCenter
         }
 
-        SiText {
+        SuText {
             text: sample.caption
             font.pixelSize: Style.small
             color: Palette.secondary
@@ -114,31 +114,31 @@ ApplicationWindow {
                 anchors.margins: Style.mediumSpacing
                 spacing: Style.largeSpacing
 
-                SiText { text: "Appearance"; anchors.verticalCenter: undefined }
+                SuText { text: "Appearance"; anchors.verticalCenter: undefined }
 
-                SiSegmentedControl {
+                SuSegmentedControl {
                     model: ["Auto", "Light", "Dark"]
                     currentIndex: SulfurSettings.appearance
                     onActivated: (index) => SulfurSettings.appearance = index
                 }
 
-                SiText { text: "Colors" }
+                SuText { text: "Colors" }
 
-                SiSegmentedControl {
+                SuSegmentedControl {
                     model: ["Default", "Solaris"]
                     currentIndex: SulfurSettings.colorTheme
                     onActivated: (index) => SulfurSettings.colorTheme = index
                 }
 
-                SiText { text: "Font" }
+                SuText { text: "Font" }
 
-                SiSegmentedControl {
+                SuSegmentedControl {
                     model: ["System", "Inter", "Saira", "DejaVu"]
                     currentIndex: SulfurSettings.fontTheme
                     onActivated: (index) => SulfurSettings.fontTheme = index
                 }
 
-                SiCheckBox {
+                SuCheckBox {
                     text: "Layout debug aids"
                     checked: SulfurSettings.debug
                     onToggled: SulfurSettings.debug = checked
@@ -211,36 +211,36 @@ ApplicationWindow {
                     Layout.leftMargin: Style.largeSpacing
                     Layout.rightMargin: Style.largeSpacing
 
-                    Sample { caption: "SiButton"; SiButton { text: "Button" } }
-                    Sample { caption: "accented"; SiButton { text: "Accented"; accented: true } }
-                    Sample { caption: "disabled"; SiButton { text: "Disabled"; enabled: false } }
+                    Sample { caption: "SuButton"; SuButton { text: "Button" } }
+                    Sample { caption: "accented"; SuButton { text: "Accented"; accented: true } }
+                    Sample { caption: "disabled"; SuButton { text: "Disabled"; enabled: false } }
                     Sample {
                         caption: "icon buttons"
-                        SiButton { symbol: "settings" }
-                        SiButton { phosphor: "clipboard"; checkable: true; checked: true }
-                        SiButton { symbol: "folder"; enabled: false }
+                        SuButton { symbol: "settings" }
+                        SuButton { phosphor: "clipboard"; checkable: true; checked: true }
+                        SuButton { symbol: "folder"; enabled: false }
                     }
-                    Sample { caption: "sizes"; SiButton { text: "Small"; size: Size.small } SiButton { text: "Large"; size: Size.large } }
+                    Sample { caption: "sizes"; SuButton { text: "Small"; size: Size.small } SuButton { text: "Large"; size: Size.large } }
 
                     Sample {
-                        caption: "SiSymbolButton"
-                        SiSymbolButton { phosphor: "gear" }
-                        SiSymbolButton { phosphor: "magnifying-glass" }
-                        SiSymbolButton { phosphor: "bug-beetle"; checkable: true }
+                        caption: "SuSymbolButton"
+                        SuSymbolButton { phosphor: "gear" }
+                        SuSymbolButton { phosphor: "magnifying-glass" }
+                        SuSymbolButton { phosphor: "bug-beetle"; checkable: true }
                     }
 
                     Sample {
-                        caption: "SiBarButton"
-                        SiBarButton {
+                        caption: "SuBarButton"
+                        SuBarButton {
                             phosphor: "terminal-window"
                             text: "Shell"
                             checkable: true
-                            SiToolTip { text: "Hover for a tooltip" }
+                            SuToolTip { text: "Hover for a tooltip" }
                         }
                     }
 
-                    Sample { caption: "SiHelpButton"; SiHelpButton { checkable: true } }
-                    Sample { caption: "SiOverlayButton"; SiOverlayButton { symbol: "play_circle"; size: 48 } }
+                    Sample { caption: "SuHelpButton"; SuHelpButton { checkable: true } }
+                    Sample { caption: "SuOverlayButton"; SuOverlayButton { symbol: "play_circle"; size: 48 } }
                 }
 
                 //
@@ -254,17 +254,17 @@ ApplicationWindow {
                     Layout.rightMargin: Style.largeSpacing
 
                     Sample {
-                        caption: "SiText"
+                        caption: "SuText"
                         ColumnLayout {
-                            SiText { text: "Heading"; font.pixelSize: Style.heading }
-                            SiText { text: "Regular text" }
-                            SiText { text: "Small text"; font.pixelSize: Style.small }
+                            SuText { text: "Heading"; font.pixelSize: Style.heading }
+                            SuText { text: "Regular text" }
+                            SuText { text: "Small text"; font.pixelSize: Style.small }
                         }
                     }
 
-                    Sample { caption: "SiLabel"; SiLabel { text: "A label" } }
-                    Sample { caption: "SiTextField"; SiTextField { placeholderText: "Type here"; implicitWidth: 160 } }
-                    Sample { caption: "SiNumberInput"; SiNumberInput { text: "42"; implicitWidth: 80 } }
+                    Sample { caption: "SuLabel"; SuLabel { text: "A label" } }
+                    Sample { caption: "SuTextField"; SuTextField { placeholderText: "Type here"; implicitWidth: 160 } }
+                    Sample { caption: "SuNumberInput"; SuNumberInput { text: "42"; implicitWidth: 80 } }
                 }
 
                 //
@@ -277,12 +277,12 @@ ApplicationWindow {
                     Layout.leftMargin: Style.largeSpacing
                     Layout.rightMargin: Style.largeSpacing
 
-                    Sample { caption: "SiCheckBox"; SiCheckBox { text: "Check me"; checked: true } }
-                    Sample { caption: "bit style"; SiCheckBox { bitStyle: true; checked: true } }
+                    Sample { caption: "SuCheckBox"; SuCheckBox { text: "Check me"; checked: true } }
+                    Sample { caption: "bit style"; SuCheckBox { bitStyle: true; checked: true } }
 
                     Sample {
-                        caption: "SiSegmentedControl"
-                        SiSegmentedControl {
+                        caption: "SuSegmentedControl"
+                        SuSegmentedControl {
                             id: segments
                             model: ["One", "Two", "Three"]
                             onActivated: (index) => currentIndex = index
@@ -291,7 +291,7 @@ ApplicationWindow {
 
                     Sample {
                         caption: "icon segments"
-                        SiSegmentedControl {
+                        SuSegmentedControl {
                             minSegmentWidth: 34
                             currentIndex: -1
                             model: [
@@ -305,23 +305,23 @@ ApplicationWindow {
                     }
 
                     Sample {
-                        caption: "SiComboBox"
-                        SiComboBox { model: ["Amiga", "Commodore 64", "Atari ST"]; implicitWidth: 160 }
+                        caption: "SuComboBox"
+                        SuComboBox { model: ["Amiga", "Commodore 64", "Atari ST"]; implicitWidth: 160 }
                     }
 
                     Sample {
-                        caption: "SiMenu"
-                        SiButton {
+                        caption: "SuMenu"
+                        SuButton {
                             id: menuButton
                             text: "Open menu"
                             onClicked: demoMenu.popup(0, height)
 
-                            SiMenu {
+                            SuMenu {
                                 id: demoMenu
-                                SiMenuItem { text: "Open..." }
-                                SiMenuItem { text: "Checkable"; checkable: true; checked: true }
-                                SiMenuSeparator { }
-                                SiMenuItem { text: "Disabled"; enabled: false }
+                                SuMenuItem { text: "Open..." }
+                                SuMenuItem { text: "Checkable"; checkable: true; checked: true }
+                                SuMenuSeparator { }
+                                SuMenuItem { text: "Disabled"; enabled: false }
                             }
                         }
                     }
@@ -338,24 +338,24 @@ ApplicationWindow {
                     Layout.rightMargin: Style.largeSpacing
 
                     Sample {
-                        caption: "SiSlider"
-                        SiSlider { value: root.level; onMoved: root.level = value; implicitWidth: 160 }
+                        caption: "SuSlider"
+                        SuSlider { value: root.level; onMoved: root.level = value; implicitWidth: 160 }
                     }
                     Sample {
-                        caption: "SiProgressBar"
-                        SiProgressBar { value: root.level; implicitWidth: 160 }
+                        caption: "SuProgressBar"
+                        SuProgressBar { value: root.level; implicitWidth: 160 }
                     }
                     Sample {
-                        caption: "SiBarGauge"
-                        SiBarGauge { value: root.level; implicitWidth: 160; implicitHeight: 16 }
+                        caption: "SuBarGauge"
+                        SuBarGauge { value: root.level; implicitWidth: 160; implicitHeight: 16 }
                     }
                     Sample {
-                        caption: "SiKnob"
-                        SiKnob { value: root.level; from: 0; to: 1; onMoved: (v) => root.level = v }
+                        caption: "SuKnob"
+                        SuKnob { value: root.level; from: 0; to: 1; onMoved: (v) => root.level = v }
                     }
                     Sample {
-                        caption: "SiMinMaxSlider"
-                        SiMinMaxSlider {
+                        caption: "SuMinMaxSlider"
+                        SuMinMaxSlider {
                             topText: "1"
                             bottomText: "0"
                             from: 0
@@ -366,8 +366,8 @@ ApplicationWindow {
                         }
                     }
                     Sample {
-                        caption: "SiColorWell"
-                        SiColorWell { value: "#3366cc"; onPicked: (v) => value = v }
+                        caption: "SuColorWell"
+                        SuColorWell { value: "#3366cc"; onPicked: (v) => value = v }
                     }
                 }
 
@@ -385,12 +385,12 @@ ApplicationWindow {
 
                         spacing: Style.smallSpacing
 
-                        SiLabeledTextBox { l: "Name:"; lwidth: 110; controlWidth: 180; text: "Workbench" }
-                        SiLabeledNumberInput { l: "Memory:"; lwidth: 110; controlWidth: 80; r: "KB"; intValue: 512 }
-                        SiLabeledCheckBox { l: "Fast RAM:"; lwidth: 110; checkBoxText: "Enabled"; checked: true }
-                        SiLabeledComboBox { l: "Model:"; lwidth: 110; controlWidth: 180; model: ["A500", "A1000", "A2000"]; currentIndex: 0 }
-                        SiLabeledSlider { l: "Volume:"; lwidth: 110; controlWidth: 180; from: 0; to: 100; value: root.level * 100; onMoved: (v) => root.level = v / 100 }
-                        SiLabeledProgressBar { l: "Progress:"; lwidth: 110; controlWidth: 180; from: 0; to: 1; value: root.level }
+                        SuLabeledTextBox { l: "Name:"; lwidth: 110; controlWidth: 180; text: "Workbench" }
+                        SuLabeledNumberInput { l: "Memory:"; lwidth: 110; controlWidth: 80; r: "KB"; intValue: 512 }
+                        SuLabeledCheckBox { l: "Fast RAM:"; lwidth: 110; checkBoxText: "Enabled"; checked: true }
+                        SuLabeledComboBox { l: "Model:"; lwidth: 110; controlWidth: 180; model: ["A500", "A1000", "A2000"]; currentIndex: 0 }
+                        SuLabeledSlider { l: "Volume:"; lwidth: 110; controlWidth: 180; from: 0; to: 100; value: root.level * 100; onMoved: (v) => root.level = v / 100 }
+                        SuLabeledProgressBar { l: "Progress:"; lwidth: 110; controlWidth: 180; from: 0; to: 1; value: root.level }
                     }
                 }
 
@@ -405,13 +405,13 @@ ApplicationWindow {
                     Layout.rightMargin: Style.largeSpacing
 
                     Sample {
-                        caption: "SiUserDialog"
-                        SiButton { text: "Show dialog"; onClicked: messageDialog.open() }
+                        caption: "SuUserDialog"
+                        SuButton { text: "Show dialog"; onClicked: messageDialog.open() }
                     }
 
                     Sample {
-                        caption: "SiProgressDialog"
-                        SiButton {
+                        caption: "SuProgressDialog"
+                        SuButton {
                             text: "Show progress"
                             onClicked: {
                                 progressDialog.progress = 0
@@ -423,12 +423,12 @@ ApplicationWindow {
 
                     Sample {
                         caption: "NotificationCenter"
-                        SiButton { text: "Notify"; onClicked: notifications.show("Sulfur", "A notification, shown by the notification center.", notifications.info) }
+                        SuButton { text: "Notify"; onClicked: notifications.show("Sulfur", "A notification, shown by the notification center.", notifications.info) }
                     }
 
                     Sample {
-                        caption: "SiBanner"
-                        SiButton { text: "Show banner"; onClicked: banner.show("A message that takes itself away", 500, 3000) }
+                        caption: "SuBanner"
+                        SuButton { text: "Show banner"; onClicked: banner.show("A message that takes itself away", 500, 3000) }
                     }
                 }
 
@@ -441,7 +441,7 @@ ApplicationWindow {
     // Things that float
     //
 
-    SiBanner {
+    SuBanner {
 
         id: banner
         anchors.fill: parent
@@ -458,7 +458,7 @@ ApplicationWindow {
         z: 999
     }
 
-    SiUserDialog {
+    SuUserDialog {
 
         id: messageDialog
         titleText: "Hello from Sulfur"
@@ -466,7 +466,7 @@ ApplicationWindow {
         buttons: Dialog.Cancel | Dialog.Ok
     }
 
-    SiProgressDialog {
+    SuProgressDialog {
 
         id: progressDialog
         text: "Working..."

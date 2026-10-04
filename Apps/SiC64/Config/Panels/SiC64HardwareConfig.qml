@@ -65,13 +65,13 @@ SettingsPage {
             header: "VICII"
             size: root.sectionWidth
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 lwidth: root.labelWidth
                 l: "Revision:"
                 model: ["MOS 6569 R1 (PAL)", "MOS 6569 R3", "MOS 8565", "MOS 6567  R56A (NTSC)", "MOS 6567", "MOS 8562"]
 
-                SiHelpButton {
+                SuHelpButton {
                     onClicked: root.help("vic-revision.md")
                 }
 
@@ -79,12 +79,12 @@ SettingsPage {
                 onCurrentIndexChanged: config.VICII_REVISION = currentIndex;
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 r: "Emulate grey dot bug"
 
-                SiHelpButton {
+                SuHelpButton {
                     onClicked: root.help("vic-gray-dot-bug.md")
                 }
                 HSpacer {}
@@ -105,7 +105,7 @@ SettingsPage {
             header: "SID"
             size: root.sectionWidth
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Revision:"
                 lwidth: root.labelWidth
@@ -115,7 +115,7 @@ SettingsPage {
                 // help.visible: true
                 // onHelpClicked: root.help("sid-revision.md")
 
-                SiHelpButton {
+                SuHelpButton {
                     onClicked: root.help("sid-revision.md")
                 }
 
@@ -123,19 +123,19 @@ SettingsPage {
                 onCurrentIndexChanged: config.SID_REV = currentIndex;
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 r: "SID 2 at"
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     model: sidAddressModel
                     currentIndex: (config.SID_ADDRESS1 - 0xD400) / 0x20
                     onCurrentIndexChanged: config.SID_ADDRESS1 = currentIndex * 0x20 + 0xD400;
 
-                    SiHelpButton {
+                    SuHelpButton {
                         onClicked: root.help("multi-sid.md")
                     }
                 }
@@ -143,13 +143,13 @@ SettingsPage {
                 onClicked: config.SID_ENABLE1 = checked;
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 r: "SID 3 at"
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     model: sidAddressModel
                     currentIndex: (config.SID_ADDRESS2 - 0xD400) / 0x20
@@ -163,13 +163,13 @@ SettingsPage {
 
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 r: "SID 4 at"
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     model: sidAddressModel
                     currentIndex: (config.SID_ADDRESS3 - 0xD400) / 0x20
@@ -192,24 +192,24 @@ SettingsPage {
             header: "CIAs"
             size: root.sectionWidth
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Revision:"
                 lwidth: root.labelWidth
                 model: ["MOS 6526", "MOS 8521"]
 
-                SiHelpButton { onClicked: root.help("cia-revision.md") }
+                SuHelpButton { onClicked: root.help("cia-revision.md") }
 
                 currentIndex: config.CIA_REVISION
                 onCurrentIndexChanged: config.CIA_REVISION = currentIndex;
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 r: "Emulate timer B bug"
 
-                SiHelpButton { onClicked: root.help("cia-timer-b-bug.md") }
+                SuHelpButton { onClicked: root.help("cia-timer-b-bug.md") }
                 HSpacer {}
 
                 checked: config.CIA_TIMER_B_BUG
@@ -226,13 +226,13 @@ SettingsPage {
             header: "LOGIC BOARD"
             size: root.sectionWidth
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Glue Logic:"
                 lwidth: root.labelWidth
                 model: ["Discrete", "Custom IC"]
 
-                SiHelpButton {
+                SuHelpButton {
                     onClicked: root.help("glue-logic.md")
                 }
 
@@ -250,13 +250,13 @@ SettingsPage {
             header: "POWER SUPPLY"
             size: root.sectionWidth
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Frequency:"
                 lwidth: root.labelWidth
                 model: ["50Hz stable", "50Hz unstable", "60Hz stable", "60Hz unstable"]
 
-                SiHelpButton {
+                SuHelpButton {
                     onClicked: root.help("power-supply.md")
                 }
 
@@ -274,13 +274,13 @@ SettingsPage {
             header: "POWER UP"
             size: root.sectionWidth
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "RAM pattern:"
                 lwidth: root.labelWidth
                 model: ["VICE", "CSS", "Zeroes", "Ones", "Random"]
 
-                SiHelpButton {
+                SuHelpButton {
                     onClicked: root.help("ram-pattern.md")
                 }
 

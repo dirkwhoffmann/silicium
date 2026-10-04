@@ -29,7 +29,7 @@ SiC64InspectorWindow {
     readonly property real columnWidth: Math.max(260,
         (scrollView.availableWidth - Style.largeSpacing * 2) / 3)
 
-    component SiLabeledBinaryView: SiLabeledNumberView {
+    component SuLabeledBinaryView: SuLabeledNumberView {
 
         size: Size.small
         font.bold: true
@@ -39,7 +39,7 @@ SiC64InspectorWindow {
         padded: true
     }
 
-    component SiLabeledByteView: SiLabeledNumberView {
+    component SuLabeledByteView: SuLabeledNumberView {
 
         size: Size.small
         font.weight: 500
@@ -49,7 +49,7 @@ SiC64InspectorWindow {
         padded: root.numPadded
     }
 
-    component SiLabeledExtByteView: SiLabeledNumberView {
+    component SiLabeledExtByteView: SuLabeledNumberView {
 
         size: Size.small
         font.weight: 500
@@ -59,7 +59,7 @@ SiC64InspectorWindow {
         padded: root.numPadded
     }
 
-    component SiLabeledWordView: SiLabeledNumberView {
+    component SuLabeledWordView: SuLabeledNumberView {
 
         size: Size.small
         font.weight: 500
@@ -70,7 +70,7 @@ SiC64InspectorWindow {
     }
 
     // One per-sprite "cut" checkbox in the Debugging box's sprite mask.
-    component SpriteMaskCheck: SiLabeledCheckBox {
+    component SpriteMaskCheck: SuLabeledCheckBox {
 
         required property int spriteNr
 
@@ -142,10 +142,10 @@ SiC64InspectorWindow {
                         SiLabeledExtByteView { size: Size.small; lwidth: 65; l: qsTr("VC:"); value: vic.vc }
                         SiLabeledExtByteView { size: Size.small; lwidth: 65; l: qsTr("VC Base:"); value: vic.vcBase }
 
-                        SiLabeledByteView { size: Size.small; lwidth: 65; l: qsTr("RC:"); bits: 4; value: vic.rc }
-                        SiLabeledByteView { size: Size.small; lwidth: 65; l: qsTr("VMLI:"); bits: 8; value: vic.vmli }
+                        SuLabeledByteView { size: Size.small; lwidth: 65; l: qsTr("RC:"); bits: 4; value: vic.rc }
+                        SuLabeledByteView { size: Size.small; lwidth: 65; l: qsTr("VMLI:"); bits: 8; value: vic.vmli }
 
-                        SiLabeledByteView { size: Size.small; lwidth: 65; l: qsTr("Raster IRQ:"); bits: 8; value: vic.irqRasterline }
+                        SuLabeledByteView { size: Size.small; lwidth: 65; l: qsTr("Raster IRQ:"); bits: 8; value: vic.irqRasterline }
                     }
 
                     VSpacer { }
@@ -166,16 +166,16 @@ SiC64InspectorWindow {
 
                     RowLayout {
 
-                        SiLabeledByteView { size: Size.small; lwidth: 100; l: qsTr("Memory select"); value: vic.memSelect }
+                        SuLabeledByteView { size: Size.small; lwidth: 100; l: qsTr("Memory select"); value: vic.memSelect }
                         HSpacer { }
-                        SiLabeledCheckBox { size: Size.small; checked: vic.ultimax; r: qsTr("Ultimax") }
+                        SuLabeledCheckBox { size: Size.small; checked: vic.ultimax; r: qsTr("Ultimax") }
                     }
 
                     // Bank / screen / char memory are shown, not edited
                     // here -- there's no live setter for them yet, so
                     // these combo boxes are disabled, single-option
                     // read-outs rather than functional selectors.
-                    SiLabeledComboBox {
+                    SuLabeledComboBox {
 
                         size: Size.small
                         lwidth: 100
@@ -185,7 +185,7 @@ SiC64InspectorWindow {
                         currentIndex: 0
                     }
 
-                    SiLabeledComboBox {
+                    SuLabeledComboBox {
 
                         size: Size.small
                         lwidth: 100
@@ -195,7 +195,7 @@ SiC64InspectorWindow {
                         currentIndex: 0
                     }
 
-                    SiLabeledComboBox {
+                    SuLabeledComboBox {
 
                         size: Size.small
                         lwidth: 100
@@ -221,7 +221,7 @@ SiC64InspectorWindow {
                     Layout.preferredWidth: root.columnWidth
                     spacing: root.boxSpacing
 
-                    SiLabeledCheckBox {
+                    SuLabeledCheckBox {
 
                         size: Size.small
                         checked: vic.cutEnable
@@ -234,7 +234,7 @@ SiC64InspectorWindow {
                         Layout.fillHeight: true
                         spacing: root.boxSpacing
 
-                        SiSlider {
+                        SuSlider {
 
                             orientation: Qt.Vertical
                             Layout.preferredHeight: cutGrid.height
@@ -256,7 +256,7 @@ SiC64InspectorWindow {
                                 columnSpacing: Style.mediumSpacing
                                 rowSpacing: Style.tinySpacing
 
-                                SiLabeledCheckBox {
+                                SuLabeledCheckBox {
 
                                     size: Size.small
                                     checked: vic.cutBorder
@@ -264,7 +264,7 @@ SiC64InspectorWindow {
                                     r: qsTr("Border")
                                 }
 
-                                SiLabeledCheckBox {
+                                SuLabeledCheckBox {
 
                                     size: Size.small
                                     checked: vic.cutSprites
@@ -272,7 +272,7 @@ SiC64InspectorWindow {
                                     r: qsTr("Sprites")
                                 }
 
-                                SiLabeledCheckBox {
+                                SuLabeledCheckBox {
 
                                     size: Size.small
                                     checked: vic.cutForeground
@@ -296,7 +296,7 @@ SiC64InspectorWindow {
                                     }
                                 }
 
-                                SiLabeledCheckBox {
+                                SuLabeledCheckBox {
 
                                     size: Size.small
                                     checked: vic.cutBackground
@@ -340,11 +340,11 @@ SiC64InspectorWindow {
                     spacing: root.boxSpacing
 
                     RowLayout {
-                        SiLabeledByteView { size: Size.small; lwidth: 50; l: qsTr("Control:"); value: vic.ctrl1 }
-                        SiLabeledByteView { size: Size.small; value: vic.ctrl2 }
+                        SuLabeledByteView { size: Size.small; lwidth: 50; l: qsTr("Control:"); value: vic.ctrl1 }
+                        SuLabeledByteView { size: Size.small; value: vic.ctrl2 }
                         HSpacer { }
-                        SiLabeledByteView { size: Size.small; controlWidth: 24; lwidth: 20; l: qsTr("dX:"); bits: 4; value: vic.dx }
-                        SiLabeledByteView { size: Size.small; controlWidth: 24; lwidth: 20; l: qsTr("dY:"); bits: 4; value: vic.dy }
+                        SuLabeledByteView { size: Size.small; controlWidth: 24; lwidth: 20; l: qsTr("dX:"); bits: 4; value: vic.dx }
+                        SuLabeledByteView { size: Size.small; controlWidth: 24; lwidth: 20; l: qsTr("dY:"); bits: 4; value: vic.dy }
                     }
 
                     GridLayout {
@@ -355,19 +355,19 @@ SiC64InspectorWindow {
 
                         Item { Layout.preferredWidth: 50 }
 
-                        SiLabeledCheckBox {
+                        SuLabeledCheckBox {
                             size: Size.small
                             checked: vic.denBit
                             r: qsTr("DEN")
                         }
 
-                        SiLabeledCheckBox {
+                        SuLabeledCheckBox {
                             size: Size.small
                             checked: vic.badLine
                             r: qsTr("Bad")
                         }
 
-                        SiLabeledCheckBox {
+                        SuLabeledCheckBox {
                             size: Size.small
                             checked: vic.displayState
                             r: qsTr("Disp")
@@ -375,26 +375,26 @@ SiC64InspectorWindow {
 
                         Item { Layout.preferredWidth: 50 }
 
-                        SiLabeledCheckBox {
+                        SuLabeledCheckBox {
                             size: Size.small
                             checked: vic.vblank
                             r: qsTr("VBL")
                         }
 
-                        SiLabeledCheckBox {
+                        SuLabeledCheckBox {
                             size: Size.small
                             checked: vic.hFlop
                             r: qsTr("HFlop")
                         }
 
-                        SiLabeledCheckBox {
+                        SuLabeledCheckBox {
                             size: Size.small
                             checked: vic.vFlop
                             r: qsTr("VFlop")
                         }
                     }
 
-                    SiLabeledComboBox {
+                    SuLabeledComboBox {
                         size: Size.small
                         lwidth: 50
                         l: qsTr("Canvas:")
@@ -403,7 +403,7 @@ SiC64InspectorWindow {
                         currentIndex: 0
                     }
 
-                    SiLabeledComboBox {
+                    SuLabeledComboBox {
                         size: Size.small
                         lwidth: 50
                         l: qsTr("Mode:")
@@ -416,11 +416,11 @@ SiC64InspectorWindow {
 
                         HSpacer { size: 50 }
                         spacing: Style.smallSpacing
-                        SiColorWell { readOnly: true; value: vic.borderColor }
-                        SiColorWell { readOnly: true; value: vic.bgColor0 }
-                        SiColorWell { readOnly: true; value: vic.bgColor1 }
-                        SiColorWell { readOnly: true; value: vic.bgColor2 }
-                        SiColorWell { readOnly: true; value: vic.bgColor3 }
+                        SuColorWell { readOnly: true; value: vic.borderColor }
+                        SuColorWell { readOnly: true; value: vic.bgColor0 }
+                        SuColorWell { readOnly: true; value: vic.bgColor1 }
+                        SuColorWell { readOnly: true; value: vic.bgColor2 }
+                        SuColorWell { readOnly: true; value: vic.bgColor3 }
                         Item { Layout.fillWidth: true }
                     }
 
@@ -447,26 +447,26 @@ SiC64InspectorWindow {
                         rowSpacing: root.boxSpacing
                         Layout.alignment: Qt.AlignHCenter
 
-                        SiLabeledByteView { size: Size.small; l: qsTr("Enable"); value: vic.imr; Layout.alignment: Qt.AlignRight }
-                        SiLabeledByteView { size: Size.small; r: qsTr("Request"); value: vic.irr }
+                        SuLabeledByteView { size: Size.small; l: qsTr("Enable"); value: vic.imr; Layout.alignment: Qt.AlignRight }
+                        SuLabeledByteView { size: Size.small; r: qsTr("Request"); value: vic.irr }
 
-                        SiLabeledCheckBox { size: Size.small; checked: vic.imrLP; l: qsTr("Lightpen"); Layout.alignment: Qt.AlignRight }
-                        SiLabeledCheckBox { size: Size.small; checked: vic.irrLP; r: qsTr("Lightpen") }
+                        SuLabeledCheckBox { size: Size.small; checked: vic.imrLP; l: qsTr("Lightpen"); Layout.alignment: Qt.AlignRight }
+                        SuLabeledCheckBox { size: Size.small; checked: vic.irrLP; r: qsTr("Lightpen") }
 
-                        SiLabeledCheckBox { size: Size.small; checked: vic.imrSS; l: qsTr("SS Collision"); Layout.alignment: Qt.AlignRight }
-                        SiLabeledCheckBox { size: Size.small; checked: vic.irrSS; r: qsTr("SS Collision") }
+                        SuLabeledCheckBox { size: Size.small; checked: vic.imrSS; l: qsTr("SS Collision"); Layout.alignment: Qt.AlignRight }
+                        SuLabeledCheckBox { size: Size.small; checked: vic.irrSS; r: qsTr("SS Collision") }
 
-                        SiLabeledCheckBox { size: Size.small; checked: vic.imrSB; l: qsTr("SB Collision"); Layout.alignment: Qt.AlignRight }
-                        SiLabeledCheckBox { size: Size.small; checked: vic.irrSB; r: qsTr("SB Collision") }
+                        SuLabeledCheckBox { size: Size.small; checked: vic.imrSB; l: qsTr("SB Collision"); Layout.alignment: Qt.AlignRight }
+                        SuLabeledCheckBox { size: Size.small; checked: vic.irrSB; r: qsTr("SB Collision") }
 
-                        SiLabeledCheckBox { size: Size.small; checked: vic.imrRaster; l: qsTr("Raster"); Layout.alignment: Qt.AlignRight }
-                        SiLabeledCheckBox { size: Size.small; checked: vic.irrRaster; r: qsTr("Raster") }
+                        SuLabeledCheckBox { size: Size.small; checked: vic.imrRaster; l: qsTr("Raster"); Layout.alignment: Qt.AlignRight }
+                        SuLabeledCheckBox { size: Size.small; checked: vic.irrRaster; r: qsTr("Raster") }
 
-                        SiLabeledByteView { size: Size.small; l: qsTr("LP X latch"); value: vic.latchedLPX; Layout.alignment: Qt.AlignRight }
-                        SiLabeledCheckBox { size: Size.small; checked: vic.lpLine; r: qsTr("LP line") }
+                        SuLabeledByteView { size: Size.small; l: qsTr("LP X latch"); value: vic.latchedLPX; Layout.alignment: Qt.AlignRight }
+                        SuLabeledCheckBox { size: Size.small; checked: vic.lpLine; r: qsTr("LP line") }
 
-                        SiLabeledByteView { size: Size.small; l: qsTr("LP Y latch"); value: vic.latchedLPY; Layout.alignment: Qt.AlignRight }
-                        SiLabeledCheckBox { size: Size.small; checked: vic.lpIrqHasOccurred; r: qsTr("IRQ occurred") }
+                        SuLabeledByteView { size: Size.small; l: qsTr("LP Y latch"); value: vic.latchedLPY; Layout.alignment: Qt.AlignRight }
+                        SuLabeledCheckBox { size: Size.small; checked: vic.lpIrqHasOccurred; r: qsTr("IRQ occurred") }
                     }
 
                     VSpacer { }
@@ -484,7 +484,7 @@ SiC64InspectorWindow {
                     Layout.topMargin: 12
                     spacing: Style.mediumSpacing
 
-                    SiSegmentedControl {
+                    SuSegmentedControl {
 
                         size: Size.small
                         Layout.alignment: Qt.AlignHCenter
@@ -508,33 +508,33 @@ SiC64InspectorWindow {
                             rowSpacing: Style.mediumSpacing
                             Layout.alignment: Qt.AlignHCenter
 
-                            SiLabeledCheckBox { size: Size.small; l: qsTr("Enabled:"); lwidth: 32; checked: vic.sprEnabled }
+                            SuLabeledCheckBox { size: Size.small; l: qsTr("Enabled:"); lwidth: 32; checked: vic.sprEnabled }
                             Item { Layout.columnSpan: 3 }
 
-                            SiLabeledByteView { size: Size.small; l: qsTr("X:"); lwidth: 32; bits: 12; value: vic.sprX }
-                            SiLabeledCheckBox { size: Size.small; checked: vic.sprExpandX; r: qsTr("Exp") }
+                            SuLabeledByteView { size: Size.small; l: qsTr("X:"); lwidth: 32; bits: 12; value: vic.sprX }
+                            SuLabeledCheckBox { size: Size.small; checked: vic.sprExpandX; r: qsTr("Exp") }
                             Item { Layout.columnSpan: 2 }
-                            // SiLabeledCheckBox { size: Size.small; checked: vic.sprPriority; r: qsTr("Pri") }
-                            // SiLabeledCheckBox { size: Size.small; checked: vic.sprMulticolor; r: qsTr("MC") }
+                            // SuLabeledCheckBox { size: Size.small; checked: vic.sprPriority; r: qsTr("Pri") }
+                            // SuLabeledCheckBox { size: Size.small; checked: vic.sprMulticolor; r: qsTr("MC") }
 
-                            SiLabeledByteView { size: Size.small; l: qsTr("Y:"); lwidth: 32; bits: 8; value: vic.sprY }
-                            SiLabeledCheckBox { size: Size.small; checked: vic.sprExpandY; r: qsTr("Exp") }
+                            SuLabeledByteView { size: Size.small; l: qsTr("Y:"); lwidth: 32; bits: 8; value: vic.sprY }
+                            SuLabeledCheckBox { size: Size.small; checked: vic.sprExpandY; r: qsTr("Exp") }
                             Item { Layout.columnSpan: 2 }
 
-                            SiLabeledCheckBox { size: Size.small; l: qsTr("Flags:"); lwidth: 32; checked: vic.sprPriority; r: qsTr("Pri") }
-                            SiLabeledCheckBox { size: Size.small; checked: vic.sprMulticolor; r: qsTr("MC") }
-                            SiLabeledCheckBox { size: Size.small; checked: vic.sprSSCollision; r: qsTr("SS") }
-                            SiLabeledCheckBox { size: Size.small; checked: vic.sprSBCollision; r: qsTr("SB") }
+                            SuLabeledCheckBox { size: Size.small; l: qsTr("Flags:"); lwidth: 32; checked: vic.sprPriority; r: qsTr("Pri") }
+                            SuLabeledCheckBox { size: Size.small; checked: vic.sprMulticolor; r: qsTr("MC") }
+                            SuLabeledCheckBox { size: Size.small; checked: vic.sprSSCollision; r: qsTr("SS") }
+                            SuLabeledCheckBox { size: Size.small; checked: vic.sprSBCollision; r: qsTr("SB") }
 
-                            SiLabeledColorWell {
+                            SuLabeledColorWell {
 
                                 Layout.columnSpan: 4
                                 l: qsTr("Colors:"); lwidth: 32; readOnly: true; value: vic.sprColor
 
-                                SiColorWell {
+                                SuColorWell {
                                     readOnly: true; value: vic.sprExtra1
                                 }
-                                SiColorWell {
+                                SuColorWell {
                                     readOnly: true; value: vic.sprExtra2
                                 }
                             }

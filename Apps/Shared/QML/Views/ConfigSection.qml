@@ -59,7 +59,7 @@ Pane {
             Layout.preferredHeight: category.implicitHeight
             Layout.fillHeight: false
 
-            SiCheckBox {
+            SuCheckBox {
 
                 id: checkbox
                 visible: root.checkable
@@ -69,7 +69,7 @@ Pane {
                 onClicked: root.clicked()
             }
 
-            SiText {
+            SuText {
 
                 id: category
                 Layout.alignment: Qt.AlignVCenter

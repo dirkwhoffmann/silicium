@@ -18,7 +18,7 @@ RoundButton {
         border.width: 1
     }
 
-    contentItem: SiText {
+    contentItem: SuText {
 
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter

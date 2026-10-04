@@ -15,7 +15,7 @@ import Silicium.Assets
 import Silicium.Controllers
 import Sulfur
 
-SiDialog {
+SuDialog {
 
     id: root
 
@@ -171,7 +171,7 @@ SiDialog {
             Layout.alignment: Qt.AlignTop
             spacing: Style.mediumSpacing
 
-            SiText {
+            SuText {
 
                 text: qsTr("Amiga Hard Drive")
                 font.pixelSize: Style.large
@@ -187,7 +187,7 @@ SiDialog {
                 color: Palette.border
             }
 
-            SiLabeledComboInput {
+            SuLabeledComboInput {
 
                 id: capacityCombo
                 l: qsTr("Capacity:")
@@ -198,7 +198,7 @@ SiDialog {
                 onActivated: root.commit()
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 id: fsCombo
                 l: qsTr("File system:")
@@ -209,14 +209,14 @@ SiDialog {
                 // onActivated: { if (!root.formatted) root.importUrl = "" }
             }
 
-            SiLabeled {
+            SuLabeled {
 
                 l: qsTr("Name:")
                 lwidth: root.labelWidth
                 opacity: root.formattable && fsCombo.currentIndex !== root.nodos ? 1.0 : 0.0
 
                 control: [
-                    SiTextField {
+                    SuTextField {
                         id: nameField
                         Layout.fillWidth: true
                         Layout.preferredHeight: 22
@@ -226,7 +226,7 @@ SiDialog {
                 ]
             }
 
-            SiLabeled {
+            SuLabeled {
 
                 id: importControl
                 l: qsTr("Files:")
@@ -235,14 +235,14 @@ SiDialog {
 
                 control: [
 
-                    SiSymbolButton {
+                    SuSymbolButton {
 
                         size: Size.large
                         phosphor: "folder"
                         onClicked: importDialog.open()
                     },
 
-                    SiLabel {
+                    SuLabel {
 
                         Layout.fillWidth: true
                         enabled: !root.unformattable
@@ -257,7 +257,7 @@ SiDialog {
 
     }
 
-    SiUserDialog {
+    SuUserDialog {
 
         id: capacityRefused
         titleText: qsTr("Maximum hard drive capacity exceeded.")
@@ -286,14 +286,14 @@ SiDialog {
             anchors.rightMargin: Style.largeSpacing
             spacing: Style.mediumSpacing
 
-            SiButton {
+            SuButton {
                 text: qsTr("Cancel")
                 onClicked: root.close()
             }
 
             HSpacer { }
 
-            SiButton {
+            SuButton {
                 accented: true
                 text: qsTr("Attach")
                 enabled: root.megabytes > 0 && !root.tooLarge

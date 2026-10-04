@@ -39,7 +39,7 @@ Pane {
                 color: "transparent"
             }
 
-            SiToolTip {
+            SuToolTip {
                 text: gitHubButton.repository
             }
             onClicked: {
@@ -51,7 +51,7 @@ Pane {
 
             spacing: Style.zeroTextSpacing
 
-            SiText {
+            SuText {
                 text: hoverArea.containsMouse ? "Build Nr " + AppController.buildNr : "Version " + AppController.version
                 font.pixelSize: Style.tiny
                 font.bold: false
@@ -63,7 +63,7 @@ Pane {
                     hoverEnabled: true
                 }
             }
-            SiText {
+            SuText {
                 text: "Build with Qt " + AppController.qtVersion
                 font.pixelSize: Style.tiny
                 font.bold: false

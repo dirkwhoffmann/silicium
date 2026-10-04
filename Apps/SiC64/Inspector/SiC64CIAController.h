@@ -34,7 +34,7 @@ class SiC64CIAController : public SiC64InspectorController {
     QString m_title;
 
     // Port A / B. The register/direction values are raw so the panel's
-    // SiNumberView can format them per the shared display format.
+    // SuNumberView can format them per the shared display format.
     int m_portAPort = 0;
     int m_portBPort = 0;
     int m_portAReg = 0, m_portADir = 0;

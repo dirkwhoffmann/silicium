@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import Sulfur
 
-SiText {
+SuText {
 
     color: Palette.tertiary
     font.bold: true

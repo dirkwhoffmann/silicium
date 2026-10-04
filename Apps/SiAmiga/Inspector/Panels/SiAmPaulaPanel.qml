@@ -42,36 +42,36 @@ SiAmInspectorWindow {
     readonly property real columnWidth: Math.max(260,
         (scrollView.availableWidth - Style.largeSpacing * 2) / 3)
 
-    // SiLabeledByteView/SiLabeledWordView (Apps/Shared/QML/Compounds) hold
+    // SuLabeledByteView/SuLabeledWordView (Apps/Shared/QML/Compounds) hold
     // the structural bits; this panel only adds the width override and the
     // hex/decimal toggle binding. The word-view wrapper is named SiHex16
-    // rather than SiLabeledWordView (unlike this panel's previous local
+    // rather than SuLabeledWordView (unlike this panel's previous local
     // version) to avoid colliding with the shared component of that name.
-    component SiHex8: SiLabeledByteView {
+    component SiHex8: SuLabeledByteView {
 
         // controlWidth: 44
         base: root.numBase
         padded: root.numPadded
     }
 
-    component SiHex16: SiLabeledWordView {
+    component SiHex16: SuLabeledWordView {
 
         // controlWidth: 64
         base: root.numBase
         padded: root.numPadded
     }
 
-    // SiLabeledBitView (a single read-only bit-style checkbox) now lives in
+    // SuLabeledBitView (a single read-only bit-style checkbox) now lives in
     // Apps/Shared/QML/Compounds -- used directly below.
 
     // Five-node DMA state-machine diagram -- one of five pre-rendered
     // template images (see the class comment), picked by currentState (0,
     // 1, 2, 3 or 5 -- anything else falls back to the idle/state0 image).
-    // SiTemplateImage (not a plain Image) so the line art tints with
+    // SuTemplateImage (not a plain Image) so the line art tints with
     // Palette.primary the same way the toolbar's MousePress/MousePush
     // icons already do, instead of showing whatever raw color the PNGs
     // happen to be.
-    component StateDiagram: SiTemplateImage {
+    component StateDiagram: SuTemplateImage {
 
         property int currentState: 0
 
@@ -187,108 +187,108 @@ SiAmInspectorWindow {
                         r: qsTr("INTREQ"); rwidth: 55; value: paula.intreq; Layout.alignment: Qt.AlignLeft
                     }
 
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intenaBit(14); l: paula.intBitLabel(14); lwidth: 55; Layout.alignment: Qt.AlignRight
                     }
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intreqBit(14); r: paula.intBitLabel(14); rwidth: 55; Layout.alignment: Qt.AlignLeft
                     }
 
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intenaBit(13); l: paula.intBitLabel(13); lwidth: 55; Layout.alignment: Qt.AlignRight
                     }
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intreqBit(13); r: paula.intBitLabel(13); rwidth: 55; Layout.alignment: Qt.AlignLeft
                     }
 
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intenaBit(12); l: paula.intBitLabel(12); lwidth: 55; Layout.alignment: Qt.AlignRight
                     }
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intreqBit(12); r: paula.intBitLabel(12); rwidth: 55; Layout.alignment: Qt.AlignLeft
                     }
 
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intenaBit(11); l: paula.intBitLabel(11); lwidth: 55; Layout.alignment: Qt.AlignRight
                     }
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intreqBit(11); r: paula.intBitLabel(11); rwidth: 55; Layout.alignment: Qt.AlignLeft
                     }
 
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intenaBit(10); l: paula.intBitLabel(10); lwidth: 55; Layout.alignment: Qt.AlignRight
                     }
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intreqBit(10); r: paula.intBitLabel(10); rwidth: 55; Layout.alignment: Qt.AlignLeft
                     }
 
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intenaBit(9); l: paula.intBitLabel(9); lwidth: 55; Layout.alignment: Qt.AlignRight
                     }
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intreqBit(9); r: paula.intBitLabel(9); rwidth: 55; Layout.alignment: Qt.AlignLeft
                     }
 
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intenaBit(8); l: paula.intBitLabel(8); lwidth: 55; Layout.alignment: Qt.AlignRight
                     }
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intreqBit(8); r: paula.intBitLabel(8); rwidth: 55; Layout.alignment: Qt.AlignLeft
                     }
 
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intenaBit(7); l: paula.intBitLabel(7); lwidth: 55; Layout.alignment: Qt.AlignRight
                     }
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intreqBit(7); r: paula.intBitLabel(7); rwidth: 55; Layout.alignment: Qt.AlignLeft
                     }
 
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intenaBit(6); l: paula.intBitLabel(6); lwidth: 55; Layout.alignment: Qt.AlignRight
                     }
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intreqBit(6); r: paula.intBitLabel(6); rwidth: 55; Layout.alignment: Qt.AlignLeft
                     }
 
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intenaBit(5); l: paula.intBitLabel(5); lwidth: 55; Layout.alignment: Qt.AlignRight
                     }
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intreqBit(5); r: paula.intBitLabel(5); rwidth: 55; Layout.alignment: Qt.AlignLeft
                     }
 
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intenaBit(4); l: paula.intBitLabel(4); lwidth: 55; Layout.alignment: Qt.AlignRight
                     }
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intreqBit(4); r: paula.intBitLabel(4); rwidth: 55; Layout.alignment: Qt.AlignLeft
                     }
 
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intenaBit(3); l: paula.intBitLabel(3); lwidth: 55; Layout.alignment: Qt.AlignRight
                     }
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intreqBit(3); r: paula.intBitLabel(3); rwidth: 55; Layout.alignment: Qt.AlignLeft
                     }
 
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intenaBit(2); l: paula.intBitLabel(2); lwidth: 55; Layout.alignment: Qt.AlignRight
                     }
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intreqBit(2); r: paula.intBitLabel(2); rwidth: 55; Layout.alignment: Qt.AlignLeft
                     }
 
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intenaBit(1); l: paula.intBitLabel(1); lwidth: 55; Layout.alignment: Qt.AlignRight
                     }
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intreqBit(1); r: paula.intBitLabel(1); rwidth: 55; Layout.alignment: Qt.AlignLeft
                     }
 
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intenaBit(0); l: paula.intBitLabel(0); lwidth: 55; Layout.alignment: Qt.AlignRight
                     }
-                    SiLabeledBitView {
+                    SuLabeledBitView {
                         readOnly: true; checked: paula.intreqBit(0); r: paula.intBitLabel(0); rwidth: 55; Layout.alignment: Qt.AlignLeft
                     }
                 }
@@ -323,7 +323,7 @@ SiAmInspectorWindow {
 
                         RowLayout {
                             spacing: Style.smallSpacing
-                            SiLabel {
+                            SuLabel {
                                 text: qsTr("Selected Drive:")
                             }
                             Repeater {
@@ -331,10 +331,10 @@ SiAmInspectorWindow {
                                 RowLayout {
                                     required property int index
                                     spacing: 2
-                                    SiLabel {
+                                    SuLabel {
                                         text: index
                                     }
-                                    SiLabeledBitView {
+                                    SuLabeledBitView {
                                         readOnly: true; checked: paula.selectedDrive === index
                                     }
                                 }
@@ -343,10 +343,10 @@ SiAmInspectorWindow {
 
                         RowLayout {
                             spacing: Style.smallSpacing
-                            SiLabel {
+                            SuLabel {
                                 text: qsTr("State:")
                             }
-                            SiLabel {
+                            SuLabel {
                                 text: paula.dcStateText; font.weight: 500
                             }
                         }
@@ -365,59 +365,59 @@ SiAmInspectorWindow {
                                 l: qsTr("ADKCON HI"); lwidth: dc.lw; value: paula.adkconHi
                             }
 
-                            SiLabeledBitView {
+                            SuLabeledBitView {
                                 checked: paula.dmaen; l: qsTr("DMAEN"); lwidth: dc.lw
                             }
-                            SiLabeledBitView {
+                            SuLabeledBitView {
                                 checked: paula.precomp1; l: qsTr("PRECOMP1"); lwidth: dc.lw
                             }
 
-                            SiLabeledBitView {
+                            SuLabeledBitView {
                                 checked: paula.write; l: qsTr("WRITE"); lwidth: dc.lw
                             }
-                            SiLabeledBitView {
+                            SuLabeledBitView {
                                 checked: paula.precomp0; l: qsTr("PRECOMP0"); lwidth: dc.lw
                             }
 
                             SiHex16 {
                                 l: qsTr("DSKBYTE"); lwidth: dc.lw; value: paula.dskbytr
                             }
-                            SiLabeledBitView {
+                            SuLabeledBitView {
                                 checked: paula.mfmprec; l: qsTr("MFMPREC"); lwidth: dc.lw
                             }
 
-                            SiLabeledBitView {
+                            SuLabeledBitView {
                                 checked: paula.byteready; l: qsTr("BYTEREADY"); lwidth: dc.lw
                             }
-                            SiLabeledBitView {
+                            SuLabeledBitView {
                                 checked: paula.uartbrk; l: qsTr("UARTBRK"); lwidth: dc.lw
                             }
 
-                            SiLabeledBitView {
+                            SuLabeledBitView {
                                 checked: paula.dmaon; l: qsTr("DMAON"); lwidth: dc.lw
                             }
-                            SiLabeledBitView {
+                            SuLabeledBitView {
                                 checked: paula.wordsync; l: qsTr("WORDSYNC"); lwidth: dc.lw
                             }
 
-                            SiLabeledBitView {
+                            SuLabeledBitView {
                                 checked: paula.diskwrite; l: qsTr("DISKWRITE"); lwidth: dc.lw
                             }
-                            SiLabeledBitView {
+                            SuLabeledBitView {
                                 checked: paula.msbsync; l: qsTr("MSBSYNC"); lwidth: dc.lw
                             }
 
-                            SiLabeledBitView {
+                            SuLabeledBitView {
                                 checked: paula.wordequal; l: qsTr("WORDEQUAL"); lwidth: dc.lw
                             }
-                            SiLabeledBitView {
+                            SuLabeledBitView {
                                 checked: paula.fast; l: qsTr("FAST"); lwidth: dc.lw
                             }
 
                             SiHex16 {
                                 l: qsTr("DSKSYNC"); value: paula.dsksync; lwidth: dc.lw
                             }
-                            SiText {
+                            SuText {
                                 visible: paula.dsksyncWarning
                                 text: qsTr("(expected 4489)")
                                 color: "#E0A030"
@@ -436,7 +436,7 @@ SiAmInspectorWindow {
                     Layout.alignment: Qt.AlignHCenter
                     spacing: Style.tinySpacing
 
-                    SiText {
+                    SuText {
                         text: "→"
                         DebugRect {}
                     }
@@ -450,7 +450,7 @@ SiAmInspectorWindow {
                         }
                     }
 
-                    SiText {
+                    SuText {
                         text: "→"
                     }
                 }
@@ -494,20 +494,20 @@ SiAmInspectorWindow {
                             // instead of 5 wide ones, saving horizontal space.
                             Item {
                             } // Layout.preferredWidth: 24 }
-                            SiLabel {
+                            SuLabel {
                                 size: Size.small; text: qsTr("AUDxLEN"); horizontalAlignment: Text.AlignHCenter
                             } // ;Layout.preferredWidth: 48 }
-                            SiLabel {
+                            SuLabel {
                                 size: Size.small; text: qsTr("AUDxPER"); horizontalAlignment: Text.AlignHCenter
                             } // ; Layout.preferredWidth: 48 }
-                            SiLabel {
+                            SuLabel {
                                 size: Size.small; text: qsTr("AUDxVOL"); horizontalAlignment: Text.AlignHCenter
                             } // ; Layout.preferredWidth: 48 }
-                            SiLabel {
+                            SuLabel {
                                 size: Size.small; text: qsTr("AUDxDAT"); horizontalAlignment: Text.AlignHCenter
                             } // ; Layout.preferredWidth: 48 }
 
-                            SiLabel {
+                            SuLabel {
                                 size: Size.small; text: "0"; horizontalAlignment: Text.AlignHCenter
                             }
                             SiHex16 {
@@ -523,7 +523,7 @@ SiAmInspectorWindow {
                                 value: paula.audioDat(0)
                             }
 
-                            SiLabel {
+                            SuLabel {
                                 size: Size.small; text: "1"; horizontalAlignment: Text.AlignHCenter
                             }
                             SiHex16 {
@@ -539,7 +539,7 @@ SiAmInspectorWindow {
                                 value: paula.audioDat(1)
                             }
 
-                            SiLabel {
+                            SuLabel {
                                 size: Size.small; text: "2"; horizontalAlignment: Text.AlignHCenter
                             }
                             SiHex16 {
@@ -555,7 +555,7 @@ SiAmInspectorWindow {
                                 value: paula.audioDat(2)
                             }
 
-                            SiLabel {
+                            SuLabel {
                                 size: Size.small; text: "3"; horizontalAlignment: Text.AlignHCenter
                             }
                             SiHex16 {

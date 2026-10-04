@@ -121,7 +121,7 @@ SiAmInspectorWindow {
             }
         }
 
-        SiSegmentedControl {
+        SuSegmentedControl {
 
             id: tabControl
             anchors.horizontalCenter: stackBox.horizontalCenter

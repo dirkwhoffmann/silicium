@@ -23,7 +23,7 @@ import Sulfur
  *
  * Bind 'controller' and call openFor(driveNr, url).
  */
-SiUserDialog {
+SuUserDialog {
 
     id: root
 

@@ -102,7 +102,7 @@ Rectangle {
                 }
             }
 
-            SiText {
+            SuText {
 
                 id: leftText
                 anchors.left: parent.left
@@ -117,7 +117,7 @@ Rectangle {
                 elide: Text.ElideRight
             }
 
-            SiText {
+            SuText {
 
                 id: rightText
                 visible: model.isTask

@@ -30,7 +30,7 @@ RowLayout {
 
     spacing: Style.mediumSpacing
 
-    component Si16: SiLabeledWordView {
+    component Si16: SuLabeledWordView {
 
         size: Size.small
         controlWidth: 44
@@ -73,7 +73,7 @@ RowLayout {
         property alias hovered: hoverHandler.hovered
 
         // Multi-line tooltip laid out as a label/colon/value mini table --
-        // SiToolTip only supports a single plain-text string, so this
+        // SuToolTip only supports a single plain-text string, so this
         // borrows its look (delay/timeout/padding/colors/background)
         // rather than using it directly, and builds its own GridLayout
         // content so the label column can be right-aligned and the value
@@ -94,21 +94,21 @@ RowLayout {
                 rowSpacing: 0
                 columnSpacing: Style.tinySpacing
 
-                SiText { text: qsTr("Hex");   Layout.alignment: Qt.AlignRight;  font.pixelSize: Style.small; color: Palette.primary }
-                SiText { text: ":";           Layout.alignment: Qt.AlignHCenter; font.pixelSize: Style.small; color: Palette.primary }
-                SiText { text: swatch.hex;    Layout.alignment: Qt.AlignLeft;   font.pixelSize: Style.small; color: Palette.primary }
+                SuText { text: qsTr("Hex");   Layout.alignment: Qt.AlignRight;  font.pixelSize: Style.small; color: Palette.primary }
+                SuText { text: ":";           Layout.alignment: Qt.AlignHCenter; font.pixelSize: Style.small; color: Palette.primary }
+                SuText { text: swatch.hex;    Layout.alignment: Qt.AlignLeft;   font.pixelSize: Style.small; color: Palette.primary }
 
-                SiText { text: qsTr("Red");   Layout.alignment: Qt.AlignRight;  font.pixelSize: Style.small; color: Palette.primary }
-                SiText { text: ":";           Layout.alignment: Qt.AlignHCenter; font.pixelSize: Style.small; color: Palette.primary }
-                SiText { text: swatch.redValue;   Layout.alignment: Qt.AlignLeft; font.pixelSize: Style.small; color: Palette.primary }
+                SuText { text: qsTr("Red");   Layout.alignment: Qt.AlignRight;  font.pixelSize: Style.small; color: Palette.primary }
+                SuText { text: ":";           Layout.alignment: Qt.AlignHCenter; font.pixelSize: Style.small; color: Palette.primary }
+                SuText { text: swatch.redValue;   Layout.alignment: Qt.AlignLeft; font.pixelSize: Style.small; color: Palette.primary }
 
-                SiText { text: qsTr("Green"); Layout.alignment: Qt.AlignRight;  font.pixelSize: Style.small; color: Palette.primary }
-                SiText { text: ":";           Layout.alignment: Qt.AlignHCenter; font.pixelSize: Style.small; color: Palette.primary }
-                SiText { text: swatch.greenValue; Layout.alignment: Qt.AlignLeft; font.pixelSize: Style.small; color: Palette.primary }
+                SuText { text: qsTr("Green"); Layout.alignment: Qt.AlignRight;  font.pixelSize: Style.small; color: Palette.primary }
+                SuText { text: ":";           Layout.alignment: Qt.AlignHCenter; font.pixelSize: Style.small; color: Palette.primary }
+                SuText { text: swatch.greenValue; Layout.alignment: Qt.AlignLeft; font.pixelSize: Style.small; color: Palette.primary }
 
-                SiText { text: qsTr("Blue");  Layout.alignment: Qt.AlignRight;  font.pixelSize: Style.small; color: Palette.primary }
-                SiText { text: ":";           Layout.alignment: Qt.AlignHCenter; font.pixelSize: Style.small; color: Palette.primary }
-                SiText { text: swatch.blueValue;  Layout.alignment: Qt.AlignLeft; font.pixelSize: Style.small; color: Palette.primary }
+                SuText { text: qsTr("Blue");  Layout.alignment: Qt.AlignRight;  font.pixelSize: Style.small; color: Palette.primary }
+                SuText { text: ":";           Layout.alignment: Qt.AlignHCenter; font.pixelSize: Style.small; color: Palette.primary }
+                SuText { text: swatch.blueValue;  Layout.alignment: Qt.AlignLeft; font.pixelSize: Style.small; color: Palette.primary }
             }
 
             background: Rectangle {

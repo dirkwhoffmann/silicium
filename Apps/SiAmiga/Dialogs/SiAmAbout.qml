@@ -59,7 +59,7 @@ ApplicationWindow {
             fillMode: Image.PreserveAspectFit
         }
 
-        SiText {
+        SuText {
 
             Layout.alignment: Qt.AlignHCenter
             text: qsTr("Amiga Virtual Machine")
@@ -67,7 +67,7 @@ ApplicationWindow {
             font.pixelSize: Style.regular
         }
 
-        SiText {
+        SuText {
 
             Layout.alignment: Qt.AlignHCenter
             text: hoverArea.containsMouse ? build : version
@@ -95,11 +95,11 @@ ApplicationWindow {
             icon.color: hovered ? "#ffffff" : "#d0ffffff"
 
             background: Rectangle { color: "transparent" }
-            SiToolTip { text: gitHubButton.repository }
+            SuToolTip { text: gitHubButton.repository }
             onClicked: Qt.openUrlExternally(gitHubButton.repository)
         }
 
-        SiText {
+        SuText {
 
             visible: root.hasError
             Layout.fillWidth: true
@@ -111,7 +111,7 @@ ApplicationWindow {
 
         VSpacer {}
 
-        SiButton {
+        SuButton {
 
             Layout.alignment: Qt.AlignHCenter
             Layout.bottomMargin: Style.largeSpacing

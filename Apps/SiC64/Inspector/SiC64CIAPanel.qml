@@ -28,7 +28,7 @@ SiC64InspectorWindow {
     readonly property real columnWidth: Math.max(260,
         (scrollView.availableWidth - Style.largeSpacing * 2) / 3)
 
-    component SiLabeledBinaryView: SiLabeledNumberView {
+    component SuLabeledBinaryView: SuLabeledNumberView {
 
         size: Size.small
         font.weight: 500
@@ -38,7 +38,7 @@ SiC64InspectorWindow {
         padded: true
     }
 
-    component SiLabeledByteView: SiLabeledNumberView {
+    component SuLabeledByteView: SuLabeledNumberView {
 
         size: Size.small
         font.weight: 500
@@ -48,7 +48,7 @@ SiC64InspectorWindow {
         padded: root.numPadded
     }
 
-    component SiLabeledWordView: SiLabeledNumberView {
+    component SuLabeledWordView: SuLabeledNumberView {
 
         size: Size.small
         font.weight: 500
@@ -59,8 +59,8 @@ SiC64InspectorWindow {
     }
 
     // A labeled row of the four TOD fields (hours, minutes, seconds,
-    // tenths), each shown as a SiLabeledByteView.
-    component SiLabeledTOD: SiLabeled {
+    // tenths), each shown as a SuLabeledByteView.
+    component SiLabeledTOD: SuLabeled {
 
         id: todControl
 
@@ -78,13 +78,13 @@ SiC64InspectorWindow {
 
                 spacing: Style.smallSpacing
 
-                SiLabeledByteView { value: todControl.hours }
-                SiText { text: ":"; Layout.leftMargin: 1 }
-                SiLabeledByteView { value: todControl.minutes }
-                SiText { text: ":"; Layout.leftMargin: 1 }
-                SiLabeledByteView { value: todControl.seconds }
-                SiText { text: ":"; Layout.leftMargin: 1 }
-                SiLabeledByteView { value: todControl.tenths }
+                SuLabeledByteView { value: todControl.hours }
+                SuText { text: ":"; Layout.leftMargin: 1 }
+                SuLabeledByteView { value: todControl.minutes }
+                SuText { text: ":"; Layout.leftMargin: 1 }
+                SuLabeledByteView { value: todControl.seconds }
+                SuText { text: ":"; Layout.leftMargin: 1 }
+                SuLabeledByteView { value: todControl.tenths }
             }
         ]
     }
@@ -111,14 +111,14 @@ SiC64InspectorWindow {
 
             ColumnLayout {
 
-                SiLabeledWordView {
+                SuLabeledWordView {
 
                     l: qsTr("Timer %1:").arg(label)
                     lwidth: 50
                     value: countValue
                 }
 
-                SiLabeledWordView {
+                SuLabeledWordView {
 
                     l: qsTr("Latch %1:").arg(label)
                     lwidth: 50
@@ -132,10 +132,10 @@ SiC64InspectorWindow {
 
                 spacing: Style.tinySpacing
 
-                SiLabeledBitView { checked: running; r: qsTr("Running") }
-                SiLabeledBitView { checked: toggle; r: qsTr("Toggle") }
-                SiLabeledBitView { checked: pbout; r: qsTr("PB out") }
-                SiLabeledBitView { checked: oneShot; r: qsTr("One shot") }
+                SuLabeledBitView { checked: running; r: qsTr("Running") }
+                SuLabeledBitView { checked: toggle; r: qsTr("Toggle") }
+                SuLabeledBitView { checked: pbout; r: qsTr("PB out") }
+                SuLabeledBitView { checked: oneShot; r: qsTr("One shot") }
             }
         }
     }
@@ -163,7 +163,7 @@ SiC64InspectorWindow {
 
             ColumnLayout {
 
-                SiLabeledByteView {
+                SuLabeledByteView {
 
                     size: Size.small
                     lwidth: 60
@@ -171,14 +171,14 @@ SiC64InspectorWindow {
                     value: portBox.regValue
                 }
 
-                SiLabeledBinaryView {
+                SuLabeledBinaryView {
 
                     size: Size.small
                     indent: 60
                     value: portBox.regValue
                 }
 
-                SiLabeledByteView {
+                SuLabeledByteView {
 
                     size: Size.small
                     lwidth: 60
@@ -186,7 +186,7 @@ SiC64InspectorWindow {
                     value: portBox.dirValue
                 }
 
-                SiLabeledBinaryView {
+                SuLabeledBinaryView {
 
                     size: Size.small
                     indent: 60
@@ -203,7 +203,7 @@ SiC64InspectorWindow {
                 Repeater {
 
                     model: 8
-                    delegate: SiLabeledBitView {
+                    delegate: SuLabeledBitView {
 
                         required property int index
                         readonly property int bitNr: 7 - index
@@ -234,7 +234,7 @@ SiC64InspectorWindow {
             Layout.fillWidth: true
             spacing: Style.mediumSpacing
 
-            SiLabel {
+            SuLabel {
 
                 Layout.fillWidth: true
                 Layout.preferredWidth: 200
@@ -242,7 +242,7 @@ SiC64InspectorWindow {
                 text: qsTr("Idle for %1 cycles.").arg(cia.idleCycles)
             }
 
-            SiSegmentedControl {
+            SuSegmentedControl {
 
                 model: [qsTr("CIA 1"), qsTr("CIA 2")]
                 currentIndex: cia.selectedCia
@@ -257,13 +257,13 @@ SiC64InspectorWindow {
 
                 HSpacer { }
 
-                SiLabel {
+                SuLabel {
 
                     Layout.alignment: Qt.AlignVCenter
                     text: qsTr("Overall active time:")
                 }
 
-                SiLabeledProgressBar {
+                SuLabeledProgressBar {
 
                     l: qsTr("%1 %").arg(100 - cia.idlePercentage)
                     lwidth: 48
@@ -381,14 +381,14 @@ SiC64InspectorWindow {
 
                             Layout.alignment: Qt.AlignHCenter
 
-                            SiLabeledByteView {
+                            SuLabeledByteView {
 
                                 size: Size.small
                                 lwidth: 100
                                 l: qsTr("Mask Register:")
                                 value: cia.imr
 
-                                SiLabeledBinaryView {
+                                SuLabeledBinaryView {
 
                                     size: Size.small
                                     value: cia.imr
@@ -397,21 +397,21 @@ SiC64InspectorWindow {
                                 HSpacer {}
                             }
 
-                            SiLabeledByteView {
+                            SuLabeledByteView {
 
                                 size: Size.small
                                 lwidth: 100
                                 l: qsTr("Control Register:")
                                 value: cia.icr
 
-                                SiLabeledBinaryView {
+                                SuLabeledBinaryView {
 
                                     size: Size.small
                                     value: cia.icr
                                 }
                             }
 
-                            SiLabeledCheckBox {
+                            SuLabeledCheckBox {
 
                                 indent: 100
                                 size: Size.small
@@ -454,7 +454,7 @@ SiC64InspectorWindow {
                                 tenths: cia.todAlarmTenth
                             }
 
-                            SiLabeledCheckBox {
+                            SuLabeledCheckBox {
 
                                 size: Size.small
                                 indent: 48
@@ -477,21 +477,21 @@ SiC64InspectorWindow {
 
                             Layout.alignment: Qt.AlignHCenter
 
-                            SiLabeledByteView {
+                            SuLabeledByteView {
 
                                 size: Size.small
                                 lwidth: 90
                                 l: qsTr("Shift Register:")
                                 value: cia.ssr
 
-                                SiLabeledBinaryView {
+                                SuLabeledBinaryView {
 
                                     size: Size.small
                                     value: cia.ssr
                                 }
                             }
 
-                            SiLabeledByteView {
+                            SuLabeledByteView {
 
                                 size: Size.small
                                 lwidth: 90

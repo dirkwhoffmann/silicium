@@ -140,7 +140,7 @@ Rectangle {
         id: hoverHandler
     }
 
-    SiSymbolButton {
+    SuSymbolButton {
 
         visible: hoverHandler.hovered
         anchors.top: parent.top

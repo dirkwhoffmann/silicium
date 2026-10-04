@@ -15,7 +15,7 @@ import Silicium.Controllers
 import Silicium.Preferences
 import Sulfur
 
-SiMenuBar {
+SuMenuBar {
 
     id: root
 
@@ -27,21 +27,21 @@ SiMenuBar {
     // Amiga menu
     //
 
-    SiMenu {
+    SuMenu {
         title: qsTr("Amiga")
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.showAbout
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.config
             text: qsTr("Settings...")
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
         Action {
             text: qsTr("&Quit");
@@ -54,49 +54,49 @@ SiMenuBar {
     // Edit Menu (unchanged from SiC64Menu, wired via window.actions)
     //
 
-    SiMenu {
+    SuMenu {
         title: qsTr("&Edit")
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.captureOrReleaseMouse
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.pause
         }
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.hardReset
         }
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.softReset
         }
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.power
         }
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.brk
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.stepOver
         }
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.stepInto
         }
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.finishLine
         }
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.finishFrame
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.toggleWarp
         }
     }
@@ -105,14 +105,14 @@ SiMenuBar {
     // View Menu (unchanged from SiC64Menu)
     //
 
-    SiMenu {
+    SuMenu {
         title: qsTr("&View")
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.toggleCommandBar
             onTriggered: window.showToolbarHint()
         }
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.toggleStatusBar
         }
     }
@@ -121,7 +121,7 @@ SiMenuBar {
     // Floppy Drive Menu (reusable inline component, instantiated for df0..df3)
     //
 
-    component DriveMenu: SiMenu {
+    component DriveMenu: SuMenu {
 
         id: driveMenu
 
@@ -150,38 +150,38 @@ SiMenuBar {
         // is hidden and only the toggle remains -- mirrors DriveMenu in
         // SiC64Menu.qml. df0 (see updatePeripheralMenus below) is the one
         // drive that stays in the bar regardless of this toggle.
-        SiMenuItem {
+        SuMenuItem {
             text: connected ? qsTr("Disconnect") : qsTr("Connect")
             onTriggered: config.setDriveConnected(driveNr, !connected)
         }
 
-        SiMenuSeparator { visible: connected }
+        SuMenuSeparator { visible: connected }
 
-        SiMenuItem {
+        SuMenuItem {
             text: qsTr("New...")
             visible: connected
             onTriggered: window.actions.newDiskAction(driveNr)
         }
-        SiMenuItem {
+        SuMenuItem {
             text: qsTr("Insert...")
             visible: connected
             onTriggered: window.actions.insertDiskAction(driveNr)
         }
-        SiMenuSeparator { visible: connected }
-        SiMenuItem {
+        SuMenuSeparator { visible: connected }
+        SuMenuItem {
             text: qsTr("Eject")
             visible: connected
             enabled: hasDisk
             onTriggered: window.actions.ejectDiskAction(driveNr)
         }
-        SiMenuItem {
+        SuMenuItem {
             text: qsTr("Export...")
             visible: connected
             enabled: hasDisk
             onTriggered: window.actions.exportDiskAction(driveNr)
         }
-        SiMenuSeparator { visible: connected }
-        SiMenuItem {
+        SuMenuSeparator { visible: connected }
+        SuMenuItem {
             text: qsTr("Write Protected")
             checkable: true
             visible: connected
@@ -205,7 +205,7 @@ SiMenuBar {
     // like).
     //
 
-    component HardDriveMenu: SiMenu {
+    component HardDriveMenu: SuMenu {
 
         id: hdMenu
 
@@ -223,25 +223,25 @@ SiMenuBar {
         }
         readonly property bool hasDisk: amiga.media.hdHasDisk(driveNr)
 
-        SiMenuItem {
+        SuMenuItem {
             text: connected ? qsTr("Detach") : qsTr("Connect")
             onTriggered: connected ? amiga.media.detachHd(driveNr) : config.setHdConnected(driveNr, true)
         }
 
-        SiMenuSeparator { visible: connected }
+        SuMenuSeparator { visible: connected }
 
-        SiMenuItem {
+        SuMenuItem {
             text: qsTr("New...")
             visible: connected
             onTriggered: window.actions.newHardDiskAction(driveNr)
         }
-        SiMenuItem {
+        SuMenuItem {
             text: qsTr("Attach...")
             visible: connected
             onTriggered: window.actions.attachHdAction(driveNr)
         }
-        SiMenuSeparator { visible: connected }
-        SiMenuItem {
+        SuMenuSeparator { visible: connected }
+        SuMenuItem {
             text: qsTr("Export...")
             visible: connected
             enabled: hasDisk
@@ -341,15 +341,15 @@ SiMenuBar {
     // KERNAL is.
     //
 
-    SiMenu {
+    SuMenu {
         title: qsTr("&Keyboard")
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.keyboard
             text: qsTr("Show...")
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
         Action {
             text: qsTr("Control Warp Mode with Caps Lock Key")
@@ -358,7 +358,7 @@ SiMenuBar {
             onTriggered: Preferences.capsLockAction = checked ? 1 : 0
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
         Action {
             text: qsTr("Reset Keyboard Handler")
@@ -373,62 +373,62 @@ SiMenuBar {
     // RetroShell/Logger) and toolbar (Debug Panel).
     //
 
-    SiMenu {
+    SuMenu {
         title: qsTr("&Debug")
 
-        SiMenu {
+        SuMenu {
             title: qsTr("Inspector")
 
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openCPUInspector
             }
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openLogicAnalyzer
             }
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openXRayScanner
             }
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openCIAInspector
             }
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openMemoryInspector
             }
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openAgnusInspector
             }
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openCopperInspector
             }
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openBlitterInspector
             }
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openPaulaInspector
             }
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openDeniseInspector
             }
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openPortInspector
             }
-            SiMenuItem {
+            SuMenuItem {
                 action: window.actions.openEventsInspector
             }
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.retroShell
         }
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.logger
         }
 
-        SiMenuSeparator { }
+        SuMenuSeparator { }
 
-        SiMenuItem {
+        SuMenuItem {
             action: window.actions.debug
             checkable: true
             checked: amiga.debugPanel

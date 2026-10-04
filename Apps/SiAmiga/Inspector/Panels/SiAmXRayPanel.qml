@@ -52,7 +52,7 @@ SiAmInspectorWindow {
         Layout.fillWidth: true
         spacing: Style.mediumSpacing
 
-        SiLabeledCheckBox {
+        SuLabeledCheckBox {
 
             Layout.fillWidth: true
             // indent: tab
@@ -63,7 +63,7 @@ SiAmInspectorWindow {
 
         HSpacer { }
 
-        SiColorWell {
+        SuColorWell {
 
             value: chRow.swatch
             onPicked: (value) => chRow.colorPicked(value)
@@ -115,7 +115,7 @@ SiAmInspectorWindow {
                 Layout.fillWidth: true
                 spacing: Style.tinySpacing
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     Layout.fillWidth: true
                     model: [qsTr("Off"), qsTr("DMA scan"), qsTr("Layer scan")]
@@ -133,7 +133,7 @@ SiAmInspectorWindow {
                     size: Style.smallSpacing
                 }
 
-                SiLabeledCheckBox {
+                SuLabeledCheckBox {
 
                     // indent: tab
                     visible: cc.XRAY_MODE !== xrayNone
@@ -142,7 +142,7 @@ SiAmInspectorWindow {
                     r: qsTr("Show as overlay")
                 }
 
-                SiLabeledComboBox {
+                SuLabeledComboBox {
 
                     indent: tab
                     Layout.fillWidth: true
@@ -153,7 +153,7 @@ SiAmInspectorWindow {
                     onCurrentIndexChanged: cc.XRAY_OVERLAY_STYLE = currentIndex
                 }
 
-                SiLabeledSlider {
+                SuLabeledSlider {
 
                     visible: cc.XRAY_MODE !== xrayNone
                     indent: tab
@@ -389,7 +389,7 @@ SiAmInspectorWindow {
                 Layout.fillHeight: true
                 visible: cc.XRAY_MODE === xrayNone
 
-                SiSymbol {
+                SuSymbol {
 
                     anchors.centerIn: parent
                     phosphor: "eye"

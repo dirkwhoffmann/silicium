@@ -68,7 +68,7 @@ ColumnLayout {
 
         HSpacer {}
 
-        SiTemplateImage {
+        SuTemplateImage {
 
             id: mouseIcon1
             source: Assets.iconUrl(Assets.MousePress)
@@ -77,7 +77,7 @@ ColumnLayout {
             Layout.preferredHeight: 24
         }
 
-        SiTemplateImage {
+        SuTemplateImage {
 
             id: mouseIcon2
             source: Assets.iconUrl(Assets.MousePush)
@@ -101,7 +101,7 @@ ColumnLayout {
 
             model: root.kc.keyModel
 
-            delegate: SiButton {
+            delegate: SuButton {
 
                 id: control
 

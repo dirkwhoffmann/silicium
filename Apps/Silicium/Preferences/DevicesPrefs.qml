@@ -51,7 +51,7 @@ PrefPage {
 
         menuContent: [
 
-            SiMenuItem {
+            SuMenuItem {
                 text: "Restore factory defaults..."
                 onTriggered: Preferences.resetDevicesSettings()
             }
@@ -59,13 +59,13 @@ PrefPage {
 
         HSpacer { }
 
-        SiLabel {
+        SuLabel {
 
             text: root.port.sdlName ? String(root.port.sdlName) : ""
             rightPadding: Style.mediumSpacing
         }
 
-        SiLabeledComboBox {
+        SuLabeledComboBox {
 
             id: deviceSelector
 

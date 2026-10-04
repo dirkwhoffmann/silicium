@@ -14,7 +14,7 @@ import Silicium.Assets
 import Silicium.Controllers
 import Sulfur
 
-SiDialog {
+SuDialog {
 
     id: root
 
@@ -102,7 +102,7 @@ SiDialog {
             Layout.alignment: Qt.AlignTop
             spacing: Style.mediumSpacing
 
-            SiText {
+            SuText {
 
                 text: qsTr("Amiga Floppy Disk")
                 font.bold: false
@@ -119,7 +119,7 @@ SiDialog {
                 color: Palette.border
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: qsTr("Capacity:")
                 lwidth: root.labelWidth
@@ -128,7 +128,7 @@ SiDialog {
                 enabled: false
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 id: fsCombo
                 l: qsTr("File system:")
@@ -137,7 +137,7 @@ SiDialog {
                 tags: [root.nodos, 0, 1]    // NODOS, OFS, FFS
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 id: bbCombo
                 l: qsTr("Boot block:")
@@ -151,7 +151,7 @@ SiDialog {
                 tags: [0, 1, 2, 3, 4]       // BootBlockId, in enum order
             }
 
-            SiLabeled {
+            SuLabeled {
 
                 id: nameControl
                 l: qsTr("Name:")
@@ -159,7 +159,7 @@ SiDialog {
                 visible: root.formatted
 
                 control: [
-                    SiTextField {
+                    SuTextField {
                         id: nameField
                         Layout.fillWidth: true
                         Layout.preferredHeight: 24
@@ -191,14 +191,14 @@ SiDialog {
             anchors.rightMargin: Style.largeSpacing
             spacing: Style.mediumSpacing
 
-            SiButton {
+            SuButton {
                 text: qsTr("Cancel")
                 onClicked: root.close()
             }
 
             HSpacer { }
 
-            SiButton {
+            SuButton {
                 accented: true
                 text: qsTr("Insert")
                 onClicked: root.insert()

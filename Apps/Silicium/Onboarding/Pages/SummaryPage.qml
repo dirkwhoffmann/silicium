@@ -65,7 +65,7 @@ Item {
             Layout.fillWidth: false
             spacing: 10
 
-            SiText {
+            SuText {
                 text: "Machine Name"
                 color: "#bbffffff"
                 font.pixelSize: Style.regular

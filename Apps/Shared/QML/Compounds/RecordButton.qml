@@ -53,7 +53,7 @@ FocusScope {
     signal keyRecorded(int key, int virtualKey)
     signal clicked()
 
-    SiButton {
+    SuButton {
 
         id: keyButton
 
@@ -78,7 +78,7 @@ FocusScope {
         // Top
         //
 
-        SiText {
+        SuText {
 
             visible: root.labels
             text: root.topLabel
@@ -93,7 +93,7 @@ FocusScope {
         // Bottom
         //
 
-        SiText {
+        SuText {
 
             visible: root.labels
             text: root.bottomLabel
@@ -108,7 +108,7 @@ FocusScope {
         // Left
         //
 
-        SiText {
+        SuText {
 
             visible: root.labels
             text: root.leftLabel
@@ -123,7 +123,7 @@ FocusScope {
         // Right
         //
 
-        SiText {
+        SuText {
 
             visible: root.labels
             text: root.rightLabel

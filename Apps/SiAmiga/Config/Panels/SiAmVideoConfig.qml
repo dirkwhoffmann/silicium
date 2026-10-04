@@ -64,7 +64,7 @@ SettingsPage {
         }
     }
 
-    component VideoKnob: SiKnob {
+    component VideoKnob: SuKnob {
 
         id: knob
 
@@ -95,7 +95,7 @@ SettingsPage {
             // Row 1: Palette
             //
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 Layout.alignment: Qt.AlignVCenter
 
@@ -151,7 +151,7 @@ SettingsPage {
             // Row 2: Zoom
             //
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 Layout.alignment: Qt.AlignVCenter
 
@@ -193,7 +193,7 @@ SettingsPage {
             // Row 3: Center
             //
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 Layout.alignment: Qt.AlignVCenter
 
@@ -248,7 +248,7 @@ SettingsPage {
             // Row 1: Flicker fixer
             //
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 Layout.alignment: Qt.AlignVCenter
 
@@ -278,7 +278,7 @@ SettingsPage {
             // Row 2: Off state
             //
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 Layout.alignment: Qt.AlignVCenter
 

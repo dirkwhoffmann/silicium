@@ -22,7 +22,7 @@ RowLayout {
     spacing: Style.mediumSpacing
     Layout.fillWidth: true
 
-    SiText {
+    SuText {
         id: keyLabel
         visible: text !== ""
         Layout.fillWidth: root.keyWidth <= 0
@@ -33,7 +33,7 @@ RowLayout {
         elide: Text.ElideRight
     }
 
-    SiText {
+    SuText {
         id: valueLabel
         Layout.fillWidth: root.valueWidth <= 0
         Layout.preferredWidth: root.valueWidth > 0 ? root.valueWidth : -1

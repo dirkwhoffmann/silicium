@@ -39,7 +39,7 @@ Item {
         anchors.fill: parent
         spacing: 0
 
-        SiLabel {
+        SuLabel {
 
             id: header
             visible: title !== ""

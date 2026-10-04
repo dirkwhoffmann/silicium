@@ -19,7 +19,7 @@ Item {
     Layout.preferredWidth: vertical ? 40 : length
     Layout.preferredHeight: vertical ? length : 40
 
-    SiProgressBar {
+    SuProgressBar {
 
         id: axis
         from: 0
@@ -31,7 +31,7 @@ Item {
     }
 
     // Top
-    SiText {
+    SuText {
 
         text: root.topLabel
         anchors.bottom: parent.top
@@ -42,7 +42,7 @@ Item {
     }
 
     // Bottom
-    SiText {
+    SuText {
 
         text: root.bottomLabel
         anchors.top: parent.bottom
@@ -53,7 +53,7 @@ Item {
     }
 
     // Left
-    SiText {
+    SuText {
 
         text: root.leftLabel
         anchors.right: parent.left
@@ -64,7 +64,7 @@ Item {
     }
 
     // Right
-    SiText {
+    SuText {
 
         text: root.rightLabel
         anchors.left: parent.right
@@ -75,7 +75,7 @@ Item {
     }
 
     // Center
-    SiText {
+    SuText {
 
         text: root.centerLabel
         anchors.centerIn: parent

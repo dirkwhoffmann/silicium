@@ -36,7 +36,7 @@ PrefPage {
 
         heading: "General Settings"
         menuContent: [
-            SiMenuItem {
+            SuMenuItem {
                 text: "Restore factory defaults..."
                 onTriggered: Preferences.resetGeneralSettings()
             }
@@ -55,7 +55,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 id: vmSortMode
                 Layout.fillWidth: true
@@ -73,7 +73,7 @@ PrefPage {
                     "Platform, Modified"
                 ]
 
-                SiHelpButton {
+                SuHelpButton {
 
                     id: vmSortModeHelp
                     checkable: true
@@ -92,13 +92,13 @@ PrefPage {
 
         HelpWrapper {
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 id: hideShowcases
                 r: "Hide preinstalled machines"
                 lwidth: root.labelWidth
 
-                SiHelpButton {
+                SuHelpButton {
 
                     id: hideShowcasesHelp
                     checkable: true
@@ -120,14 +120,14 @@ PrefPage {
 
         HelpWrapper {
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 id: resolveUUIDConflicts
                 l: "Identity:"
                 lwidth: root.labelWidth
                 r: "Automatically resolve UUID conflicts"
 
-                SiHelpButton {
+                SuHelpButton {
 
                     id: resolveUUIDConflictsHelp
                     checkable: true
@@ -154,7 +154,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiLabeledNumberInput {
+            SuLabeledNumberInput {
 
                 id: maxSnapshots
                 l: "Capacity:"
@@ -162,7 +162,7 @@ PrefPage {
                 lwidth: root.labelWidth
                 controlWidth: 64
 
-                SiHelpButton {
+                SuHelpButton {
 
                     id: maxSnapshotsHelp
                     checkable: true
@@ -184,13 +184,13 @@ PrefPage {
 
         HelpWrapper {
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 id: autoDeleteSnapshots
                 r: "Auto-delete oldest snapshot"
                 lwidth: root.labelWidth
 
-                SiHelpButton {
+                SuHelpButton {
 
                     id: autoDeleteSnapshotsHelp
                     checkable: true
@@ -217,13 +217,13 @@ PrefPage {
 
         HelpWrapper {
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 id: hibernateSnapshot
                 lwidth: root.labelWidth
                 r: "Save snapshot"
 
-                SiHelpButton {
+                SuHelpButton {
 
                     id: hibernateSnapshotHelp
                     checkable: true
@@ -245,13 +245,13 @@ PrefPage {
 
         HelpWrapper {
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 id: hibernateWorkspace
                 lwidth: root.labelWidth
                 r: "Save workspace"
 
-                SiHelpButton {
+                SuHelpButton {
 
                     id: hibernateWorkspaceHelp
                     checkable: true
@@ -273,13 +273,13 @@ PrefPage {
 
         HelpWrapper {
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 id: showHibernationDialog
                 lwidth: root.labelWidth
                 r: "Ask the user for confirmation"
 
-                SiHelpButton {
+                SuHelpButton {
 
                     id: showHibernationDialogHelp
                     checkable: true
@@ -306,14 +306,14 @@ PrefPage {
 
         HelpWrapper {
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 id: ejectWithoutAsking
                 l: "Media:"
                 lwidth: root.labelWidth
                 r: "Eject unsaved media without asking"
 
-                SiHelpButton {
+                SuHelpButton {
 
                     id: ejectWithoutAskingHelp
                     checkable: true
@@ -335,14 +335,14 @@ PrefPage {
 
         HelpWrapper {
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 id: pauseWhileInBackground
                 l: "Activity:"
                 lwidth: root.labelWidth
                 r: "Pause emulation in background"
 
-                SiHelpButton {
+                SuHelpButton {
 
                     id: pauseWhileInBackgroundHelp
                     checkable: true
@@ -364,14 +364,14 @@ PrefPage {
 
         HelpWrapper {
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 id: preventSleep
                 l: "Sleep:"
                 lwidth: root.labelWidth
                 r: "Prevent the Mac from sleeping while running"
 
-                SiHelpButton {
+                SuHelpButton {
 
                     id: preventSleepHelp
                     checkable: true

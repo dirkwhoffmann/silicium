@@ -45,17 +45,17 @@ SiAmInspectorWindow {
     readonly property bool below10: cpuRev === 0
     readonly property bool below20: cpuRev === 0 || cpuRev === 1
 
-    // SiLabeledWord32View/SiLabeledWordView (Apps/Shared/QML/Compounds) hold
+    // SuLabeledWord32View/SuLabeledWordView (Apps/Shared/QML/Compounds) hold
     // the structural bits (size/weight/bits/default width) shared with every
     // other panel; this panel only adds the hex/decimal toggle binding local
     // wrappers like this let every usage below stay untouched.
-    component SiHex32: SiLabeledWord32View {
+    component SiHex32: SuLabeledWord32View {
 
         base: root.numBase
         padded: root.numPadded
     }
 
-    component SiHex16: SiLabeledWordView {
+    component SiHex16: SuLabeledWordView {
 
         controlWidth: 64
         base: root.numBase
@@ -76,7 +76,7 @@ SiAmInspectorWindow {
         Layout.preferredHeight: check.implicitHeight
         Layout.alignment: Qt.AlignHCenter
 
-        SiCheckBox {
+        SuCheckBox {
 
             id: check
             size: Size.small
@@ -90,7 +90,7 @@ SiAmInspectorWindow {
     // The label underneath a FlagBit (or a group of them). Every cell --
     // checkbox or label -- shares the same Layout.preferredWidth, so all 16
     // grid columns come out equally wide regardless of what's in them.
-    component FlagLabel: SiText {
+    component FlagLabel: SuText {
 
         property string label: ""
         property bool unused: false
@@ -181,7 +181,7 @@ SiAmInspectorWindow {
                 }
             }
 
-            SiSegmentedControl {
+            SuSegmentedControl {
 
                 id: tabControl
                 anchors.horizontalCenter: stackBox.horizontalCenter

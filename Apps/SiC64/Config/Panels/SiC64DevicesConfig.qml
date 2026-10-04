@@ -63,7 +63,7 @@ SettingsPage {
             checked: config.DRIVE8_CONNECTED
             onClicked: config.DRIVE8_CONNECTED = checked;
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 id: autoConfig8
                 l: "Config:"
@@ -75,7 +75,7 @@ SettingsPage {
                 HSpacer { size: 20 }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Type:"
                 lwidth: root.labelWidth
@@ -83,10 +83,10 @@ SettingsPage {
                 enabled: autoConfig8.enabled && autoConfig8.currentIndex === 1
                 currentIndex: root.config.DRIVE8_TYPE
                 onCurrentIndexChanged: root.config.DRIVE8_TYPE = currentIndex;
-                SiHelpButton { onClicked: root.help("vc1541-models.md") }
+                SuHelpButton { onClicked: root.help("vc1541-models.md") }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Extra RAM:"
                 lwidth: root.labelWidth
@@ -95,10 +95,10 @@ SettingsPage {
                 enabled: autoConfig8.enabled && autoConfig8.currentIndex === 1
                 currentIndex: config.DRIVE8_RAM
                 onCurrentIndexChanged: config.DRIVE8_RAM = currentIndex;
-                SiHelpButton { onClicked: root.help("vc1541-ram.md") }
+                SuHelpButton { onClicked: root.help("vc1541-ram.md") }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Parallel Cable:"
                 lwidth: root.labelWidth
@@ -106,7 +106,7 @@ SettingsPage {
                 enabled: autoConfig8.enabled && autoConfig8.currentIndex === 1
                 currentIndex: config.DRIVE8_PARCABLE
                 onCurrentIndexChanged: config.DRIVE8_PARCABLE = currentIndex;
-                SiHelpButton { onClicked: root.help("vc1541-parallel-cable.md") }
+                SuHelpButton { onClicked: root.help("vc1541-parallel-cable.md") }
             }
         }
 
@@ -123,7 +123,7 @@ SettingsPage {
             checked: config.DRIVE9_CONNECTED
             onClicked: config.DRIVE9_CONNECTED = checked;
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 id: autoConfig9
                 l: "Config:"
@@ -135,7 +135,7 @@ SettingsPage {
                 HSpacer { size: 20 }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Type:"
                 lwidth: root.labelWidth
@@ -144,29 +144,29 @@ SettingsPage {
                 enabled: autoConfig9.enabled && autoConfig9.currentIndex === 1
                 currentIndex: root.config.DRIVE9_TYPE
                 onCurrentIndexChanged: root.config.DRIVE9_TYPE = currentIndex;
-                SiHelpButton { onClicked: root.help("vc1541-models.md") }
+                SuHelpButton { onClicked: root.help("vc1541-models.md") }
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Extra RAM:"
                 lwidth: root.labelWidth
                 // controlWidth: root.comboWidth
                 model: ["None", "$8000 - $9FFF", "$6000 - $7FFF", "$4000 - $7FFF"]
                 enabled: autoConfig9.enabled && autoConfig9.currentIndex === 1
-                SiHelpButton { onClicked: root.help("vc1541-ram.md") }
+                SuHelpButton { onClicked: root.help("vc1541-ram.md") }
                 currentIndex: config.DRIVE9_RAM
                 onCurrentIndexChanged: config.DRIVE9_RAM = currentIndex;
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Parallel Cable:"
                 lwidth: root.labelWidth
                 // controlWidth: root.comboWidth
                 model: ["None", "Standard", "Dolphin"]
                 enabled: autoConfig9.enabled && autoConfig9.currentIndex === 1
-                SiHelpButton { onClicked: root.help("vc1541-parallel-cable.md") }
+                SuHelpButton { onClicked: root.help("vc1541-parallel-cable.md") }
                 currentIndex: config.DRIVE9_PARCABLE
                 onCurrentIndexChanged: config.DRIVE9_PARCABLE = currentIndex;
             }
@@ -185,13 +185,13 @@ SettingsPage {
             checked: config.DAT_CONNECT
             onClicked: config.DAT_CONNECT = checked;
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Type:"
                 lwidth: root.labelWidth
                 model: ["Commodore 1530"]
 
-                SiHelpButton {
+                SuHelpButton {
                     onClicked: root.help("datasette.md")
                 }
 
@@ -209,12 +209,12 @@ SettingsPage {
             header: "MOUSE"
             size: root.sectionWidth
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Type:"
                 lwidth: root.labelWidth
                 model: ["Commodore 1350", "Commodore 1351", "Neos", "Paddle (POTX)", "Paddle (POTY)", "Paddle (POTX + POTY)"]
-                SiHelpButton { onClicked: root.help("mouse.md") }
+                SuHelpButton { onClicked: root.help("mouse.md") }
                 currentIndex: config.MOUSE_MODEL
                 onCurrentIndexChanged: config.MOUSE_MODEL = currentIndex;
             }
@@ -229,7 +229,7 @@ SettingsPage {
             header: "JOYSTICK"
             size: root.sectionWidth
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 l: "Auto-fire:"
                 lwidth: root.labelWidth
@@ -238,7 +238,7 @@ SettingsPage {
                 checked: config.AUTOFIRE
                 onClicked: config.AUTOFIRE = checked;
 
-                SiLabeledSlider {
+                SuLabeledSlider {
 
                     l: "Fast"
                     r: "Slow"
@@ -253,7 +253,7 @@ SettingsPage {
                 }
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 l: "Burst mode:"
                 lwidth: root.labelWidth
@@ -261,7 +261,7 @@ SettingsPage {
                 checked: config.AUTOFIRE_BURSTS
                 onClicked: config.AUTOFIRE_BURSTS = checked;
 
-                SiLabeledNumberInput {
+                SuLabeledNumberInput {
 
                     l: "Fire"
                     r: "bullets per burst"

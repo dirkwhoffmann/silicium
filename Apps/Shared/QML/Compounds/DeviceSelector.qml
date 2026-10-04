@@ -31,7 +31,7 @@ ComboBox {
         implicitWidth: 28
         implicitHeight: 22
 
-        SiSymbol {
+        SuSymbol {
 
             symbol: control.model[control.currentIndex].icon
             font.pixelSize: Style.large
@@ -84,7 +84,7 @@ ComboBox {
         width: parent.width
         contentItem: RowLayout {
             spacing: 12
-            SiText {
+            SuText {
                 // If selected, show check; otherwise, show empty string
                 text: control.currentIndex === index ? "✓" : ""
 
@@ -96,7 +96,7 @@ ComboBox {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }
-            SiSymbol {
+            SuSymbol {
                 symbol: modelData.icon
                 font.pixelSize: Style.large
             }
@@ -107,7 +107,7 @@ ComboBox {
             }
 
              */
-            SiText {
+            SuText {
                 text: modelData.name
                 Layout.fillWidth: true
             }

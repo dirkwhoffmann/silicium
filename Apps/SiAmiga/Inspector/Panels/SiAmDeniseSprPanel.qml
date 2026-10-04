@@ -27,7 +27,7 @@ RowLayout {
 
     spacing: Style.mediumSpacing
 
-    component Si16: SiLabeledWordView {
+    component Si16: SuLabeledWordView {
 
         size: Size.small
         controlWidth: 44
@@ -80,7 +80,7 @@ RowLayout {
 
                 Repeater {
                     model: 8
-                    SiLabeledCheckBox {
+                    SuLabeledCheckBox {
                         required property int index
                         readOnly: true
                         l: qsTr("%1:").arg(index)
@@ -216,22 +216,22 @@ RowLayout {
                 Layout.topMargin: Style.tinySpacing
                 spacing: Style.smallSpacing
 
-                SiLabel { text: qsTr("VPOS") }
+                SuLabel { text: qsTr("VPOS") }
                 Si16 { controlWidth: 48; value: denise.sprVStart }
-                SiLabel { text: "-" }
+                SuLabel { text: "-" }
                 Si16 { controlWidth: 48; value: denise.sprVStop }
 
-                SiLabel { text: qsTr("HPOS") }
+                SuLabel { text: qsTr("HPOS") }
                 Si16 { controlWidth: 48; value: denise.sprHStart }
 
                 HSpacer { }
 
-                SiLabel { text: qsTr("AT") }
-                SiLabeledCheckBox { readOnly: true; checked: denise.sprAttach }
+                SuLabel { text: qsTr("AT") }
+                SuLabeledCheckBox { readOnly: true; checked: denise.sprAttach }
             }
         }
 
-        SiSegmentedControl {
+        SuSegmentedControl {
 
             id: spriteSelector
             anchors.horizontalCenter: spritesBox.horizontalCenter

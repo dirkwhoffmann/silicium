@@ -116,41 +116,41 @@ Item {
                 // -- see their own comments for why not every version
                 // VACore's RomFileTypes.h knows about is offered here.
                 menuContent: [
-                    SiMenu {
+                    SuMenu {
                         title: qsTr("Install AROS")
                         enabled: !root.locked
 
-                        SiMenuItem {
+                        SuMenuItem {
                             text: qsTr("Version 20260820 (newest)")
                             onTriggered: controller.media.installAros(0x7ae94477)
                         }
-                        SiMenuItem {
+                        SuMenuItem {
                             text: qsTr("Version 20250219")
                             onTriggered: controller.media.installAros(0xA3232963)
                         }
-                        SiMenuItem {
+                        SuMenuItem {
                             text: qsTr("SVN 55696 (SAE version)")
                             onTriggered: controller.media.installAros(0x3F4FCC0A)
                         }
-                        SiMenuItem {
+                        SuMenuItem {
                             text: qsTr("SVN 54705 (UAE version)")
                             onTriggered: controller.media.installAros(0x9CE0F009)
                         }
                     },
-                    SiMenu {
+                    SuMenu {
                         title: qsTr("Install DiagROM")
                         enabled: !root.locked
 
-                        SiMenuItem {
+                        SuMenuItem {
                             text: qsTr("Version 1.3 (newest)")
                             onTriggered: controller.media.installDiagRom(0x55E2E127)
                         }
-                        SiMenuItem {
+                        SuMenuItem {
                             text: qsTr("Version 1.2.1")
                             onTriggered: controller.media.installDiagRom(0x850209CD)
                         }
                     },
-                    SiMenuItem {
+                    SuMenuItem {
                         text: qsTr("Install EmuTOS 1.3")
                         enabled: !root.locked
                         onTriggered: controller.media.installEmuTOS()
@@ -219,9 +219,9 @@ Item {
                     visible: cc.hasExtRom
                     spacing: Style.smallSpacing
 
-                    SiLabel { text: qsTr("Location:") }
+                    SuLabel { text: qsTr("Location:") }
 
-                    SiLabeledComboBox {
+                    SuLabeledComboBox {
 
                         model: ["$E00000", "$F00000"]
                         currentIndex: cc.MEM_EXT_START === 0xF0 ? 1 : 0
@@ -237,18 +237,18 @@ Item {
                 Layout.alignment: Qt.AlignHCenter
                 spacing: Style.mediumSpacing
 
-                SiSymbol { symbol: "info"; size: Size.large; color: Palette.accent }
+                SuSymbol { symbol: "info"; size: Size.large; color: Palette.accent }
 
                 ColumnLayout {
 
                     spacing: 0
 
-                    SiText {
+                    SuText {
                         text: qsTr("To add a Rom, drag a Rom image file onto one of the chip icons, or click an icon to select a file.")
                         font.bold: true
                         color: Palette.primary
                     }
-                    SiText {
+                    SuText {
                         text: qsTr("Original Roms are protected by copyright. Please obey legal regulations.")
                         color: Palette.secondary
                     }

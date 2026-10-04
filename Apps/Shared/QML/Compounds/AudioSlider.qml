@@ -15,7 +15,7 @@ Item {
     property string midLabelText: "MID"
     property string minLabelText: "MIN"
 
-    // 'value' is the gated model input (see SiSlider.boundValue); user-driven
+    // 'value' is the gated model input (see SuSlider.boundValue); user-driven
     // changes are reported via moved(value). Use that for write-back so a
     // rounded value can't fight the drag.
     property alias value: internalSlider.boundValue
@@ -33,7 +33,7 @@ Item {
 
     DebugRect {}
 
-    component SliderLabel: SiText {
+    component SliderLabel: SuText {
 
         Layout.alignment: Qt.AlignLeft
         font.pixelSize: Style.tiny
@@ -49,7 +49,7 @@ Item {
 
         HSpacer { size: labelColumn.width }
 
-        SiSlider {
+        SuSlider {
 
             id: internalSlider
             orientation: Qt.Vertical

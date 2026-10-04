@@ -38,12 +38,12 @@ RowLayout {
     // Subcomponents
     //
 
-    component Si1: SiLabeledBitView {
+    component Si1: SuLabeledBitView {
 
         size: Size.tiny
     }
 
-    component Si8: SiLabeledByteView {
+    component Si8: SuLabeledByteView {
 
         size: Size.small
         controlWidth: 36
@@ -51,7 +51,7 @@ RowLayout {
         padded: root.numPadded
     }
 
-    component Si16: SiLabeledWordView {
+    component Si16: SuLabeledWordView {
 
         size: Size.small
         controlWidth: 44
@@ -325,10 +325,10 @@ RowLayout {
 
                 spacing: Style.smallSpacing
 
-                SiLabel { size: Size.small; font.bold: true; text: denise.modeText }
-                SiLabel { size: Size.small; font.bold: true; text: denise.resolutionText }
-                SiLabel { size: Size.small; font.bold: true; text: denise.dbplf ? qsTr("Dual Playfield") : qsTr("Single Playfield") }
-                SiLabel { size: Size.small; font.bold: true; text: denise.lace ? qsTr("Interlaced") : qsTr("Non-interlaced") }
+                SuLabel { size: Size.small; font.bold: true; text: denise.modeText }
+                SuLabel { size: Size.small; font.bold: true; text: denise.resolutionText }
+                SuLabel { size: Size.small; font.bold: true; text: denise.dbplf ? qsTr("Dual Playfield") : qsTr("Single Playfield") }
+                SuLabel { size: Size.small; font.bold: true; text: denise.lace ? qsTr("Interlaced") : qsTr("Non-interlaced") }
             }
         }
 
@@ -359,7 +359,7 @@ RowLayout {
                 Si16 { Layout.columnSpan: 3; Layout.alignment: Qt.AlignHCenter; value: denise.vstrt }
 
                 Si16 { Layout.alignment: Qt.AlignHCenter; value: denise.hstrt }
-                SiSymbol {
+                SuSymbol {
 
                     size: Size.huge
                     Layout.alignment: Qt.AlignHCenter

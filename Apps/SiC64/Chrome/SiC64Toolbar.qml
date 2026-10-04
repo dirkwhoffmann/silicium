@@ -41,7 +41,7 @@ Item {
         anchors.fill: parent
         spacing: 0
 
-        SiBarButton {
+        SuBarButton {
 
             action: root.window.actions.config
             // symbol: "settings"
@@ -49,9 +49,9 @@ Item {
             phosphor: "gear"
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
 
             id: inspectButton
             // symbol: "search"
@@ -60,38 +60,38 @@ Item {
             text: qsTr("Inspector")
             onClicked: inspectMenu.open()
 
-            SiMenu {
+            SuMenu {
 
                 id: inspectMenu
                 y: inspectButton.height
 
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openCPUInspector
                 }
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openMemoryInspector
                 }
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openBusInspector
                 }
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openCIAInspector
                 }
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openVICInspector
                 }
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openSIDInspector
                 }
-                SiMenuItem {
+                SuMenuItem {
                     action: root.window.actions.openEventsInspector
                 }
             }
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
 
             action: root.window.actions.retroShell
             phosphor: "terminal-window"
@@ -99,9 +99,9 @@ Item {
             checked: root.c64.retroShell
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
 
             action: root.window.actions.logger
             phosphor: "clipboard"
@@ -109,36 +109,36 @@ Item {
             checked: root.window.actions.logger.isOpen
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
         HSpacer {}
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
             phosphor: "database"
             action: root.window.actions.saveWorkspace
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
             phosphor: "download-simple"
             action: root.window.actions.saveSnapshot
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
             phosphor: "upload-simple"
             action: root.window.actions.loadSnapshot
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
         HSpacer {}
 
-        SiBarDivider {}
+        SuBarDivider {}
 
         DeviceSelectorFlat {
 
@@ -149,7 +149,7 @@ Item {
             onDeviceSelected: (index) => AppController.inputManager.port0 = index
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
         DeviceSelectorFlat {
 
@@ -160,26 +160,26 @@ Item {
             onDeviceSelected: (index) => AppController.inputManager.port1 = index
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
         HSpacer {}
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
             phosphor: "keyboard"
             action: root.window.actions.keyboard
             checkable: true
             checked: root.window.actions.keyboard.isOpen
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
         HSpacer {}
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
             visible: Preferences.developerMode
             phosphor: "bug-beetle"
             action: root.window.actions.debug
@@ -187,23 +187,23 @@ Item {
             checked: root.c64.debugPanel
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
             phosphor: root.c64.isPaused ? "play-circle" : "pause-circle"
             action: root.window.actions.pause
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
             phosphor: "arrows-clockwise"
             action: root.window.actions.reset
         }
 
-        SiBarDivider {}
+        SuBarDivider {}
 
-        SiBarButton {
+        SuBarButton {
             phosphor: "power"
             action: root.window.actions.power
         }

@@ -117,7 +117,7 @@ QtObject {
     // matching suffix (e.g. "gear-bold" instead of "gear") for the
     // ligature rule to match -- otherwise the font falls back to rendering
     // the literal letters. Derived from the loaded file's name so callers
-    // (see SiSymbol.qml) don't need to know which weight is active.
+    // (see SuSymbol.qml) don't need to know which weight is active.
     readonly property string phosphorSuffix: {
         const src = phosphorFont.source.toString();
         if (src.indexOf("Phosphor-Bold") !== -1) return "-bold";

@@ -22,7 +22,7 @@ ColumnLayout {
             sourceSize: Qt.size(32, 32)
         }
 
-        SiText {
+        SuText {
             id: titleLabel
             font.weight: Font.DemiBold
             font.pixelSize: Style.heading
@@ -30,7 +30,7 @@ ColumnLayout {
         }
     }
 
-    SiText {
+    SuText {
         id: descriptionLabel
         Layout.alignment: Qt.AlignHCenter
         Layout.fillWidth: true

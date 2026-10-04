@@ -88,7 +88,7 @@ Image {
                     width: scrollView.availableWidth
                     spacing: 0
 
-                    SiText {
+                    SuText {
 
                         color: "#CCE5FF" // "#99CCFF"
                         font.pixelSize: 64
@@ -99,7 +99,7 @@ Image {
                         }
                     }
 
-                    SiText {
+                    SuText {
 
                         Layout.topMargin: -8
                         text: author
@@ -113,7 +113,7 @@ Image {
                         }
                     }
 
-                    SiText {
+                    SuText {
 
                         Layout.preferredWidth: 0.6 * scrollView.availableWidth
                         text: description + "\n\n\n"

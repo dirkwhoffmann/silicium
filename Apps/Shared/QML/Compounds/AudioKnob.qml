@@ -1,8 +1,8 @@
 
-// Stereo balance knob: a SiKnob with fixed "L" / "R" side labels.
+// Stereo balance knob: a SuKnob with fixed "L" / "R" side labels.
 import Sulfur
 
-SiKnob {
+SuKnob {
 
     l: "L"
     r: "R"

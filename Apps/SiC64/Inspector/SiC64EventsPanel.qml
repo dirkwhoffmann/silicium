@@ -58,29 +58,29 @@ SiC64InspectorWindow {
             ProgressBox {
 
                 title: qsTr("CPU Progress")
-                SiText { text: ec.cpuProgress; font.family: Fonts.mono }
-                SiText { text: qsTr("Cycles") }
+                SuText { text: ec.cpuProgress; font.family: Fonts.mono }
+                SuText { text: qsTr("Cycles") }
             }
 
             ProgressBox {
 
                 title: qsTr("VICII Progress")
-                SiText { text: ec.vicProgress; font.family: Fonts.mono }
-                SiText { text: qsTr("Frames") }
+                SuText { text: ec.vicProgress; font.family: Fonts.mono }
+                SuText { text: qsTr("Frames") }
             }
 
             ProgressBox {
 
                 title: qsTr("CIA1 Progress")
-                SiText { text: ec.cia1Progress; font.family: Fonts.mono }
-                SiText { text: qsTr("Cycles") }
+                SuText { text: ec.cia1Progress; font.family: Fonts.mono }
+                SuText { text: qsTr("Cycles") }
             }
 
             ProgressBox {
 
                 title: qsTr("CIA2 Progress")
-                SiText { text: ec.cia2Progress; font.family: Fonts.mono }
-                SiText { text: qsTr("Cycles") }
+                SuText { text: ec.cia2Progress; font.family: Fonts.mono }
+                SuText { text: qsTr("Cycles") }
             }
         }
 
@@ -99,7 +99,7 @@ SiC64InspectorWindow {
             readonly property int hpos: 70
         }
 
-        component HeaderLabel: SiLabel {
+        component HeaderLabel: SuLabel {
 
             topPadding: 2
             bottomPadding: 2
@@ -107,7 +107,7 @@ SiC64InspectorWindow {
             elide: Text.ElideRight
         }
 
-        component Cell: SiLabel {
+        component Cell: SuLabel {
 
             property bool pending: true
 

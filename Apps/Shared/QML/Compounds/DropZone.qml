@@ -70,7 +70,7 @@ Item {
             radius: Style.radius
             clip: true
 
-            SiText {
+            SuText {
 
                 text: action.text
                 font.pixelSize: Style.large

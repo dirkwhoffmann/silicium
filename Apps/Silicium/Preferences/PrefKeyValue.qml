@@ -14,7 +14,7 @@ RowLayout {
     spacing: 15
     Layout.fillWidth: true
 
-    SiText {
+    SuText {
 
         id: keyLabel
         Layout.preferredWidth: keyWidth
@@ -23,7 +23,7 @@ RowLayout {
         elide: Text.ElideRight
     }
 
-    SiText {
+    SuText {
 
         id: valueLabel
         Layout.fillWidth: true

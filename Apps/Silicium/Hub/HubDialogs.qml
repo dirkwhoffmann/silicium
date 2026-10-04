@@ -16,7 +16,7 @@ Item {
     property alias clone: cloneDialog
     property alias close: closeDialog
 
-    SiUserDialog {
+    SuUserDialog {
 
         id: alert
         parent: window.contentItem
@@ -63,7 +63,7 @@ Item {
         }
     }
 
-    SiUserDialog {
+    SuUserDialog {
 
         id: closeDialog
         parent: window.contentItem

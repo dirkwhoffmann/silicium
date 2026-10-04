@@ -30,7 +30,7 @@ RoundButton {
             opacity: root.checked ? 1.0 : 0.6
         }
 
-        SiText {
+        SuText {
             Layout.alignment: Qt.AlignHCenter
             text: root.text
             font.pixelSize: Style.large

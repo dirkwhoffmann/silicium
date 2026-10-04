@@ -41,7 +41,7 @@ ToolBar {
         anchors.rightMargin: Style.mediumSpacing
         spacing: Style.smallSpacing
 
-        SiButton {
+        SuButton {
 
             action: actions.preferences
             symbol: "settings"
@@ -51,14 +51,14 @@ ToolBar {
         HSpacer {
         }
 
-        SiButton {
+        SuButton {
 
             action: actions.open
             symbol: "folder"
             tooltip: "Open Virtual Machine"
         }
 
-        SiButton {
+        SuButton {
 
             action: actions.onboardingToggle
             symbol: "add"
@@ -70,7 +70,7 @@ ToolBar {
         HSpacer {
         }
 
-        SiSegmentedControl {
+        SuSegmentedControl {
 
             minSegmentWidth: 34
             model: [

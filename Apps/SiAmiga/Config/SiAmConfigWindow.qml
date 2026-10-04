@@ -68,7 +68,7 @@ Window {
         }
     }
 
-    SiUserDialog {
+    SuUserDialog {
 
         id: errorDialog
         sound: true
@@ -137,7 +137,7 @@ Window {
 
                         spacing: Style.mediumSpacing
 
-                        SiText {
+                        SuText {
                             Layout.alignment: Qt.AlignVCenter
                             text: symbol
                             font.family: Fonts.symbols
@@ -145,7 +145,7 @@ Window {
                             color: highlighted ? Palette.accentText : Palette.accent
                         }
 
-                        SiText {
+                        SuText {
                             Layout.alignment: Qt.AlignVCenter
                             Layout.fillWidth: true
                             text: name

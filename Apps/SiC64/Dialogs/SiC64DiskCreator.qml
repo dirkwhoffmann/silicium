@@ -14,7 +14,7 @@ import Silicium.Assets
 import Silicium.Controllers
 import Sulfur
 
-SiDialog {
+SuDialog {
 
     id: root
 
@@ -79,7 +79,7 @@ SiDialog {
             Layout.alignment: Qt.AlignTop
             spacing: Style.mediumSpacing
 
-            SiText {
+            SuText {
 
                 text: qsTr("Commodore Floppy Disk")
                 font.bold: false // true
@@ -96,7 +96,7 @@ SiDialog {
                 color: Palette.border
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: qsTr("Capacity:")
                 lwidth: root.labelWidth
@@ -104,7 +104,7 @@ SiDialog {
                 currentIndex: 0
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 id: fsCombo
                 l: qsTr("File system:")
@@ -112,7 +112,7 @@ SiDialog {
                 model: [qsTr("No File System"), qsTr("CBM DOS")]
             }
 
-            SiLabeled {
+            SuLabeled {
 
                 id: nameControl
                 l: qsTr("Name:")
@@ -120,7 +120,7 @@ SiDialog {
                 visible: root.cbmSelected
 
                 control: [
-                    SiTextField {
+                    SuTextField {
                         id: nameField
                         Layout.fillWidth: true
                         Layout.preferredHeight: 24
@@ -158,14 +158,14 @@ SiDialog {
 
              */
 
-            SiButton {
+            SuButton {
                 text: qsTr("Cancel")
                 onClicked: root.close()
             }
 
             HSpacer { }
 
-            SiButton {
+            SuButton {
                 accented: true
                 text: qsTr("Insert")
                 onClicked: root.insert()
@@ -186,7 +186,7 @@ SiDialog {
                     color: insertButton.down ? Palette.accentElevated : Palette.accent
                 }
 
-                contentItem: SiText {
+                contentItem: SuText {
                     text: insertButton.text
                     color: Palette.accentText
                     font.family: Fonts.main

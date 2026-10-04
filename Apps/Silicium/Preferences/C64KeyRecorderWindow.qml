@@ -65,19 +65,19 @@ Window {
             Layout.fillHeight: false
             spacing: Style.mediumSpacing
 
-            SiText {
+            SuText {
 
                 text: "STEP 1: SELECT A C64 KEY TO RECORD"
                 font.pixelSize: Style.small
                 color: controller.selectedKey === -1 ? Palette.accent : Palette.tertiary
             }
 
-            SiText {
+            SuText {
                 text: "|"
                 color: Palette.tertiary
             }
 
-            SiText {
+            SuText {
 
                 text: "STEP 2: PRESS A KEY ON THE PHYSICAL KEYBOARD"
                 font.pixelSize: Style.small
@@ -85,7 +85,7 @@ Window {
             }
 
             /*
-            SiText {
+            SuText {
 
                 text: controller.selectedKey === -1
                     ? "STEP 1: SELECT A KEY TO RECORD"
@@ -99,7 +99,7 @@ Window {
 
             HSpacer {}
 
-            SiButton {
+            SuButton {
 
                 symbol: "replay"
                 tooltip: "Revert to Default Keymap"
@@ -123,7 +123,7 @@ Window {
 
                 model: controller.keyModel
 
-                delegate: SiButton {
+                delegate: SuButton {
 
                     id: keyControl
 
@@ -144,7 +144,7 @@ Window {
                     // re-evaluates whenever a mapping is captured while the tooltip
                     // is already visible (mappingInfo() is a plain invokable call
                     // with no change notification of its own).
-                    SiToolTip {
+                    SuToolTip {
 
                         visible: keyControl.hovered
                         text: controller.selectedKey !== undefined ? controller.mappingInfo(model.nr) : ""

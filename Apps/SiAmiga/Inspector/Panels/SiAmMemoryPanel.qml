@@ -69,7 +69,7 @@ SiAmInspectorWindow {
     readonly property int typeWom: 15
     readonly property int typeExt: 16
 
-    component HeaderLabel: SiLabel {
+    component HeaderLabel: SuLabel {
 
         topPadding: 2
         bottomPadding: 2
@@ -77,7 +77,7 @@ SiAmInspectorWindow {
         elide: Text.ElideRight
     }
 
-    component Value: SiLabel {
+    component Value: SuLabel {
 
         size: Size.small
         topPadding: 1
@@ -109,7 +109,7 @@ SiAmInspectorWindow {
         16: "#990000"  // EXT
     })
 
-    component TypeInfo: SiLabeled {
+    component TypeInfo: SuLabeled {
 
         id: typeInfo
 
@@ -189,9 +189,9 @@ SiAmInspectorWindow {
             Layout.fillWidth: true
             spacing: Style.mediumSpacing
 
-            SiLabel { text: qsTr("Inspect") }
+            SuLabel { text: qsTr("Inspect") }
 
-            SiComboBox {
+            SuComboBox {
 
                 Layout.preferredWidth: 190
                 model: [
@@ -204,7 +204,7 @@ SiAmInspectorWindow {
 
             Item { Layout.fillWidth: true }
 
-            SiLabeledSearch {
+            SuLabeledSearch {
 
                 controlWidth: 160
                 base: root.numBase
@@ -234,7 +234,7 @@ SiAmInspectorWindow {
                 Layout.rightMargin: 7
             }
 
-            SiSlider {
+            SuSlider {
 
                 id: navSlider
 

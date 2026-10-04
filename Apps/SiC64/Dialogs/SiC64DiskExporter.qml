@@ -19,7 +19,7 @@ import Sulfur
 // an export format, then hands off to a native file/folder picker. T64 and
 // PRG aren't offered here (unlike the original) since the core's codec only
 // implements D64 encoding right now -- see FloppyDisk::writeToFile.
-SiDialog {
+SuDialog {
 
     id: root
 
@@ -77,7 +77,7 @@ SiDialog {
             Layout.alignment: Qt.AlignTop
             spacing: Style.mediumSpacing
 
-            SiText {
+            SuText {
                 text: qsTr("Commodore Floppy Disk")
                 font.bold: true
                 font.pixelSize: Style.large
@@ -92,7 +92,7 @@ SiDialog {
                 color: Palette.border
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
                 id: formatCombo
                 l: qsTr("Export As:")
                 lwidth: root.labelWidth
@@ -117,7 +117,7 @@ SiDialog {
             anchors.topMargin: 0
             spacing: Style.mediumSpacing
 
-            SiButton {
+            SuButton {
                 text: qsTr("Cancel")
                 onClicked: root.close()
             }
@@ -138,7 +138,7 @@ SiDialog {
                     color: exportButton.down ? Palette.accentElevated : Palette.accent
                 }
 
-                contentItem: SiText {
+                contentItem: SuText {
                     text: exportButton.text
                     color: Palette.accentText
                     font.family: Fonts.main

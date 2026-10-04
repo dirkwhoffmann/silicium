@@ -235,18 +235,18 @@ SettingsPage {
             header: "AUDIO SYNTHESIS"
             size: root.sectionWidth
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "SID Engine:"
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
                 model: ["ReSID"]
-                SiHelpButton { onClicked: root.help("sid-models.md") }
+                SuHelpButton { onClicked: root.help("sid-models.md") }
                 currentIndex: config.SID_ENGINE
                 onCurrentIndexChanged: config.SID_ENGINE = currentIndex
             }
 
-            SiLabeledCheckBox {
+            SuLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 r: "Audio Filter"
@@ -254,13 +254,13 @@ SettingsPage {
                 onClicked: config.SID_FILTER = checked;
             }
 
-            SiLabeledComboBox {
+            SuLabeledComboBox {
 
                 l: "Interpolation:"
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
                 model: ["Nearest", "Interpolate", "Resample"]
-                SiHelpButton { onClicked: root.help("") }
+                SuHelpButton { onClicked: root.help("") }
                 currentIndex: config.SID_SAMPLING
                 onCurrentIndexChanged: config.SID_SAMPLING = currentIndex
             }

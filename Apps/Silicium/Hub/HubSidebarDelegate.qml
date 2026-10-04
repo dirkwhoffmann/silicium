@@ -132,26 +132,26 @@ ItemDelegate {
         }
     }
 
-    SiMenu {
+    SuMenu {
 
         id: itemMenu
 
-        SiMenuItem {
+        SuMenuItem {
             visible: (isVM || isSnapshot) && !readOnly
             action: renameAction
         }
 
-        SiMenuItem {
+        SuMenuItem {
             visible: isVM
             action: cloneAction
         }
 
-        SiMenuItem {
+        SuMenuItem {
             visible: isVM && !readOnly
             action: removeAction
         }
 
-        SiMenuItem {
+        SuMenuItem {
             visible: isSnapshot
             action: deleteAction
         }
@@ -185,7 +185,7 @@ ItemDelegate {
             Layout.preferredHeight: 18
             Layout.alignment: Qt.AlignVCenter
 
-            SiText {
+            SuText {
 
                 visible: isExpandable && !readOnly
                 anchors.centerIn: parent
@@ -197,7 +197,7 @@ ItemDelegate {
                 rotation: isExpanded ? 90 : 0
             }
 
-            SiSymbol {
+            SuSymbol {
 
                 visible: readOnly
                 anchors.centerIn: parent
@@ -236,7 +236,7 @@ ItemDelegate {
             Layout.alignment: Qt.AlignVCenter
         }
 
-        SiSymbol {
+        SuSymbol {
 
             visible: isSnapshot
 
@@ -253,7 +253,7 @@ ItemDelegate {
         // Text
         //
 
-        SiText {
+        SuText {
 
             visible: !editing
             text: title
@@ -391,7 +391,7 @@ ItemDelegate {
         // Renaming field
         //
 
-        SiTextField {
+        SuTextField {
 
             id: editor
             visible: myDelegate.editing
@@ -425,7 +425,7 @@ ItemDelegate {
         // Aux button
         //
 
-        SiSymbolButton {
+        SuSymbolButton {
 
             visible: opacity > 0
             opacity: ((auxAction && delegateHover.hovered) || isSnapshot) ? 1.0 : 0.0

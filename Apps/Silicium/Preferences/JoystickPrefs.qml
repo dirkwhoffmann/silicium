@@ -52,7 +52,7 @@ RowLayout {
 
         VSpacer { }
 
-        SiLabeledCheckBox {
+        SuLabeledCheckBox {
 
             r: "Disconnect emulation keys from keyboard"
             checked: Preferences.disconnectEmulationKeys
@@ -179,7 +179,7 @@ RowLayout {
                             Layout.alignment: Qt.AlignTop
                             spacing: 0
 
-                            SiSymbolButton {
+                            SuSymbolButton {
 
                                 symbol: "delete"
                                 size: Size.small
@@ -189,7 +189,7 @@ RowLayout {
                                 onClicked: root.controller.resetMapping()
                             }
 
-                            SiText {
+                            SuText {
 
                                 text: "Mapping:"
                                 Layout.alignment: Qt.AlignVCenter
