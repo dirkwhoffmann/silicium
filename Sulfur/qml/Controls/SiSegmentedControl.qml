@@ -22,6 +22,9 @@ import Sulfur
 //   symbol    icon from the Material symbols font
 //   phosphor  icon from the Phosphor font
 //   awesome   icon from the Awesome font
+//   rotate    icon rotation in degrees
+//   action    an Action: triggered on click; its enabled state is followed
+//             and its text is the default tooltip
 //   tooltip   tooltip text
 //   enabled   false disables the segment (default true)
 //
@@ -133,7 +136,8 @@ Item {
                 readonly property bool isLast: index === root.count - 1
 
                 height: row.height
-                enabled: entry.enabled ?? true
+                action: entry.action ?? null
+                enabled: (entry.enabled ?? true) && (entry.action ? entry.action.enabled : true)
                 leftPadding: [8, 10, 12][root.size]
                 rightPadding: [8, 10, 12][root.size]
                 implicitWidth: root.segmentWidth > 0
@@ -143,7 +147,7 @@ Item {
                 onClicked: root.activated(index)
 
                 SiToolTip {
-                    text: seg.entry.tooltip ?? ""
+                    text: seg.entry.tooltip ?? seg.entry.action?.text ?? ""
                 }
 
                 background: Item {
@@ -200,6 +204,7 @@ Item {
                     font.family: seg.hasIcon ? Fonts.iconFamily(seg.symbol, seg.phosphor, seg.awesome)
                                              : Fonts.main
                     font.pixelSize: seg.hasIcon ? Size.fontSize(root.size) + 6 : Size.fontSize(root.size)
+                    rotation: seg.entry.rotate ?? 0
                     opacity: seg.enabled ? 1 : 0.4
                     color: seg.selected ? root.accentText : root.primary
                     horizontalAlignment: Text.AlignHCenter

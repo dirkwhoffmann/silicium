@@ -28,6 +28,9 @@ Button {
     property string symbol: ""
     property string phosphor: ""
     property string awesome: ""
+    property real iconRotation: 0
+    // Tooltip text. Icon-only buttons default to the button's text (e.g. the action's).
+    property string tooltip: hasIcon ? text : ""
     readonly property bool hasIcon: symbol !== "" || phosphor !== "" || awesome !== ""
 
     property color bgUpColor: accentedUp ? Palette.accent : Palette.widget
@@ -108,7 +111,13 @@ Button {
         }
     }
 
+    SiToolTip {
+        text: root.tooltip
+    }
+
     contentItem: SiText {
+
+        rotation: root.iconRotation
 
         text: root.hasIcon ? Fonts.iconText(root.symbol, root.phosphor, root.awesome) : root.text
         font.family: root.hasIcon ? Fonts.iconFamily(root.symbol, root.phosphor, root.awesome)

@@ -99,21 +99,13 @@ Window {
 
             HSpacer {}
 
-            NavBarGroup {
+            SiButton {
 
-                NavTextButton {
-
-                    symbol: "replay"
-                    font.pixelSize: Style.large
-                    onClicked: {
-                        console.log("Resetting kb mapping")
-                        controller.revertKeyMap()
-                    }
-
-                    SiToolTip {
-
-                        text: "Revert to Default Keymap"
-                    }
+                symbol: "replay"
+                tooltip: "Revert to Default Keymap"
+                onClicked: {
+                    console.log("Resetting kb mapping")
+                    controller.revertKeyMap()
                 }
             }
         }

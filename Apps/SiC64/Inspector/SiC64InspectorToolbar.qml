@@ -58,59 +58,31 @@ ToolBar {
             anchors.rightMargin: Style.mediumSpacing
             spacing: Style.smallSpacing
 
-            NavBarGroup {
+            SiButton {
 
-                NavTextButton {
-
-                    action: root.actions.pause
-                    symbol: root.controller.isPaused ? "play_circle" : "pause_circle"
-                }
+                action: root.actions.pause
+                symbol: root.controller.isPaused ? "play_circle" : "pause_circle"
             }
 
-            NavBarGroup {
+            SiSegmentedControl {
 
-                NavTextButton {
-
-                    action: root.actions.stepInto
-                    symbol: "step_into"
-                }
-
-                NavDivider {
-                }
-
-                NavTextButton {
-
-                    action: root.actions.stepOver
-                    symbol: "step_over"
-                }
+                minSegmentWidth: 34
+                currentIndex: -1   // momentary: nothing stays selected
+                model: [
+                    { action: root.actions.stepInto, symbol: "step_into" },
+                    { action: root.actions.stepOver, symbol: "step_over" }
+                ]
             }
 
-            NavBarGroup {
+            SiSegmentedControl {
 
-                NavTextButton {
-
-                    action: root.actions.stepCycle
-                    symbol: "vital_signs"
-                }
-
-                NavDivider {
-                }
-
-                NavTextButton {
-
-                    action: root.actions.finishLine
-                    symbol: "text_select_move_down"
-                    rotate: -90
-                }
-
-                NavDivider {
-                }
-
-                NavTextButton {
-
-                    action: root.actions.finishFrame
-                    symbol: "text_select_move_down"
-                }
+                minSegmentWidth: 34
+                currentIndex: -1   // momentary: nothing stays selected
+                model: [
+                    { action: root.actions.stepCycle, symbol: "vital_signs" },
+                    { action: root.actions.finishLine, symbol: "text_select_move_down", rotate: -90 },
+                    { action: root.actions.finishFrame, symbol: "text_select_move_down" }
+                ]
             }
 
             HSpacer { }
@@ -134,35 +106,30 @@ ToolBar {
                 }
             }
 
-            NavBarGroup {
+            SiButton {
 
-                NavTextButton {
+                id: formatButton
+                symbol: "list"
+                tooltip: "Number Format"
 
-                    id: formatButton
-                    symbol: "list"
-                    SiToolTip {
-                        text: "Number Format"
+                onClicked: formatMenu.open()
+
+                SiMenu {
+
+                    id: formatMenu
+                    y: formatButton.height
+
+                    SiMenuItem {
+                        action: root.actions.formatHex
                     }
-
-                    onClicked: formatMenu.open()
-
-                    SiMenu {
-
-                        id: formatMenu
-                        y: formatButton.height
-
-                        SiMenuItem {
-                            action: root.actions.formatHex
-                        }
-                        SiMenuItem {
-                            action: root.actions.formatHexPadded
-                        }
-                        SiMenuItem {
-                            action: root.actions.formatDecimal
-                        }
-                        SiMenuItem {
-                            action: root.actions.formatDecimalPadded
-                        }
+                    SiMenuItem {
+                        action: root.actions.formatHexPadded
+                    }
+                    SiMenuItem {
+                        action: root.actions.formatDecimal
+                    }
+                    SiMenuItem {
+                        action: root.actions.formatDecimalPadded
                     }
                 }
             }

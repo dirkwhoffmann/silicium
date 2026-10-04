@@ -41,50 +41,30 @@ ToolBar {
         anchors.rightMargin: Style.mediumSpacing
         spacing: Style.smallSpacing
 
-        NavBarGroup {
+        SiButton {
 
-            // label: "Preferences"
-
-            SiButton {
-
-                action: actions.preferences
-                symbol: "settings"
-                SiToolTip {
-                    text: qsTr("Open Preferences")
-                }
-            }
+            action: actions.preferences
+            symbol: "settings"
+            tooltip: qsTr("Open Preferences")
         }
 
         HSpacer {
         }
 
-        NavBarGroup {
+        SiButton {
 
-            // label: "Machines"
-
-            SiButton {
-
-                action: actions.open
-                symbol: "folder"
-                SiToolTip {
-                    text: "Open Virtual Machine"
-                }
-            }
+            action: actions.open
+            symbol: "folder"
+            tooltip: "Open Virtual Machine"
         }
 
-        NavBarGroup {
+        SiButton {
 
-
-            SiButton {
-
-                action: actions.onboardingToggle
-                symbol: "add"
-                checkable: true
-                checked: HubController.panel == "assistant"
-                SiToolTip {
-                    text: qsTr("New Virtual Machine")
-                }
-            }
+            action: actions.onboardingToggle
+            symbol: "add"
+            checkable: true
+            checked: HubController.panel == "assistant"
+            tooltip: qsTr("New Virtual Machine")
         }
 
         HSpacer {
