@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
 import Silicium.Controllers
+import Sulfur
 
 Item {
 

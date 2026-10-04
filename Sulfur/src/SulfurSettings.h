@@ -11,6 +11,7 @@
 
 #include <QObject>
 #include <QQmlEngine>
+#include <QUrl>
 
 /* The settings Sulfur needs from the application.
  *
@@ -42,11 +43,18 @@ class SulfurSettings : public QObject {
     // Draws layout debug aids (see DebugRect, HSpacer, VSpacer)
     Q_PROPERTY(bool debug READ debug WRITE setDebug NOTIFY changed)
 
+    // The pictures a message dialog (SiUserDialog) shows: the icon of the
+    // application, and the badge in its corner
+    Q_PROPERTY(QUrl dialogIcon READ dialogIcon WRITE setDialogIcon NOTIFY changed)
+    Q_PROPERTY(QUrl dialogBadge READ dialogBadge WRITE setDialogBadge NOTIFY changed)
+
     int m_appearance = 0;
     int m_colorTheme = 0;
     int m_fontTheme = 0;
     int m_monoFontTheme = 0;
     bool m_debug = false;
+    QUrl m_dialogIcon;
+    QUrl m_dialogBadge;
 
 public:
 
@@ -72,6 +80,12 @@ public:
 
     bool debug() const { return m_debug; }
     void setDebug(bool value) { update(m_debug, value); }
+
+    QUrl dialogIcon() const { return m_dialogIcon; }
+    void setDialogIcon(const QUrl &value) { update(m_dialogIcon, value); }
+
+    QUrl dialogBadge() const { return m_dialogBadge; }
+    void setDialogBadge(const QUrl &value) { update(m_dialogBadge, value); }
 
 signals:
 

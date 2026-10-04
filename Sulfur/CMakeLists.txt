@@ -22,7 +22,10 @@
 #     src/         C++: Palette (colors), Shortcuts (shortcut texts),
 #                  SulfurSettings (what the application tells Sulfur)
 #     qml/Theme    Style, Fonts, Size, Sounds
-#     qml/Controls the controls
+#     qml/Controls the controls (buttons, menus, fields, gauges, ...)
+#     qml/Compounds labeled controls built from them (SiControl and its
+#                  variants), knobs and sliders, notifications
+#     qml/Dialogs  the dialog frame and the standard dialogs
 #     resources/   fonts and sounds the theme needs
 
 # The theme singletons

@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
-import Silicium.Preferences
 import Sulfur
 
 // A rotary knob (dial) with optional labels on any of its four sides

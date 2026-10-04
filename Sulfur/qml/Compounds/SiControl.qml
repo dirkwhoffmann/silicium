@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Silicium.Preferences
 import Sulfur
 
 // Layout:
@@ -39,7 +38,7 @@ RowLayout {
     property bool hide: false
     // Kept for subclasses/callers that want to tint their own background;
     // SiControl itself no longer draws one (see note below).
-    property bool debug: Preferences.qtDebug
+    property bool debug: SulfurSettings.debug
 
     // property alias help: helpButton
     property alias control: controlContainer.data

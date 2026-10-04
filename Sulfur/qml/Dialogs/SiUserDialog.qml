@@ -9,8 +9,8 @@ SiDialog {
 
     property string titleText: ""
     property string bodyText: ""
-    property url iconSource: Assets.iconUrl(Assets.AppIcon)
-    property url badgeSource: Assets.iconUrl(Assets.Biohazard)
+    property url iconSource: SulfurSettings.dialogIcon
+    property url badgeSource: SulfurSettings.dialogBadge
 
     default property alias content: dynamicContent.data
 

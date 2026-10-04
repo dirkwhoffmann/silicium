@@ -11,6 +11,7 @@ import QtQuick
 import QtQuick.Controls
 import Silicium.Assets
 import Silicium.Controllers
+import Sulfur
 
 /* Asks before a dropped hard disk image is taken into the machine.
  *

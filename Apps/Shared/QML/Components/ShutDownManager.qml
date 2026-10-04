@@ -10,6 +10,7 @@
 import QtQuick
 import QtQuick.Controls
 import Silicium.Preferences
+import Sulfur
 
 /* Manages the closing sequence of a window that hosts a virtual machine.
  *

@@ -8,6 +8,7 @@
 // -----------------------------------------------------------------------------
 
 #include "SulfurBridge.h"
+#include "Assets.h"
 #include "Preferences.h"
 #include "SulfurSettings.h"
 
@@ -30,6 +31,11 @@ SulfurBridge::install()
     };
 
     sync();
+
+    // The pictures of the message dialogs never change
+    auto *assets = Assets::instance();
+    sulfur.setDialogIcon(assets->iconUrl(Assets::Icon::AppIcon));
+    sulfur.setDialogBadge(assets->iconUrl(Assets::Icon::Biohazard));
 
     QObject::connect(&prefs, &Preferences::appearancePrefsChanged, &sulfur, sync);
     QObject::connect(&prefs, &Preferences::developerPrefsChanged, &sulfur, sync);
