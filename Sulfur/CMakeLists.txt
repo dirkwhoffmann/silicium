@@ -74,3 +74,6 @@ target_link_libraries(Sulfur PUBLIC
         Qt6::QuickControls2
         Qt6::QuickEffects
         Qt6::Multimedia)
+
+# The gallery: a small application that depends on nothing but Sulfur
+add_subdirectory(Gallery)

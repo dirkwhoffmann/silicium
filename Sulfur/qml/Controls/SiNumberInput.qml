@@ -10,6 +10,13 @@ TextField {
     // Control-size level (see Size)
     property int size: Size.regular
 
+    // The range of numbers the field accepts
+    property int minValue: 0
+    property int maxValue: 999999
+
+    // Emitted once the user has finished editing, with the number entered
+    signal valueEdited(int value)
+
     implicitWidth: 48
     implicitHeight: Size.controlHeight(size)
     Layout.preferredWidth: implicitWidth
@@ -30,16 +37,11 @@ TextField {
 
     // Restrict input exclusively to whole numbers
     validator: IntValidator {
-        bottom: root.minValue; top: root.maxValue
+        bottom: control.minValue; top: control.maxValue
     }
     inputMethodHints: Qt.ImhDigitsOnly
 
-    onEditingFinished: {
-        root.valueEdited(parseInt(control.text) || 0)
-        root.editingFinished()
-    }
-
-    // onEditingFinished: root.editingFinished()
+    onEditingFinished: control.valueEdited(parseInt(control.text) || 0)
 
     background: Rectangle {
 

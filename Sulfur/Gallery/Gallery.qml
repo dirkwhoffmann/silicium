@@ -1,0 +1,469 @@
+// -----------------------------------------------------------------------------
+// This file is part of Sulfur, the Silicium UI toolkit
+//
+// Copyright (C) Dirk W. Hoffmann. www.dirkwhoffmann.de
+// Licensed under the GNU General Public License v3
+//
+// See https://www.gnu.org for license information
+// -----------------------------------------------------------------------------
+
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import Sulfur
+
+/* The Sulfur gallery: one page with the controls, grouped by what they do.
+ *
+ * Nothing in here imports anything but Qt and Sulfur. The theme controls at
+ * the top change the settings Sulfur is given (SulfurSettings), which is what
+ * an application does with its own preferences.
+ */
+ApplicationWindow {
+
+    id: root
+
+    width: 980
+    height: 760
+    minimumWidth: 640
+    minimumHeight: 400
+    visible: true
+    title: "Sulfur Gallery"
+
+    Palette.appearance: SulfurSettings.appearance
+    Palette.theme: SulfurSettings.colorTheme
+    color: Palette.background
+
+    // A value the controls below share, so that they visibly belong together
+    property real level: 0.4
+
+    //
+    // A titled group of controls
+    //
+
+    component Section: ColumnLayout {
+
+        id: section
+
+        property string title: ""
+        default property alias content: body.data
+
+        Layout.fillWidth: true
+        spacing: Style.mediumSpacing
+
+        SiText {
+            text: section.title
+            font.bold: true
+            font.pixelSize: Style.large
+            Layout.topMargin: Style.largeSpacing
+        }
+
+        HLine { }
+
+        Flow {
+
+            id: body
+            Layout.fillWidth: true
+            spacing: Style.largeSpacing
+        }
+    }
+
+    // A control with a caption underneath
+    component Sample: ColumnLayout {
+
+        id: sample
+
+        property string caption: ""
+        default property alias content: slot.data
+
+        spacing: Style.smallSpacing
+
+        RowLayout {
+
+            id: slot
+            Layout.alignment: Qt.AlignHCenter
+        }
+
+        SiText {
+            text: sample.caption
+            font.pixelSize: Style.small
+            color: Palette.secondary
+            Layout.alignment: Qt.AlignHCenter
+        }
+    }
+
+    //
+    // Layout
+    //
+
+    ColumnLayout {
+
+        anchors.fill: parent
+        spacing: 0
+
+        // The settings an application hands to Sulfur
+        Rectangle {
+
+            Layout.fillWidth: true
+            implicitHeight: settingsRow.implicitHeight + 2 * Style.mediumSpacing
+            color: Palette.toolbar
+
+            Flow {
+
+                id: settingsRow
+                anchors.fill: parent
+                anchors.margins: Style.mediumSpacing
+                spacing: Style.largeSpacing
+
+                SiText { text: "Appearance"; anchors.verticalCenter: undefined }
+
+                SiSegmentedControl {
+                    model: ["Auto", "Light", "Dark"]
+                    currentIndex: SulfurSettings.appearance
+                    onActivated: (index) => SulfurSettings.appearance = index
+                }
+
+                SiText { text: "Colors" }
+
+                SiSegmentedControl {
+                    model: ["Default", "Solaris"]
+                    currentIndex: SulfurSettings.colorTheme
+                    onActivated: (index) => SulfurSettings.colorTheme = index
+                }
+
+                SiText { text: "Font" }
+
+                SiSegmentedControl {
+                    model: ["System", "Inter", "Saira", "DejaVu"]
+                    currentIndex: SulfurSettings.fontTheme
+                    onActivated: (index) => SulfurSettings.fontTheme = index
+                }
+
+                SiCheckBox {
+                    text: "Layout debug aids"
+                    checked: SulfurSettings.debug
+                    onToggled: SulfurSettings.debug = checked
+                }
+            }
+        }
+
+        ScrollView {
+
+            id: scroll
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            contentWidth: availableWidth
+            clip: true
+
+            ColumnLayout {
+
+                width: scroll.availableWidth
+                spacing: Style.mediumSpacing
+
+                // Margins on the sides, without squeezing the sections
+                Item { Layout.preferredHeight: 0 }
+
+                //
+                // Colors
+                //
+
+                Section {
+
+                    title: "Palette"
+                    Layout.leftMargin: Style.largeSpacing
+                    Layout.rightMargin: Style.largeSpacing
+
+                    Repeater {
+
+                        model: [
+                            { name: "background", color: Palette.background },
+                            { name: "toolbar", color: Palette.toolbar },
+                            { name: "widget", color: Palette.widget },
+                            { name: "control", color: Palette.control },
+                            { name: "accent", color: Palette.accent },
+                            { name: "primary", color: Palette.primary },
+                            { name: "secondary", color: Palette.secondary },
+                            { name: "disabled", color: Palette.disabled }
+                        ]
+
+                        Sample {
+
+                            required property var modelData
+                            caption: modelData.name
+
+                            Rectangle {
+                                implicitWidth: 72
+                                implicitHeight: 32
+                                radius: Style.radius
+                                color: parent.parent.modelData.color
+                                border.color: Palette.border
+                            }
+                        }
+                    }
+                }
+
+                //
+                // Buttons
+                //
+
+                Section {
+
+                    title: "Buttons"
+                    Layout.leftMargin: Style.largeSpacing
+                    Layout.rightMargin: Style.largeSpacing
+
+                    Sample { caption: "SiButton"; SiButton { text: "Button" } }
+                    Sample { caption: "accented"; SiButton { text: "Accented"; accented: true } }
+                    Sample { caption: "disabled"; SiButton { text: "Disabled"; enabled: false } }
+                    Sample { caption: "sizes"; SiButton { text: "Small"; size: Size.small } SiButton { text: "Large"; size: Size.large } }
+
+                    Sample {
+                        caption: "SiSymbolButton"
+                        SiSymbolButton { phosphor: "gear" }
+                        SiSymbolButton { phosphor: "magnifying-glass" }
+                        SiSymbolButton { phosphor: "bug-beetle"; checkable: true }
+                    }
+
+                    Sample {
+                        caption: "NavTextButton"
+                        NavTextButton { phosphor: "gear"; text: "Settings" }
+                    }
+
+                    Sample {
+                        caption: "NavTextButtonFlat"
+                        NavTextButtonFlat {
+                            phosphor: "terminal-window"
+                            text: "Shell"
+                            checkable: true
+                            SiToolTip { text: "Hover for a tooltip" }
+                        }
+                    }
+
+                    Sample { caption: "SiHelpButton"; SiHelpButton { checkable: true } }
+                    Sample { caption: "SiOverlayButton"; SiOverlayButton { symbol: "play_circle"; size: 48 } }
+                }
+
+                //
+                // Text
+                //
+
+                Section {
+
+                    title: "Text and fields"
+                    Layout.leftMargin: Style.largeSpacing
+                    Layout.rightMargin: Style.largeSpacing
+
+                    Sample {
+                        caption: "SiText"
+                        ColumnLayout {
+                            SiText { text: "Heading"; font.pixelSize: Style.heading }
+                            SiText { text: "Regular text" }
+                            SiText { text: "Small text"; font.pixelSize: Style.small }
+                        }
+                    }
+
+                    Sample { caption: "SiLabel"; SiLabel { text: "A label" } }
+                    Sample { caption: "SiTextField"; SiTextField { placeholderText: "Type here"; implicitWidth: 160 } }
+                    Sample { caption: "SiNumberInput"; SiNumberInput { text: "42"; implicitWidth: 80 } }
+                }
+
+                //
+                // Choices
+                //
+
+                Section {
+
+                    title: "Choices"
+                    Layout.leftMargin: Style.largeSpacing
+                    Layout.rightMargin: Style.largeSpacing
+
+                    Sample { caption: "SiCheckBox"; SiCheckBox { text: "Check me"; checked: true } }
+                    Sample { caption: "bit style"; SiCheckBox { bitStyle: true; checked: true } }
+
+                    Sample {
+                        caption: "SiSegmentedControl"
+                        SiSegmentedControl {
+                            id: segments
+                            model: ["One", "Two", "Three"]
+                            onActivated: (index) => currentIndex = index
+                        }
+                    }
+
+                    Sample {
+                        caption: "SiComboBox"
+                        SiComboBox { model: ["Amiga", "Commodore 64", "Atari ST"]; implicitWidth: 160 }
+                    }
+
+                    Sample {
+                        caption: "SiMenu"
+                        SiButton {
+                            id: menuButton
+                            text: "Open menu"
+                            onClicked: demoMenu.popup(0, height)
+
+                            SiMenu {
+                                id: demoMenu
+                                SiMenuItem { text: "Open..." }
+                                SiMenuItem { text: "Checkable"; checkable: true; checked: true }
+                                SiMenuSeparator { }
+                                SiMenuItem { text: "Disabled"; enabled: false }
+                            }
+                        }
+                    }
+                }
+
+                //
+                // Values
+                //
+
+                Section {
+
+                    title: "Values"
+                    Layout.leftMargin: Style.largeSpacing
+                    Layout.rightMargin: Style.largeSpacing
+
+                    Sample {
+                        caption: "SiSlider"
+                        SiSlider { value: root.level; onMoved: root.level = value; implicitWidth: 160 }
+                    }
+                    Sample {
+                        caption: "SiProgressBar"
+                        SiProgressBar { value: root.level; implicitWidth: 160 }
+                    }
+                    Sample {
+                        caption: "SiBarGauge"
+                        SiBarGauge { value: root.level; implicitWidth: 160; implicitHeight: 16 }
+                    }
+                    Sample {
+                        caption: "SiKnob"
+                        SiKnob { value: root.level; from: 0; to: 1; onMoved: (v) => root.level = v }
+                    }
+                    Sample {
+                        caption: "SiMinMaxSlider"
+                        SiMinMaxSlider {
+                            topText: "1"
+                            bottomText: "0"
+                            from: 0
+                            to: 1
+                            value: root.level
+                            length: 90
+                            onMoved: (v) => root.level = v
+                        }
+                    }
+                    Sample {
+                        caption: "SiColorWell"
+                        SiColorWell { value: "#3366cc"; onPicked: (v) => value = v }
+                    }
+                }
+
+                //
+                // Labeled controls
+                //
+
+                Section {
+
+                    title: "Labeled controls"
+                    Layout.leftMargin: Style.largeSpacing
+                    Layout.rightMargin: Style.largeSpacing
+
+                    ColumnLayout {
+
+                        spacing: Style.smallSpacing
+
+                        SiTextBoxControl { l: "Name:"; lwidth: 110; controlWidth: 180; text: "Workbench" }
+                        SiNumberInputControl { l: "Memory:"; lwidth: 110; controlWidth: 80; r: "KB"; intValue: 512 }
+                        SiCheckBoxControl { l: "Fast RAM:"; lwidth: 110; checkBoxText: "Enabled"; checked: true }
+                        SiComboBoxControl { l: "Model:"; lwidth: 110; controlWidth: 180; model: ["A500", "A1000", "A2000"]; currentIndex: 0 }
+                        SiSliderControl { l: "Volume:"; lwidth: 110; controlWidth: 180; from: 0; to: 100; value: root.level * 100; onMoved: (v) => root.level = v / 100 }
+                        SiProgressBarControl { l: "Progress:"; lwidth: 110; controlWidth: 180; from: 0; to: 1; value: root.level }
+                    }
+                }
+
+                //
+                // Messages
+                //
+
+                Section {
+
+                    title: "Dialogs and messages"
+                    Layout.leftMargin: Style.largeSpacing
+                    Layout.rightMargin: Style.largeSpacing
+
+                    Sample {
+                        caption: "SiUserDialog"
+                        SiButton { text: "Show dialog"; onClicked: messageDialog.open() }
+                    }
+
+                    Sample {
+                        caption: "SiProgressDialog"
+                        SiButton {
+                            text: "Show progress"
+                            onClicked: {
+                                progressDialog.progress = 0
+                                progressDialog.open()
+                                progressAnimation.restart()
+                            }
+                        }
+                    }
+
+                    Sample {
+                        caption: "NotificationCenter"
+                        SiButton { text: "Notify"; onClicked: notifications.show("Sulfur", "A notification, shown by the notification center.", notifications.info) }
+                    }
+
+                    Sample {
+                        caption: "SiBanner"
+                        SiButton { text: "Show banner"; onClicked: banner.show("A message that takes itself away", 500, 3000) }
+                    }
+                }
+
+                Item { Layout.preferredHeight: Style.largeSpacing }
+            }
+        }
+    }
+
+    //
+    // Things that float
+    //
+
+    SiBanner {
+
+        id: banner
+        anchors.fill: parent
+        z: 2
+        alignment: Qt.AlignBottom
+    }
+
+    NotificationCenter {
+
+        id: notifications
+        maxWidth: root.width - 2 * Style.largeSpacing
+        maxHeight: root.height - 2 * Style.largeSpacing
+        watchdog: 0
+        z: 999
+    }
+
+    SiUserDialog {
+
+        id: messageDialog
+        titleText: "Hello from Sulfur"
+        bodyText: "This is a message dialog. Its icon and badge come from the application, through SulfurSettings."
+        buttons: Dialog.Cancel | Dialog.Ok
+    }
+
+    SiProgressDialog {
+
+        id: progressDialog
+        text: "Working..."
+
+        NumberAnimation {
+
+            id: progressAnimation
+            target: progressDialog
+            property: "progress"
+            from: 0
+            to: 1
+            duration: 2500
+            onFinished: progressDialog.close()
+        }
+    }
+}

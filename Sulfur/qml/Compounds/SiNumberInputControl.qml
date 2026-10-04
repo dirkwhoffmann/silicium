@@ -41,6 +41,9 @@ SiControl {
 
             id: control
             size: root.size
+            minValue: root.minValue
+            maxValue: root.maxValue
+            onValueEdited: (value) => root.valueEdited(value)
             Layout.fillWidth: hasFlexControl
             Layout.fillHeight: false
             Layout.preferredWidth: hasFlexControl ? control.implicitWidth : root.controlWidth
@@ -48,6 +51,12 @@ SiControl {
             Layout.minimumWidth: hasFlexControl ? 40 : root.controlWidth
             Layout.maximumWidth: hasFlexControl ? 9999 : root.controlWidth
             Layout.alignment: Qt.AlignVCenter
+
+            Connections {
+
+                target: control
+                function onEditingFinished() { root.editingFinished() }
+            }
         }
     ]
 }
