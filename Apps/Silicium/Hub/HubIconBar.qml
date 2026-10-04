@@ -45,7 +45,7 @@ ToolBar {
 
             // label: "Preferences"
 
-            NavTextButton {
+            SiButton {
 
                 action: actions.preferences
                 symbol: "settings"
@@ -62,7 +62,7 @@ ToolBar {
 
             // label: "Machines"
 
-            NavTextButton {
+            SiButton {
 
                 action: actions.open
                 symbol: "folder"
@@ -75,7 +75,7 @@ ToolBar {
         NavBarGroup {
 
 
-            NavTextButton {
+            SiButton {
 
                 action: actions.onboardingToggle
                 symbol: "add"

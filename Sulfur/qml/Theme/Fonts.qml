@@ -125,6 +125,18 @@ QtObject {
         return "";
     }
 
+    // Icon helpers: map an icon given by one of the three icon-font names
+    // (Material symbol, Phosphor, Awesome; first non-empty wins) to the text
+    // and font family needed to draw it.
+    function iconText(sym, phos, awe) {
+        return sym ? sym
+            : phos ? phos + phosphorSuffix
+            : awe ? awe : "";
+    }
+    function iconFamily(sym, phos, awe) {
+        return sym ? symbols : phos ? phosphor : awesome;
+    }
+
     // Font-specific compensation for large leadings
     readonly property int vgapFix: SulfurSettings.fontTheme == 2 ? -4 : 0 // DEPRECATED
 }

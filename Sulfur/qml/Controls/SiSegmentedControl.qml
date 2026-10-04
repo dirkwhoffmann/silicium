@@ -195,14 +195,10 @@ Item {
 
                 contentItem: SiText {
                     id: label
-                    text: seg.symbol ? seg.symbol
-                        : seg.phosphor ? seg.phosphor + Fonts.phosphorSuffix
-                        : seg.awesome ? seg.awesome
-                        : (seg.entry.text ?? "")
-                    font.family: seg.symbol ? Fonts.symbols
-                        : seg.phosphor ? Fonts.phosphor
-                        : seg.awesome ? Fonts.awesome
-                        : Fonts.main
+                    text: seg.hasIcon ? Fonts.iconText(seg.symbol, seg.phosphor, seg.awesome)
+                                      : (seg.entry.text ?? "")
+                    font.family: seg.hasIcon ? Fonts.iconFamily(seg.symbol, seg.phosphor, seg.awesome)
+                                             : Fonts.main
                     font.pixelSize: seg.hasIcon ? Size.fontSize(root.size) + 6 : Size.fontSize(root.size)
                     opacity: seg.enabled ? 1 : 0.4
                     color: seg.selected ? root.accentText : root.primary

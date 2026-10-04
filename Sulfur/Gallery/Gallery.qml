@@ -214,6 +214,12 @@ ApplicationWindow {
                     Sample { caption: "SiButton"; SiButton { text: "Button" } }
                     Sample { caption: "accented"; SiButton { text: "Accented"; accented: true } }
                     Sample { caption: "disabled"; SiButton { text: "Disabled"; enabled: false } }
+                    Sample {
+                        caption: "icon buttons"
+                        SiButton { symbol: "settings" }
+                        SiButton { phosphor: "clipboard"; checkable: true; checked: true }
+                        SiButton { symbol: "folder"; enabled: false }
+                    }
                     Sample { caption: "sizes"; SiButton { text: "Small"; size: Size.small } SiButton { text: "Large"; size: Size.large } }
 
                     Sample {

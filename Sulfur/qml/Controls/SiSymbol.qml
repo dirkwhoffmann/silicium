@@ -17,7 +17,7 @@ AbstractButton {
     implicitHeight: Size.iconSize(size)
     enabled: false
 
-    font.family: symbol ? Fonts.symbols : phosphor ? Fonts.phosphor : Fonts.awesome
+    font.family: Fonts.iconFamily(symbol, phosphor, awesome)
 
     contentItem: SiText {
 
@@ -29,7 +29,7 @@ AbstractButton {
         // Phosphor icons are selected via ligatures, and non-Regular weights
         // require a matching name suffix (e.g. "gear-bold") -- see
         // Fonts.phosphorSuffix.
-        text: symbol ? symbol : phosphor ? phosphor + Fonts.phosphorSuffix : awesome
+        text: Fonts.iconText(symbol, phosphor, awesome)
         font.family: root.font.family
         font.bold: root.font.bold
 

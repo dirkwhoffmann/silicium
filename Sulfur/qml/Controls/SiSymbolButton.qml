@@ -19,7 +19,7 @@ AbstractButton {
     implicitWidth: Size.iconSize(size)
     implicitHeight: Size.iconSize(size)
 
-    font.family: symbol ? Fonts.symbols : phosphor ? Fonts.phosphor : Fonts.awesome
+    font.family: Fonts.iconFamily(symbol, phosphor, awesome)
 
     contentItem: SiText {
 
@@ -28,7 +28,7 @@ AbstractButton {
         anchors.fill: parent
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        text: symbol ? symbol : phosphor ? phosphor + Fonts.phosphorSuffix : awesome
+        text: Fonts.iconText(symbol, phosphor, awesome)
         font.family: root.font.family
         font.bold: root.font.bold
         font.pixelSize: Math.round(Math.min(width, height) * root.scale)

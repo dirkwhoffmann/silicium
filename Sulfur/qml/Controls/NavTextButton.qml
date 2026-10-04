@@ -19,12 +19,8 @@ ToolButton {
     contentItem: SiText {
 
         id: textElement
-        text: control.symbol ? control.symbol
-            : control.phosphor ? control.phosphor + Fonts.phosphorSuffix
-                : control.awesome
-        font.family: control.symbol ? Fonts.symbols
-            : control.phosphor ? Fonts.phosphor
-                : Fonts.awesome
+        text: Fonts.iconText(control.symbol, control.phosphor, control.awesome)
+        font.family: Fonts.iconFamily(control.symbol, control.phosphor, control.awesome)
         font.pixelSize: 20
         color: control.enabled ? Palette.primary : Palette.disabled
         opacity: 0.7

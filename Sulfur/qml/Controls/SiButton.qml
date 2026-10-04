@@ -18,10 +18,17 @@ Button {
     id: root
 
     property bool accented: false
-    property bool accentedUp: accented
+    property bool accentedUp: accented || checked
     property bool accentedDown: accented
 
     property int size: Size.regular
+
+    // Optional icon (first non-empty wins). An icon replaces the text and
+    // makes the button square-ish instead of at least 80 points wide.
+    property string symbol: ""
+    property string phosphor: ""
+    property string awesome: ""
+    readonly property bool hasIcon: symbol !== "" || phosphor !== "" || awesome !== ""
 
     property color bgUpColor: accentedUp ? Palette.accent : Palette.widget
     property color bgDownColor: accentedDown ? Palette.accentElevated : Palette.widgetElevated
@@ -38,7 +45,9 @@ Button {
     font.pixelSize: Size.fontSize(size)
 
     implicitHeight: Size.controlHeight(size)
-    implicitWidth: Math.max(80, contentItem.implicitWidth + leftPadding + rightPadding)
+    implicitWidth: hasIcon
+        ? implicitHeight + 8
+        : Math.max(80, contentItem.implicitWidth + leftPadding + rightPadding)
 
     background: Rectangle {
 
@@ -101,9 +110,12 @@ Button {
 
     contentItem: SiText {
 
-        text: root.text
-        font: root.font
-        color: root.fgColor
+        text: root.hasIcon ? Fonts.iconText(root.symbol, root.phosphor, root.awesome) : root.text
+        font.family: root.hasIcon ? Fonts.iconFamily(root.symbol, root.phosphor, root.awesome)
+                                  : root.font.family
+        font.pixelSize: root.hasIcon ? root.font.pixelSize + 6 : root.font.pixelSize
+        font.bold: root.font.bold
+        color: (root.enabled || !root.hasIcon) ? root.fgColor : Palette.disabled
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         elide: Text.ElideRight
