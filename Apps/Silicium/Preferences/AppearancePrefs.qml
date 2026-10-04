@@ -52,7 +52,7 @@ PrefPage {
 
         header: "THEMES"
 
-        SiComboBoxControl {
+        SiLabeledComboBox {
 
             l: "Color Theme:"
             lwidth: root.labelWidth
@@ -68,7 +68,7 @@ PrefPage {
             }
         }
 
-        SiComboBoxControl {
+        SiLabeledComboBox {
 
             Layout.preferredWidth: root.comboWidth + root.labelWidth
             Layout.fillWidth: false
@@ -86,7 +86,7 @@ PrefPage {
             }
         }
 
-        SiComboBoxControl {
+        SiLabeledComboBox {
 
             l: "Fonts:"
             lwidth: root.labelWidth
@@ -104,7 +104,7 @@ PrefPage {
             }
         }
 
-        SiComboBoxControl {
+        SiLabeledComboBox {
 
             l: "Monospaced:"
             lwidth: root.labelWidth
@@ -127,7 +127,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 id: resizeMode
                 l: "Resizing:"
@@ -161,7 +161,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 id: statusbar
                 l: "Statusbar:"
@@ -201,7 +201,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 id: chromePlacement
                 l: "Placement:"
@@ -234,7 +234,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 id: chromeTitleBar
                 l: "Title Bar:"
@@ -267,7 +267,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 id: chromeLayout
                 l: "Controls:"

@@ -12,7 +12,7 @@ import Sulfur
 // A RowLayout itself, rather than an Item wrapping an anchors.fill inner
 // RowLayout -- that older shape derived implicitWidth/Height from a child
 // that was, in turn, sized from this item's own width/height, which is a
-// real (if usually latent) feedback loop once SiControl ends up nested
+// real (if usually latent) feedback loop once SiLabeled ends up nested
 // inside other flexible layouts (see SiBox/ScrollView for a case where the
 // equivalent pattern actually broke). Being a RowLayout directly gives a
 // correct, non-circular implicit size for free, computed from the children
@@ -23,7 +23,7 @@ RowLayout {
     id: root
 
     // Control-size level (see Size), propagated to the labels and available
-    // to the concrete control a subclass supplies (e.g. SiNumberViewControl).
+    // to the concrete control a subclass supplies (e.g. SiLabeledNumberView).
     property int size: Size.regular
 
     property int indent: 0
@@ -37,7 +37,7 @@ RowLayout {
     property int aspacing: Style.smallSpacing
     property bool hide: false
     // Kept for subclasses/callers that want to tint their own background;
-    // SiControl itself no longer draws one (see note below).
+    // SiLabeled itself no longer draws one (see note below).
     property bool debug: SulfurSettings.debug
 
     // property alias help: helpButton

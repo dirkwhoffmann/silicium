@@ -63,7 +63,7 @@ SiBox {
         Layout.fillWidth: true
         spacing: Style.smallSpacing
 
-        SiSearchControl {
+        SiLabeledSearch {
 
             controlWidth: 100
             size: Size.small
@@ -78,7 +78,7 @@ SiBox {
 
         SiLabel { text: qsTr("Syntax:") }
 
-        SiComboBoxControl {
+        SiLabeledComboBox {
 
             size: Size.small
             model: root.syntaxNames
@@ -86,7 +86,7 @@ SiBox {
             onCurrentIndexChanged: cc.CPU_DASM_SYNTAX = currentIndex
         }
 
-        SiComboBoxControl {
+        SiLabeledComboBox {
 
             size: Size.small
             model: root.revisionNames

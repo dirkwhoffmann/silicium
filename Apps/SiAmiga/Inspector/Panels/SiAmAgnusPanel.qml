@@ -37,8 +37,8 @@ SiAmInspectorWindow {
 
         spacing: 0
 
-        SiCheckBoxControl { id: box; size: Size.small; readOnly: true; lwidth: root.labelWidth }
-        SiWord24ViewControl { id: field }
+        SiLabeledCheckBox { id: box; size: Size.small; readOnly: true; lwidth: root.labelWidth }
+        SiLabeledWord24View { id: field }
     }
 
     ScrollView {
@@ -127,8 +127,8 @@ SiAmInspectorWindow {
                         columnSpacing: Style.smallSpacing
                         rowSpacing: Style.tinySpacing
 
-                        SiWordViewControl { l: qsTr("VPOS:"); lwidth: root.labelWidth; value: agnus.vpos }
-                        SiWordViewControl { l: qsTr("HPOS:"); lwidth: root.labelWidth; value: agnus.hpos }
+                        SiLabeledWordView { l: qsTr("VPOS:"); lwidth: root.labelWidth; value: agnus.vpos }
+                        SiLabeledWordView { l: qsTr("HPOS:"); lwidth: root.labelWidth; value: agnus.hpos }
                     }
 
                     // VSpacer {}
@@ -148,19 +148,19 @@ SiAmInspectorWindow {
                         columnSpacing: Style.smallSpacing
                         rowSpacing: Style.tinySpacing
 
-                        SiWordViewControl { l: qsTr("DMACON:"); lwidth: root.labelWidth; value: agnus.dmacon }
-                        SiWordViewControl { l: qsTr("BPL0CON:"); lwidth: root.labelWidth; value: agnus.bplcon0 }
+                        SiLabeledWordView { l: qsTr("DMACON:"); lwidth: root.labelWidth; value: agnus.dmacon }
+                        SiLabeledWordView { l: qsTr("BPL0CON:"); lwidth: root.labelWidth; value: agnus.bplcon0 }
 
-                        SiWordViewControl { l: qsTr("FMODE:"); lwidth: root.labelWidth; value: agnus.fmode }
+                        SiLabeledWordView { l: qsTr("FMODE:"); lwidth: root.labelWidth; value: agnus.fmode }
                         Item { }
 
-                        SiWordViewControl { l: qsTr("DDFSTRT:"); lwidth: root.labelWidth; value: agnus.ddfstrt }
-                        SiWordViewControl { l: qsTr("DDFSTOP:"); lwidth: root.labelWidth; value: agnus.ddfstop }
+                        SiLabeledWordView { l: qsTr("DDFSTRT:"); lwidth: root.labelWidth; value: agnus.ddfstrt }
+                        SiLabeledWordView { l: qsTr("DDFSTOP:"); lwidth: root.labelWidth; value: agnus.ddfstop }
 
-                        SiWordViewControl { l: qsTr("DIWSTRT:"); lwidth: root.labelWidth; value: agnus.diwstrt }
-                        SiWordViewControl { l: qsTr("DIWSTOP:"); lwidth: root.labelWidth; value: agnus.diwstop }
+                        SiLabeledWordView { l: qsTr("DIWSTRT:"); lwidth: root.labelWidth; value: agnus.diwstrt }
+                        SiLabeledWordView { l: qsTr("DIWSTOP:"); lwidth: root.labelWidth; value: agnus.diwstop }
 
-                        SiWordViewControl { l: qsTr("DIWHIGH:"); lwidth: root.labelWidth; value: agnus.diwhigh }
+                        SiLabeledWordView { l: qsTr("DIWHIGH:"); lwidth: root.labelWidth; value: agnus.diwhigh }
                         Item { }
                     }
                 }
@@ -234,8 +234,8 @@ SiAmInspectorWindow {
                         DmaRow { label: qsTr("BLTCPT:"); checked: agnus.bltEnabled(2); value: agnus.bltPt(2) }
                         DmaRow { label: qsTr("BLTDPT:"); checked: agnus.bltEnabled(3); value: agnus.bltPt(3) }
 
-                        SiCheckBoxControl { size: Size.small; readOnly: true; lwidth: root.labelWidth; l: qsTr("BLTPRI:"); checked: agnus.bltPri }
-                        SiCheckBoxControl { size: Size.small; readOnly: true; lwidth: root.labelWidth; l: qsTr("BLS:"); checked: agnus.bls }
+                        SiLabeledCheckBox { size: Size.small; readOnly: true; lwidth: root.labelWidth; l: qsTr("BLTPRI:"); checked: agnus.bltPri }
+                        SiLabeledCheckBox { size: Size.small; readOnly: true; lwidth: root.labelWidth; l: qsTr("BLS:"); checked: agnus.bls }
 
                         // VSpacer { }
                     }
@@ -260,16 +260,16 @@ SiAmInspectorWindow {
                     columnSpacing: Style.smallSpacing
                     rowSpacing: Style.tinySpacing
 
-                    SiWordViewControl { l: qsTr("BLTAMOD:"); lwidth: root.labelWidth; value: agnus.bltamod }
-                    SiWordViewControl { l: qsTr("BPL1MOD:"); lwidth: root.labelWidth; value: agnus.bpl1mod }
+                    SiLabeledWordView { l: qsTr("BLTAMOD:"); lwidth: root.labelWidth; value: agnus.bltamod }
+                    SiLabeledWordView { l: qsTr("BPL1MOD:"); lwidth: root.labelWidth; value: agnus.bpl1mod }
 
-                    SiWordViewControl { l: qsTr("BLTBMOD:"); lwidth: root.labelWidth; value: agnus.bltbmod }
-                    SiWordViewControl { l: qsTr("BPL2MOD:"); lwidth: root.labelWidth; value: agnus.bpl2mod }
+                    SiLabeledWordView { l: qsTr("BLTBMOD:"); lwidth: root.labelWidth; value: agnus.bltbmod }
+                    SiLabeledWordView { l: qsTr("BPL2MOD:"); lwidth: root.labelWidth; value: agnus.bpl2mod }
 
-                    SiWordViewControl { l: qsTr("BLTCMOD:"); lwidth: root.labelWidth; value: agnus.bltcmod }
+                    SiLabeledWordView { l: qsTr("BLTCMOD:"); lwidth: root.labelWidth; value: agnus.bltcmod }
                     Item { }
 
-                    SiWordViewControl { l: qsTr("BLTDMOD:"); lwidth: root.labelWidth; value: agnus.bltdmod }
+                    SiLabeledWordView { l: qsTr("BLTDMOD:"); lwidth: root.labelWidth; value: agnus.bltdmod }
                     Item { }
                 }
             }
@@ -311,7 +311,7 @@ SiAmInspectorWindow {
                                     value: agnus.audPt(parent.index)
                                 }
                                 SiLabel { text: qsTr("←") }
-                                SiWord24ViewControl { value: agnus.audLc(parent.index); r: qsTr("AUD%1LC").arg(parent.index) }
+                                SiLabeledWord24View { value: agnus.audLc(parent.index); r: qsTr("AUD%1LC").arg(parent.index) }
                             }
                         }
                     }

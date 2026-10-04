@@ -46,7 +46,7 @@ PrefPage {
 
         header: "DEBUGGING"
 
-        SiCheckBoxControl {
+        SiLabeledCheckBox {
 
             indent: root.labelWidth
             r: "Developer Mode"
@@ -54,7 +54,7 @@ PrefPage {
             onCheckedChanged: Preferences.developerMode = checked
         }
 
-        SiCheckBoxControl {
+        SiLabeledCheckBox {
 
             indent: root.labelWidth
             r: "Qt Layout Hints"
@@ -67,7 +67,7 @@ PrefPage {
 
         header: "LOGGING"
 
-        SiCheckBoxControl {
+        SiLabeledCheckBox {
 
             indent: root.labelWidth
             r: "Include debug messages"

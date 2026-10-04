@@ -55,7 +55,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 id: vmSortMode
                 Layout.fillWidth: true
@@ -92,7 +92,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 id: hideShowcases
                 r: "Hide preinstalled machines"
@@ -120,7 +120,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 id: resolveUUIDConflicts
                 l: "Identity:"
@@ -154,7 +154,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiNumberInputControl {
+            SiLabeledNumberInput {
 
                 id: maxSnapshots
                 l: "Capacity:"
@@ -184,7 +184,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 id: autoDeleteSnapshots
                 r: "Auto-delete oldest snapshot"
@@ -217,7 +217,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 id: hibernateSnapshot
                 lwidth: root.labelWidth
@@ -245,7 +245,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 id: hibernateWorkspace
                 lwidth: root.labelWidth
@@ -273,7 +273,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 id: showHibernationDialog
                 lwidth: root.labelWidth
@@ -306,7 +306,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 id: ejectWithoutAsking
                 l: "Media:"
@@ -335,7 +335,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 id: pauseWhileInBackground
                 l: "Activity:"
@@ -364,7 +364,7 @@ PrefPage {
 
         HelpWrapper {
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 id: preventSleep
                 l: "Sleep:"

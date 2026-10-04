@@ -63,7 +63,7 @@ SettingsPage {
             checked: config.DRIVE8_CONNECTED
             onClicked: config.DRIVE8_CONNECTED = checked;
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 id: autoConfig8
                 l: "Config:"
@@ -75,7 +75,7 @@ SettingsPage {
                 HSpacer { size: 20 }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "Type:"
                 lwidth: root.labelWidth
@@ -86,7 +86,7 @@ SettingsPage {
                 SiHelpButton { onClicked: root.help("vc1541-models.md") }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "Extra RAM:"
                 lwidth: root.labelWidth
@@ -98,7 +98,7 @@ SettingsPage {
                 SiHelpButton { onClicked: root.help("vc1541-ram.md") }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "Parallel Cable:"
                 lwidth: root.labelWidth
@@ -123,7 +123,7 @@ SettingsPage {
             checked: config.DRIVE9_CONNECTED
             onClicked: config.DRIVE9_CONNECTED = checked;
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 id: autoConfig9
                 l: "Config:"
@@ -135,7 +135,7 @@ SettingsPage {
                 HSpacer { size: 20 }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "Type:"
                 lwidth: root.labelWidth
@@ -147,7 +147,7 @@ SettingsPage {
                 SiHelpButton { onClicked: root.help("vc1541-models.md") }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "Extra RAM:"
                 lwidth: root.labelWidth
@@ -159,7 +159,7 @@ SettingsPage {
                 onCurrentIndexChanged: config.DRIVE9_RAM = currentIndex;
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "Parallel Cable:"
                 lwidth: root.labelWidth
@@ -185,7 +185,7 @@ SettingsPage {
             checked: config.DAT_CONNECT
             onClicked: config.DAT_CONNECT = checked;
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "Type:"
                 lwidth: root.labelWidth
@@ -209,7 +209,7 @@ SettingsPage {
             header: "MOUSE"
             size: root.sectionWidth
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "Type:"
                 lwidth: root.labelWidth
@@ -229,7 +229,7 @@ SettingsPage {
             header: "JOYSTICK"
             size: root.sectionWidth
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 l: "Auto-fire:"
                 lwidth: root.labelWidth
@@ -238,7 +238,7 @@ SettingsPage {
                 checked: config.AUTOFIRE
                 onClicked: config.AUTOFIRE = checked;
 
-                SiSliderControl {
+                SiLabeledSlider {
 
                     l: "Fast"
                     r: "Slow"
@@ -253,7 +253,7 @@ SettingsPage {
                 }
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 l: "Burst mode:"
                 lwidth: root.labelWidth
@@ -261,7 +261,7 @@ SettingsPage {
                 checked: config.AUTOFIRE_BURSTS
                 onClicked: config.AUTOFIRE_BURSTS = checked;
 
-                SiNumberInputControl {
+                SiLabeledNumberInput {
 
                     l: "Fire"
                     r: "bullets per burst"

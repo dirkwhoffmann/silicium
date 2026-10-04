@@ -109,7 +109,7 @@ SiAmInspectorWindow {
         16: "#990000"  // EXT
     })
 
-    component TypeInfo: SiControl {
+    component TypeInfo: SiLabeled {
 
         id: typeInfo
 
@@ -204,7 +204,7 @@ SiAmInspectorWindow {
 
             Item { Layout.fillWidth: true }
 
-            SiSearchControl {
+            SiLabeledSearch {
 
                 controlWidth: 160
                 base: root.numBase

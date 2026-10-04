@@ -29,7 +29,7 @@ SiC64InspectorWindow {
     readonly property real columnWidth: Math.max(260,
         (scrollView.availableWidth - Style.largeSpacing * 2) / 3)
 
-    component SiByteViewControl: SiNumberViewControl {
+    component SiLabeledByteView: SiLabeledNumberView {
 
         size: Size.small
         font.weight: 500
@@ -70,7 +70,7 @@ SiC64InspectorWindow {
         Layout.fillHeight: true
         spacing: Style.mediumSpacing
 
-        SiTextControl {
+        SiLabeledText {
 
             size: Size.small
             l: qsTr("Waveform:")
@@ -82,7 +82,7 @@ SiC64InspectorWindow {
 
             Layout.fillWidth: true
 
-            SiByteViewControl {
+            SiLabeledByteView {
 
                 l: qsTr("Frequency:")
                 lwidth: voiceBox.lwidth
@@ -92,7 +92,7 @@ SiC64InspectorWindow {
 
             HSpacer { }
 
-            SiByteViewControl {
+            SiLabeledByteView {
 
                 l: qsTr("Width:")
                 // lwidth: 80
@@ -101,7 +101,7 @@ SiC64InspectorWindow {
             }
         }
 
-        SiControl {
+        SiLabeled {
 
             size: Size.small
             l: qsTr("ADSR:")
@@ -114,27 +114,27 @@ SiC64InspectorWindow {
 
                     spacing: Style.smallSpacing
 
-                    SiByteViewControl { bits: 4; value: voiceBox.v.attackRate }
+                    SiLabeledByteView { bits: 4; value: voiceBox.v.attackRate }
                     SiText { text: "-"; Layout.leftMargin: 1 }
-                    SiByteViewControl { bits: 4; value: voiceBox.v.decayRate }
+                    SiLabeledByteView { bits: 4; value: voiceBox.v.decayRate }
                     SiText { text: "-"; Layout.leftMargin: 1 }
-                    SiByteViewControl { bits: 4; value: voiceBox.v.sustainRate }
+                    SiLabeledByteView { bits: 4; value: voiceBox.v.sustainRate }
                     SiText { text: "-"; Layout.leftMargin: 1 }
-                    SiByteViewControl { bits: 4; value: voiceBox.v.releaseRate }
+                    SiLabeledByteView { bits: 4; value: voiceBox.v.releaseRate }
                 }
             ]
         }
 
-        SiCheckBoxControl {
+        SiLabeledCheckBox {
 
             size: Size.small
             indent: voiceBox.lwidth
             checked: voiceBox.v.test
             r: qsTr("Test")
 
-            SiCheckBoxControl { size: Size.small; checked: voiceBox.v.gate; r: qsTr("Gate") }
-            SiCheckBoxControl { size: Size.small; checked: voiceBox.v.sync; r: qsTr("Sync") }
-            SiCheckBoxControl { size: Size.small; checked: voiceBox.v.ring; r: qsTr("Ring") }
+            SiLabeledCheckBox { size: Size.small; checked: voiceBox.v.gate; r: qsTr("Gate") }
+            SiLabeledCheckBox { size: Size.small; checked: voiceBox.v.sync; r: qsTr("Sync") }
+            SiLabeledCheckBox { size: Size.small; checked: voiceBox.v.ring; r: qsTr("Ring") }
         }
 
         VSpacer { }
@@ -229,7 +229,7 @@ SiC64InspectorWindow {
                         Layout.fillWidth: true
                         spacing: Style.tinySpacing
 
-                        SiByteViewControl {
+                        SiLabeledByteView {
 
                             l: qsTr("Volume:")
                             lwidth: mixerBox.lwidth
@@ -238,7 +238,7 @@ SiC64InspectorWindow {
 
                         HSpacer { }
 
-                        SiByteViewControl {
+                        SiLabeledByteView {
 
                             l: qsTr("PotX:")
                             value: sid.volume
@@ -246,14 +246,14 @@ SiC64InspectorWindow {
 
                         HSpacer { }
 
-                        SiByteViewControl {
+                        SiLabeledByteView {
 
                             l: qsTr("PotY:")
                             value: sid.potY
                         }
                     }
 
-                    SiTextControl {
+                    SiLabeledText {
 
                         size: Size.small
                         l: qsTr("Filter type:")
@@ -265,7 +265,7 @@ SiC64InspectorWindow {
                         ])
                     }
 
-                    SiCheckBoxControl {
+                    SiLabeledCheckBox {
 
                         size: Size.small
                         lwidth: mixerBox.lwidth
@@ -273,13 +273,13 @@ SiC64InspectorWindow {
                         checked: sid.filter1
                         r: "1"
 
-                        SiCheckBoxControl { size: Size.small; checked: sid.filter2; r: "2" }
-                        SiCheckBoxControl { size: Size.small; checked: sid.filter3; r: "3" }
+                        SiLabeledCheckBox { size: Size.small; checked: sid.filter2; r: "2" }
+                        SiLabeledCheckBox { size: Size.small; checked: sid.filter3; r: "3" }
                     }
 
                     RowLayout {
 
-                        SiByteViewControl {
+                        SiLabeledByteView {
 
                             size: Size.small
                             lwidth: mixerBox.lwidth
@@ -290,7 +290,7 @@ SiC64InspectorWindow {
 
                         HSpacer { }
 
-                        SiByteViewControl {
+                        SiLabeledByteView {
 
                             size: Size.small
                             l: qsTr("Resonance:")
@@ -311,7 +311,7 @@ SiC64InspectorWindow {
                     Layout.preferredWidth: root.columnWidth
                     spacing: Style.mediumSpacing
 
-                    SiComboBoxControl {
+                    SiLabeledComboBox {
 
                         l: "Show:"
                         model: [qsTr("Audio out"), qsTr("Selected SID")]
@@ -349,7 +349,7 @@ SiC64InspectorWindow {
                     Layout.preferredWidth: root.columnWidth
                     spacing: Style.mediumSpacing
 
-                    SiProgressBarControl {
+                    SiLabeledProgressBar {
 
                         size: Size.small
                         l: "Fill level:"

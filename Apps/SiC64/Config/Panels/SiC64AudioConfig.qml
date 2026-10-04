@@ -235,7 +235,7 @@ SettingsPage {
             header: "AUDIO SYNTHESIS"
             size: root.sectionWidth
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "SID Engine:"
                 lwidth: root.labelWidth
@@ -246,7 +246,7 @@ SettingsPage {
                 onCurrentIndexChanged: config.SID_ENGINE = currentIndex
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 r: "Audio Filter"
@@ -254,7 +254,7 @@ SettingsPage {
                 onClicked: config.SID_FILTER = checked;
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "Interpolation:"
                 lwidth: root.labelWidth

@@ -64,7 +64,7 @@ SettingsPage {
 
         // Forwarded from the port field. Write the port back from here rather
         // than from onPortChanged: 'port' is bound to a config option, and
-        // assigning it would destroy that binding (see SiNumberInputControl).
+        // assigning it would destroy that binding (see SiLabeledNumberInput).
         signal portEdited(int value)
 
         columns: 2
@@ -74,7 +74,7 @@ SettingsPage {
         // Row 1
         //
 
-        SiCheckBoxControl {
+        SiLabeledCheckBox {
 
             id: checkBox
             // Layout.preferredWidth: 150
@@ -87,7 +87,7 @@ SettingsPage {
 
         RowLayout {
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 id: comboBox
                 // Layout.fillWidth: false
@@ -95,7 +95,7 @@ SettingsPage {
                 model: [ "STDIO", "TCP", "HTTP" ]
             }
 
-            SiNumberInputControl {
+            SiLabeledNumberInput {
 
                 id: numberBox
                 // Layout.fillWidth: false

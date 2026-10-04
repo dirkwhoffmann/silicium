@@ -52,7 +52,7 @@ RowLayout {
 
         VSpacer { }
 
-        SiCheckBoxControl {
+        SiLabeledCheckBox {
 
             r: "Disconnect emulation keys from keyboard"
             checked: Preferences.disconnectEmulationKeys

@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Sulfur
 
-SiControl {
+SiLabeled {
 
     id: root
 
@@ -42,7 +42,7 @@ SiControl {
      * The value flows one way, inwards. What the user types comes back out
      * through accepted()/editingFinished() and the editText below, and the
      * caller is expected to write it to wherever the binding reads from --
-     * the same arrangement SiNumberInputControl has with valueEdited().
+     * the same arrangement SiLabeledNumberInput has with valueEdited().
      *
      * Once the caller has had its say, the field is put back in step with
      * this property (see resync), which is what makes the source the last
@@ -70,7 +70,7 @@ SiControl {
 
     /* Set false to keep the control out of the focus chain, e.g. so it can't
      * swallow the standard emulation keys. Not an alias to the inner
-     * focusPolicy: SiControl is an Item, and Item carries a focusPolicy of its
+     * focusPolicy: SiLabeled is an Item, and Item carries a focusPolicy of its
      * own (Qt 6.7+), so an alias of that name would shadow a base member.
      */
     property bool focusable: true
@@ -97,7 +97,7 @@ SiControl {
     /* Follows the source. A Connections object rather than an onTextChanged
      * handler on root: a call site declaring one of those would replace the
      * handler declared here rather than run alongside it (the same reason
-     * SiComboBoxControl watches its own currentIndex this way).
+     * SiLabeledComboBox watches its own currentIndex this way).
      */
     Connections {
 

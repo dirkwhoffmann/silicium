@@ -4,10 +4,10 @@ import QtQuick.Layouts
 import Sulfur
 
 // A zero-padded 16-bit value -- originally SiAmCIAPanel's own
-// SiWordViewControl. See SiByteViewControl for the base/padded defaults and
-// the toggle-following convention; SiWord24ViewControl/SiWord32ViewControl
+// SiLabeledWordView. See SiLabeledByteView for the base/padded defaults and
+// the toggle-following convention; SiLabeledWord24View/SiLabeledWord32View
 // are the wider counterparts.
-SiNumberViewControl {
+SiLabeledNumberView {
 
     size: Size.small
     font.weight: 500

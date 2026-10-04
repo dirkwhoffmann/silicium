@@ -92,7 +92,7 @@ SiDialog {
                 color: Palette.border
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 id: formatCombo
                 l: qsTr("Export As:")
                 lwidth: root.labelWidth

@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Sulfur
 
-SiControl {
+SiLabeled {
 
     id: root
 

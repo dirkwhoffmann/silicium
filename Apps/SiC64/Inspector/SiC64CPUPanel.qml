@@ -32,7 +32,7 @@ SiC64InspectorWindow {
     // side), 1 = Debug (breakpoints + watchpoints side by side).
     property int page: 0
 
-    component SiByteViewControl: SiNumberViewControl {
+    component SiLabeledByteView: SiLabeledNumberView {
 
         size: Size.small
         font.weight: 500
@@ -220,7 +220,7 @@ SiC64InspectorWindow {
 
                             Layout.fillWidth: true
 
-                            SiByteViewControl { l: qsTr("PC:"); lwidth: grid.lw; bits: 16; controlWidth: 46; value: info.pc }
+                            SiLabeledByteView { l: qsTr("PC:"); lwidth: grid.lw; bits: 16; controlWidth: 46; value: info.pc }
 
                             SiText {
 
@@ -245,7 +245,7 @@ SiC64InspectorWindow {
                             readonly property int lw: 28
 
                             /*
-                            SiByteViewControl { l: qsTr("PC:"); lwidth: grid.lw; bits: 16; controlWidth: 46; value: info.pc }
+                            SiLabeledByteView { l: qsTr("PC:"); lwidth: grid.lw; bits: 16; controlWidth: 46; value: info.pc }
 
                             SiText {
 
@@ -259,13 +259,13 @@ SiC64InspectorWindow {
 
                              */
 
-                            SiByteViewControl { l: qsTr("A:"); lwidth: grid.lw; value: info.a }
-                            SiByteViewControl { l: qsTr("X:"); lwidth: grid.lw; value: info.x }
-                            SiByteViewControl { l: qsTr("Y:"); lwidth: grid.lw; value: info.y }
+                            SiLabeledByteView { l: qsTr("A:"); lwidth: grid.lw; value: info.a }
+                            SiLabeledByteView { l: qsTr("X:"); lwidth: grid.lw; value: info.x }
+                            SiLabeledByteView { l: qsTr("Y:"); lwidth: grid.lw; value: info.y }
 
-                            SiByteViewControl { l: qsTr("SP:"); lwidth: grid.lw; value: info.sp }
-                            SiByteViewControl { l: qsTr("PP:"); lwidth: grid.lw; value: info.portReg }
-                            SiByteViewControl { l: "↔:"; lwidth: grid.lw; value: info.portDir }
+                            SiLabeledByteView { l: qsTr("SP:"); lwidth: grid.lw; value: info.sp }
+                            SiLabeledByteView { l: qsTr("PP:"); lwidth: grid.lw; value: info.portReg }
+                            SiLabeledByteView { l: "↔:"; lwidth: grid.lw; value: info.portDir }
 
                             Item { }
 
@@ -310,17 +310,17 @@ SiC64InspectorWindow {
                             columnSpacing: Style.mediumSpacing
                             rowSpacing: Style.smallSpacing
 
-                            SiCheckBoxControl { size: Size.small; readOnly: true; checked: info.irq; r: qsTr("IRQ") }
-                            SiCheckBoxControl { size: Size.tiny; indent: 2; readOnly: true; checked: info.irqCIA; r: qsTr("CIA 1") }
-                            SiCheckBoxControl { size: Size.tiny; indent: 2; readOnly: true; checked: info.irqVIC; r: qsTr("VICII") }
-                            SiCheckBoxControl { size: Size.tiny; indent: 2; readOnly: true; checked: info.irqEXP; r: qsTr("EPort") }
+                            SiLabeledCheckBox { size: Size.small; readOnly: true; checked: info.irq; r: qsTr("IRQ") }
+                            SiLabeledCheckBox { size: Size.tiny; indent: 2; readOnly: true; checked: info.irqCIA; r: qsTr("CIA 1") }
+                            SiLabeledCheckBox { size: Size.tiny; indent: 2; readOnly: true; checked: info.irqVIC; r: qsTr("VICII") }
+                            SiLabeledCheckBox { size: Size.tiny; indent: 2; readOnly: true; checked: info.irqEXP; r: qsTr("EPort") }
 
-                            SiCheckBoxControl { size: Size.small; readOnly: true; checked: info.nmi; r: qsTr("NMI") }
-                            SiCheckBoxControl { size: Size.tiny; indent: 2; readOnly: true; checked: info.nmiCIA; r: qsTr("CIA 2") }
-                            SiCheckBoxControl { size: Size.tiny; indent: 2; readOnly: true; checked: info.nmiKBD; r: qsTr("Keyboard") }
-                            SiCheckBoxControl { size: Size.tiny; indent: 2; readOnly: true; checked: info.nmiEXP; r: qsTr("EPort") }
+                            SiLabeledCheckBox { size: Size.small; readOnly: true; checked: info.nmi; r: qsTr("NMI") }
+                            SiLabeledCheckBox { size: Size.tiny; indent: 2; readOnly: true; checked: info.nmiCIA; r: qsTr("CIA 2") }
+                            SiLabeledCheckBox { size: Size.tiny; indent: 2; readOnly: true; checked: info.nmiKBD; r: qsTr("Keyboard") }
+                            SiLabeledCheckBox { size: Size.tiny; indent: 2; readOnly: true; checked: info.nmiEXP; r: qsTr("EPort") }
 
-                            SiCheckBoxControl { size: Size.small; readOnly: true; checked: info.rdy; r: qsTr("RDY") }
+                            SiLabeledCheckBox { size: Size.small; readOnly: true; checked: info.rdy; r: qsTr("RDY") }
                         }
 
                         VSpacer { }

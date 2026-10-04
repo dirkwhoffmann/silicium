@@ -65,7 +65,7 @@ PrefPage {
             rightPadding: Style.mediumSpacing
         }
 
-        SiComboBoxControl {
+        SiLabeledComboBox {
 
             id: deviceSelector
 

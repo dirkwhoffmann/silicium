@@ -48,7 +48,7 @@ SiAmInspectorWindow {
     // BLTCON0/1's ash/bsh + sub-field bytes, and the barrel shifters' shift
     // amounts -- fmt4/fmt8 in the Swift reference (fixed hex, not tied to
     // the shared format setting -- see the class comment).
-    component SiHex4: SiNumberViewControl {
+    component SiHex4: SiLabeledNumberView {
         size: Size.small
         font.weight: 500
         controlWidth: 32
@@ -57,19 +57,19 @@ SiAmInspectorWindow {
         padded: true
     }
 
-    // SiByteViewControl's default width (32) is a bit tight for this
+    // SiLabeledByteView's default width (32) is a bit tight for this
     // panel's sub-byte fields.
-    component SiHex8: SiByteViewControl {
+    component SiHex8: SiLabeledByteView {
         controlWidth: 44
     }
 
     // Blitter Data's Hold/Old/New registers -- fmt16 hex in the Swift
-    // reference. SiWordViewControl's own default width fits, so it's used
+    // reference. SiLabeledWordView's own default width fits, so it's used
     // directly (no local alias) everywhere below.
 
     // Mask/Shift/Fill Circuitry and Minterm Generator values -- fmt16b
     // binary in the Swift reference.
-    component SiBin16: SiNumberViewControl {
+    component SiBin16: SiLabeledNumberView {
 
         size: Size.small
         font.weight: 500
@@ -183,13 +183,13 @@ SiAmInspectorWindow {
                             SiHex8 { value: blitter.bltcon1C }
                         }
 
-                        SiCheckBoxControl { size: Size.small; lwidth: root.labelWidth; readOnly: true; checked: blitter.exclusiveFill; r: qsTr("Exclusive Fill") }
-                        SiCheckBoxControl { size: Size.small; lwidth: root.labelWidth; readOnly: true; checked: blitter.inclusiveFill; r: qsTr("Inclusive Fill") }
-                        SiCheckBoxControl { size: Size.small; lwidth: root.labelWidth; readOnly: true; checked: blitter.fillCarry; r: qsTr("Fill Carry") }
-                        SiCheckBoxControl { size: Size.small; lwidth: root.labelWidth; readOnly: true; checked: blitter.descending; r: qsTr("Descending") }
-                        SiCheckBoxControl { size: Size.small; lwidth: root.labelWidth; readOnly: true; checked: blitter.lineMode; r: qsTr("Line Mode") }
+                        SiLabeledCheckBox { size: Size.small; lwidth: root.labelWidth; readOnly: true; checked: blitter.exclusiveFill; r: qsTr("Exclusive Fill") }
+                        SiLabeledCheckBox { size: Size.small; lwidth: root.labelWidth; readOnly: true; checked: blitter.inclusiveFill; r: qsTr("Inclusive Fill") }
+                        SiLabeledCheckBox { size: Size.small; lwidth: root.labelWidth; readOnly: true; checked: blitter.fillCarry; r: qsTr("Fill Carry") }
+                        SiLabeledCheckBox { size: Size.small; lwidth: root.labelWidth; readOnly: true; checked: blitter.descending; r: qsTr("Descending") }
+                        SiLabeledCheckBox { size: Size.small; lwidth: root.labelWidth; readOnly: true; checked: blitter.lineMode; r: qsTr("Line Mode") }
 
-                        SiCheckBoxControl {
+                        SiLabeledCheckBox {
 
                             size: Size.small
                             lwidth: root.labelWidth
@@ -219,25 +219,25 @@ SiAmInspectorWindow {
                         SiLabel { size: Size.small; text: qsTr("Old"); horizontalAlignment: Text.AlignHCenter; Layout.preferredWidth: 52 }
                         SiLabel { size: Size.small; text: qsTr("New"); horizontalAlignment: Text.AlignHCenter; Layout.preferredWidth: 52 }
 
-                        SiCheckBoxControl { size: Size.small; readOnly: true; checked: blitter.useA; l: qsTr("Channel A") }
-                        SiWordViewControl { value: blitter.aHold }
-                        SiWordViewControl { value: blitter.aOld }
-                        SiWordViewControl { value: blitter.aNew }
+                        SiLabeledCheckBox { size: Size.small; readOnly: true; checked: blitter.useA; l: qsTr("Channel A") }
+                        SiLabeledWordView { value: blitter.aHold }
+                        SiLabeledWordView { value: blitter.aOld }
+                        SiLabeledWordView { value: blitter.aNew }
 
-                        SiCheckBoxControl { size: Size.small; readOnly: true; checked: blitter.useB; l: qsTr("Channel B") }
-                        SiWordViewControl { value: blitter.bHold }
-                        SiWordViewControl { value: blitter.bOld }
-                        SiWordViewControl { value: blitter.bNew }
+                        SiLabeledCheckBox { size: Size.small; readOnly: true; checked: blitter.useB; l: qsTr("Channel B") }
+                        SiLabeledWordView { value: blitter.bHold }
+                        SiLabeledWordView { value: blitter.bOld }
+                        SiLabeledWordView { value: blitter.bNew }
 
-                        SiCheckBoxControl { size: Size.small; readOnly: true; checked: blitter.useC; l: qsTr("Channel C") }
-                        SiWordViewControl { value: blitter.cHold }
+                        SiLabeledCheckBox { size: Size.small; readOnly: true; checked: blitter.useC; l: qsTr("Channel C") }
+                        SiLabeledWordView { value: blitter.cHold }
                         Item { }
                         Item { }
 
-                        SiCheckBoxControl { size: Size.small; readOnly: true; checked: blitter.useD; l: qsTr("Channel D") }
-                        SiWordViewControl { value: blitter.dHold }
+                        SiLabeledCheckBox { size: Size.small; readOnly: true; checked: blitter.useD; l: qsTr("Channel D") }
+                        SiLabeledWordView { value: blitter.dHold }
                         Item { }
-                        SiCheckBoxControl { size: Size.small; readOnly: true; checked: blitter.bzero; r: qsTr("BZERO") }
+                        SiLabeledCheckBox { size: Size.small; readOnly: true; checked: blitter.bzero; r: qsTr("BZERO") }
                     }
                 }
             }
@@ -270,13 +270,13 @@ SiAmInspectorWindow {
                         SiBin16 {
 
                             l: qsTr("First word:"); lwidth: root.labelWidth; value: blitter.afwm
-                            SiCheckBoxControl { size: Size.small; readOnly: true; checked: blitter.firstWord }
+                            SiLabeledCheckBox { size: Size.small; readOnly: true; checked: blitter.firstWord }
                         }
 
                         SiBin16 {
 
                             l: qsTr("Last word:"); lwidth: root.labelWidth; value: blitter.alwm
-                            SiCheckBoxControl { size: Size.small; readOnly: true; checked: blitter.lastWord }
+                            SiLabeledCheckBox { size: Size.small; readOnly: true; checked: blitter.lastWord }
                         }
 
                         SiBin16 { l: qsTr("Masked:"); lwidth: root.labelWidth; value: blitter.masked }
@@ -297,7 +297,7 @@ SiAmInspectorWindow {
 
                         SiBin16 {
                             l: qsTr("Barrel A In:"); lwidth: root.labelWidth; value: blitter.barrelAIn
-                            SiCheckBoxControl { size: Size.small; hide: true }
+                            SiLabeledCheckBox { size: Size.small; hide: true }
                         }
 
                         SiHex4 {
@@ -345,7 +345,7 @@ SiAmInspectorWindow {
 
                         SiBin16 {
                             l: qsTr("Fill in:"); lwidth: root.labelWidth; value: blitter.fillIn
-                            SiCheckBoxControl { size: Size.small; hide: true }
+                            SiLabeledCheckBox { size: Size.small; hide: true }
                         }
                         SiBin16 {
                             l: qsTr("Fill out:"); lwidth: root.labelWidth; value: blitter.fillOut
@@ -386,7 +386,7 @@ SiAmInspectorWindow {
                             l: blitter.lfLabel(index) + ":"
                             value: blitter.lfValue(index)
 
-                            SiCheckBoxControl {
+                            SiLabeledCheckBox {
 
                                 size: Size.small
                                 readOnly: true

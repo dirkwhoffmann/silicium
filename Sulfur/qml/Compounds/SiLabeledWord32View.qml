@@ -4,9 +4,9 @@ import QtQuick.Layouts
 import Sulfur
 
 // A zero-padded 32-bit value -- the CPU panel's PC/D/A registers. See
-// SiByteViewControl for the base/padded defaults and the toggle-following
+// SiLabeledByteView for the base/padded defaults and the toggle-following
 // convention.
-SiNumberViewControl {
+SiLabeledNumberView {
 
     size: Size.small
     font.weight: 500

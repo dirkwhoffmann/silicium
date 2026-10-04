@@ -65,7 +65,7 @@ SettingsPage {
             header: "VICII"
             size: root.sectionWidth
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 lwidth: root.labelWidth
                 l: "Revision:"
@@ -79,7 +79,7 @@ SettingsPage {
                 onCurrentIndexChanged: config.VICII_REVISION = currentIndex;
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 r: "Emulate grey dot bug"
@@ -105,7 +105,7 @@ SettingsPage {
             header: "SID"
             size: root.sectionWidth
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "Revision:"
                 lwidth: root.labelWidth
@@ -123,13 +123,13 @@ SettingsPage {
                 onCurrentIndexChanged: config.SID_REV = currentIndex;
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 r: "SID 2 at"
 
-                SiComboBoxControl {
+                SiLabeledComboBox {
 
                     model: sidAddressModel
                     currentIndex: (config.SID_ADDRESS1 - 0xD400) / 0x20
@@ -143,13 +143,13 @@ SettingsPage {
                 onClicked: config.SID_ENABLE1 = checked;
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 r: "SID 3 at"
 
-                SiComboBoxControl {
+                SiLabeledComboBox {
 
                     model: sidAddressModel
                     currentIndex: (config.SID_ADDRESS2 - 0xD400) / 0x20
@@ -163,13 +163,13 @@ SettingsPage {
 
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 r: "SID 4 at"
 
-                SiComboBoxControl {
+                SiLabeledComboBox {
 
                     model: sidAddressModel
                     currentIndex: (config.SID_ADDRESS3 - 0xD400) / 0x20
@@ -192,7 +192,7 @@ SettingsPage {
             header: "CIAs"
             size: root.sectionWidth
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "Revision:"
                 lwidth: root.labelWidth
@@ -204,7 +204,7 @@ SettingsPage {
                 onCurrentIndexChanged: config.CIA_REVISION = currentIndex;
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 r: "Emulate timer B bug"
@@ -226,7 +226,7 @@ SettingsPage {
             header: "LOGIC BOARD"
             size: root.sectionWidth
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "Glue Logic:"
                 lwidth: root.labelWidth
@@ -250,7 +250,7 @@ SettingsPage {
             header: "POWER SUPPLY"
             size: root.sectionWidth
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "Frequency:"
                 lwidth: root.labelWidth
@@ -274,7 +274,7 @@ SettingsPage {
             header: "POWER UP"
             size: root.sectionWidth
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "RAM pattern:"
                 lwidth: root.labelWidth

@@ -80,7 +80,7 @@ Item {
 
             readonly property bool alignRight: root.orientation === Qt.RightToLeft
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 Layout.fillWidth: true
 

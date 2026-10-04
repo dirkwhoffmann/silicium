@@ -119,7 +119,7 @@ SiDialog {
                 color: Palette.border
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: qsTr("Capacity:")
                 lwidth: root.labelWidth
@@ -128,7 +128,7 @@ SiDialog {
                 enabled: false
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 id: fsCombo
                 l: qsTr("File system:")
@@ -137,7 +137,7 @@ SiDialog {
                 tags: [root.nodos, 0, 1]    // NODOS, OFS, FFS
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 id: bbCombo
                 l: qsTr("Boot block:")
@@ -151,7 +151,7 @@ SiDialog {
                 tags: [0, 1, 2, 3, 4]       // BootBlockId, in enum order
             }
 
-            SiControl {
+            SiLabeled {
 
                 id: nameControl
                 l: qsTr("Name:")

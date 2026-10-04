@@ -96,7 +96,7 @@ SiDialog {
                 color: Palette.border
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: qsTr("Capacity:")
                 lwidth: root.labelWidth
@@ -104,7 +104,7 @@ SiDialog {
                 currentIndex: 0
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 id: fsCombo
                 l: qsTr("File system:")
@@ -112,7 +112,7 @@ SiDialog {
                 model: [qsTr("No File System"), qsTr("CBM DOS")]
             }
 
-            SiControl {
+            SiLabeled {
 
                 id: nameControl
                 l: qsTr("Name:")

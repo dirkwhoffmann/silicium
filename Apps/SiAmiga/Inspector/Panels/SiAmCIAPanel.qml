@@ -43,19 +43,19 @@ SiAmInspectorWindow {
     readonly property real columnWidth: Math.max(260,
         (scrollView.availableWidth - Style.largeSpacing * 2) / 3)
 
-    // SiBinaryViewControl/SiByteViewControl/SiWordViewControl now live in
+    // SiLabeledBinaryView/SiLabeledByteView/SiLabeledWordView now live in
     // Apps/Shared/QML/Compounds (this panel's own versions were the ones
     // promoted, being the most complete/up to date) -- used directly below.
-    // SiByteViewControl/SiWordViewControl default to fixed hex, so every
+    // SiLabeledByteView/SiLabeledWordView default to fixed hex, so every
     // usage that should follow this panel's own hex/decimal toggle binds
-    // base/padded explicitly; SiBinaryViewControl's binary display doesn't
+    // base/padded explicitly; SiLabeledBinaryView's binary display doesn't
     // need to (it never follows the toggle, on any panel).
 
     // A single row of a raw 24-bit CIA TOD counter (value/latch/alarm --
     // there is no BCD hour:min:sec.tenth breakdown on the Amiga, see the
-    // class comment) -- narrower than SiWord24ViewControl's own default
+    // class comment) -- narrower than SiLabeledWord24View's own default
     // width.
-    component SiTODControl: SiWord24ViewControl {
+    component SiLabeledTOD: SiLabeledWord24View {
 
         controlWidth: 64
         base: root.numBase
@@ -80,17 +80,17 @@ SiAmInspectorWindow {
         columnSpacing: Style.largeSpacing
         rowSpacing: Style.tinySpacing
 
-        SiWordViewControl { base: root.numBase; padded: root.numPadded; l: qsTr("Timer %1:").arg(label); lwidth: 50; value: countValue }
-        SiBitViewControl { checked: running; r: qsTr("Running") }
+        SiLabeledWordView { base: root.numBase; padded: root.numPadded; l: qsTr("Timer %1:").arg(label); lwidth: 50; value: countValue }
+        SiLabeledBitView { checked: running; r: qsTr("Running") }
 
-        SiWordViewControl { base: root.numBase; padded: root.numPadded; l: qsTr("Latch %1:").arg(label); lwidth: 50; value: latchValue }
-        SiBitViewControl { checked: toggle; r: qsTr("Toggle") }
-
-        Item { }
-        SiBitViewControl { checked: pbout; r: qsTr("PB out") }
+        SiLabeledWordView { base: root.numBase; padded: root.numPadded; l: qsTr("Latch %1:").arg(label); lwidth: 50; value: latchValue }
+        SiLabeledBitView { checked: toggle; r: qsTr("Toggle") }
 
         Item { }
-        SiBitViewControl { checked: oneShot; r: qsTr("One shot") }
+        SiLabeledBitView { checked: pbout; r: qsTr("PB out") }
+
+        Item { }
+        SiLabeledBitView { checked: oneShot; r: qsTr("One shot") }
     }
 
     //
@@ -101,7 +101,7 @@ SiAmInspectorWindow {
     // of the Port grid below. A plain top-level component (QML doesn't allow
     // nesting an inline component inside another one), so portValue/labels
     // are passed in explicitly rather than reached via an enclosing id.
-    component Bit: SiBitViewControl {
+    component Bit: SiLabeledBitView {
 
         required property int bitNr
         property int portValue: 0
@@ -131,16 +131,16 @@ SiAmInspectorWindow {
             rowSpacing: Style.tinySpacing
             Layout.alignment: Qt.AlignHCenter
 
-            SiByteViewControl { base: root.numBase; padded: root.numPadded; lwidth: 60; l: qsTr("Register:"); value: portBox.regValue }
+            SiLabeledByteView { base: root.numBase; padded: root.numPadded; lwidth: 60; l: qsTr("Register:"); value: portBox.regValue }
             Bit { bitNr: 7; portValue: portBox.portValue; labels: portBox.labels }
 
-            SiBinaryViewControl { indent: 60; value: portBox.regValue }
+            SiLabeledBinaryView { indent: 60; value: portBox.regValue }
             Bit { bitNr: 6; portValue: portBox.portValue; labels: portBox.labels }
 
-            SiByteViewControl { base: root.numBase; padded: root.numPadded; lwidth: 60; l: qsTr("Direction:"); value: portBox.dirValue }
+            SiLabeledByteView { base: root.numBase; padded: root.numPadded; lwidth: 60; l: qsTr("Direction:"); value: portBox.dirValue }
             Bit { bitNr: 5; portValue: portBox.portValue; labels: portBox.labels }
 
-            SiBinaryViewControl { indent: 60; value: portBox.dirValue }
+            SiLabeledBinaryView { indent: 60; value: portBox.dirValue }
             Bit { bitNr: 4; portValue: portBox.portValue; labels: portBox.labels }
 
             Item { }
@@ -205,7 +205,7 @@ SiAmInspectorWindow {
                     text: qsTr("Overall active time:")
                 }
 
-                SiProgressBarControl {
+                SiLabeledProgressBar {
 
                     l: qsTr("%1 %").arg(100 - cia.idlePercentage)
                     lwidth: 48
@@ -370,7 +370,7 @@ SiAmInspectorWindow {
 
                         Layout.alignment: Qt.AlignHCenter
 
-                        SiByteViewControl {
+                        SiLabeledByteView {
 
                             base: root.numBase
                             padded: root.numPadded
@@ -378,7 +378,7 @@ SiAmInspectorWindow {
                             l: qsTr("Mask Register:")
                             value: cia.imr
 
-                            SiBinaryViewControl {
+                            SiLabeledBinaryView {
 
                                 value: cia.imr
                             }
@@ -387,7 +387,7 @@ SiAmInspectorWindow {
                             }
                         }
 
-                        SiByteViewControl {
+                        SiLabeledByteView {
 
                             base: root.numBase
                             padded: root.numPadded
@@ -395,13 +395,13 @@ SiAmInspectorWindow {
                             l: qsTr("Control Register:")
                             value: cia.icr
 
-                            SiBinaryViewControl {
+                            SiLabeledBinaryView {
 
                                 value: cia.icr
                             }
                         }
 
-                        SiCheckBoxControl {
+                        SiLabeledCheckBox {
 
                             indent: 100
                             size: Size.small
@@ -424,28 +424,28 @@ SiAmInspectorWindow {
 
                         Layout.alignment: Qt.AlignHCenter
 
-                        SiTODControl {
+                        SiLabeledTOD {
 
                             l: qsTr("TOD:")
                             lwidth: 48
                             value: cia.todValue
                         }
 
-                        SiTODControl {
+                        SiLabeledTOD {
 
                             l: qsTr("Latch:")
                             lwidth: 48
                             value: cia.todLatch
                         }
 
-                        SiTODControl {
+                        SiLabeledTOD {
 
                             l: qsTr("Alarm:")
                             lwidth: 48
                             value: cia.todAlarm
                         }
 
-                        SiCheckBoxControl {
+                        SiLabeledCheckBox {
 
                             size: Size.small
                             indent: 48
@@ -468,7 +468,7 @@ SiAmInspectorWindow {
 
                         Layout.alignment: Qt.AlignHCenter
 
-                        SiByteViewControl {
+                        SiLabeledByteView {
 
                             base: root.numBase
                             padded: root.numPadded
@@ -476,13 +476,13 @@ SiAmInspectorWindow {
                             l: qsTr("Shift Register:")
                             value: cia.ssr
 
-                            SiBinaryViewControl {
+                            SiLabeledBinaryView {
 
                                 value: cia.ssr
                             }
                         }
 
-                        SiByteViewControl {
+                        SiLabeledByteView {
 
                             base: root.numBase
                             padded: root.numPadded

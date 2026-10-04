@@ -7,10 +7,10 @@ import Sulfur
 // to 8 digits, regardless of whatever hex/decimal toggle the enclosing
 // panel's other fields might follow (a bit-logic view like this one cares
 // about the actual bit pattern, not the display base). Originally
-// SiAmCIAPanel's own SiBitViewControl -- see SiByteViewControl/
-// SiWordViewControl/SiWord24ViewControl/SiWord32ViewControl for the
+// SiAmCIAPanel's own SiLabeledBitView -- see SiLabeledByteView/
+// SiLabeledWordView/SiLabeledWord24View/SiLabeledWord32View for the
 // decimal/hex-formatted counterparts.
-SiNumberViewControl {
+SiLabeledNumberView {
 
     size: Size.small
     font.weight: 500

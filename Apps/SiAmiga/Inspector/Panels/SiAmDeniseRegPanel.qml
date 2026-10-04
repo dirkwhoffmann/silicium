@@ -38,12 +38,12 @@ RowLayout {
     // Subcomponents
     //
 
-    component Si1: SiBitViewControl {
+    component Si1: SiLabeledBitView {
 
         size: Size.tiny
     }
 
-    component Si8: SiByteViewControl {
+    component Si8: SiLabeledByteView {
 
         size: Size.small
         controlWidth: 36
@@ -51,7 +51,7 @@ RowLayout {
         padded: root.numPadded
     }
 
-    component Si16: SiWordViewControl {
+    component Si16: SiLabeledWordView {
 
         size: Size.small
         controlWidth: 44

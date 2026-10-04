@@ -80,7 +80,7 @@ SiC64InspectorWindow {
         8: "#33AA33"  // PP
     })
 
-    component TypeInfo: SiControl {
+    component TypeInfo: SiLabeled {
 
         id: typeInfo
 
@@ -179,15 +179,15 @@ SiC64InspectorWindow {
 
             Item { Layout.fillWidth: true }
 
-            SiCheckBoxControl { size: Size.small; checked: mem.exrom; r: qsTr("EXROM") }
-            SiCheckBoxControl { size: Size.small; checked: mem.game; r: qsTr("GAME") }
-            SiCheckBoxControl { size: Size.small; checked: mem.charen; r: qsTr("CHAREN") }
-            SiCheckBoxControl { size: Size.small; checked: mem.loram; r: qsTr("LORAM") }
-            SiCheckBoxControl { size: Size.small; checked: mem.hiram; r: qsTr("HIRAM") }
+            SiLabeledCheckBox { size: Size.small; checked: mem.exrom; r: qsTr("EXROM") }
+            SiLabeledCheckBox { size: Size.small; checked: mem.game; r: qsTr("GAME") }
+            SiLabeledCheckBox { size: Size.small; checked: mem.charen; r: qsTr("CHAREN") }
+            SiLabeledCheckBox { size: Size.small; checked: mem.loram; r: qsTr("LORAM") }
+            SiLabeledCheckBox { size: Size.small; checked: mem.hiram; r: qsTr("HIRAM") }
 
             Item { Layout.fillWidth: true }
 
-            SiSearchControl {
+            SiLabeledSearch {
 
                 controlWidth: 160
                 base: root.numBase

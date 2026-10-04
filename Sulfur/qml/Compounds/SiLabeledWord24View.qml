@@ -4,9 +4,9 @@ import QtQuick.Layouts
 import Sulfur
 
 // A zero-padded 24-bit value -- the width DMA pointer/address registers and
-// the CIA's TOD counters share. See SiByteViewControl for the base/padded
+// the CIA's TOD counters share. See SiLabeledByteView for the base/padded
 // defaults and the toggle-following convention.
-SiNumberViewControl {
+SiLabeledNumberView {
 
     size: Size.small
     font.weight: 500

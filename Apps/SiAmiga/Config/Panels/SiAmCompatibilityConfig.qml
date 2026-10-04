@@ -65,7 +65,7 @@ SettingsPage {
             header: "FLOPPY DRIVES"
             size: root.sectionWidth
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "Speed:"
                 lwidth: root.labelWidth
@@ -75,7 +75,7 @@ SettingsPage {
                 onCurrentIndexChanged: config.DC_SPEED = root.driveSpeeds[currentIndex]
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 r: "Emulate mechanical delays"
@@ -83,7 +83,7 @@ SettingsPage {
                 onClicked: config.DRIVE_MECHANICS = checked
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 l: "Piracy:"
                 lwidth: root.labelWidth
@@ -92,7 +92,7 @@ SettingsPage {
                 onClicked: config.DC_LOCK_DSKSYNC = checked
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 r: "Always find a SYNC mark"
@@ -110,21 +110,21 @@ SettingsPage {
             header: "CHIPSET FEATURES"
             size: root.sectionWidth
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 r: "Emulate Slow Ram mirror"
                 checked: config.MEM_SLOW_RAM_MIRROR
                 onClicked: config.MEM_SLOW_RAM_MIRROR = checked
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 r: "Emulate TOD bug"
                 checked: config.CIA_A_TODBUG !== 0
                 onClicked: root.setCiaTodBug(checked)
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 r: "Emulate dropped register writes"
                 checked: config.AGNUS_PTR_DROPS
@@ -141,7 +141,7 @@ SettingsPage {
             header: "KEYBOARD"
             size: root.sectionWidth
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 l: "Protocol:"
                 lwidth: root.labelWidth
@@ -160,14 +160,14 @@ SettingsPage {
             header: "TIMING"
             size: root.sectionWidth
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 r: "Sync CIA accesses with E-clock"
                 checked: config.CIA_A_ECLOCK_SYNCING
                 onClicked: root.setCiaEClockSyncing(checked)
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
                 
                 r: "Emulate Slow Ram bus delays"
                 checked: config.MEM_SLOW_RAM_DELAY
@@ -250,19 +250,19 @@ SettingsPage {
             header: "SPRITES"
             size: root.sectionWidth
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
                 r: "Detect Sprite-Sprite collisions"
                 checked: config.DENISE_CLX_SPR_SPR
                 onClicked: config.DENISE_CLX_SPR_SPR = checked
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
                 r: "Detect Sprite-Playfield collisions"
                 checked: config.DENISE_CLX_SPR_PLF
                 onClicked: config.DENISE_CLX_SPR_PLF = checked
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
                 r: "Detect Playfield-Playfield collisions"
                 checked: config.DENISE_CLX_PLF_PLF
                 onClicked: config.DENISE_CLX_PLF_PLF = checked

@@ -30,7 +30,7 @@ RowLayout {
 
     spacing: Style.mediumSpacing
 
-    component Si16: SiWordViewControl {
+    component Si16: SiLabeledWordView {
 
         size: Size.small
         controlWidth: 44

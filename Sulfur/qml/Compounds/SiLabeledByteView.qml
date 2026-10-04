@@ -4,13 +4,13 @@ import QtQuick.Layouts
 import Sulfur
 
 // A zero-padded 8-bit value -- originally SiAmCIAPanel's own
-// SiByteViewControl. 'base' defaults to hex (16) and 'padded' to true, the
+// SiLabeledByteView. 'base' defaults to hex (16) and 'padded' to true, the
 // common case for every Inspector panel; a panel whose fields follow the
 // user's hex/decimal toggle (controller.inspectorController.hex) binds
-// 'base'/'padded' per instance -- see SiBinaryViewControl for the fixed-binary
-// counterpart and SiWordViewControl/SiWord24ViewControl/SiWord32ViewControl
+// 'base'/'padded' per instance -- see SiLabeledBinaryView for the fixed-binary
+// counterpart and SiLabeledWordView/SiLabeledWord24View/SiLabeledWord32View
 // for the wider ones.
-SiNumberViewControl {
+SiLabeledNumberView {
 
     size: Size.small
     font.weight: 500

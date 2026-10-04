@@ -369,12 +369,12 @@ ApplicationWindow {
 
                         spacing: Style.smallSpacing
 
-                        SiTextBoxControl { l: "Name:"; lwidth: 110; controlWidth: 180; text: "Workbench" }
-                        SiNumberInputControl { l: "Memory:"; lwidth: 110; controlWidth: 80; r: "KB"; intValue: 512 }
-                        SiCheckBoxControl { l: "Fast RAM:"; lwidth: 110; checkBoxText: "Enabled"; checked: true }
-                        SiComboBoxControl { l: "Model:"; lwidth: 110; controlWidth: 180; model: ["A500", "A1000", "A2000"]; currentIndex: 0 }
-                        SiSliderControl { l: "Volume:"; lwidth: 110; controlWidth: 180; from: 0; to: 100; value: root.level * 100; onMoved: (v) => root.level = v / 100 }
-                        SiProgressBarControl { l: "Progress:"; lwidth: 110; controlWidth: 180; from: 0; to: 1; value: root.level }
+                        SiLabeledTextBox { l: "Name:"; lwidth: 110; controlWidth: 180; text: "Workbench" }
+                        SiLabeledNumberInput { l: "Memory:"; lwidth: 110; controlWidth: 80; r: "KB"; intValue: 512 }
+                        SiLabeledCheckBox { l: "Fast RAM:"; lwidth: 110; checkBoxText: "Enabled"; checked: true }
+                        SiLabeledComboBox { l: "Model:"; lwidth: 110; controlWidth: 180; model: ["A500", "A1000", "A2000"]; currentIndex: 0 }
+                        SiLabeledSlider { l: "Volume:"; lwidth: 110; controlWidth: 180; from: 0; to: 100; value: root.level * 100; onMoved: (v) => root.level = v / 100 }
+                        SiLabeledProgressBar { l: "Progress:"; lwidth: 110; controlWidth: 180; from: 0; to: 1; value: root.level }
                     }
                 }
 

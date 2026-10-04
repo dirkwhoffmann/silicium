@@ -27,7 +27,7 @@ RowLayout {
 
     spacing: Style.mediumSpacing
 
-    component Si16: SiWordViewControl {
+    component Si16: SiLabeledWordView {
 
         size: Size.small
         controlWidth: 44
@@ -80,7 +80,7 @@ RowLayout {
 
                 Repeater {
                     model: 8
-                    SiCheckBoxControl {
+                    SiLabeledCheckBox {
                         required property int index
                         readOnly: true
                         l: qsTr("%1:").arg(index)
@@ -227,7 +227,7 @@ RowLayout {
                 HSpacer { }
 
                 SiLabel { text: qsTr("AT") }
-                SiCheckBoxControl { readOnly: true; checked: denise.sprAttach }
+                SiLabeledCheckBox { readOnly: true; checked: denise.sprAttach }
             }
         }
 

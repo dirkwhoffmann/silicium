@@ -45,17 +45,17 @@ SiAmInspectorWindow {
     readonly property bool below10: cpuRev === 0
     readonly property bool below20: cpuRev === 0 || cpuRev === 1
 
-    // SiWord32ViewControl/SiWordViewControl (Apps/Shared/QML/Compounds) hold
+    // SiLabeledWord32View/SiLabeledWordView (Apps/Shared/QML/Compounds) hold
     // the structural bits (size/weight/bits/default width) shared with every
     // other panel; this panel only adds the hex/decimal toggle binding local
     // wrappers like this let every usage below stay untouched.
-    component SiHex32: SiWord32ViewControl {
+    component SiHex32: SiLabeledWord32View {
 
         base: root.numBase
         padded: root.numPadded
     }
 
-    component SiHex16: SiWordViewControl {
+    component SiHex16: SiLabeledWordView {
 
         controlWidth: 64
         base: root.numBase

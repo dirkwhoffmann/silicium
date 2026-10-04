@@ -187,7 +187,7 @@ SiDialog {
                 color: Palette.border
             }
 
-            SiComboInputControl {
+            SiLabeledComboInput {
 
                 id: capacityCombo
                 l: qsTr("Capacity:")
@@ -198,7 +198,7 @@ SiDialog {
                 onActivated: root.commit()
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 id: fsCombo
                 l: qsTr("File system:")
@@ -209,7 +209,7 @@ SiDialog {
                 // onActivated: { if (!root.formatted) root.importUrl = "" }
             }
 
-            SiControl {
+            SiLabeled {
 
                 l: qsTr("Name:")
                 lwidth: root.labelWidth
@@ -226,7 +226,7 @@ SiDialog {
                 ]
             }
 
-            SiControl {
+            SiLabeled {
 
                 id: importControl
                 l: qsTr("Files:")

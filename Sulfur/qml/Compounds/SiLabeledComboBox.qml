@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Sulfur
 
-SiControl {
+SiLabeled {
 
     id: root
 
@@ -62,7 +62,7 @@ SiControl {
 
     /* Set false to keep the combo box out of the focus chain, e.g. so it can't
      * swallow the standard emulation keys. Not an alias to the inner
-     * focusPolicy: SiControl is an Item, and Item carries a focusPolicy of its
+     * focusPolicy: SiLabeled is an Item, and Item carries a focusPolicy of its
      * own (Qt 6.7+), so an alias of that name would shadow a base member.
      */
     property bool focusable: true

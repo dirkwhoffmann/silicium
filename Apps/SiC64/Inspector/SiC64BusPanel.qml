@@ -43,7 +43,7 @@ SiC64InspectorWindow {
         Layout.fillWidth: true
         spacing: Style.mediumSpacing
 
-        SiCheckBoxControl {
+        SiLabeledCheckBox {
 
             Layout.fillWidth: true
             indent: tab
@@ -87,7 +87,7 @@ SiC64InspectorWindow {
                 Layout.preferredWidth: 280
                 spacing: Style.tinySpacing
 
-                SiCheckBoxControl {
+                SiLabeledCheckBox {
 
                     checked: cc.XRAY_MODE === xrayDma
                     onClicked: cc.XRAY_MODE = checked ? xrayDma : xrayNone
@@ -144,7 +144,7 @@ SiC64InspectorWindow {
 
                 VSpacer { size: Style.mediumSpacing }
 
-                SiCheckBoxControl {
+                SiLabeledCheckBox {
 
                     indent: tab
                     enabled: cc.XRAY_MODE !== xrayNone
@@ -153,7 +153,7 @@ SiC64InspectorWindow {
                     r: qsTr("Show as overlay")
                 }
 
-                SiComboBoxControl {
+                SiLabeledComboBox {
 
                     indent: tabtab
                     Layout.fillWidth: true
@@ -163,7 +163,7 @@ SiC64InspectorWindow {
                     onCurrentIndexChanged: cc.XRAY_OVERLAY_STYLE = currentIndex
                 }
 
-                SiSliderControl {
+                SiLabeledSlider {
 
                     enabled: cc.XRAY_MODE !== xrayNone && cc.XRAY_OVERLAY
                     indent: tabtab

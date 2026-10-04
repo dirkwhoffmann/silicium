@@ -221,7 +221,7 @@ Item {
 
                     SiLabel { text: qsTr("Location:") }
 
-                    SiComboBoxControl {
+                    SiLabeledComboBox {
 
                         model: ["$E00000", "$F00000"]
                         currentIndex: cc.MEM_EXT_START === 0xF0 ? 1 : 0

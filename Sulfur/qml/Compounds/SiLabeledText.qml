@@ -4,9 +4,9 @@ import QtQuick.Layouts
 import Sulfur
 
 // A labeled read-only text display -- the text counterpart to
-// SiNumberViewControl. Wraps a SiTextView in the standard SiControl
+// SiLabeledNumberView. Wraps a SiTextView in the standard SiLabeled
 // label/control layout.
-SiControl {
+SiLabeled {
 
     id: root
 

@@ -50,7 +50,7 @@ SiBox {
     // Controls
     //
 
-    SiSearchControl {
+    SiLabeledSearch {
 
         controlWidth: 100
         size: Size.small

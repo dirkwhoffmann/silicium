@@ -37,12 +37,12 @@ SiAmInspectorWindow {
     // Subcomponents
     //
 
-    component Si1: SiBitViewControl {
+    component Si1: SiLabeledBitView {
 
         size: Size.tiny
     }
 
-    component Si8: SiByteViewControl {
+    component Si8: SiLabeledByteView {
 
         size: Size.small
         controlWidth: 36
@@ -50,7 +50,7 @@ SiAmInspectorWindow {
         padded: root.numPadded
     }
 
-    component Si16: SiWordViewControl {
+    component Si16: SiLabeledWordView {
 
         size: Size.small
         controlWidth: 44
@@ -59,10 +59,10 @@ SiAmInspectorWindow {
     }
 
 
-    // SiWordViewControl (Apps/Shared/QML/Compounds) holds the structural
+    // SiLabeledWordView (Apps/Shared/QML/Compounds) holds the structural
     // bits; this panel only adds the width override and the hex/decimal
     // toggle binding.
-    component SiHex16: SiWordViewControl {
+    component SiHex16: SiLabeledWordView {
 
         controlWidth: 64
         base: root.numBase
@@ -72,7 +72,7 @@ SiAmInspectorWindow {
     // A single potgo/potgor bit -- a bare, unlabeled checkbox (the row's own
     // SiLabel carries the name), matching PortPanel.swift's compact
     // OUTxy/DATxy/DATxyR triplets.
-    component Bit: SiCheckBoxControl {
+    component Bit: SiLabeledCheckBox {
 
         readOnly: true
         implicitWidth: Size.controlHeight(Size.regular)
@@ -245,7 +245,7 @@ SiAmInspectorWindow {
                     SiText {
                         text: ""; Layout.preferredWidth: 32
                     }
-                    SiCheckBoxControl {
+                    SiLabeledCheckBox {
                         size: Size.small; readOnly: true; checked: po.long_; r: qsTr("LONG, %1 Baud").arg(po.baudRate)
                     }
                     HSpacer {

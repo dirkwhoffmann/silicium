@@ -53,21 +53,21 @@ PrefPage {
 
             header: "FIXED WIDTH"
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 lwidth: root.labelWidth
                 r: "Ipsum"
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 r: "Ipsum"
@@ -75,7 +75,7 @@ PrefPage {
                 model: ["Item 1", "Item 2", "Item 3"]
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
@@ -84,7 +84,7 @@ PrefPage {
                 SiHelpButton {}
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 lwidth: root.labelWidth
                 r: "Ipsum"
                 controlWidth: root.comboWidth
@@ -93,7 +93,7 @@ PrefPage {
                 SiHelpButton {}
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 r: "Ipsum"
@@ -103,7 +103,7 @@ PrefPage {
                 SiHelpButton {}
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
@@ -114,7 +114,7 @@ PrefPage {
                 }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 lwidth: root.labelWidth
                 r: "Ipsum"
                 controlWidth: root.comboWidth
@@ -125,7 +125,7 @@ PrefPage {
                 }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 r: "Ipsum"
@@ -146,26 +146,26 @@ PrefPage {
 
             header: "FLEX WIDTH"
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 model: ["Item 1", "Item 2", "Item 3"]
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 lwidth: root.labelWidth
                 r: "Ipsum"
                 model: ["Item 1", "Item 2", "Item 3"]
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 r: "Ipsum"
                 model: ["Item 1", "Item 2", "Item 3"]
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 model: ["Item 1", "Item 2", "Item 3"]
@@ -173,7 +173,7 @@ PrefPage {
                 SiHelpButton {}
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 lwidth: root.labelWidth
                 r: "Ipsum"
                 model: ["Item 1", "Item 2", "Item 3"]
@@ -181,7 +181,7 @@ PrefPage {
                 SiHelpButton {}
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 r: "Ipsum"
@@ -190,7 +190,7 @@ PrefPage {
                 SiHelpButton {}
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 model: ["Item 1", "Item 2", "Item 3"]
@@ -200,7 +200,7 @@ PrefPage {
                 }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 lwidth: root.labelWidth
                 r: "Ipsum"
                 model: ["Item 1", "Item 2", "Item 3"]
@@ -210,7 +210,7 @@ PrefPage {
                 }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 l: "Lorem:"
                 lwidth: root.labelWidth
                 r: "Ipsum"
@@ -230,45 +230,45 @@ PrefPage {
 
             header: "FIXED WIDTH + ATTACHMENTS"
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 lwidth: root.labelWidth
                 l: "Lorem: "
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiCheckBoxControl {
+                SiLabeledCheckBox {
                     l: "A"
                 }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiCheckBoxControl {
+                SiLabeledCheckBox {
                     r: "B"
                 }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiCheckBoxControl {
+                SiLabeledCheckBox {
                     l: "A"
                     r: "B"
                 }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 lwidth: root.labelWidth
                 l: "Lorem: "
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiCheckBoxControl {
+                SiLabeledCheckBox {
                     l: "A"
 
                     SiHelpButton {
@@ -277,12 +277,12 @@ PrefPage {
                 }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiCheckBoxControl {
+                SiLabeledCheckBox {
                     r: "B"
 
                     SiHelpButton {
@@ -291,12 +291,12 @@ PrefPage {
                 }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 lwidth: root.labelWidth
                 controlWidth: root.comboWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiCheckBoxControl {
+                SiLabeledCheckBox {
                     l: "A"
                     r: "B"
 
@@ -315,41 +315,41 @@ PrefPage {
 
             header: "FLEX WIDTH + ATTACHMENTS"
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 lwidth: root.labelWidth
                 l: "Lorem: "
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiCheckBoxControl {
+                SiLabeledCheckBox {
                     l: "A"
                 }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 lwidth: root.labelWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiCheckBoxControl {
+                SiLabeledCheckBox {
                     r: "B"
                 }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 lwidth: root.labelWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiCheckBoxControl {
+                SiLabeledCheckBox {
                     l: "A"
                     r: "B"
                 }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 lwidth: root.labelWidth
                 l: "Lorem: "
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiCheckBoxControl {
+                SiLabeledCheckBox {
                     l: "A"
 
                     SiHelpButton {
@@ -358,11 +358,11 @@ PrefPage {
                 }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 lwidth: root.labelWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiCheckBoxControl {
+                SiLabeledCheckBox {
                     r: "B"
 
                     SiHelpButton {
@@ -371,11 +371,11 @@ PrefPage {
                 }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
                 lwidth: root.labelWidth
                 model: ["Item 1", "Item 2", "Item 3"]
 
-                SiCheckBoxControl {
+                SiLabeledCheckBox {
                     l: "A"
                     r: "B"
 

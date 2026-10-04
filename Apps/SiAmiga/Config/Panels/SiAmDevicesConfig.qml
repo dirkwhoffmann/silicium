@@ -141,7 +141,7 @@ SettingsPage {
             size: root.sectionWidth
             rowSpacing: Style.smallSpacing
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -150,7 +150,7 @@ SettingsPage {
                 checked: true
                 hide: true
 
-                SiComboBoxControl {
+                SiLabeledComboBox {
 
                     controlEnabled: !root.locked
                     model: root.driveTypeNames
@@ -160,7 +160,7 @@ SettingsPage {
                 }
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -172,7 +172,7 @@ SettingsPage {
                     if (!checked) { config.DF2_CONNECTED = false; config.DF3_CONNECTED = false }
                 }
 
-                SiComboBoxControl {
+                SiLabeledComboBox {
 
                     controlEnabled: !root.locked
                     model: root.driveTypeNames
@@ -182,7 +182,7 @@ SettingsPage {
                 }
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -194,7 +194,7 @@ SettingsPage {
                     if (!checked) { config.DF3_CONNECTED = false }
                 }
 
-                SiComboBoxControl {
+                SiLabeledComboBox {
 
                     controlEnabled: !root.locked && config.DF2_CONNECTED
                     model: root.driveTypeNames
@@ -205,7 +205,7 @@ SettingsPage {
                 }
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -216,7 +216,7 @@ SettingsPage {
                     config.DF3_CONNECTED = checked
                 }
 
-                SiComboBoxControl {
+                SiLabeledComboBox {
 
                     controlEnabled: !root.locked && config.DF3_CONNECTED
                     model: root.driveTypeNames
@@ -237,7 +237,7 @@ SettingsPage {
             size: root.sectionWidth
             rowSpacing: Style.smallSpacing
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -246,7 +246,7 @@ SettingsPage {
                 checked: config.HD0_CONNECTED
                 onClicked: config.HD0_CONNECTED = checked
 
-                SiComboBoxControl {
+                SiLabeledComboBox {
 
                     controlEnabled: !root.locked && config.HD0_CONNECTED
                     model: root.hdTypeNames
@@ -256,7 +256,7 @@ SettingsPage {
                 }
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -265,7 +265,7 @@ SettingsPage {
                 checked: config.HD1_CONNECTED
                 onClicked: config.HD1_CONNECTED = checked
 
-                SiComboBoxControl {
+                SiLabeledComboBox {
 
                     controlEnabled: !root.locked && config.HD1_CONNECTED
                     model: root.hdTypeNames
@@ -275,7 +275,7 @@ SettingsPage {
                 }
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -284,7 +284,7 @@ SettingsPage {
                 checked: config.HD2_CONNECTED
                 onClicked: config.HD2_CONNECTED = checked
 
-                SiComboBoxControl {
+                SiLabeledComboBox {
 
                     enabled: !root.locked && config.HD2_CONNECTED
                     model: root.hdTypeNames
@@ -294,7 +294,7 @@ SettingsPage {
                 }
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
@@ -303,7 +303,7 @@ SettingsPage {
                 checked: config.HD3_CONNECTED
                 onClicked: config.HD3_CONNECTED = checked
 
-                SiComboBoxControl {
+                SiLabeledComboBox {
 
                     enabled: !root.locked && config.HD3_CONNECTED
                     model: root.hdTypeNames
@@ -323,7 +323,7 @@ SettingsPage {
             header: "GAME PORTS"
             size: root.sectionWidth
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "Game 1:"
                 lwidth: root.labelWidth
@@ -333,7 +333,7 @@ SettingsPage {
                 SiHelpButton { onClicked: root.help("") }
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "Game 2:"
                 lwidth: root.labelWidth
@@ -353,13 +353,13 @@ SettingsPage {
             header: "JOYSTICK"
             size: root.sectionWidth
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 l: "Auto-fire:"
                 lwidth: root.labelWidth
-                // SiCheckBoxControl overrides hasFlexControl to false, which
+                // SiLabeledCheckBox overrides hasFlexControl to false, which
                 // is what makes accessoryContainer (holding the slider
-                // below) flex in the first place -- see SiControl.qml's
+                // below) flex in the first place -- see SiLabeled.qml's
                 // 'Layout.fillWidth: !hasFlexControl' on it. But that same
                 // override also makes *this* row's own default
                 // Layout.fillWidth ('hasFlexControl') false, so without this
@@ -370,7 +370,7 @@ SettingsPage {
                 checked: config.JOY1_AUTOFIRE
                 onClicked: root.setAutofire(checked)
 
-                SiSliderControl {
+                SiLabeledSlider {
 
                     // l: "-"
                     // r: "+"
@@ -383,7 +383,7 @@ SettingsPage {
                 }
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 l: "Burst Mode:"
                 lwidth: root.labelWidth
@@ -392,7 +392,7 @@ SettingsPage {
 
                 Layout.fillWidth: true
 
-                SiNumberInputControl {
+                SiLabeledNumberInput {
 
                     Layout.fillWidth: true
                     controlEnabled: config.JOY1_AUTOFIRE_BURSTS
@@ -416,7 +416,7 @@ SettingsPage {
             header: "SERIAL PORT"
             size: root.sectionWidth
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "Serial:"
                 lwidth: root.labelWidth

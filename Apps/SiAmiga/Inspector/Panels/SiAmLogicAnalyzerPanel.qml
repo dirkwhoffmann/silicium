@@ -74,7 +74,7 @@ SiAmInspectorWindow {
     // current selection (probeLabel()) and accepts input the two ways
     // BusPanel.swift's NSComboButton did -- picking a preset from the
     // dropdown, or typing a custom hex address directly into the field.
-    component ProbeSelector : SiComboInputControl {
+    component ProbeSelector : SiLabeledComboInput {
 
         id: sel
 
@@ -90,7 +90,7 @@ SiAmInspectorWindow {
 
         /* The label is the probe's, not the field's: what the user types is
          * an instruction to change the probe, and the field shows whatever
-         * the probe says afterwards. SiComboInputControl puts it back in
+         * the probe says afterwards. SiLabeledComboInput puts it back in
          * step on its own, so an address selectAddress() refuses leaves the
          * old label on screen with nothing to restore here.
          */
@@ -155,7 +155,7 @@ SiAmInspectorWindow {
                 Layout.leftMargin: leftColumn.width + Style.smallSpacing
                 spacing: Style.smallSpacing
 
-                SiCheckBoxControl {
+                SiLabeledCheckBox {
 
                     checked: root.cc.LA_CONNECT
                     onClicked: root.cc.LA_CONNECT = checked
@@ -170,7 +170,7 @@ SiAmInspectorWindow {
                     // phosphor: "minus-circle"
                 }
 
-                SiSliderControl {
+                SiLabeledSlider {
 
                     // l: qsTr("Zoom")
                     // l: "-"
@@ -190,7 +190,7 @@ SiAmInspectorWindow {
 
                 HSpacer { size: Style.largeSpacing }
 
-                SiCheckBoxControl {
+                SiLabeledCheckBox {
 
                     id: symbolicBox
                     r: qsTr("Symbolic")

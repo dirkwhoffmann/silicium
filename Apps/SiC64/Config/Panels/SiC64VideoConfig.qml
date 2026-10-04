@@ -77,7 +77,7 @@ SettingsPage {
             // Row 1: Palette
             //
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 Layout.alignment: Qt.AlignVCenter
 
@@ -129,7 +129,7 @@ SettingsPage {
             // Row 2: Zoom
             //
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 Layout.alignment: Qt.AlignVCenter
 
@@ -166,7 +166,7 @@ SettingsPage {
             // Row 3: Center
             //
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 Layout.alignment: Qt.AlignVCenter
 

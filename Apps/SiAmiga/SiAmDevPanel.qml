@@ -145,7 +145,7 @@ Rectangle {
                 text: ":"
             }
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 id: categoryCombo
                 Layout.fillWidth: true

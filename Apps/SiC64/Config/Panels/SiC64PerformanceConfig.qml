@@ -57,7 +57,7 @@ SettingsPage {
             header: "WARP MODE"
             size: root.sectionWidth
 
-            SiComboBoxControl {
+            SiLabeledComboBox {
 
                 l: "Activation:"
                 lwidth: root.labelWidth
@@ -68,7 +68,7 @@ SettingsPage {
                 onCurrentIndexChanged: config.C64_WARP_MODE = currentIndex;
             }
 
-            SiNumberInputControl {
+            SiLabeledNumberInput {
 
                 l: "Boot for"
                 r: "seconds in warp mode"
@@ -89,7 +89,7 @@ SettingsPage {
             header: "SPEED BOOSTERS"
             size: root.sectionWidth
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: smallIndent
                 r: "Put drive 8 to sleep when not in use"
@@ -98,7 +98,7 @@ SettingsPage {
                 onClicked: config.DRIVE8_POWER_SAVE = checked
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: smallIndent
                 r: "Put drive 9 to sleep when not in use"
@@ -107,7 +107,7 @@ SettingsPage {
                 onClicked: config.DRIVE9_POWER_SAVE = checked
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: smallIndent
                 r: "Reduce frame rate in warp mode"
@@ -116,7 +116,7 @@ SettingsPage {
                 onClicked: config.VICII_POWER_SAVE = checked
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 lwidth: smallIndent
                 r: "Skip audio synthesis in warp mode"
@@ -135,7 +135,7 @@ SettingsPage {
             header: "SPRITES"
             size: root.sectionWidth
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 r: "Detect sprite-sprite collisions"
                 lwidth: smallIndent
@@ -144,7 +144,7 @@ SettingsPage {
                 onClicked: config.VICII_SS_COLLISIONS = checked
             }
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
                 r: "Detect sprite-background collisions"
                 lwidth: smallIndent
 
@@ -162,7 +162,7 @@ SettingsPage {
             header: "THREADING"
             size: root.sectionWidth
 
-            SiCheckBoxControl {
+            SiLabeledCheckBox {
 
                 l: "Sync mode:"
                 r: "VSYNC"
@@ -172,7 +172,7 @@ SettingsPage {
                 onClicked: config.C64_VSYNC = checked
             }
 
-            SiSliderControl {
+            SiLabeledSlider {
 
                 l: "Speed:"
                 r: `${value} %`
@@ -187,7 +187,7 @@ SettingsPage {
                 onMoved: (value) => config.C64_SPEED_BOOST = value
             }
 
-            SiSliderControl {
+            SiLabeledSlider {
 
                 l: value < 0 ? "Run behind:" : "Run ahead:"
                 r: `${value} frames`

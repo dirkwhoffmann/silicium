@@ -52,7 +52,7 @@ SiAmInspectorWindow {
         Layout.fillWidth: true
         spacing: Style.mediumSpacing
 
-        SiCheckBoxControl {
+        SiLabeledCheckBox {
 
             Layout.fillWidth: true
             // indent: tab
@@ -115,7 +115,7 @@ SiAmInspectorWindow {
                 Layout.fillWidth: true
                 spacing: Style.tinySpacing
 
-                SiComboBoxControl {
+                SiLabeledComboBox {
 
                     Layout.fillWidth: true
                     model: [qsTr("Off"), qsTr("DMA scan"), qsTr("Layer scan")]
@@ -133,7 +133,7 @@ SiAmInspectorWindow {
                     size: Style.smallSpacing
                 }
 
-                SiCheckBoxControl {
+                SiLabeledCheckBox {
 
                     // indent: tab
                     visible: cc.XRAY_MODE !== xrayNone
@@ -142,7 +142,7 @@ SiAmInspectorWindow {
                     r: qsTr("Show as overlay")
                 }
 
-                SiComboBoxControl {
+                SiLabeledComboBox {
 
                     indent: tab
                     Layout.fillWidth: true
@@ -153,7 +153,7 @@ SiAmInspectorWindow {
                     onCurrentIndexChanged: cc.XRAY_OVERLAY_STYLE = currentIndex
                 }
 
-                SiSliderControl {
+                SiLabeledSlider {
 
                     visible: cc.XRAY_MODE !== xrayNone
                     indent: tab

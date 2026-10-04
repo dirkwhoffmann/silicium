@@ -4,7 +4,7 @@ pragma Singleton
 
 // Control-size scale, analogous to Cocoa's controlSize (regular / small / mini).
 //
-// A component's size is a per-instance property (see SiControl.size); this
+// A component's size is a per-instance property (see SiLabeled.size); this
 // singleton only maps a chosen level to the concrete metrics every sized
 // component should use, so the font/height/padding relationships live in one
 // place. Regular deliberately maps to the app's existing defaults, so adding a
@@ -12,7 +12,7 @@ pragma Singleton
 //
 // Usage:
 //
-//   SiNumberViewControl { size: Size.small; ... }
+//   SiLabeledNumberView { size: Size.small; ... }
 //
 QtObject {
 
