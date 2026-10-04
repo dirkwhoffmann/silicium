@@ -11,7 +11,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 // Port of SiC64MemoryPanel.qml. Its own top-level window (see
 // SiAmInspectorWindow.qml), same as SiC64's per-panel inspector windows.

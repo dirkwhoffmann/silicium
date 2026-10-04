@@ -11,7 +11,6 @@
 #include "AppController.h"
 #include "Assets.h"
 #include "Logger.h"
-#include "Palette.h"
 #include "Preferences.h"
 #include "C64Controller.h"
 #include "SiC64Renderer.h"
@@ -23,7 +22,7 @@
 #include "Inspector/SiC64Waveform.h"
 #include "SiC64ActivityController.h"
 #include "Keyboard/SiC64KeyboardController.h"
-#include "Shortcuts.h"
+#include "SulfurBridge.h"
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
@@ -77,8 +76,8 @@ main(int argc, char *argv[])
     qmlRegisterType<SiC64Heatmap>("Silicium.Components", 1, 0, "SiC64Heatmap");
     qmlRegisterType<SiC64Waveform>("Silicium.Components", 1, 0, "SiC64Waveform");
 
-    // Register attachments
-    qmlRegisterUncreatableType<Palette>("Silicium.Theme", 1, 0, "Palette", "Palette is an attached property");
+    // Tell the UI toolkit what the user has set up
+    SulfurBridge::install();
 
     // Register singletons
     qmlRegisterSingletonInstance("Silicium.Assets", 1, 0, "Assets", Assets::instance());
@@ -86,7 +85,6 @@ main(int argc, char *argv[])
     qmlRegisterSingletonInstance("Silicium.Controllers", 1, 0, "AppController", &AppController::instance());
     qmlRegisterSingletonInstance("Silicium.Controllers", 1, 0, "C64Controller", &C64Controller::instance());
     qmlRegisterSingletonInstance("Silicium.Preferences", 1, 0, "Preferences", &Preferences::instance());
-    qmlRegisterSingletonInstance("Silicium.Theme", 1, 0, "Shortcuts", &Shortcuts::instance());
 
     // Parse the command line and open the SVM file it names
     bool ok = C64Controller::instance().parseArguments(app);

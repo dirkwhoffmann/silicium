@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Silicium.Theme
+import Sulfur
 
 // A zero-padded 32-bit value -- the CPU panel's PC/D/A registers. See
 // SiByteViewControl for the base/padded defaults and the toggle-following

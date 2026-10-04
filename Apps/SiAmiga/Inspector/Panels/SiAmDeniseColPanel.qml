@@ -12,7 +12,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Components
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 // SiAmDenisePanel's "Colors" tab -- one box per AGA color bank (4 banks of
 // 32 registers each; see SiAmDeniseController's own colorAt(n) comment),

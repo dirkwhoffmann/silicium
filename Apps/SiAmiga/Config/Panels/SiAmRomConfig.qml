@@ -13,7 +13,7 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import Silicium.Assets
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 // Port of vAmiga's own GUI/Settings/ViewControllers/RomSettings.swift. Only
 // two ROM slots -- the Amiga has no BASIC/Kernal/Char/VC1541 split the way

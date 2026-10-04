@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Silicium.Theme
+import Sulfur
 
 // A zero-padded 24-bit value -- the width DMA pointer/address registers and
 // the CIA's TOD counters share. See SiByteViewControl for the base/padded

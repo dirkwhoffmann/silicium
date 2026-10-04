@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 FocusScope {
 

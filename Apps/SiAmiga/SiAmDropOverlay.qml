@@ -12,7 +12,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Assets
 import Silicium.Controllers
-import Silicium.Theme
 
 // Port of SiC64DropOverlay.qml, but with different semantics -- ported from
 // vAmiga's own GUI/Layers/DropZone.swift rather than being a like-for-like

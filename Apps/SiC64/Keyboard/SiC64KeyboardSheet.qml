@@ -11,7 +11,7 @@ import QtQuick
 import QtQuick.Controls
 import Qt5Compat.GraphicalEffects
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 // Slide-down variant of the virtual C64 keyboard. Instead of opening in a
 // separate window, the keyboard drops down from the top edge of the

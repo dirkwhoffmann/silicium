@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Controls
-import Silicium.Theme
+import Sulfur
 
 RoundButton {
 

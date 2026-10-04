@@ -14,7 +14,7 @@ import QtQuick.Dialogs
 import Silicium.Assets
 import Silicium.Controllers
 import Silicium.Preferences
-import Silicium.Theme
+import Sulfur
 
 Rectangle {
 

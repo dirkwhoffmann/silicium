@@ -12,7 +12,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Components
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 // Port of vAmiga's own GUI/Inspector/BusPanel.swift + LogicView.swift. Its
 // own top-level window (see SiAmInspectorWindow.qml). A single "Logic

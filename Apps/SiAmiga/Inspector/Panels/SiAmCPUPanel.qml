@@ -11,7 +11,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 // Port of vAmiga's own GUI/Inspector/CPUPanel.swift. Its own top-level
 // window (see SiAmInspectorWindow.qml), mirroring SiC64CPUPanel.qml, so it

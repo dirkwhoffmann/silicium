@@ -11,7 +11,6 @@ import QtQuick
 import QtQuick.Controls
 import Silicium.Assets
 import Silicium.Preferences
-import Silicium.Theme
 
 /* Asks what to keep when a machine is about to go away.
  *

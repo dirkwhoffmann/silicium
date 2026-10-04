@@ -13,7 +13,7 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import Silicium.Controllers
 import Silicium.Assets
-import Silicium.Theme
+import Sulfur
 
 Rectangle {
 

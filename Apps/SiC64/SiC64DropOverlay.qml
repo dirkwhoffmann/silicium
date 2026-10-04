@@ -12,7 +12,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Assets
 import Silicium.Controllers
-import Silicium.Theme
 
 DropOverlay {
 

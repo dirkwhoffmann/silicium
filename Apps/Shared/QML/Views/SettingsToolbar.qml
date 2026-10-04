@@ -10,7 +10,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Silicium.Theme
+import Sulfur
 
 /* Shared toolbar of every settings page: a burger menu and a heading, plus
  * whatever the page appends. Specialised by ConfigToolbar and PrefToolbar --

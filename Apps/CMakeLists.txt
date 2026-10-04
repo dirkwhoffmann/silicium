@@ -77,10 +77,6 @@ set(ICON_FILE_C64 "${CMAKE_CURRENT_SOURCE_DIR}/Shared/Assets/icons/AppIconC64.ic
 set_source_files_properties(${ICON_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 set_source_files_properties(${ICON_FILE_C64} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
-set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/Shared/Theme/Fonts.qml" PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
-set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/Shared/Theme/Sounds.qml" PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
-set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/Shared/Theme/Style.qml" PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
-set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/Shared/Theme/Size.qml" PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
 
 #
 # Silicium
@@ -109,6 +105,8 @@ target_include_directories(silicium PUBLIC
         ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(silicium PRIVATE
+        Sulfur
+        Sulfurplugin
         utlib
         rvlib
         Qt6::Core
@@ -225,6 +223,8 @@ target_include_directories(SiC64 PUBLIC
         ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(SiC64 PRIVATE
+        Sulfur
+        Sulfurplugin
         utlib
         rvlib
         VCCore
@@ -298,6 +298,8 @@ target_include_directories(SiAmiga PUBLIC
         ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(SiAmiga PRIVATE
+        Sulfur
+        Sulfurplugin
         utlib
         rvlib
         VACore

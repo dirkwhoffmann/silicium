@@ -13,7 +13,7 @@ import QtQuick.Layouts
 import Silicium.Controllers
 import Silicium.Assets
 import Silicium.Preferences
-import Silicium.Theme
+import Sulfur
 
 ToolBar {
 

@@ -11,7 +11,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 // Visual content of the virtual C64 keyboard, shared by the standalone
 // keyboard window (SiC64KeyboardWindow) and the slide-down keyboard sheet

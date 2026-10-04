@@ -11,7 +11,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Preferences
-import Silicium.Theme
+import Sulfur
 
 // SiBox variant whose content lives inside a ScrollView instead of sitting
 // directly in the Pane -- for a box whose content can outgrow the space

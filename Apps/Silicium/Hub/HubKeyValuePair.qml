@@ -9,7 +9,7 @@
 
 import QtQuick
 import QtQuick.Layouts
-import Silicium.Theme
+import Sulfur
 
 RowLayout {
 

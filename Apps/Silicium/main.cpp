@@ -11,8 +11,7 @@
 #include "AppController.h"
 #include "Assets.h"
 #include "AudioController.h"
-#include "Shared/Theme/Palette.h"
-#include "Shared/Theme/Shortcuts.h"
+#include "Shared/Preferences/SulfurBridge.h"
 #include "Shared/Preferences/Preferences.h"
 #include "HubController.h"
 #include "HubSidebarController.h"
@@ -168,8 +167,8 @@ main(int argc, char *argv[])
     // Register meta types
     qRegisterMetaType<EmulationKey>("EmulationKey");
 
-    // Register attachments
-    qmlRegisterUncreatableType<Palette>("Silicium.Theme", 1, 0, "Palette", "Palette is an attached property");
+    // Tell the UI toolkit what the user has set up
+    SulfurBridge::install();
 
     // Register singletons
     qmlRegisterSingletonInstance("Silicium.Assets", 1, 0, "Assets", Assets::instance());
@@ -178,7 +177,6 @@ main(int argc, char *argv[])
     qmlRegisterSingletonInstance("Silicium.Controllers", 1, 0, "AppController", &AppController::instance());
     qmlRegisterSingletonInstance("Silicium.Controllers", 1, 0, "HubController", &HubController::instance());
     qmlRegisterSingletonInstance("Silicium.Preferences", 1, 0, "Preferences", &Preferences::instance());
-    qmlRegisterSingletonInstance("Silicium.Theme", 1, 0, "Shortcuts", &Shortcuts::instance());
 
     // Load the QML file
     const QUrl url(QStringLiteral("qrc:/qt/qml/siliciumUI/Silicium/Hub/HubWindow.qml"));

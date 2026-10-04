@@ -11,7 +11,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 // Port of SiC64InspectorToolbar.qml, shared by every panel behind
 // SiAmInspectorWindow's page switcher (see that file; the panel picker

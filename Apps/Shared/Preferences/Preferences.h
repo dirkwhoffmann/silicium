@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include "Palette.h"
 #include "EmulationKey.h"
 #include "utl/common.h"
 #include <QtQml>

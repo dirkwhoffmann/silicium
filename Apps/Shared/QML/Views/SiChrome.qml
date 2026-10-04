@@ -10,7 +10,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Silicium.Preferences
-import Silicium.Theme
+import Sulfur
 
 /* The window chrome: the title bar, the command bar (the toolbar and menu
  * strip) and the status bar. The component fills its parent and floats above

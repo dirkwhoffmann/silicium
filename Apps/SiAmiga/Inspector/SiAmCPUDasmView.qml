@@ -10,7 +10,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Silicium.Theme
+import Sulfur
 
 // Port of vAmiga's own InstrTableView.swift -- the 256-entry disassembly
 // window (see SiAmCPUController::disassembleWindow()), plus the Search

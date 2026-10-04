@@ -9,7 +9,7 @@
 
 import QtQuick
 import QtQuick.Effects
-import Silicium.Theme
+import Sulfur
 
 /* Frosted-glass fill: a blurred copy of the page artwork shining through a
  * translucent tint. Meant as the 'background' of a Pane.

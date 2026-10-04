@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Silicium.Theme
+import Sulfur
 
 // An 8-bit value shown as its raw bit pattern -- fixed binary, zero-padded
 // to 8 digits, regardless of whatever hex/decimal toggle the enclosing

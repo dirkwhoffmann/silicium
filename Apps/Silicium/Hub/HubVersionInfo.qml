@@ -12,7 +12,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Controllers
 import Silicium.Preferences
-import Silicium.Theme
+import Sulfur
 
 Pane {
 

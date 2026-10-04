@@ -13,7 +13,7 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import Silicium.Assets
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 SiDialog {
 

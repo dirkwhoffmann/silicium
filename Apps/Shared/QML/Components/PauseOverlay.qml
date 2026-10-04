@@ -8,6 +8,7 @@
 // -----------------------------------------------------------------------------
 
 import QtQuick
+import Sulfur
 
 /* A big play button, shown over the picture while the machine is paused.
  * Clicking it resumes the machine.

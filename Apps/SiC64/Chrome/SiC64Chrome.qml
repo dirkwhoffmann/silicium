@@ -10,7 +10,7 @@
 import QtQuick
 import Silicium.Controllers
 import Silicium.Preferences
-import Silicium.Theme
+import Sulfur
 
 //
 // The window chrome of the C64 window: SiChrome, filled with the title bar

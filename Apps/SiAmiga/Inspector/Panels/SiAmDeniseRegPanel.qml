@@ -12,7 +12,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Components
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 // SiAmDenisePanel's "Registers" tab -- split out into its own file once the
 // panel's five BPLCONx columns (each now a full 16-bit list plus its own

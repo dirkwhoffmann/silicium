@@ -15,7 +15,6 @@ import QtQuick.Effects
 import Silicium.Assets
 import Silicium.Controllers
 import Silicium.Preferences
-import Silicium.Theme
 
 Pane {
 

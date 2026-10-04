@@ -10,7 +10,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Silicium.Theme
+import Sulfur
 
 // Port of SiC64KeyboardIconBar.qml. The C64 bar toggles independent
 // modifier previews (SHIFT/COMMODORE/CTRL/LOWER CASE); the Amiga keyboard

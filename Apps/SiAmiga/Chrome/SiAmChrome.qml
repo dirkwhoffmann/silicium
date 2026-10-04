@@ -10,7 +10,7 @@
 import QtQuick
 import Silicium.Controllers
 import Silicium.Preferences
-import Silicium.Theme
+import Sulfur
 
 SiChrome {
 

@@ -12,7 +12,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Components
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 // SiAmDenisePanel's "Sprites" tab. Split out of SiAmDenisePanel.qml purely
 // for file size, alongside the Registers/Colors tabs -- see

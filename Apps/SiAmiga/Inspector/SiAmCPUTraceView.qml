@@ -10,7 +10,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Silicium.Theme
+import Sulfur
 
 // Port of vAmiga's own TraceTableView.swift -- the CPU's recorded-
 // instruction log, filled only while track mode is on (see

@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
 import Silicium.Preferences
-import Silicium.Theme
+import Sulfur
 
 // A rotary knob (dial) with optional labels on any of its four sides
 // (l / r / t / b -- left, right, top, bottom). Empty label strings collapse

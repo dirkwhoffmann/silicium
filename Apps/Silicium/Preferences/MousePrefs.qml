@@ -12,7 +12,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Controllers
 import Silicium.Preferences
-import Silicium.Theme
+import Sulfur
 
 /* The mouse page of the device preferences: controls on the left, a
  * frosted-glass properties panel on the right.

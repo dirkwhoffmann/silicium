@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects // For MultiEffect
-import Silicium.Theme
+import Sulfur
 
 RoundButton {
     id: root

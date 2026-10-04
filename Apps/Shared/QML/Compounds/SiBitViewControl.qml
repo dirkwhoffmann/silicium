@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Silicium.Theme
+import Sulfur
 
 // A single read-only status/flag bit -- a small bit-style checkbox, used
 // throughout the Inspector panels for one bit of a register (e.g. a CIA

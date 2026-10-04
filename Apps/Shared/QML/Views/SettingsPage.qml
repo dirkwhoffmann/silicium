@@ -10,7 +10,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Silicium.Theme
+import Sulfur
 
 /* Shared skeleton of every settings page: a toolbar above a scrollable column
  * of content. Used directly by the config panels and, through PrefPage, by the

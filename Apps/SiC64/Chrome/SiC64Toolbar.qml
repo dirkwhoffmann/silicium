@@ -13,7 +13,7 @@ import QtQuick.Layouts
 import Silicium.Assets
 import Silicium.Controllers
 import Silicium.Preferences
-import Silicium.Theme
+import Sulfur
 
 //
 // The icon toolbar of the C64 window, handed to the chrome (see SiC64Chrome)

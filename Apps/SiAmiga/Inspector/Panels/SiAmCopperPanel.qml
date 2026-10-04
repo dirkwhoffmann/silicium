@@ -11,7 +11,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 // Port of vAmiga's own GUI/Inspector/CopperPanel.swift, CopperTableView.swift
 // and GuardTableView.swift's CopperBreakTableView -- there is no C64

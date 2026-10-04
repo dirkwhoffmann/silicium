@@ -13,7 +13,7 @@ import QtQuick.Layouts
 import Silicium.Assets
 import Silicium.Controllers
 import Silicium.Preferences
-import Silicium.Theme
+import Sulfur
 
 // Port of vAmiga's own GUI/Settings/ViewControllers/AudioSettings.swift.
 // Shaped like SiC64AudioConfig.qml (In/Out/Drive Volumes/Synthesis sections)

@@ -10,7 +10,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Silicium.Theme
+import Sulfur
 
 // Port of vAmiga's own GuardTableView (its BreakTableView/WatchTableView
 // specializations) -- one reusable breakpoint/watchpoint table, parameterized

@@ -10,7 +10,7 @@
 import QtQuick
 import QtQuick.Controls
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 //
 // Generic chrome for an inspector window: size and the toolbar (see

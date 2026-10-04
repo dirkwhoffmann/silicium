@@ -10,7 +10,7 @@
 import QtQuick
 import Silicium.Controllers
 import Silicium.Preferences
-import Silicium.Theme
+import Sulfur
 
 /* A small pill-shaped banner used to briefly tell the user how to recover
  * something they just hid -- e.g. how to get the mouse back after it was

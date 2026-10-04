@@ -11,7 +11,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 // Port of vAmiga's own GUI/Inspector/BlitterPanel.swift -- there is no C64
 // counterpart to port from (the Blitter is Amiga-only). Its own top-level

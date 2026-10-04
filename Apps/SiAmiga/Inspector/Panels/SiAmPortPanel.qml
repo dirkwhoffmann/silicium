@@ -11,7 +11,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 // Port of vAmiga's own GUI/Inspector/PortPanel.swift: the two control ports
 // (joystick/mouse quadrature signals + the shared POTGO/POTGOR

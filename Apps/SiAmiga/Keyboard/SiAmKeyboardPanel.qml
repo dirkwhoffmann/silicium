@@ -11,7 +11,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 // Visual content of the virtual Amiga keyboard, port of SiC64KeyboardPanel.qml.
 // The C64 panel's icon bar toggles independent modifier-preview switches

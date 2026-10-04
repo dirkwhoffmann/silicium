@@ -12,7 +12,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Components
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 SiC64InspectorWindow {
 

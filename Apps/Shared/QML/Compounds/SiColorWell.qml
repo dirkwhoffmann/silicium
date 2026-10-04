@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
-import Silicium.Theme
+import Sulfur
 
 // A small clickable color swatch that opens a ColorDialog and reports the
 // picked color via 'picked' -- the caller owns the actual color value and

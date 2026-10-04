@@ -13,7 +13,7 @@ import QtQuick.Dialogs
 import Silicium.Assets
 import Silicium.Controllers
 import Silicium.Preferences
-import Silicium.Theme
+import Sulfur
 
 VMWindow {
 
@@ -135,10 +135,6 @@ VMWindow {
         y: chrome.chromeHeight + Style.mediumSpacing
         visible: root.amiga.debugPanel && Preferences.developerMode
     }
-
-    //
-    // Actions
-    //
 
     //
     // Actions

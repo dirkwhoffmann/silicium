@@ -26,5 +26,6 @@ qt_standard_project_setup()
 qt_policy(SET QTP0001 NEW)
 qt_policy(SET QTP0004 NEW)
 
+add_subdirectory(Sulfur)
 add_subdirectory(Apps)
 add_subdirectory(Cores)

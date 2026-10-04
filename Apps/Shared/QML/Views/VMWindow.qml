@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import Silicium.Preferences
-import Silicium.Theme
+import Sulfur
 
 /* The common base of the emulator windows (SiC64Window and SiAmWindow).
  */

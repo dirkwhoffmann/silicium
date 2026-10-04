@@ -12,7 +12,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Components
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 // The X-Ray box that used to live in SiAmLogicAnalyzerPanel.qml, paired with a live
 // preview -- same split as SiC64BusPanel.qml's "DMA Channels" + "Preview"

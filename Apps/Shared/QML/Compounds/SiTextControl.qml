@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Silicium.Theme
+import Sulfur
 
 // A labeled read-only text display -- the text counterpart to
 // SiNumberViewControl. Wraps a SiTextView in the standard SiControl

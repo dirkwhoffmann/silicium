@@ -8,7 +8,7 @@
 // -----------------------------------------------------------------------------
 
 import QtQuick
-import Silicium.Theme
+import Sulfur
 
 /* The toolbar of a preferences page: a SettingsToolbar wearing frosted glass
  * instead of a flat surface.

@@ -13,7 +13,7 @@ import QtQuick.Layouts
 import Silicium.Assets
 import Silicium.Controllers
 import Silicium.Preferences
-import Silicium.Theme
+import Sulfur
 
 // Port of vAmiga's own GUI/Settings/ViewControllers/VideoSettings.swift --
 // the Monitor section only (palette/brightness/contrast/saturation, zoom,

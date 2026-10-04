@@ -12,7 +12,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Assets
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 // Port of vAmiga's own GUI/Settings/ViewControllers/HardwareSettings.swift.
 // ConfigGrid/ConfigSection cards, one per hardware component, matching

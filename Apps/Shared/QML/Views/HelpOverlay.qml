@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
 import Silicium.Assets
-import Silicium.Theme
+import Sulfur
 
 Rectangle {
 

@@ -8,7 +8,7 @@
 // -----------------------------------------------------------------------------
 
 import QtQuick
-import Silicium.Theme
+import Sulfur
 
 // A single Amiga keyboard key cap: solid background, solid border, label,
 // and press/release input. Every key on the virtual keyboard

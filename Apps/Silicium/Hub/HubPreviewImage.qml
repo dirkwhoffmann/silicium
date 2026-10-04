@@ -13,7 +13,7 @@ import QtQuick.Layouts
 import QtQuick.Effects
 import Silicium.Assets
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 Image {
 

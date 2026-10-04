@@ -13,7 +13,7 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import Silicium.Assets
 import Silicium.Controllers
-import Silicium.Theme
+import Sulfur
 
 // Ports the old Swift-based emulator's DiskExporter sheet: lets the user pick
 // an export format, then hands off to a native file/folder picker. T64 and

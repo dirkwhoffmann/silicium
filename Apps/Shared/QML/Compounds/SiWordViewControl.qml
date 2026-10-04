@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Silicium.Theme
+import Sulfur
 
 // A zero-padded 16-bit value -- originally SiAmCIAPanel's own
 // SiWordViewControl. See SiByteViewControl for the base/padded defaults and

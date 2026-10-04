@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Preferences
-import Silicium.Theme
+import Sulfur
 
 // Layout:
 //

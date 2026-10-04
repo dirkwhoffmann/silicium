@@ -13,7 +13,6 @@ import QtQuick.Layouts
 import QtQuick.Effects
 import Silicium.Controllers
 import Silicium.Preferences
-import Silicium.Theme
 
 Rectangle {
 

@@ -13,7 +13,7 @@ import QtQuick.Layouts
 import Silicium.Assets
 import Silicium.Controllers
 import Silicium.Preferences
-import Silicium.Theme
+import Sulfur
 
 // Port of SiC64ServerConfig.qml for vAmiga's own remote-server set: RSH,
 // RPC, GDB and Prometheus, plus SerServer (the emulated serial/UART port's
