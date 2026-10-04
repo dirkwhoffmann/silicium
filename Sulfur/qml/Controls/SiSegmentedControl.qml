@@ -37,6 +37,14 @@ Item {
     // Control-size level (see Size)
     property int size: Size.regular
 
+    // Color aliases (declared here to make them reactive)
+    property color accent: Palette.accent
+    property color accentElevated: Palette.accentElevated
+    property color accentText: Palette.accentText
+    property color primary: Palette.primary
+    property color widget: Palette.widget
+    property color widgetShadow: Palette.widgetShadow
+
     // Emitted when a segment is clicked. The caller updates currentIndex.
     signal activated(int index)
 
@@ -66,12 +74,12 @@ Item {
         id: body
         anchors.fill: parent
         radius: Style.radius
-        border.color: Palette.widgetShadow
+        border.color: root.widgetShadow
         border.width: 1
 
         gradient: Gradient {
-            GradientStop { position: 0.0; color: Palette.widget.lighter(1.4) }
-            GradientStop { position: 1.0; color: Palette.widget.darker(1.05) }
+            GradientStop { position: 0.0; color: root.widget.lighter(1.4) }
+            GradientStop { position: 1.0; color: root.widget.darker(1.05) }
         }
     }
 
@@ -124,16 +132,16 @@ Item {
                         gradient: Gradient {
                             GradientStop {
                                 position: 0.0
-                                color: (seg.down ? Palette.accentElevated : Palette.accent).lighter(1.4)
+                                color: (seg.down ? root.accentElevated : root.accent).lighter(1.4)
                             }
                             GradientStop {
                                 position: 1.0
-                                color: (seg.down ? Palette.accentElevated : Palette.accent).darker(1.05)
+                                color: (seg.down ? root.accentElevated : root.accent).darker(1.05)
                             }
                         }
 
                         border.width: 1
-                        border.color: seg.down ? Palette.accent : Palette.accentElevated
+                        border.color: seg.down ? root.accent : root.accentElevated
 
                         topLeftRadius: seg.isFirst ? Style.radius : 0
                         bottomLeftRadius: seg.isFirst ? Style.radius : 0
@@ -153,7 +161,7 @@ Item {
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
                         width: 1
-                        color: Palette.widgetShadow
+                        color: root.widgetShadow
                     }
                 }
 
@@ -161,7 +169,7 @@ Item {
                     id: label
                     text: seg.modelData
                     font.pixelSize: Size.fontSize(root.size)
-                    color: seg.selected ? Palette.accentText : Palette.primary
+                    color: seg.selected ? root.accentText : root.primary
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                 }

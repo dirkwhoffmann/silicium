@@ -338,46 +338,104 @@ Palette::computeSolarisColor(Color c, bool darkMode) const
         return computeSolarisColor(col, darkMode).darker(factor);
     };
 
-    switch (c) {
+    if (darkMode) {
 
-        case Color::Accent:                 return QColor("#A75376");
-        case Color::AccentElevated:         return lighter(Color::Accent);
-        case Color::Backdrop:               return QColor("#5C636A");
-        case Color::Background:             return QColor("#AFB2C1");
-        case Color::BackgroundBorder:       return darker(Color::Background, 200);
-        case Color::BackgroundElevated:     return lighter(Color::Background);
-        case Color::Elevation:              return QColor("#10000000");
-        case Color::Surface:                return QColor("#9496A4");
-        case Color::SurfaceBorder:          return QColor("#c8c8c8");
-        case Color::SurfaceElevated:        return lighter(Color::Surface);
-        case Color::Tint:                   return QColor("#636398");
-        case Color::Toolbar:                return lighter(Color::Background);
-        case Color::ToolbarBorder:          return darker(Color::Toolbar, 130);
+        //
+        // Dark mode
+        //
 
-        case Color::AccentText:             return QColor("#FFFFFF");
-        case Color::Primary:                return QColor("#000000");
-        case Color::Secondary:              return QColor("#98000000");
-        case Color::Tertiary:               return QColor("#80000000");
-        case Color::Disabled:               return QColor("#40000000");
-        case Color::Success:                return QColor("#66ff66");
-        case Color::Warning:                return QColor("#A75376");
-        case Color::Error:                  return QColor("#ff6666");
+        switch (c) {
 
-        case Color::Widget:                 return QColor("#D4D5DF");
-        case Color::WidgetElevated:         return lighter(Color::Widget);
-        case Color::WidgetShadow:           return darker(Color::Widget);
+            case Color::Accent:                 return QColor("#A75376");
+            case Color::AccentElevated:         return lighter(Color::Accent);
+            case Color::Backdrop:               return QColor("#5C636A");
+            case Color::Background:             return QColor("#AFB2C1").darker(115);
+            case Color::BackgroundBorder:       return darker(Color::Background, 200);
+            case Color::BackgroundElevated:     return lighter(Color::Background);
+            case Color::Elevation:              return QColor("#10000000");
+            case Color::Surface:                return QColor("#9496A4");
+            case Color::SurfaceBorder:          return QColor("#c8c8c8");
+            case Color::SurfaceElevated:        return lighter(Color::Surface);
+            case Color::Tint:                   return QColor("#636398");
+            case Color::Toolbar:                return lighter(Color::Background);
+            case Color::ToolbarBorder:          return darker(Color::Toolbar, 130);
 
-        case Color::Control:                return QColor("#D4D5DF");
-        case Color::ControlSelected:        return lighter(Color::Control); //, 130);
-        case Color::ControlBorder:          return darker(Color::Control, 150); //, 140);
-        case Color::ControlBorderSelected:  return darker(Color::ControlBorder);
+            case Color::AccentText:             return QColor("#FFFFFF");
+            case Color::Primary:                return QColor("#FFFFFF");
+            case Color::Secondary:              return QColor("#98FFFFFF");
+            case Color::Tertiary:               return QColor("#80FFFFFF");
+            case Color::Disabled:               return QColor("#40FFFFFF");
+            case Color::Success:                return QColor("#66ff66");
+            case Color::Warning:                return QColor("#A75376");
+            case Color::Error:                  return QColor("#ff6666");
 
-        case Color::Overlay:                return QColor("#C0000000");
-        case Color::OverlayElevated:        return QColor("#E0000000");
-        case Color::OverlayBorder:          return QColor("#50ffffff");
-        case Color::OverlayBorderElevated:  return QColor("#90ffffff");
+            case Color::Widget:                 return QColor("#6B6C76"); // #767882");
+            case Color::WidgetElevated:         return lighter(Color::Widget);
+            case Color::WidgetShadow:           return darker(Color::Widget);
 
-        default:
-            return computeDefaultColor(c, darkMode);
+            case Color::Control:                return QColor("#6B6C76"); // "#767882");
+            case Color::ControlSelected:        return lighter(Color::Control); //, 130);
+            case Color::ControlBorder:          return darker(Color::Control, 150); //, 140);
+            case Color::ControlBorderSelected:  return darker(Color::ControlBorder);
+
+            case Color::Overlay:                return QColor("#C0000000");
+            case Color::OverlayElevated:        return QColor("#E0000000");
+            case Color::OverlayBorder:          return QColor("#50ffffff");
+            case Color::OverlayBorderElevated:  return QColor("#90ffffff");
+
+            default:
+                break;
+        }
+
+    } else {
+
+        //
+        // Light mode
+        //
+
+        switch (c) {
+
+            case Color::Accent:                 return QColor("#A75376");
+            case Color::AccentElevated:         return lighter(Color::Accent);
+            case Color::Backdrop:               return QColor("#5C636A");
+            case Color::Background:             return QColor("#AFB2C1");
+            case Color::BackgroundBorder:       return darker(Color::Background, 200);
+            case Color::BackgroundElevated:     return lighter(Color::Background);
+            case Color::Elevation:              return QColor("#10000000");
+            case Color::Surface:                return QColor("#9496A4");
+            case Color::SurfaceBorder:          return QColor("#c8c8c8");
+            case Color::SurfaceElevated:        return lighter(Color::Surface);
+            case Color::Tint:                   return QColor("#636398");
+            case Color::Toolbar:                return lighter(Color::Background);
+            case Color::ToolbarBorder:          return darker(Color::Toolbar, 130);
+
+            case Color::AccentText:             return QColor("#FFFFFF");
+            case Color::Primary:                return QColor("#000000");
+            case Color::Secondary:              return QColor("#98000000");
+            case Color::Tertiary:               return QColor("#80000000");
+            case Color::Disabled:               return QColor("#40000000");
+            case Color::Success:                return QColor("#66ff66");
+            case Color::Warning:                return QColor("#A75376");
+            case Color::Error:                  return QColor("#ff6666");
+
+            case Color::Widget:                 return QColor("#D4D5DF");
+            case Color::WidgetElevated:         return lighter(Color::Widget);
+            case Color::WidgetShadow:           return darker(Color::Widget);
+
+            case Color::Control:                return QColor("#D4D5DF");
+            case Color::ControlSelected:        return lighter(Color::Control); //, 130);
+            case Color::ControlBorder:          return darker(Color::Control, 150); //, 140);
+            case Color::ControlBorderSelected:  return darker(Color::ControlBorder);
+
+            case Color::Overlay:                return QColor("#C0000000");
+            case Color::OverlayElevated:        return QColor("#E0000000");
+            case Color::OverlayBorder:          return QColor("#50ffffff");
+            case Color::OverlayBorderElevated:  return QColor("#90ffffff");
+
+            default:
+                break;
+        }
     }
+
+    return computeDefaultColor(c, darkMode);
 }
