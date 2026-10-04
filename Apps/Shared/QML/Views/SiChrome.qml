@@ -210,7 +210,7 @@ Item {
 
                 spacing: 0
 
-                NavTextButtonFlat {
+                SiBarButton {
 
                     visible: root.compact
                     phosphor: "list"
@@ -218,7 +218,7 @@ Item {
                     onClicked: root.menuSwitch = 1
                 }
 
-                NavDivider {
+                SiBarDivider {
 
                     visible: root.compact
                 }
@@ -256,7 +256,7 @@ Item {
                 anchors.fill: parent
                 spacing: 0
 
-                NavTextButtonFlat {
+                SiBarButton {
 
                     visible: root.compact
                     phosphor: "list"
@@ -264,7 +264,7 @@ Item {
                     onClicked: root.menuSwitch = 0
                 }
 
-                NavDivider {
+                SiBarDivider {
 
                     visible: root.compact
                 }

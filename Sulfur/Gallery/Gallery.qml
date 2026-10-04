@@ -230,13 +230,8 @@ ApplicationWindow {
                     }
 
                     Sample {
-                        caption: "NavTextButton"
-                        NavTextButton { phosphor: "gear"; text: "Settings" }
-                    }
-
-                    Sample {
-                        caption: "NavTextButtonFlat"
-                        NavTextButtonFlat {
+                        caption: "SiBarButton"
+                        SiBarButton {
                             phosphor: "terminal-window"
                             text: "Shell"
                             checkable: true

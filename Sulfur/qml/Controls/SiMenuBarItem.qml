@@ -6,7 +6,7 @@ MenuBarItem {
 
     id: root
 
-    // Same height as NavTextButtonFlat, so both line up in the toolbar row
+    // Same height as SiBarButton, so both line up in the toolbar row
     implicitHeight: Style.barItemHeight
     topPadding: 0
     bottomPadding: 0

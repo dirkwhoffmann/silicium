@@ -33,15 +33,15 @@ Item {
         anchors.fill: parent
         spacing: 0
 
-        NavTextButtonFlat {
+        SiBarButton {
 
             phosphor: "gear"
             action: root.window.actions.config
         }
 
-        NavDivider {}
+        SiBarDivider {}
 
-        NavTextButtonFlat {
+        SiBarButton {
 
             id: inspectButton
             phosphor: "magnifying-glass"
@@ -95,9 +95,9 @@ Item {
             }
         }
 
-        NavDivider {}
+        SiBarDivider {}
 
-        NavTextButtonFlat {
+        SiBarButton {
 
             phosphor: "terminal-window"
             action: root.window.actions.retroShell
@@ -105,9 +105,9 @@ Item {
             checked: root.amiga.retroShell
         }
 
-        NavDivider {}
+        SiBarDivider {}
 
-        NavTextButtonFlat {
+        SiBarButton {
 
             phosphor: "clipboard"
             action: root.window.actions.logger
@@ -115,36 +115,36 @@ Item {
             checked: root.window.actions.logger.isOpen
         }
 
-        NavDivider {}
+        SiBarDivider {}
 
         HSpacer {}
 
-        NavDivider {}
+        SiBarDivider {}
 
-        NavTextButtonFlat {
+        SiBarButton {
             phosphor: "database"
             action: root.window.actions.saveWorkspace
         }
 
-        NavDivider {}
+        SiBarDivider {}
 
-        NavTextButtonFlat {
+        SiBarButton {
             phosphor: "download-simple"
             action: root.window.actions.saveSnapshot
         }
 
-        NavDivider {}
+        SiBarDivider {}
 
-        NavTextButtonFlat {
+        SiBarButton {
             phosphor: "upload-simple"
             action: root.window.actions.loadSnapshot
         }
 
-        NavDivider {}
+        SiBarDivider {}
 
         HSpacer {}
 
-        NavDivider {}
+        SiBarDivider {}
 
         DeviceSelectorFlat {
 
@@ -155,7 +155,7 @@ Item {
             onDeviceSelected: (index) => AppController.inputManager.port0 = index
         }
 
-        NavDivider {}
+        SiBarDivider {}
 
         DeviceSelectorFlat {
 
@@ -166,24 +166,24 @@ Item {
             onDeviceSelected: (index) => AppController.inputManager.port1 = index
         }
 
-        NavDivider {}
+        SiBarDivider {}
 
         HSpacer {}
 
-        NavDivider {}
+        SiBarDivider {}
 
-        NavTextButtonFlat {
+        SiBarButton {
             phosphor: "keyboard"
             action: root.window.actions.keyboard
         }
 
-        NavDivider {}
+        SiBarDivider {}
 
         HSpacer {}
 
-        NavDivider {}
+        SiBarDivider {}
 
-        NavTextButtonFlat {
+        SiBarButton {
             visible: Preferences.developerMode
             phosphor: "bug-beetle"
             action: root.window.actions.debug
@@ -191,23 +191,23 @@ Item {
             checked: root.amiga.debugPanel
         }
 
-        NavDivider {}
+        SiBarDivider {}
 
-        NavTextButtonFlat {
+        SiBarButton {
             phosphor: root.amiga.isPaused ? "play-circle" : "pause-circle"
             action: root.window.actions.pause
         }
 
-        NavDivider {}
+        SiBarDivider {}
 
-        NavTextButtonFlat {
+        SiBarButton {
             phosphor: "arrows-clockwise"
             action: root.window.actions.reset
         }
 
-        NavDivider {}
+        SiBarDivider {}
 
-        NavTextButtonFlat {
+        SiBarButton {
             phosphor: "power"
             action: root.window.actions.power
         }
