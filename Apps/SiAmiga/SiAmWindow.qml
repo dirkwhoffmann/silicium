@@ -166,6 +166,9 @@ VMWindow {
         userDialogRef: userDialog
         diskCreatorRef: diskCreatorDialog
         insertDiskDialogRef: insertDiskDialog
+        exportDiskDialogRef: exportDiskDialog
+        attachHdDialogRef: attachHdDialog
+        exportHdDialogRef: exportHdDialog
         canvasOverlayRef: canvasOverlay
         chromeRef: chrome
     }
@@ -183,6 +186,43 @@ VMWindow {
         property int driveNr: 0
 
         onAccepted: root.amiga.media.insertDisk(driveNr, selectedFile)
+    }
+
+    FileDialog {
+
+        id: exportDiskDialog
+        title: qsTr("Export Disk")
+        fileMode: FileDialog.SaveFile
+        nameFilters: [qsTr("Disk image (*.adf)")]
+        defaultSuffix: "adf"
+
+        property int driveNr: 0
+
+        onAccepted: root.amiga.media.exportDisk(driveNr, selectedFile)
+    }
+
+    FileDialog {
+
+        id: attachHdDialog
+        title: qsTr("Attach Hard Drive")
+        nameFilters: [qsTr("Hard drive images (*.hdf *.hdz)"), qsTr("All files (*)")]
+
+        property int driveNr: 0
+
+        onAccepted: root.amiga.media.attachHdAsync(driveNr, selectedFile)
+    }
+
+    FileDialog {
+
+        id: exportHdDialog
+        title: qsTr("Export Hard Drive")
+        fileMode: FileDialog.SaveFile
+        nameFilters: [qsTr("Hard drive image (*.hdf)")]
+        defaultSuffix: "hdf"
+
+        property int driveNr: 0
+
+        onAccepted: root.amiga.media.exportHd(driveNr, selectedFile)
     }
 
     //

@@ -157,8 +157,6 @@ SiMenuBar {
 
         SiMenuSeparator { visible: connected }
 
-        // exportDiskAction is still missing (see SiC64Window.qml for what it
-        // looks like).
         SiMenuItem {
             text: qsTr("New...")
             visible: connected
@@ -174,13 +172,13 @@ SiMenuBar {
             text: qsTr("Eject")
             visible: connected
             enabled: hasDisk
-            onTriggered: amiga.media.ejectDisk(driveNr)
+            onTriggered: window.actions.ejectDiskAction(driveNr)
         }
         SiMenuItem {
             text: qsTr("Export...")
             visible: connected
             enabled: hasDisk
-            onTriggered: window.exportDiskAction(driveNr)
+            onTriggered: window.actions.exportDiskAction(driveNr)
         }
         SiMenuSeparator { visible: connected }
         SiMenuItem {
@@ -240,14 +238,14 @@ SiMenuBar {
         SiMenuItem {
             text: qsTr("Attach...")
             visible: connected
-            onTriggered: window.attachHdAction(driveNr)
+            onTriggered: window.actions.attachHdAction(driveNr)
         }
         SiMenuSeparator { visible: connected }
         SiMenuItem {
             text: qsTr("Export...")
             visible: connected
             enabled: hasDisk
-            onTriggered: window.exportHdAction(driveNr)
+            onTriggered: window.actions.exportHdAction(driveNr)
         }
     }
 

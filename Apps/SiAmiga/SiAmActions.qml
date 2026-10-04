@@ -39,6 +39,9 @@ Item {
     required property var userDialogRef
     required property var diskCreatorRef
     required property var insertDiskDialogRef
+    required property var exportDiskDialogRef
+    required property var attachHdDialogRef
+    required property var exportHdDialogRef
     required property var canvasOverlayRef
     required property var chromeRef
     required property var aboutWindowRef
@@ -132,6 +135,21 @@ Item {
         })
     }
 
+    // Ejects the disk in a drive, and warns first where changes are at stake
+    function ejectDiskAction(driveNr) {
+
+        proceedWithUnsavedFloppyDisk(driveNr, function () {
+            amiga.media.ejectDisk(driveNr)
+        })
+    }
+
+    // Asks where to export the disk in a drive to
+    function exportDiskAction(driveNr) {
+
+        exportDiskDialogRef.driveNr = driveNr
+        exportDiskDialogRef.open()
+    }
+
     // Asks for a new floppy disk, and warns first where changes are at stake
     function newDiskAction(driveNr) {
 
@@ -139,6 +157,41 @@ Item {
             diskCreatorRef.driveNr = driveNr
             diskCreatorRef.open()
         })
+    }
+
+    /* Runs 'proceed', after warning first where a hard drive is at stake:
+     * when the slot holds one, or the machine folder holds an image of one.
+     * 'what' says what is about to replace it.
+     *
+     * The image file is asked about as well as the drive: a new image is
+     * written under the same name (hdN.hdf), so a file left in the folder by
+     * an earlier drive is overwritten even when the slot itself is empty.
+     */
+    function proceedWithExistingHardDisk(driveNr, what, proceed) {
+
+        const hasDisk =
+                driveNr === 0 ? amiga.info.hdHasDisk0 :
+                        driveNr === 1 ? amiga.info.hdHasDisk1 :
+                                driveNr === 2 ? amiga.info.hdHasDisk2 :
+                                        driveNr === 3 ? amiga.info.hdHasDisk3 : false
+
+        const existing = amiga.media.hdExistingImage(driveNr)
+
+        if (!hasDisk && existing === "") {
+            proceed()
+            return
+        }
+
+        const dialog = userDialogRef
+        dialog.titleText = hasDisk ?
+            qsTr("Hd%1 already holds a hard drive.").arg(driveNr) :
+            qsTr("The machine folder already holds %1.").arg(existing)
+        dialog.bodyText = qsTr("%1 replaces it. Anything on it that has not " +
+                               "been exported will be lost.").arg(what)
+        dialog.buttons = Dialog.Cancel | Dialog.Ok
+        dialog.okLabel = qsTr("Proceed")
+        dialog.acceptedCallback = proceed
+        dialog.open()
     }
 
     /* Asks for a new hard drive, and warns first where one is at stake.
@@ -149,41 +202,28 @@ Item {
      */
     function newHardDiskAction(driveNr) {
 
-        const hasDisk =
-                driveNr === 0 ? amiga.info.hdHasDisk0 :
-                        driveNr === 1 ? amiga.info.hdHasDisk1 :
-                                driveNr === 2 ? amiga.info.hdHasDisk2 :
-                                        driveNr === 3 ? amiga.info.hdHasDisk3 : false
-
-        // The image file is asked about as well as the drive: the new one
-        // is written under that same name (hdN.hdf), so a file left in the
-        // folder by an earlier drive is overwritten even when the slot
-        // itself is empty.
-        const existing = amiga.media.hdExistingImage(driveNr)
-
-        const creator = hardDiskCreatorRef
-
-        if (!hasDisk && existing === "") {
-            creator.driveNr = driveNr
-            creator.open()
-            return
-        }
-
-        const dialog = userDialogRef
-        dialog.titleText = hasDisk ?
-            qsTr("Hd%1 already holds a hard drive.").arg(driveNr) :
-            qsTr("The machine folder already holds %1.").arg(existing)
-        dialog.bodyText = qsTr("Creating a new one replaces it. Anything on " +
-                               "it that has not been exported will be lost.")
-        dialog.buttons = Dialog.Cancel | Dialog.Ok
-        dialog.okLabel = qsTr("Proceed")
-        dialog.acceptedCallback = function () {
-            creator.driveNr = driveNr
-            creator.open()
-        }
-        dialog.open()
+        proceedWithExistingHardDisk(driveNr, qsTr("Creating a new one"), function () {
+            hardDiskCreatorRef.driveNr = driveNr
+            hardDiskCreatorRef.open()
+        })
     }
 
+    // Asks for a hard drive image to attach, and warns first where a drive is
+    // at stake. Attaching resets the machine.
+    function attachHdAction(driveNr) {
+
+        proceedWithExistingHardDisk(driveNr, qsTr("Attaching another one"), function () {
+            attachHdDialogRef.driveNr = driveNr
+            attachHdDialogRef.open()
+        })
+    }
+
+    // Asks where to export the hard drive to
+    function exportHdAction(driveNr) {
+
+        exportHdDialogRef.driveNr = driveNr
+        exportHdDialogRef.open()
+    }
 
     Action {
 

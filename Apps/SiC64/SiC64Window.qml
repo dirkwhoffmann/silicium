@@ -10,6 +10,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
+import Silicium.Assets
 import Silicium.Controllers
 import Silicium.Preferences
 import Silicium.Theme
