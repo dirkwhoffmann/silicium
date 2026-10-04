@@ -349,7 +349,7 @@ Palette::computeSolarisColor(Color c, bool darkMode) const
             case Color::Accent:                 return QColor("#A75376");
             case Color::AccentElevated:         return lighter(Color::Accent);
             case Color::Backdrop:               return QColor("#5C636A");
-            case Color::Background:             return QColor("#AFB2C1").darker(115);
+            case Color::Background:             return QColor("#494971"); // #586C80"); // #718BA4"); // #AFB2C1").darker(115);
             case Color::BackgroundBorder:       return darker(Color::Background, 200);
             case Color::BackgroundElevated:     return lighter(Color::Background);
             case Color::Elevation:              return QColor("#10000000");
@@ -369,11 +369,11 @@ Palette::computeSolarisColor(Color c, bool darkMode) const
             case Color::Warning:                return QColor("#A75376");
             case Color::Error:                  return QColor("#ff6666");
 
-            case Color::Widget:                 return QColor("#6B6C76"); // #767882");
+            case Color::Widget:                 return QColor("#55556E"); // darker(Color::Tint, 100); // #6B6C76"); // #767882");
             case Color::WidgetElevated:         return lighter(Color::Widget);
             case Color::WidgetShadow:           return darker(Color::Widget);
 
-            case Color::Control:                return QColor("#6B6C76"); // "#767882");
+            case Color::Control:                return darker(Color::Tint, 100); // "#767882");
             case Color::ControlSelected:        return lighter(Color::Control); //, 130);
             case Color::ControlBorder:          return darker(Color::Control, 150); //, 140);
             case Color::ControlBorderSelected:  return darker(Color::ControlBorder);
