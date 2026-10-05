@@ -101,20 +101,67 @@ ApplicationWindow {
     //
 
     /* The window refuses the first close and goes away only once the machine
-     * has been put away (see ShutDownManager).
+     * has been put away, because everything from here on is asynchronous: a
+     * dialog is waiting for an answer, and a window that closed underneath it
+     * would take the answer -- and the machine -- with it.
+     *
+     *    1. Pause the machine
+     *    2. Optional: ask what to save (hibernation dialog)
+     *    3. hibernate(), which saves in the background and reports its
+     *       progress to the status bar, and says when it is done
+     *       (onHibernated)
+     *    4. byebye()
+     *
+     * The machine (controllerRef) needs a readOnly property, the methods
+     * pause(), hibernate(snapshot, workspace) and shutdown(), and the
+     * hibernated and shutdown signals.
      */
-    ShutDownManager {
 
-        id: shutDownManager
-        controller: root.controllerRef
+    // True once the controller reported that it has wound down
+    property bool shutdownInProgress: false
+
+    onClosing: function(closeEvent) {
+
+        if (shutdownInProgress) return
+
+        // Prevent the window from closing immediately
+        closeEvent.accepted = false
+
+        controllerRef.pause()
+
+        if (controllerRef.readOnly) {
+            byebye()
+        } else if (Preferences.showHibernationDialog) {
+            hibernationDialog.open()
+        } else {
+            hibernate(Preferences.hibernateSnapshot, Preferences.hibernateWorkspace)
+        }
     }
 
-    onClosing: function(closeEvent) { shutDownManager.windowClosing(closeEvent) }
+    function hibernate(snapshot, workspace) {
+
+        // Asynchronous: the machine goes away from onHibernated
+        if (snapshot || workspace) {
+
+            controllerRef.hibernate(snapshot, workspace)
+            return
+        }
+
+        byebye()
+    }
 
     // Goes away right now, without pausing, asking or hibernating
     function byebye() {
 
-        shutDownManager.byebye()
+        controllerRef.shutdown()
+    }
+
+    SiHibernationDialog {
+
+        id: hibernationDialog
+        parent: Overlay.overlay
+
+        onConfirmed: (snapshot, workspace) => root.hibernate(snapshot, workspace)
     }
 
     //
@@ -226,6 +273,19 @@ ApplicationWindow {
             // notification above is already on the wire (the stdio transport
             // flushes every packet), so quitting cannot lose it.
             root.byebye()
+        }
+
+        // Everything is saved: the machine can go
+        function onHibernated() {
+
+            root.byebye()
+        }
+
+        // The machine has wound down
+        function onShutdown() {
+
+            root.shutdownInProgress = true
+            Qt.quit()
         }
 
         // The snapshot storage is full: ask before the oldest snapshot goes
