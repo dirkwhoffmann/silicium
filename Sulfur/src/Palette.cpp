@@ -220,44 +220,31 @@ Palette::computeColor<Palette::Theme::AppDefault>(Color c, bool darkMode) const
         switch (c) {
 
             case Color::Accent:                 return QColor("#0080FF");
-            case Color::AccentElevated:         return lighter(Color::Accent);
             case Color::Backdrop:               return QColor("#161414");
             case Color::Background:             return QColor("#262424");
-            case Color::BackgroundBorder:       return QColor("#6C6B6B");
-            case Color::BackgroundElevated:     return lighter(Color::Background);
-            case Color::Elevation:              return QColor("#10FFFFFF");
             case Color::Surface:                return QColor("#3c3c3e"); // QColor("#2c2c2e");
-            case Color::SurfaceBorder:          return QColor("#6C6B6B");
-            case Color::SurfaceElevated:        return lighter(Color::Surface);
             case Color::Tint:                   return QColor("#99ccff");
             case Color::Toolbar:                return darker(Color::Surface, 100); // lighter(Color::Background, 110);
-            case Color::ToolbarBorder:          return darker(Color::SurfaceBorder, 100); // lighter(Color::Toolbar);
 
             case Color::AccentText:             return QColor("#FFFFFF");
             case Color::Primary:                return QColor("#ffffff");
             case Color::Secondary:              return QColor("#c0ffffff"); // alpha(Color::Primary, 192);
             case Color::Tertiary:               return QColor("#80ffffff"); // alpha(Color::Primary, 128);
             case Color::Disabled:               return QColor("#40ffffff"); // alpha(Color::Primary, 64);
+
             case Color::StatusSuccess:          return QColor("#66ff66");
             case Color::StatusWarning:          return QColor("#ffff66");
             case Color::StatusError:            return QColor("#ff6666");
 
             case Color::Widget:                 return QColor("#363434");
-            case Color::WidgetElevated:         return lighter(Color::Widget);
-            case Color::WidgetBorder:           return darker(Color::Widget);
-
-            case Color::Inset:                return lighter(Color::Surface,120); // QColor("#555555"); //  ""#656565");
-            case Color::InsetFocused:         return lighter(Color::Inset,130);
-            case Color::InsetBorder:          return lighter(Color::Inset,140);
-            case Color::InsetBorderFocused:   return lighter(Color::InsetFocused,150);
+            case Color::Inset:                  return lighter(Color::Surface,120); // QColor("#555555"); //  ""#656565");
+            case Color::InsetFocused:           return lighter(Color::Inset,130);
+            case Color::InsetBorderFocused:     return lighter(Color::InsetFocused,150);
 
             case Color::Overlay:                return QColor("#A0000000");
-            case Color::OverlayElevated:        return QColor("#E0000000");
-            case Color::OverlayBorder:          return QColor("#50ffffff");
-            case Color::OverlayBorderElevated:  return QColor("#90ffffff");
 
             default:
-                return QColor("red");
+                return deriveColor<Theme::AppDefault>(c, darkMode);
         }
 
     } else {
@@ -269,44 +256,32 @@ Palette::computeColor<Palette::Theme::AppDefault>(Color c, bool darkMode) const
         switch (c) {
 
             case Color::Accent:                 return QColor("#00309F");
-            case Color::AccentElevated:         return darker(Color::Accent);
             case Color::Backdrop:               return QColor("#cccccc");
             case Color::Background:             return QColor("#ececec");
-            case Color::BackgroundBorder:       return QColor("#a8a8a8");
-            case Color::BackgroundElevated:     return darker(Color::Background);
-            case Color::Elevation:              return QColor("#10000000");
             case Color::Surface:                return QColor("#e2e2e2");
-            case Color::SurfaceBorder:          return QColor("#c8c8c8");
-            case Color::SurfaceElevated:        return darker(Color::Surface);
             case Color::Tint:                   return QColor("#CFDDFF");
             case Color::Toolbar:                return darker(Color::Surface, 100); // darker(Color::Background, 104);
-            case Color::ToolbarBorder:          return darker(Color::SurfaceBorder, 100); //darker(Color::Toolbar);
 
             case Color::AccentText:             return QColor("#FFFFFF");
             case Color::Primary:                return QColor("#000000");
             case Color::Secondary:              return QColor("#c0000000");
             case Color::Tertiary:               return QColor("#80000000");
             case Color::Disabled:               return QColor("#40000000");
+
             case Color::StatusSuccess:          return QColor("#00aa00");
             case Color::StatusWarning:          return QColor("#cccc00");
             case Color::StatusError:            return QColor("#ff0000");
 
             case Color::Widget:                 return QColor("#dcdcdc");
-            case Color::WidgetElevated:         return darker(Color::Widget);
-            case Color::WidgetBorder:           return lighter(Color::Widget);
-
-            case Color::Inset:                return QColor("#FFFFFF");
-            case Color::InsetFocused:        return QColor("#FFFFFF");
-            case Color::InsetBorder:          return darker(Color::Inset);
-            case Color::InsetBorderFocused:  return darker(Color::InsetBorder);
+            case Color::Inset:                  return QColor("#FFFFFF");
+            case Color::InsetFocused:           return QColor("#FFFFFF");
+            case Color::InsetBorder:            return darker(Color::Inset);
+            case Color::InsetBorderFocused:     return darker(Color::InsetBorder);
 
             case Color::Overlay:                return QColor("#A0000000");
-            case Color::OverlayElevated:        return QColor("#E0000000");
-            case Color::OverlayBorder:          return QColor("#50ffffff");
-            case Color::OverlayBorderElevated:  return QColor("#90ffffff");
 
             default:
-                return QColor("red");
+                return deriveColor<Theme::AppDefault>(c, darkMode);
         }
     }
 }
@@ -330,44 +305,32 @@ Palette::computeColor<Palette::Theme::Solaris>(Color c, bool darkMode) const
         switch (c) {
 
             case Color::Accent:                 return QColor("#A75376");
-            case Color::AccentElevated:         return lighter(Color::Accent);
             case Color::Backdrop:               return QColor("#5C636A");
             case Color::Background:             return QColor("#494971"); // #586C80"); // #718BA4"); // #AFB2C1").darker(115);
-            case Color::BackgroundBorder:       return darker(Color::Background, 200);
-            case Color::BackgroundElevated:     return lighter(Color::Background);
-            case Color::Elevation:              return QColor("#10000000");
             case Color::Surface:                return QColor("#9496A4");
-            case Color::SurfaceBorder:          return QColor("#c8c8c8");
-            case Color::SurfaceElevated:        return lighter(Color::Surface);
             case Color::Tint:                   return QColor("#636398");
             case Color::Toolbar:                return lighter(Color::Background);
-            case Color::ToolbarBorder:          return darker(Color::Toolbar, 130);
 
             case Color::AccentText:             return QColor("#FFFFFF");
             case Color::Primary:                return QColor("#FFFFFF");
             case Color::Secondary:              return QColor("#98FFFFFF");
             case Color::Tertiary:               return QColor("#80FFFFFF");
             case Color::Disabled:               return QColor("#40FFFFFF");
+
             case Color::StatusSuccess:          return QColor("#66ff66");
             case Color::StatusWarning:          return QColor("#A75376");
             case Color::StatusError:            return QColor("#ff6666");
 
             case Color::Widget:                 return QColor("#55556E"); // darker(Color::Tint, 100); // #6B6C76"); // #767882");
-            case Color::WidgetElevated:         return lighter(Color::Widget);
-            case Color::WidgetBorder:           return darker(Color::Widget);
-
-            case Color::Inset:                return darker(Color::Tint, 100); // "#767882");
-            case Color::InsetFocused:        return lighter(Color::Inset); //, 130);
-            case Color::InsetBorder:          return darker(Color::Inset, 150); //, 140);
-            case Color::InsetBorderFocused:  return darker(Color::InsetBorder);
+            case Color::Inset:                  return darker(Color::Tint, 100); // "#767882");
+            case Color::InsetFocused:           return lighter(Color::Inset); //, 130);
+            case Color::InsetBorder:            return darker(Color::Inset, 150); //, 140);
+            case Color::InsetBorderFocused:     return darker(Color::InsetBorder);
 
             case Color::Overlay:                return QColor("#A0000000");
-            case Color::OverlayElevated:        return QColor("#E0000000");
-            case Color::OverlayBorder:          return QColor("#50ffffff");
-            case Color::OverlayBorderElevated:  return QColor("#90ffffff");
 
             default:
-                break;
+                return deriveColor<Theme::Solaris>(c, darkMode);
         }
 
     } else {
@@ -379,48 +342,90 @@ Palette::computeColor<Palette::Theme::Solaris>(Color c, bool darkMode) const
         switch (c) {
 
             case Color::Accent:                 return QColor("#A75376");
-            case Color::AccentElevated:         return lighter(Color::Accent);
             case Color::Backdrop:               return QColor("#5C636A");
             case Color::Background:             return QColor("#AFB2C1");
-            case Color::BackgroundBorder:       return darker(Color::Background, 200);
-            case Color::BackgroundElevated:     return lighter(Color::Background);
-            case Color::Elevation:              return QColor("#10000000");
             case Color::Surface:                return QColor("#9496A4");
-            case Color::SurfaceBorder:          return QColor("#c8c8c8");
-            case Color::SurfaceElevated:        return lighter(Color::Surface);
             case Color::Tint:                   return QColor("#636398");
             case Color::Toolbar:                return lighter(Color::Background);
-            case Color::ToolbarBorder:          return darker(Color::Toolbar, 130);
 
             case Color::AccentText:             return QColor("#FFFFFF");
             case Color::Primary:                return QColor("#000000");
             case Color::Secondary:              return QColor("#98000000");
             case Color::Tertiary:               return QColor("#80000000");
             case Color::Disabled:               return QColor("#40000000");
+
             case Color::StatusSuccess:          return QColor("#66ff66");
             case Color::StatusWarning:          return QColor("#A75376");
             case Color::StatusError:            return QColor("#ff6666");
 
             case Color::Widget:                 return QColor("#D4D5DF");
-            case Color::WidgetElevated:         return lighter(Color::Widget);
-            case Color::WidgetBorder:           return darker(Color::Widget);
-
-            case Color::Inset:                return QColor("#D4D5DF");
-            case Color::InsetFocused:        return lighter(Color::Inset); //, 130);
-            case Color::InsetBorder:          return darker(Color::Inset, 150); //, 140);
-            case Color::InsetBorderFocused:  return darker(Color::InsetBorder);
+            case Color::Inset:                  return QColor("#D4D5DF");
+            case Color::InsetFocused:           return lighter(Color::Inset); //, 130);
+            case Color::InsetBorder:            return darker(Color::Inset, 150); //, 140);
+            case Color::InsetBorderFocused:     return darker(Color::InsetBorder);
 
             case Color::Overlay:                return QColor("#A0000000");
-            case Color::OverlayElevated:        return QColor("#E0000000");
-            case Color::OverlayBorder:          return QColor("#50ffffff");
-            case Color::OverlayBorderElevated:  return QColor("#90ffffff");
 
             default:
-                break;
+                return deriveColor<Theme::Solaris>(c, darkMode);
         }
     }
+}
 
-    return computeColor<Theme::AppDefault>(c, darkMode);
+template <Palette::Theme T> QColor
+Palette::deriveColor(Color c, bool darkMode) const
+{
+    auto lighter = [&](Color col, int factor = 115) {
+        return computeColor<T>(col, darkMode).lighter(factor);
+    };
+    auto darker = [&](Color col, int factor = 115) {
+        return computeColor<T>(col, darkMode).darker(factor);
+    };
+
+    if (darkMode) {
+
+        switch (c) {
+
+            case Color::AccentElevated:         return lighter(Color::Accent);
+            case Color::BackgroundElevated:     return lighter(Color::Background);
+            case Color::BackgroundBorder:       return darker(Color::Background);
+            case Color::SurfaceElevated:        return lighter(Color::Surface);
+            case Color::SurfaceBorder:          return darker(Color::Surface);
+            case Color::WidgetElevated:         return lighter(Color::Widget);
+            case Color::WidgetBorder:           return darker(Color::Widget);
+            case Color::InsetBorder:            return darker(Color::Inset);
+            case Color::OverlayElevated:        return lighter(Color::Overlay);
+            case Color::OverlayBorder:          return darker(Color::Overlay);
+            case Color::OverlayBorderElevated:  return lighter(Color::OverlayBorder);
+            case Color::ToolbarBorder:          return darker(Color::Toolbar);
+            case Color::Elevation:              return QColor("#10FFFFFF");
+
+            default:
+                return QColor("red");
+        }
+
+    } else {
+
+        switch (c) {
+
+            case Color::AccentElevated:         return darker(Color::Accent);
+            case Color::BackgroundElevated:     return darker(Color::Background);
+            case Color::BackgroundBorder:       return lighter(Color::Background);
+            case Color::SurfaceElevated:        return darker(Color::Surface);
+            case Color::SurfaceBorder:          return lighter(Color::Surface);
+            case Color::WidgetElevated:         return darker(Color::Widget);
+            case Color::WidgetBorder:           return darker(Color::Widget);
+            case Color::InsetBorder:            return darker(Color::Inset);
+            case Color::OverlayElevated:        return darker(Color::Overlay);
+            case Color::OverlayBorder:          return lighter(Color::Overlay);
+            case Color::OverlayBorderElevated:  return darker(Color::OverlayBorder);
+            case Color::ToolbarBorder:          return lighter(Color::Toolbar);
+            case Color::Elevation:              return QColor("#10000000");
+
+            default:
+                return QColor("red");
+        }
+    }
 }
 
 void

@@ -56,8 +56,6 @@ class Palette : public QQuickAttachedPropertyPropagator {
         Widget,
         WidgetElevated,
         WidgetBorder,
-
-        // Inset widgets
         Inset,
         InsetFocused,
         InsetBorder,
@@ -211,4 +209,5 @@ Q_SIGNALS:
 
     void computeColorTables();
     template <Theme T> QColor computeColor(Color c, bool darkMode) const;
+    template <Theme T> QColor deriveColor(Color c, bool darkMode) const;
 };
