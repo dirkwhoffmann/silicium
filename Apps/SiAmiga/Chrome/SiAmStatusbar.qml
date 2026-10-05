@@ -788,16 +788,6 @@ Rectangle {
         }
 
         //
-        // Pause state, in place of the speedometer
-        //
-
-        Pictogram {
-
-            state: root.amiga.isPaused
-            phosphor: "pause"
-        }
-
-        //
         // Server status
         //
 

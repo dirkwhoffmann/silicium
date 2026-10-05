@@ -27,6 +27,7 @@ SiChrome {
     titleBarInset: window.contentItem.SafeArea.margins.top
 
     titleText: "SiAmiga"
+    paused: amiga.isPaused
 
     titleBarContent: [
 

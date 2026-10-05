@@ -63,6 +63,9 @@ Item {
     // its view swallows mouse clicks and so blocks dragging the window.
     property string titleText: ""
 
+    // Whether the machine is paused, which the title bar shows next to the title
+    property bool paused: false
+
     // State of the menu / toolbar switch (0 = menu, 1 = toolbar)
     property int menuSwitch: 0
 
@@ -145,8 +148,20 @@ Item {
                 onPressed: Window.window.startSystemMove()
             }
 
+            SuSymbol {
+
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: titleLabel.left
+                anchors.rightMargin: Style.smallSpacing
+                visible: root.showTitleBar && root.paused
+                phosphor: "pause"
+                size: Size.small
+                color: Palette.secondary
+            }
+
             Text {
 
+                id: titleLabel
                 anchors.centerIn: parent
                 visible: root.showTitleBar
                 text: root.titleText

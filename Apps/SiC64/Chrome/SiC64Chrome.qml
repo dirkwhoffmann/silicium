@@ -35,6 +35,7 @@ SiChrome {
     titleBarInset: window.contentItem.SafeArea.margins.top
 
     titleText: c64.name + (Preferences.developerMode ? " - " + c64.uuid : "")
+    paused: c64.isPaused
 
     titleBarContent: [
 
