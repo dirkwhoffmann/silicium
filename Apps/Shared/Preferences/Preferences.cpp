@@ -40,6 +40,8 @@ Preferences::readVmList() const
 void
 Preferences::writeVmList(const QStringList &list)
 {
+    LogTask task("Persisting the virtual machine list...");
+
     auto &s = store();
 
     s.setValue("userVMs", list);
@@ -49,10 +51,6 @@ Preferences::writeVmList(const QStringList &list)
         qCWarning(siLog) << "Failed to persist list of virtual machines:" << s.status();
     }
 }
-
-//
-// Devices
-//
 
 //
 // General
