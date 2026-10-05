@@ -89,10 +89,11 @@ QtObject {
 
         switch (SulfurSettings.fontTheme) {
 
-            case 0:  return Qt.application.font.family;
-            case 1:  return interFont.name;
-            case 2:  return sairaFont.name;
-            default: return dejaVuFont.name;
+            case 1: return dejaVuFont.name;
+            case 2: return sairaFont.name;
+
+            default:
+                return Qt.application.font.family;
         }
     }
 
@@ -101,8 +102,10 @@ QtObject {
 
         switch (SulfurSettings.dataFontTheme) {
 
-            case 0:  return dejaVuMonoFont.name;
-            default: return libertinusFont.name;
+            case 1: return dejaVuMonoFont.name;
+
+            default:
+                return libertinusFont.name;
         }
     }
 
@@ -111,8 +114,10 @@ QtObject {
 
         switch (SulfurSettings.consoleFontTheme) {
 
-            case 0:  return dejaVuMonoFont.name;
-            default: return libertinusFont.name;
+            case 1: return dejaVuMonoFont.name;
+
+            default:
+                return libertinusFont.name;
         }
     }
 

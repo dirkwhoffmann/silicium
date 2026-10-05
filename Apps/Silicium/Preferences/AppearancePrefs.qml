@@ -95,7 +95,6 @@ PrefPage {
                 "System Default",
                 "Classic",
                 "Futuristic",
-                "Solaris"
             ]
 
             currentIndex: Preferences.fontTheme
