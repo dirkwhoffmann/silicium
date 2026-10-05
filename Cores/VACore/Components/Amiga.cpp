@@ -363,26 +363,6 @@ Amiga::saveWorkspace(const fs::path &path)
 
             string file = name + ".hdf";
 
-            /* A drive already sitting on one of this folder's own files stays
-             * on it, even when that is a compressed .hdz from an older
-             * workspace. The file is the drive: renaming it here would leave
-             * the image the drive is reading from behind under the old name
-             * and write a second copy under the new one. writeToFile() knows
-             * how to write a file the image itself is loaded from, so this
-             * updates it in place rather than replacing it.
-             */
-            if (const auto own = drive.getPath(); !own.empty()) {
-
-                std::error_code ec;
-                for (const auto *ext : { ".hdf", ".hdz" }) {
-
-                    if (fs::equivalent(own, path / (name + ext), ec)) {
-                        file = name + ext;
-                        break;
-                    }
-                }
-            }
-
             try {
                 
                 drive.writeToFile(path / file);
@@ -399,20 +379,6 @@ Amiga::saveWorkspace(const fs::path &path)
         }
     };
 
-    // If a file with the specified name exists, delete it
-    if (fs::exists(path) && !fs::is_directory(path)) fs::remove(path);
-    
-    // Create the directory if necessary
-    if (!fs::exists(path)) fs::create_directories(path);
-        
-    /* Remove old files, except the images the hard drives are sitting on.
-     *
-     * A file-backed drive *is* its file: exportHDF() below writes its changes
-     * back into it, and a drive whose file had just been deleted has nothing
-     * left to write -- it would silently export nothing and the machine would
-     * come back without the drive. Collected first and deleted afterwards, so
-     * the directory is not being changed while it is walked.
-     */
     auto isLiveDriveImage = [&](const fs::path &file) {
 
         for (auto *drive : { &hd0, &hd1, &hd2, &hd3 }) {
@@ -426,6 +392,13 @@ Amiga::saveWorkspace(const fs::path &path)
         return false;
     };
 
+    // If a file with the specified name exists, delete it
+    if (fs::exists(path) && !fs::is_directory(path)) fs::remove(path);
+    
+    // Create the directory if necessary
+    if (!fs::exists(path)) fs::create_directories(path);
+        
+    // Remove old files, except the images the hard drives are sitting on
     std::vector<fs::path> obsolete;
     for (const auto &entry : fs::directory_iterator(path)) {
         if (!isLiveDriveImage(entry.path())) obsolete.push_back(entry.path());

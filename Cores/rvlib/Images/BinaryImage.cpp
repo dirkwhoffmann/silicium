@@ -145,7 +145,7 @@ BinaryImage::saveAs(const fs::path &newPath)
     // Write the entire image first, so that a failure changes nothing
     copy(newPath);
 
-    // Continue on top of the new file, which now holds exactly this image
+    // Continue on top of the new file
     path = newPath;
     data.init(getSize(), newPath);
 }
