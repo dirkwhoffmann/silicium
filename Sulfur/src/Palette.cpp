@@ -251,7 +251,6 @@ Palette::computeDefaultColor(Color c, bool darkMode) const
             case Color::Secondary:              return QColor("#c0ffffff"); // alpha(Color::Primary, 192);
             case Color::Tertiary:               return QColor("#80ffffff"); // alpha(Color::Primary, 128);
             case Color::Disabled:               return QColor("#40ffffff"); // alpha(Color::Primary, 64);
-            case Color::Icon:                   return QColor("#d8d8d8");
             case Color::StatusSuccess:          return QColor("#66ff66");
             case Color::StatusWarning:          return QColor("#ffff66");
             case Color::StatusError:            return QColor("#ff6666");
@@ -301,7 +300,6 @@ Palette::computeDefaultColor(Color c, bool darkMode) const
             case Color::Secondary:              return QColor("#c0000000");
             case Color::Tertiary:               return QColor("#80000000");
             case Color::Disabled:               return QColor("#40000000");
-            case Color::Icon:                   return QColor("#7B7B7B");
             case Color::StatusSuccess:          return QColor("#00aa00");
             case Color::StatusWarning:          return QColor("#cccc00");
             case Color::StatusError:            return QColor("#ff0000");

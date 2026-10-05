@@ -46,7 +46,6 @@ class Palette : public QQuickAttachedPropertyPropagator {
         Secondary,
         Tertiary,
         Disabled,
-        Icon,
 
         // Status colors
         StatusSuccess,
@@ -110,7 +109,6 @@ private:
     Q_PROPERTY(QColor secondary READ secondary NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor tertiary READ tertiary NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor disabled READ disabled NOTIFY themeChanged FINAL)
-    Q_PROPERTY(QColor icon READ icon NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor statusSuccess READ statusSuccess NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor statusWarning READ statusWarning NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor statusError READ statusError NOTIFY themeChanged FINAL)
@@ -175,7 +173,6 @@ private:
     QColor secondary() const { return getColor(Color::Secondary); }
     QColor tertiary() const { return getColor(Color::Tertiary); }
     QColor disabled() const { return getColor(Color::Disabled); }
-    QColor icon() const { return getColor(Color::Icon); }
     QColor statusSuccess() const { return getColor(Color::StatusSuccess); }
     QColor statusWarning() const { return getColor(Color::StatusWarning); }
     QColor statusError() const { return getColor(Color::StatusError); }

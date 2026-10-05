@@ -173,7 +173,7 @@ Rectangle {
 
                 text: counter
                 font.pixelSize: Style.tiny
-                color: Palette.icon
+                color: Palette.secondary
             }
 
             PictogramIcon {
