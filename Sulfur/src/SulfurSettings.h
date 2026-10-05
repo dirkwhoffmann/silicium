@@ -36,9 +36,10 @@ class SulfurSettings : public QObject {
     // Color theme: Palette::Theme (AppDefault, Solaris)
     Q_PROPERTY(int colorTheme READ colorTheme WRITE setColorTheme NOTIFY changed)
 
-    // Proportional and monospaced font family (see Fonts.qml)
+    // Font families for ordinary text, data views and consoles (see Fonts.qml)
     Q_PROPERTY(int fontTheme READ fontTheme WRITE setFontTheme NOTIFY changed)
-    Q_PROPERTY(int monoFontTheme READ monoFontTheme WRITE setMonoFontTheme NOTIFY changed)
+    Q_PROPERTY(int dataFontTheme READ dataFontTheme WRITE setDataFontTheme NOTIFY changed)
+    Q_PROPERTY(int consoleFontTheme READ consoleFontTheme WRITE setConsoleFontTheme NOTIFY changed)
 
     // Draws layout debug aids (see DebugRect, HSpacer, VSpacer)
     Q_PROPERTY(bool debug READ debug WRITE setDebug NOTIFY changed)
@@ -51,7 +52,8 @@ class SulfurSettings : public QObject {
     int m_appearance = 0;
     int m_colorTheme = 0;
     int m_fontTheme = 0;
-    int m_monoFontTheme = 0;
+    int m_dataFontTheme = 0;
+    int m_consoleFontTheme = 0;
     bool m_debug = false;
     QUrl m_dialogIcon;
     QUrl m_dialogBadge;
@@ -75,8 +77,11 @@ public:
     int fontTheme() const { return m_fontTheme; }
     void setFontTheme(int value) { update(m_fontTheme, value); }
 
-    int monoFontTheme() const { return m_monoFontTheme; }
-    void setMonoFontTheme(int value) { update(m_monoFontTheme, value); }
+    int dataFontTheme() const { return m_dataFontTheme; }
+    void setDataFontTheme(int value) { update(m_dataFontTheme, value); }
+
+    int consoleFontTheme() const { return m_consoleFontTheme; }
+    void setConsoleFontTheme(int value) { update(m_consoleFontTheme, value); }
 
     bool debug() const { return m_debug; }
     void setDebug(bool value) { update(m_debug, value); }

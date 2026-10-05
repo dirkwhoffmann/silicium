@@ -88,7 +88,7 @@ PrefPage {
 
         SuLabeledComboBox {
 
-            l: "Fonts:"
+            l: "Main font:"
             lwidth: root.labelWidth
             controlWidth: root.comboWidth
             model: [
@@ -106,7 +106,7 @@ PrefPage {
 
         SuLabeledComboBox {
 
-            l: "Monospaced:"
+            l: "Data font:"
             lwidth: root.labelWidth
             controlWidth: root.comboWidth
             model: [
@@ -114,9 +114,25 @@ PrefPage {
                 "Serif"
             ]
 
-            currentIndex: Preferences.monoFontTheme
+            currentIndex: Preferences.dataFontTheme
             onCurrentIndexChanged: {
-                Preferences.monoFontTheme = currentIndex
+                Preferences.dataFontTheme = currentIndex
+            }
+        }
+
+        SuLabeledComboBox {
+
+            l: "Console font:"
+            lwidth: root.labelWidth
+            controlWidth: root.comboWidth
+            model: [
+                "Sans-serif",
+                "Serif"
+            ]
+
+            currentIndex: Preferences.consoleFontTheme
+            onCurrentIndexChanged: {
+                Preferences.consoleFontTheme = currentIndex
             }
         }
     }

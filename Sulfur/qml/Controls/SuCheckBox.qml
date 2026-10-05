@@ -69,7 +69,7 @@ CheckBox {
             width: parent.width
             height: parent.height
             text: root.bitStyle ? (checked ? "1" : "0") : "check"
-            font.family: root.bitStyle ? Fonts.mono : Fonts.symbols // awesome
+            font.family: root.bitStyle ? Fonts.data : Fonts.symbols // awesome
             color: root.bitStyle ? (checked ? Palette.accentText : Palette.primary) : "white"
             font.pixelSize: root.bitStyle ? [8, 9, 11][size] : Size.indicatorSize(size) - 2
             font.bold: !root.bitStyle

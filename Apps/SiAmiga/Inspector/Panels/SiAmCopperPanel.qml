@@ -68,7 +68,7 @@ SiAmInspectorWindow {
         size: Size.small
         topPadding: 1
         bottomPadding: 1
-        font.family: Fonts.mono
+        font.family: Fonts.data
         font.weight: 500
         elide: Text.ElideRight
     }

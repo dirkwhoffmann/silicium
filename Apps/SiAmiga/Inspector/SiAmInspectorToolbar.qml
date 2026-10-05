@@ -103,7 +103,7 @@ ToolBar {
 
                     anchors.centerIn: parent
                     text: root.inspectorController.beamPosition
-                    font.family: Fonts.mono
+                    font.family: Fonts.data
                     Layout.preferredWidth: 110
                     horizontalAlignment: Text.AlignHCenter
                 }

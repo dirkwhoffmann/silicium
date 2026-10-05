@@ -58,28 +58,28 @@ SiC64InspectorWindow {
             ProgressBox {
 
                 title: qsTr("CPU Progress")
-                SuText { text: ec.cpuProgress; font.family: Fonts.mono }
+                SuText { text: ec.cpuProgress; font.family: Fonts.data }
                 SuText { text: qsTr("Cycles") }
             }
 
             ProgressBox {
 
                 title: qsTr("VICII Progress")
-                SuText { text: ec.vicProgress; font.family: Fonts.mono }
+                SuText { text: ec.vicProgress; font.family: Fonts.data }
                 SuText { text: qsTr("Frames") }
             }
 
             ProgressBox {
 
                 title: qsTr("CIA1 Progress")
-                SuText { text: ec.cia1Progress; font.family: Fonts.mono }
+                SuText { text: ec.cia1Progress; font.family: Fonts.data }
                 SuText { text: qsTr("Cycles") }
             }
 
             ProgressBox {
 
                 title: qsTr("CIA2 Progress")
-                SuText { text: ec.cia2Progress; font.family: Fonts.mono }
+                SuText { text: ec.cia2Progress; font.family: Fonts.data }
                 SuText { text: qsTr("Cycles") }
             }
         }

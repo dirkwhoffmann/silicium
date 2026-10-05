@@ -74,36 +74,36 @@ SiAmInspectorWindow {
             ProgressBox {
 
                 title: qsTr("CPU Progress")
-                SuText { text: ec.cpuProgress; font.family: Fonts.mono }
+                SuText { text: ec.cpuProgress; font.family: Fonts.data }
                 SuText { text: qsTr("Master Cycles") }
-                SuText { text: ec.cpuProgress2; font.family: Fonts.mono }
+                SuText { text: ec.cpuProgress2; font.family: Fonts.data }
                 SuText { text: qsTr("CPU Cycles") }
             }
 
             ProgressBox {
 
                 title: qsTr("Agnus Progress")
-                SuText { text: ec.agnusProgress; font.family: Fonts.mono }
+                SuText { text: ec.agnusProgress; font.family: Fonts.data }
                 SuText { text: qsTr("Master Cycles") }
-                SuText { text: ec.agnusProgress2; font.family: Fonts.mono }
+                SuText { text: ec.agnusProgress2; font.family: Fonts.data }
                 SuText { text: qsTr("DMA Cycles") }
             }
 
             ProgressBox {
 
                 title: qsTr("CIA A Progress")
-                SuText { text: ec.ciaAProgress; font.family: Fonts.mono }
+                SuText { text: ec.ciaAProgress; font.family: Fonts.data }
                 SuText { text: qsTr("Master Cycles") }
-                SuText { text: ec.ciaAProgress2; font.family: Fonts.mono }
+                SuText { text: ec.ciaAProgress2; font.family: Fonts.data }
                 SuText { text: qsTr("CIA Cycles") }
             }
 
             ProgressBox {
 
                 title: qsTr("CIA B Progress")
-                SuText { text: ec.ciaBProgress; font.family: Fonts.mono }
+                SuText { text: ec.ciaBProgress; font.family: Fonts.data }
                 SuText { text: qsTr("Master Cycles") }
-                SuText { text: ec.ciaBProgress2; font.family: Fonts.mono }
+                SuText { text: ec.ciaBProgress2; font.family: Fonts.data }
                 SuText { text: qsTr("CIA Cycles") }
             }
         }

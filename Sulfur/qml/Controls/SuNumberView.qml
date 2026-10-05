@@ -69,7 +69,7 @@ Item {
         leftPadding: Size.hPadding(control.size)
         rightPadding: Size.hPadding(control.size)
         text: control.display
-        font.family: Fonts.mono
+        font.family: Fonts.data
         font.pixelSize: Size.fontSize(control.size)
         horizontalAlignment: Text.AlignRight
         verticalAlignment: Text.AlignVCenter

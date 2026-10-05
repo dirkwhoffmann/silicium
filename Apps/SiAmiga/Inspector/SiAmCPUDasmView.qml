@@ -42,7 +42,7 @@ SiBox {
         font.weight: 500
         topPadding: 1
         bottomPadding: 1
-        font.family: Fonts.mono
+        font.family: Fonts.data
         elide: Text.ElideRight
     }
 

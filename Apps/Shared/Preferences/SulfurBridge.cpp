@@ -25,7 +25,8 @@ SulfurBridge::install()
         sulfur.setAppearance(prefs.getAppearance());
         sulfur.setColorTheme(prefs.getColorTheme());
         sulfur.setFontTheme(prefs.getFontTheme());
-        sulfur.setMonoFontTheme(prefs.getMonoFontTheme());
+        sulfur.setDataFontTheme(prefs.getDataFontTheme());
+        sulfur.setConsoleFontTheme(prefs.getConsoleFontTheme());
         // (The developer getters are private; the property is not)
         sulfur.setDebug(prefs.property("qtDebug").toBool());
     };

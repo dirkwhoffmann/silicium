@@ -77,7 +77,7 @@ Rectangle {
             }
 
             color: "lightsteelblue"
-            font.family: Fonts.mono
+            font.family: Fonts.terminal
             font.weight: 600
             font.pixelSize: 14
             readOnly: true

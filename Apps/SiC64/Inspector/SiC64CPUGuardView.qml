@@ -54,7 +54,7 @@ SiBox {
 
         topPadding: 1
         bottomPadding: 1
-        font.family: Fonts.mono
+        font.family: Fonts.data
         font.weight: 500
         elide: Text.ElideRight
     }
@@ -166,7 +166,7 @@ SiBox {
                                     Layout.fillWidth: true
                                     visible: list.addingNew
                                     size: Size.regular
-                                    font.family: Fonts.mono
+                                    font.family: Fonts.data
 
                                     // Establishes list.rowH from the field's
                                     // intrinsic height (independent of the

@@ -57,7 +57,8 @@ class Preferences : public QObject {
     int appearance;
     int colorTheme;
     int fontTheme;
-    int monoFontTheme;
+    int dataFontTheme;
+    int consoleFontTheme;
 
 
     //
@@ -280,7 +281,8 @@ class Preferences : public QObject {
     Q_PROPERTY(int appearance READ getAppearance WRITE setAppearance NOTIFY appearancePrefsChanged)
     Q_PROPERTY(int colorTheme READ getColorTheme WRITE setColorTheme NOTIFY appearancePrefsChanged)
     Q_PROPERTY(int fontTheme READ getFontTheme WRITE setFontTheme NOTIFY appearancePrefsChanged)
-    Q_PROPERTY(int monoFontTheme READ getMonoFontTheme WRITE setMonoFontTheme NOTIFY appearancePrefsChanged)
+    Q_PROPERTY(int dataFontTheme READ getDataFontTheme WRITE setDataFontTheme NOTIFY appearancePrefsChanged)
+    Q_PROPERTY(int consoleFontTheme READ getConsoleFontTheme WRITE setConsoleFontTheme NOTIFY appearancePrefsChanged)
 
     int getChromeLayout() const { return chromeLayout; }
     void setChromeLayout(int value) { setAppearanceProperty(chromeLayout, value); }
@@ -299,8 +301,10 @@ class Preferences : public QObject {
     void setColorTheme(int value) { setAppearanceProperty(colorTheme, value); }
     int getFontTheme() const { return fontTheme; }
     void setFontTheme(int value) { setAppearanceProperty(fontTheme, value); }
-    int getMonoFontTheme() const { return monoFontTheme; }
-    void setMonoFontTheme(int value) { setAppearanceProperty(monoFontTheme, value); }
+    int getDataFontTheme() const { return dataFontTheme; }
+    void setDataFontTheme(int value) { setAppearanceProperty(dataFontTheme, value); }
+    int getConsoleFontTheme() const { return consoleFontTheme; }
+    void setConsoleFontTheme(int value) { setAppearanceProperty(consoleFontTheme, value); }
 
   private:
 

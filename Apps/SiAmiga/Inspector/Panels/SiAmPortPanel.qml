@@ -336,7 +336,7 @@ SiAmInspectorWindow {
                         readOnly: true
                         wrapMode: TextArea.Wrap
                         text: root.logPage === 0 ? po.serialOut : po.serialIn
-                        font.family: Fonts.mono
+                        font.family: Fonts.terminal
                         color: Palette.primary
                         selectByMouse: true
                         background: null

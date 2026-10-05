@@ -95,14 +95,27 @@ QtObject {
             default: return dejaVuFont.name;
         }
     }
-    readonly property string mono: {
 
-        switch (SulfurSettings.monoFontTheme) {
+    // Monospaced family for data views (numbers, tables, disassembly, ...)
+    readonly property string data: {
+
+        switch (SulfurSettings.dataFontTheme) {
 
             case 0:  return dejaVuMonoFont.name;
             default: return libertinusFont.name;
         }
     }
+
+    // Monospaced family for consoles and text logs (RetroShell, serial output, ...)
+    readonly property string terminal: {
+
+        switch (SulfurSettings.consoleFontTheme) {
+
+            case 0:  return dejaVuMonoFont.name;
+            default: return libertinusFont.name;
+        }
+    }
+
     readonly property string c64: c64Font.name
     readonly property string showcaseTitleFont: sofiaExtraFont.name
     readonly property string showcaseSubtitleFont: sofiaSemiFont.name
