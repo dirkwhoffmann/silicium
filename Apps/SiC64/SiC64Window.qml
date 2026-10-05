@@ -100,7 +100,10 @@ VMWindow {
 
         id: pauseOverlay
 
-        anchors.fill: overlayArea
+        anchors.top: overlayArea.top
+        anchors.right: overlayArea.right
+        anchors.topMargin: Style.largeSpacing
+        anchors.rightMargin: Style.largeSpacing
         controller: root.c64
     }
 

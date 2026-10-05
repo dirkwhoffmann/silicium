@@ -58,7 +58,7 @@ Rectangle {
 
         property bool state: true
 
-        visible: state || Preferences.qtDebug
+        visible: state
         color: Palette.tertiary
     }
 
@@ -66,7 +66,7 @@ Rectangle {
 
         property bool state: true
 
-        visible: state || Preferences.qtDebug
+        visible: state
         icon.color: Palette.tertiary
     }
 
@@ -665,7 +665,20 @@ Rectangle {
         // Activity
         //
 
-        Speedometer { }
+        Speedometer {
+
+            visible: !root.c64.isPaused
+        }
+
+        //
+        // Pause state, in place of the speedometer
+        //
+
+        Pictogram {
+
+            state: root.c64.isPaused
+            phosphor: "pause"
+        }
         // HSpacer { size: Style.tinySpacing }
 
         //

@@ -10,11 +10,11 @@
 import QtQuick
 import Sulfur
 
-/* A big play button, shown over the picture while the machine is paused.
+/* A play button, shown over the picture while the machine is paused.
  * Clicking it resumes the machine.
  *
- * Fills its parent by default (anchor it to something else to cover less) and
- * floats above its siblings.
+ * Anchor it where it should go (the windows put it in the upper right corner
+ * of the canvas area); it floats above its siblings.
  */
 SuOverlayButton {
 
@@ -23,9 +23,8 @@ SuOverlayButton {
     // The machine. Needs an isPaused property and a run() method.
     required property var controller
 
-    anchors.fill: parent
     visible: opacity > 0.01
-    size: 220
+    size: 64
     symbol: "play_circle"
     opacity: controller.isPaused ? 1.0 : 0.0
     z: 1

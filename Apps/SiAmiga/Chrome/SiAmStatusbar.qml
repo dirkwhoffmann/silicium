@@ -198,7 +198,7 @@ Rectangle {
 
         property bool state: true
 
-        visible: state || Preferences.qtDebug
+        visible: state
         color: Palette.tertiary
     }
 
@@ -206,7 +206,7 @@ Rectangle {
 
         property bool state: true
 
-        visible: state || Preferences.qtDebug
+        visible: state
         icon.color: Palette.tertiary
     }
 
@@ -782,7 +782,20 @@ Rectangle {
         // Activity
         //
 
-        Speedometer { }
+        Speedometer {
+
+            visible: !root.amiga.isPaused
+        }
+
+        //
+        // Pause state, in place of the speedometer
+        //
+
+        Pictogram {
+
+            state: root.amiga.isPaused
+            phosphor: "pause"
+        }
 
         //
         // Server status
