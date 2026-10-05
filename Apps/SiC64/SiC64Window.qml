@@ -146,6 +146,7 @@ VMWindow {
 
         id: siActions
         configWindowRef: configWindow
+        progressDialogRef: progressDialog
         keyboardSheetRef: keyboardSheet
         keyboardWindowRef: keyboardWindow
         eventsInspectorRef: eventsInspectorWindow
@@ -166,6 +167,17 @@ VMWindow {
         exportTapeDialogRef: exportTapeDialog
         attachCartridgeDialogRef: attachCartridgeDialog
         exportCartridgeDialogRef: exportCartridgeDialog
+    }
+
+    //
+    // Progress dialog (test of SuDialogController)
+    //
+
+    SuProgressDialog {
+
+        id: progressDialog
+        text: ""
+        onTaskFinished: close()
     }
 
     //

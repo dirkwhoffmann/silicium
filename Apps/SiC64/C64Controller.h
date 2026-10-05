@@ -232,6 +232,9 @@ public:
 
     Q_INVOKABLE void toggleDebugPanel() { setDebugPanel(!m_debugPanel); }
 
+    // Test of SuDialogController: changes a SuProgressDialog's text four times
+    Q_INVOKABLE void testProgressDialog(QObject *dialog);
+
     Q_INVOKABLE void openConfigurator() {}
     Q_INVOKABLE void openInspector() {}
     Q_INVOKABLE void openKeyboard() {}

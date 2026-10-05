@@ -22,6 +22,7 @@ Item {
 
     readonly property C64Controller c64: C64Controller
     required property var configWindowRef
+    required property var progressDialogRef
     required property var keyboardSheetRef
     required property var keyboardWindowRef
     required property var eventsInspectorRef
@@ -292,7 +293,15 @@ Item {
 
         id: debugAction
         text: qsTr("Debug Panel")
-        onTriggered: c64.toggleDebugPanel()
+        onTriggered: {
+
+            c64.toggleDebugPanel()
+
+            // Test of SuDialogController (temporary)
+            progressDialogRef.text = qsTr("Starting...")
+            progressDialogRef.open()
+            c64.testProgressDialog(progressDialogRef)
+        }
     }
 
     // Edit menu commands (see SiC64Menu's Edit menu).
