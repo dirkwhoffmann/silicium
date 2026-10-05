@@ -84,7 +84,7 @@ public:
      *
      * A compressed file cannot be read in pieces. If a compressor is given,
      * the file is therefore uncompressed in full, and the image holds the
-     * result in memory: it is MEMORY_BACKED, has no path, and save() has
+     * result in memory: it is not file backed, has no path, and save() has
      * nowhere to write to (use saveAs() with the compressor).
      */
     void init(const fs::path& p, utl::Compressor compressor = utl::Compressor::NONE);
@@ -131,24 +131,16 @@ public:
 
 public:
 
+    // Returns the image size in bytes
     isize getSize() const { return data.size(); }
+
+    // Returns true if the image contains no data
     bool empty() const { return data.empty(); }
 
-    /* Returns where the bytes of the image live
-     *
-     * FILE_BACKED if the image sits on top of the file it was read from or
-     * saved to, MEMORY_BACKED if it was built in memory or let go of its file
-     * (see detach()).
-     */
-    StorageMode getStorageMode() const {
-        return data.backed() ? StorageMode::FILE_BACKED : StorageMode::MEMORY_BACKED;
-    }
+    // Returns true if the image is backed by a file
+    bool fileBacked() const { return data.backed(); }
 
-    /* Returns true if the image holds changes the file does not have yet
-     *
-     * A memory-backed image has no file to compare itself to; for such an
-     * image, the answer says nothing (see save()).
-     */
+    // Returns true if the backing file has outdated data
     bool modified() const { return data.dirty(); }
 
 
@@ -158,21 +150,16 @@ public:
 
 public:
 
-    // Returns a view of bytes [offset, offset + len), which must lie within the image
+    // Returns a view of bytes [offset, offset + len) within the image
     utl::ByteView byteView(isize offset, isize len) const;
     utl::MutableByteView mutableByteView(isize offset, isize len);
 
-    /* Loads the image into memory and lets go of its file.
-     *
-     * The image keeps its contents and forgets where they came from: it is
-     * then an image built in memory, like any other, and the file is no
-     * longer touched. Modifications that were never saved are kept.
-     */
+    // Turns a file backed image into a memory backed image
     void detach();
 
     // Copies the file contents into a buffer
-    virtual void copy(u8 *dst, isize offset, isize len) const;
     virtual void copy(u8 *dst, isize offset = 0) const;
+    virtual void copy(u8 *dst, isize offset, isize len) const;
 
 
     //
@@ -181,11 +168,10 @@ public:
 
 public:
 
-    /* Writes the modifications back to the file the image came from.
+    /* Writes the modifications back to the backing file.
      *
-     * Only what has been modified is written (see utl::BackedBuffer::persist).
-     * An image that was built in memory has no file to go back to; for such
-     * an image, save() is saveAs(path), which fails if there is no path.
+     * Only what has been modified is written. Throws, if no backing file
+     * is present.
      */
     void save() override;
 

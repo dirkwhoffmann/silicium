@@ -1265,13 +1265,6 @@ FloppyDriveAPI::writeToFile(const std::filesystem::path& path)
     drive->writeToFile(path);
 }
 
-StorageMode
-FloppyDriveAPI::getStorageMode() const
-{
-    VAMIGA_PUBLIC
-    return drive->getStorageMode();
-}
-
 fs::path
 FloppyDriveAPI::path() const
 {
@@ -1376,10 +1369,10 @@ HardDriveAPI::changeGeometry(isize c, isize h, isize s, isize b)
 }
 
 void
-HardDriveAPI::attach(const fs::path &path, StorageMode mode)
+HardDriveAPI::attach(const fs::path &path)
 {
     VAMIGA_PUBLIC_SUSPEND
-    drive->init(path, mode);
+    drive->init(path);
 }
 
 void
@@ -1410,13 +1403,6 @@ HardDriveAPI::importFiles(const fs::path &path)
 {
     VAMIGA_PUBLIC_SUSPEND
     drive->importFolder(path);
-}
-
-StorageMode
-HardDriveAPI::getStorageMode() const
-{
-    VAMIGA_PUBLIC
-    return drive->getStorageMode();
 }
 
 fs::path
