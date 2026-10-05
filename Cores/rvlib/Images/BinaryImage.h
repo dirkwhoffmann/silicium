@@ -10,7 +10,7 @@
 #pragma once
 
 #include "Images/AnyImage.h"
-#include "utl/io/TempFile.h"
+#include "utl/abilities/Compressible.h"
 #include "utl/storage/BackedBuffer.h"
 
 namespace retro::vault {
@@ -45,22 +45,20 @@ class LinearDevice;
  *
  * Images cannot be copied, because two copies would share one backing.
  *
- * Formats that are not a buffer derive from AnyImage directly (see SVMFile)
- * and simply do not have these members.
+ * Compression:
+ *
+ * An image knows nothing about compression. It only meets it when it is
+ * created from, or written to, a compressed byte stream: the functions that
+ * do so take a utl::Compressor, which defaults to NONE. A compressed file is
+ * uncompressed into memory on the way in, so an image created from one is
+ * memory backed and remembers nothing about the file. On the way out, the
+ * bytes are compressed before they are written. Which file name stands for
+ * which compressor is not decided here (see AnyImage::compressorFor()).
  */
 class BinaryImage : public AnyImage, public utl::Dumpable {
 
     // The raw data of this file
     utl::BackedBuffer data;
-
-    /* Where the bytes really live when the image came from a packed file.
-     *
-     * A gzip compressed file cannot be read or written in pieces, so it is
-     * unpacked into a temporary file when the image is opened, and the image
-     * sits on that. Empty for a file that is the image itself, which is the
-     * normal case. See isPacked().
-     */
-    utl::TempFile unpacked;
 
 
     //
@@ -72,11 +70,21 @@ public:
     // Creates an image of the given size, all zero
     void init(isize len);
 
-    // Creates an image holding a copy of the given bytes
-    void init(const u8 *buf, isize len);
+    /* Creates an image holding a copy of the given bytes.
+     *
+     * If a compressor is given, the bytes are the compressed form of the
+     * image and are uncompressed first.
+     */
+    void init(const u8 *buf, isize len, utl::Compressor compressor = utl::Compressor::NONE);
 
-    // Creates an image on top of a file, loading its contents lazily
-    void init(const fs::path& p);
+    /* Creates an image on top of a file, loading its contents lazily.
+     *
+     * A compressed file cannot be read in pieces. If a compressor is given,
+     * the file is therefore uncompressed in full, and the image holds the
+     * result in memory: it is MEMORY_BACKED, has no path, and save() has
+     * nowhere to write to (use saveAs() with the compressor).
+     */
+    void init(const fs::path& p, utl::Compressor compressor = utl::Compressor::NONE);
 
     /* Initializes the image with the contents of a device.
      *
@@ -97,26 +105,9 @@ protected:
      * disk block to learn how large the drive is meant to be.
      *
      * The file it is given holds plain bytes: a compressed one has been
-     * unpacked by then (see isPacked()).
+     * uncompressed into a temporary file by then.
      */
     virtual isize imageSize(const fs::path &path) const;
-
-public:
-
-    /* Returns true if a file of this name holds its image gzip compressed.
-     *
-     * Compression is a property of the file name, not of the image: the same
-     * bytes are an .adf or an .adz, an .hdf or an .hdz. Reading such a file
-     * unpacks it, writing one packs it, and nothing between those two points
-     * knows about it.
-     */
-    static bool isPacked(const fs::path &path);
-
-private:
-
-    // Unpacks a compressed file into a temporary file, and back again
-    static utl::TempFile unpack(const fs::path &packed);
-    static void pack(const fs::path &plain, const fs::path &packed);
 
 
     //
@@ -199,10 +190,9 @@ public:
 
     /* Writes the modifications back to the file the image came from.
      *
-     * Only what has been modified is written (see utl::BackedBuffer::persist),
-     * in the file's own format -- a compressed file is packed again. An image
-     * that was built in memory has no file to go back to; for such an image,
-     * save() is saveAs(path).
+     * Only what has been modified is written (see utl::BackedBuffer::persist).
+     * An image that was built in memory has no file to go back to; for such
+     * an image, save() is saveAs(path), which fails if there is no path.
      */
     void save() override;
 
@@ -211,14 +201,26 @@ public:
      * Later calls to save() go to the new file. The file is written before
      * the image switches over, so if writing fails, nothing changes. Views
      * taken before the call must not be used after it.
+     *
+     * A compressed file cannot be built on. If a compressor is given, the
+     * file is written compressed and the image is left in memory, as if it
+     * had been created from that file (see init()).
      */
-    void saveAs(const fs::path &path);
+    void saveAs(const fs::path &path, utl::Compressor compressor = utl::Compressor::NONE);
 
-    virtual isize writeToStream(std::ostream &stream) const;
-    virtual isize writeToFile(const fs::path &path) const;
+    /* Writes bytes [offset, offset + len), or the entire image, to a stream or
+     * a file, compressed if a compressor is given. The result is the number
+     * of bytes written, which is the compressed size in that case.
+     */
+    virtual isize writeToStream(std::ostream &stream,
+                                utl::Compressor compressor = utl::Compressor::NONE) const;
+    virtual isize writeToFile(const fs::path &path,
+                              utl::Compressor compressor = utl::Compressor::NONE) const;
 
-    virtual isize writeToStream(std::ostream &stream, isize offset, isize len) const;
-    virtual isize writeToFile(const fs::path &path, isize offset, isize len) const;
+    virtual isize writeToStream(std::ostream &stream, isize offset, isize len,
+                                utl::Compressor compressor = utl::Compressor::NONE) const;
+    virtual isize writeToFile(const fs::path &path, isize offset, isize len,
+                              utl::Compressor compressor = utl::Compressor::NONE) const;
 
 private:
 

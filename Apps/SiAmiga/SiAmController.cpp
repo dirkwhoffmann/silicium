@@ -516,13 +516,16 @@ void
 SiAmController::saveWorkspaceNow()
 {
     LogTask task("Saving workspace...");
+
     try {
+
         const auto folder = svm->root() / SVMFile::workspaceDir;
         auto screenshot = m_renderer ? m_renderer->grabScreenshot() : QImage();
 
         workspaceWritten(writeWorkspace(folder, screenshot));
 
     } catch (const std::exception &e) {
+
         showError("Failed to save workspace.", e.what());
     }
 }
@@ -540,12 +543,8 @@ SiAmController::saveWorkspace()
     auto saved = std::make_shared<std::atomic<bool>>(false);
 
     runTask(tr("Saving workspace..."), tr("Failed to save workspace."),
-
-            [this, folder, screenshot, saved] {
-
-                *saved = writeWorkspace(folder, screenshot);
-            },
-            [this, saved] { workspaceWritten(*saved); });
+        [this, folder, screenshot, saved] { *saved = writeWorkspace(folder, screenshot); },
+        [this, saved] { workspaceWritten(*saved); });
 }
 
 void
@@ -563,7 +562,9 @@ void
 SiAmController::captureSnapshot()
 {
     LogTask task("Saving snapshot...");
+
     try {
+
         auto &m = svm->getManifest();
         if (svm->isReadOnly()) throw ImageError(ImageError::VM_READ_ONLY);
 
@@ -602,7 +603,9 @@ SiAmController::captureSnapshot()
         notifyPersist();
         emit snapshotSaved(QString::fromStdString(info.uuid.toString()));
         notifySvmChanged("snapshot", QString::fromStdString(info.uuid.toString()));
+
     } catch (const std::exception &e) {
+
         showError("Failed to save snapshot.", e.what());
     }
 }

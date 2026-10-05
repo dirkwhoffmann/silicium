@@ -1050,14 +1050,14 @@ HardDrive::saveAs(const fs::path &path)
 {
     if (!image || path.empty()) return;
 
-    image->saveAs(path);
+    image->saveAs(path, AnyImage::compressorFor(path));
 }
 
 void
 HardDrive::writeToFile(const fs::path &path)
 {
     // Write straight from the image, in the format the file name asks for
-    if (image && !path.empty()) image->writeToFile(path, 0, size());
+    if (image && !path.empty()) image->writeToFile(path, 0, size(), AnyImage::compressorFor(path));
 }
 
 std::unique_ptr<HardDiskImage>
