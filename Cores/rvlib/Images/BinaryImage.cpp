@@ -13,14 +13,11 @@
 #include "utl/abilities/Compressible.h"
 #include "utl/io.h"
 #include "utl/storage/Buffer.h"
-#include "utl/support.h"
 #include <fstream>
 #include <sstream>
 
 namespace retro::vault {
 
-using utl::ByteView;
-using utl::MutableByteView;
 using utl::IOError;
 using utl::Compressor;
 
@@ -34,18 +31,18 @@ void
 BinaryImage::init(const fs::path &p, Compressor compressor)
 {
     if (!validateURL(p))
-        throw utl::IOError(utl::IOError::FILE_TYPE_MISMATCH, p);
+        throw IOError(IOError::FILE_TYPE_MISMATCH, p);
 
     if (compressor != Compressor::NONE) {
 
         if (!fs::exists(p))
-            throw utl::IOError(utl::IOError::FILE_NOT_FOUND, p);
+            throw IOError(IOError::FILE_NOT_FOUND, p);
 
         utl::Buffer<u8> bytes;
         bytes.init(p);
 
         if (bytes.empty())
-            throw utl::IOError(utl::IOError::FILE_CANT_READ, p);
+            throw IOError(IOError::FILE_CANT_READ, p);
 
         bytes.uncompress(compressor);
 
@@ -55,7 +52,7 @@ BinaryImage::init(const fs::path &p, Compressor compressor)
     }
 
     if (utl::getSizeOfFile(p) <= 0)
-        throw utl::IOError(utl::IOError::FILE_CANT_READ, p);
+        throw IOError(IOError::FILE_CANT_READ, p);
 
     this->path = p;
 
@@ -120,40 +117,33 @@ BinaryImage::detach()
 }
 
 void
-BinaryImage::copy(u8 *buf, isize offset, isize len) const
-{
-    assert(buf);
-
-    std::memcpy(buf, byteView(offset, len).data(), len);
-}
-
-void
 BinaryImage::copy(u8 *buf, isize offset) const
 {
     copy(buf, offset, getSize() - offset);
 }
 
 void
+BinaryImage::copy(u8 *buf, isize offset, isize len) const
+{
+    assert(buf);
+    std::memcpy(buf, byteView(offset, len).data(), len);
+}
+
+void
 BinaryImage::save()
 {
-    // An image built in memory has nowhere to persist to yet
-    if (!data.backed()) { saveAs(path); return; }
-
-    // Write the modified parts back to where the image came from
     data.persist();
 }
 
 void
 BinaryImage::saveAs(const fs::path &newPath)
 {
-    auto size = getSize();
-
     // Write the entire image first, so that a failure changes nothing
     copy(newPath);
 
     // Continue on top of the new file, which now holds exactly this image
     path = newPath;
-    data.init(size, newPath);
+    data.init(getSize(), newPath);
 }
 
 isize
@@ -177,7 +167,7 @@ isize
 BinaryImage::copy(const fs::path &p, isize offset, isize len, Compressor compressor) const
 {
     if (utl::isDirectory(p)) {
-        throw utl::IOError(utl::IOError::FILE_IS_DIRECTORY);
+        throw IOError(IOError::FILE_IS_DIRECTORY);
     }
 
     /* The target may be the very file this image is loaded from. Opening it
@@ -197,7 +187,7 @@ BinaryImage::copy(const fs::path &p, isize offset, isize len, Compressor compres
     std::ofstream stream(p, std::ofstream::binary);
 
     if (!stream.is_open()) {
-        throw utl::IOError(utl::IOError::FILE_CANT_WRITE, p);
+        throw IOError(IOError::FILE_CANT_WRITE, p);
     }
 
     if (compressor != Compressor::NONE) {

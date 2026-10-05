@@ -168,8 +168,8 @@ public:
 
     /* Writes the modifications back to the backing file.
      *
-     * Only what has been modified is written. Throws, if no backing file
-     * is present.
+     * Only what has been modified is written. No action is performed if no
+     * backing file is present.
      */
     void save() override;
 
