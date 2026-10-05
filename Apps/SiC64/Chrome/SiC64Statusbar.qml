@@ -671,17 +671,6 @@ Rectangle {
         }
 
         //
-        // Pause state, in place of the speedometer
-        //
-
-        Pictogram {
-
-            state: root.c64.isPaused
-            phosphor: "pause"
-        }
-        // HSpacer { size: Style.tinySpacing }
-
-        //
         // Server status
         //
 
