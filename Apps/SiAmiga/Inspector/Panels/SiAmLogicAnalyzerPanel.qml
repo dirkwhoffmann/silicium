@@ -246,9 +246,9 @@ SiAmInspectorWindow {
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    color: Palette.control
+                    color: Palette.widgetInset
                     border.width: 1
-                    border.color: Palette.controlBorder
+                    border.color: Palette.widgetInsetBorder
                     radius: Style.radius
                     clip: true
 
@@ -272,7 +272,7 @@ SiAmInspectorWindow {
                             padded: root.ic.padded
                             symbolic: symbolicBox.checked
                             textColor: Palette.primary
-                            hairlineColor: Palette.controlBorder
+                            hairlineColor: Palette.widgetInsetBorder
                             rowColors: root.rowColors
 
                             /* Where the column under the pointer was

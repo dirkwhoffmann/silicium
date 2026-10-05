@@ -25,10 +25,10 @@ ComboBox {
     property color accentText: Palette.accentText
     property color primary: Palette.primary
     property color disabled: Palette.disabled
-    property color control: Palette.control
-    property color controlSelected: Palette.controlSelected
-    property color controlBorder: Palette.controlBorder
-    property color controlBorderSelected: Palette.controlBorderSelected
+    property color control: Palette.widgetInset
+    property color controlSelected: Palette.widgetInsetFocused
+    property color controlBorder: Palette.widgetInsetBorder
+    property color controlBorderSelected: Palette.widgetInsetBorderFocused
 
     // Width of the accent-colored pull-down segment, macOS-style.
     property real indicatorWidth: 20

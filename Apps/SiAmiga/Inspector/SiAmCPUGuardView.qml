@@ -70,8 +70,8 @@ SiBox {
 
         Layout.fillWidth: true
         Layout.fillHeight: true
-        color: Palette.control
-        border.color: Palette.controlBorder
+        color: Palette.widgetInset
+        border.color: Palette.widgetInsetBorder
         border.width: 1
         radius: Style.radius
         clip: true
@@ -132,7 +132,7 @@ SiBox {
                             id: newRow
                             width: parent.width
                             height: list.rowH
-                            color: list.count % 2 === 0 ? Palette.control.lighter(1.025) : Palette.control.darker(1.025)
+                            color: list.count % 2 === 0 ? Palette.widgetInset.lighter(1.025) : Palette.widgetInset.darker(1.025)
 
                             RowLayout {
 
@@ -188,7 +188,7 @@ SiBox {
                                 y: newRow.height + index * list.rowH
                                 width: parent.width
                                 height: list.rowH
-                                color: absoluteIndex % 2 === 0 ? Palette.control.lighter(1.025) : Palette.control.darker(1.025)
+                                color: absoluteIndex % 2 === 0 ? Palette.widgetInset.lighter(1.025) : Palette.widgetInset.darker(1.025)
                             }
                         }
                     }
@@ -209,7 +209,7 @@ SiBox {
 
                         width: ListView.view.width
                         height: list.rowH
-                        color: index % 2 === 0 ? Palette.control.lighter(1.025) : Palette.control.darker(1.025)
+                        color: index % 2 === 0 ? Palette.widgetInset.lighter(1.025) : Palette.widgetInset.darker(1.025)
 
                         RowLayout {
 

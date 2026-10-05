@@ -25,7 +25,7 @@ Rectangle {
     radius: Style.radius
     color: root.value
     border.width: 1
-    border.color: Palette.controlBorder
+    border.color: Palette.widgetInsetBorder
 
     TapHandler {
         onTapped: if (!root.readOnly) colorDialog.open()

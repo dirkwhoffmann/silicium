@@ -315,9 +315,9 @@ SiAmInspectorWindow {
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                color: Palette.control
+                color: Palette.widgetInset
                 border.width: 1
-                border.color: Palette.controlBorder
+                border.color: Palette.widgetInsetBorder
                 radius: Style.radius
                 clip: true
 

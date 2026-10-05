@@ -34,7 +34,7 @@ ProgressBar {
             width: parent.width
             height: parent.height
             color: "transparent"
-            border.color: Palette.controlBorder
+            border.color: Palette.widgetInsetBorder
             border.width: 1
         }
     }

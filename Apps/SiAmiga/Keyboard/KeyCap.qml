@@ -57,7 +57,7 @@ Item {
     property real labelVerticalOffset: notchHeight / 2
 
     readonly property color fillColor: pressed ? Palette.accentElevated : Palette.widget
-    readonly property color borderColor: Qt.darker(pressed ? Palette.accent : Palette.widgetShadow, 1.4)
+    readonly property color borderColor: Qt.darker(pressed ? Palette.accent : Palette.widgetBorder, 1.4)
 
     signal pressedKey()
     signal releasedKey()

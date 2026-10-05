@@ -61,7 +61,7 @@ Item {
     property color accentText: Palette.accentText
     property color primary: Palette.primary
     property color widget: Palette.widget
-    property color widgetShadow: Palette.widgetShadow
+    property color widgetShadow: Palette.widgetBorder
 
     // Emitted when a segment is clicked. The caller updates currentIndex.
     signal activated(int index)

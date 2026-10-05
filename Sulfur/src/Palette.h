@@ -55,13 +55,13 @@ class Palette : public QQuickAttachedPropertyPropagator {
         // Widgets
         Widget,
         WidgetElevated,
-        WidgetShadow,
+        WidgetBorder,
 
-        // Controls
-        Control,
-        ControlSelected,
-        ControlBorder,
-        ControlBorderSelected,
+        // Inset widgets
+        WidgetInset,
+        WidgetInsetFocused,
+        WidgetInsetBorder,
+        WidgetInsetBorderFocused,
 
         // Transparent overlays
         Overlay,
@@ -115,12 +115,12 @@ private:
 
     Q_PROPERTY(QColor widget READ widget NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor widgetElevated READ widgetElevated NOTIFY themeChanged FINAL)
-    Q_PROPERTY(QColor widgetShadow READ widgetShadow NOTIFY themeChanged FINAL)
+    Q_PROPERTY(QColor widgetBorder READ widgetBorder NOTIFY themeChanged FINAL)
 
-    Q_PROPERTY(QColor control READ control NOTIFY themeChanged FINAL)
-    Q_PROPERTY(QColor controlSelected READ controlSelected NOTIFY themeChanged FINAL)
-    Q_PROPERTY(QColor controlBorder READ controlBorder NOTIFY themeChanged FINAL)
-    Q_PROPERTY(QColor controlBorderSelected READ controlBorderSelected NOTIFY themeChanged FINAL)
+    Q_PROPERTY(QColor widgetInset READ widgetInset NOTIFY themeChanged FINAL)
+    Q_PROPERTY(QColor widgetInsetFocused READ widgetInsetFocused NOTIFY themeChanged FINAL)
+    Q_PROPERTY(QColor widgetInsetBorder READ widgetInsetBorder NOTIFY themeChanged FINAL)
+    Q_PROPERTY(QColor widgetInsetBorderFocused READ widgetInsetBorderFocused NOTIFY themeChanged FINAL)
 
     Q_PROPERTY(QColor overlay READ overlay NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor overlayElevated READ overlayElevated NOTIFY themeChanged FINAL)
@@ -179,12 +179,12 @@ private:
 
     QColor widget() const { return getColor(Color::Widget); }
     QColor widgetElevated() const { return getColor(Color::WidgetElevated); }
-    QColor widgetShadow() const { return getColor(Color::WidgetShadow); }
+    QColor widgetBorder() const { return getColor(Color::WidgetBorder); }
 
-    QColor control() const { return getColor(Color::Control); }
-    QColor controlSelected() const { return getColor(Color::ControlSelected); }
-    QColor controlBorder() const { return getColor(Color::ControlBorder); }
-    QColor controlBorderSelected() const { return getColor(Color::ControlBorderSelected); }
+    QColor widgetInset() const { return getColor(Color::WidgetInset); }
+    QColor widgetInsetFocused() const { return getColor(Color::WidgetInsetFocused); }
+    QColor widgetInsetBorder() const { return getColor(Color::WidgetInsetBorder); }
+    QColor widgetInsetBorderFocused() const { return getColor(Color::WidgetInsetBorderFocused); }
 
     QColor overlay() const { return getColor(Color::Overlay); }
     QColor overlayElevated() const { return getColor(Color::OverlayElevated); }

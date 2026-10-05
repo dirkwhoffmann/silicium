@@ -37,8 +37,8 @@ Button {
     property color bgDownColor: accentedDown ? Palette.accentElevated : Palette.widgetElevated
     property color fgUpColor: accentedUp ? Palette.accentText : Palette.primary
     property color fgDownColor: accentedDown ? Palette.accentText : Palette.primary
-    property color borderUpColor: accentedUp ? Palette.accentElevated : Palette.widgetShadow
-    property color borderDownColor: accentedDown ? Palette.accent : Palette.widgetShadow
+    property color borderUpColor: accentedUp ? Palette.accentElevated : Palette.widgetBorder
+    property color borderDownColor: accentedDown ? Palette.accent : Palette.widgetBorder
     readonly property color bgColor: down ? bgDownColor : bgUpColor
     readonly property color fgColor: down ? fgDownColor : fgUpColor
     readonly property color borderColor: down ? borderDownColor : borderUpColor

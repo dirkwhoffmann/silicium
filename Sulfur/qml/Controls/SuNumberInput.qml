@@ -47,8 +47,8 @@ TextField {
 
         id: inputBackground
         radius: 4
-        color: !control.enabled ? Palette.disabled : control.activeFocus ? Palette.controlSelected : Palette.control
-        border.color: control.activeFocus ? Palette.controlBorderSelected : Palette.controlBorder
+        color: !control.enabled ? Palette.disabled : control.activeFocus ? Palette.widgetInsetFocused : Palette.widgetInset
+        border.color: control.activeFocus ? Palette.widgetInsetBorderFocused : Palette.widgetInsetBorder
         border.width: 1
 
         // Subtle inner shadow for text fields
