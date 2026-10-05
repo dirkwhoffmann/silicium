@@ -178,7 +178,7 @@ ApplicationWindow {
                             { name: "background", color: Palette.background },
                             { name: "toolbar", color: Palette.toolbar },
                             { name: "widget", color: Palette.widget },
-                            { name: "widgetInset", color: Palette.widgetInset },
+                            { name: "inset", color: Palette.inset },
                             { name: "accent", color: Palette.accent },
                             { name: "primary", color: Palette.primary },
                             { name: "secondary", color: Palette.secondary },

@@ -58,10 +58,10 @@ class Palette : public QQuickAttachedPropertyPropagator {
         WidgetBorder,
 
         // Inset widgets
-        WidgetInset,
-        WidgetInsetFocused,
-        WidgetInsetBorder,
-        WidgetInsetBorderFocused,
+        Inset,
+        InsetFocused,
+        InsetBorder,
+        InsetBorderFocused,
 
         // Transparent overlays
         Overlay,
@@ -117,10 +117,10 @@ private:
     Q_PROPERTY(QColor widgetElevated READ widgetElevated NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor widgetBorder READ widgetBorder NOTIFY themeChanged FINAL)
 
-    Q_PROPERTY(QColor widgetInset READ widgetInset NOTIFY themeChanged FINAL)
-    Q_PROPERTY(QColor widgetInsetFocused READ widgetInsetFocused NOTIFY themeChanged FINAL)
-    Q_PROPERTY(QColor widgetInsetBorder READ widgetInsetBorder NOTIFY themeChanged FINAL)
-    Q_PROPERTY(QColor widgetInsetBorderFocused READ widgetInsetBorderFocused NOTIFY themeChanged FINAL)
+    Q_PROPERTY(QColor inset READ inset NOTIFY themeChanged FINAL)
+    Q_PROPERTY(QColor insetFocused READ insetFocused NOTIFY themeChanged FINAL)
+    Q_PROPERTY(QColor insetBorder READ insetBorder NOTIFY themeChanged FINAL)
+    Q_PROPERTY(QColor insetBorderFocused READ insetBorderFocused NOTIFY themeChanged FINAL)
 
     Q_PROPERTY(QColor overlay READ overlay NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor overlayElevated READ overlayElevated NOTIFY themeChanged FINAL)
@@ -181,10 +181,10 @@ private:
     QColor widgetElevated() const { return getColor(Color::WidgetElevated); }
     QColor widgetBorder() const { return getColor(Color::WidgetBorder); }
 
-    QColor widgetInset() const { return getColor(Color::WidgetInset); }
-    QColor widgetInsetFocused() const { return getColor(Color::WidgetInsetFocused); }
-    QColor widgetInsetBorder() const { return getColor(Color::WidgetInsetBorder); }
-    QColor widgetInsetBorderFocused() const { return getColor(Color::WidgetInsetBorderFocused); }
+    QColor inset() const { return getColor(Color::Inset); }
+    QColor insetFocused() const { return getColor(Color::InsetFocused); }
+    QColor insetBorder() const { return getColor(Color::InsetBorder); }
+    QColor insetBorderFocused() const { return getColor(Color::InsetBorderFocused); }
 
     QColor overlay() const { return getColor(Color::Overlay); }
     QColor overlayElevated() const { return getColor(Color::OverlayElevated); }

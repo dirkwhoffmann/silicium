@@ -259,10 +259,10 @@ Palette::computeDefaultColor(Color c, bool darkMode) const
             case Color::WidgetElevated:         return lighter(Color::Widget);
             case Color::WidgetBorder:           return darker(Color::Widget);
 
-            case Color::WidgetInset:                return lighter(Color::Surface,120); // QColor("#555555"); //  ""#656565");
-            case Color::WidgetInsetFocused:        return lighter(Color::WidgetInset,130);
-            case Color::WidgetInsetBorder:          return lighter(Color::WidgetInset,140);
-            case Color::WidgetInsetBorderFocused:  return lighter(Color::WidgetInsetFocused,150);
+            case Color::Inset:                return lighter(Color::Surface,120); // QColor("#555555"); //  ""#656565");
+            case Color::InsetFocused:         return lighter(Color::Inset,130);
+            case Color::InsetBorder:          return lighter(Color::Inset,140);
+            case Color::InsetBorderFocused:   return lighter(Color::InsetFocused,150);
 
             case Color::Overlay:                return QColor("#C0000000");
             case Color::OverlayElevated:        return QColor("#E0000000");
@@ -308,10 +308,10 @@ Palette::computeDefaultColor(Color c, bool darkMode) const
             case Color::WidgetElevated:         return darker(Color::Widget);
             case Color::WidgetBorder:           return lighter(Color::Widget);
 
-            case Color::WidgetInset:                return QColor("#FFFFFF");
-            case Color::WidgetInsetFocused:        return QColor("#FFFFFF");
-            case Color::WidgetInsetBorder:          return darker(Color::WidgetInset);
-            case Color::WidgetInsetBorderFocused:  return darker(Color::WidgetInsetBorder);
+            case Color::Inset:                return QColor("#FFFFFF");
+            case Color::InsetFocused:        return QColor("#FFFFFF");
+            case Color::InsetBorder:          return darker(Color::Inset);
+            case Color::InsetBorderFocused:  return darker(Color::InsetBorder);
 
             case Color::Overlay:                return QColor("#C0000000");
             case Color::OverlayElevated:        return QColor("#E0000000");
@@ -369,10 +369,10 @@ Palette::computeSolarisColor(Color c, bool darkMode) const
             case Color::WidgetElevated:         return lighter(Color::Widget);
             case Color::WidgetBorder:           return darker(Color::Widget);
 
-            case Color::WidgetInset:                return darker(Color::Tint, 100); // "#767882");
-            case Color::WidgetInsetFocused:        return lighter(Color::WidgetInset); //, 130);
-            case Color::WidgetInsetBorder:          return darker(Color::WidgetInset, 150); //, 140);
-            case Color::WidgetInsetBorderFocused:  return darker(Color::WidgetInsetBorder);
+            case Color::Inset:                return darker(Color::Tint, 100); // "#767882");
+            case Color::InsetFocused:        return lighter(Color::Inset); //, 130);
+            case Color::InsetBorder:          return darker(Color::Inset, 150); //, 140);
+            case Color::InsetBorderFocused:  return darker(Color::InsetBorder);
 
             case Color::Overlay:                return QColor("#C0000000");
             case Color::OverlayElevated:        return QColor("#E0000000");
@@ -418,10 +418,10 @@ Palette::computeSolarisColor(Color c, bool darkMode) const
             case Color::WidgetElevated:         return lighter(Color::Widget);
             case Color::WidgetBorder:           return darker(Color::Widget);
 
-            case Color::WidgetInset:                return QColor("#D4D5DF");
-            case Color::WidgetInsetFocused:        return lighter(Color::WidgetInset); //, 130);
-            case Color::WidgetInsetBorder:          return darker(Color::WidgetInset, 150); //, 140);
-            case Color::WidgetInsetBorderFocused:  return darker(Color::WidgetInsetBorder);
+            case Color::Inset:                return QColor("#D4D5DF");
+            case Color::InsetFocused:        return lighter(Color::Inset); //, 130);
+            case Color::InsetBorder:          return darker(Color::Inset, 150); //, 140);
+            case Color::InsetBorderFocused:  return darker(Color::InsetBorder);
 
             case Color::Overlay:                return QColor("#C0000000");
             case Color::OverlayElevated:        return QColor("#E0000000");

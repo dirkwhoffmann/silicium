@@ -128,8 +128,8 @@ SiAmInspectorWindow {
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                color: Palette.widgetInset
-                border.color: Palette.widgetInsetBorder
+                color: Palette.inset
+                border.color: Palette.insetBorder
                 border.width: 1
                 radius: Style.radius
                 clip: true
@@ -166,7 +166,7 @@ SiAmInspectorWindow {
                             width: ListView.view.width
                             implicitHeight: rowLayout.implicitHeight
                             color: model.current ? Qt.alpha(Palette.tint, 0.75)
-                                : index % 2 === 0 ? Palette.widgetInset.lighter(1.025) : Palette.widgetInset.darker(1.025)
+                                : index % 2 === 0 ? Palette.inset.lighter(1.025) : Palette.inset.darker(1.025)
 
                             RowLayout {
 

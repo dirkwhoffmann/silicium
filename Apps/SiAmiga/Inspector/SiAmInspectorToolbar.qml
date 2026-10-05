@@ -94,9 +94,9 @@ ToolBar {
 
                 Layout.preferredWidth: 128
                 Layout.preferredHeight: 26
-                color: Palette.widgetInset
+                color: Palette.inset
                 border.width: 1
-                border.color: Palette.widgetInsetBorder
+                border.color: Palette.insetBorder
                 radius: 12
 
                 SuText {

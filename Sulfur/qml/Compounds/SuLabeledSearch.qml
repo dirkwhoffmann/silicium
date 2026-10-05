@@ -67,9 +67,9 @@ SuLabeled {
             background: Rectangle {
 
                 radius: control.height / 2
-                color: Palette.widgetInset
+                color: Palette.inset
                 border.width: 1
-                border.color: control.activeFocus ? Palette.widgetInsetBorderFocused : Palette.widgetInsetBorder
+                border.color: control.activeFocus ? Palette.insetBorderFocused : Palette.insetBorder
             }
 
             SuSymbol {

@@ -55,8 +55,8 @@ CheckBox {
         y: parent.height / 2 - height / 2
         radius: Style.radius
 
-        color: checked ? Palette.accent : Palette.widgetInset
-        border.color: checked ? Palette.accent : Palette.widgetInsetBorder
+        color: checked ? Palette.accent : Palette.inset
+        border.color: checked ? Palette.accent : Palette.insetBorder
         opacity: enabled ? 1.0 : 0.4
         border.width: 1
 

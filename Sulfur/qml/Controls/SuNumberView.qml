@@ -48,8 +48,8 @@ Item {
 
         anchors.fill: parent
         radius: 4
-        color: !control.enabled ? Palette.disabled : Palette.widgetInset
-        border.color: Palette.widgetInsetBorder
+        color: !control.enabled ? Palette.disabled : Palette.inset
+        border.color: Palette.insetBorder
         border.width: 1
 
         // Subtle inner shadow, matching SuNumberInput

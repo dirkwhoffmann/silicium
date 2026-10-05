@@ -303,8 +303,8 @@ SiC64InspectorWindow {
                     Layout.preferredWidth: 160
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    color: Palette.widgetInset
-                    border.color: Palette.widgetInsetBorder
+                    color: Palette.inset
+                    border.color: Palette.insetBorder
                     border.width: 1
                     radius: Style.radius
                     clip: true
@@ -341,7 +341,7 @@ SiC64InspectorWindow {
                                 implicitHeight: bankRow.implicitHeight
                                 color: index === mem.displayedBank
                                     ? Palette.accent
-                                    : index % 2 === 0 ? Palette.widgetInset.lighter(1.025) : Palette.widgetInset.darker(1.025)
+                                    : index % 2 === 0 ? Palette.inset.lighter(1.025) : Palette.inset.darker(1.025)
                                 radius: Style.radius
 
                                 RowLayout {
@@ -392,8 +392,8 @@ SiC64InspectorWindow {
                     Layout.preferredWidth: 512
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    color: Palette.widgetInset
-                    border.color: Palette.widgetInsetBorder
+                    color: Palette.inset
+                    border.color: Palette.insetBorder
                     border.width: 1
                     radius: Style.radius
                     clip: true
@@ -437,7 +437,7 @@ SiC64InspectorWindow {
 
                                 width: ListView.view.width
                                 implicitHeight: dumpRow.implicitHeight
-                                color: index % 2 === 0 ? Palette.widgetInset.lighter(1.025) : Palette.widgetInset.darker(1.025)
+                                color: index % 2 === 0 ? Palette.inset.lighter(1.025) : Palette.inset.darker(1.025)
 
                                 RowLayout {
 
