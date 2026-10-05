@@ -23,6 +23,27 @@ Dialog {
 
     property var acceptedCallback: null
 
+    /* Runs work in the background. The controller's run() takes a C++ lambda,
+     * so it is the C++ side that calls it, e.g.
+     *
+     *     auto *c = dialog->property("controller").value<SuDialogController *>();
+     *     c->run([] { ... });
+     *
+     * While a job is running, the buttons are disabled and the dialog cannot
+     * be dismissed.
+     */
+    readonly property SuDialogController controller: SuDialogController { }
+    readonly property bool busy: controller.busy
+
+    signal taskFinished()
+    signal taskFailed(string message)
+
+    Connections {
+        target: root.controller
+        function onFinished() { root.taskFinished() }
+        function onFailed(message) { root.taskFailed(message) }
+    }
+
     onAccepted: {
         if (acceptedCallback) acceptedCallback()
     }
@@ -67,7 +88,7 @@ Dialog {
 
     padding: Style.largeSpacing
     modal: true
-    closePolicy: Popup.CloseOnEscape
+    closePolicy: busy ? Popup.NoAutoClose : Popup.CloseOnEscape
     header: Item { visible: false }
 
     //
@@ -78,6 +99,7 @@ Dialog {
 
         id: buttonBox
         alignment: Qt.AlignRight
+        enabled: !root.busy
         spacing: Style.mediumSpacing
         background: Rectangle { color: "transparent" }
         topPadding: 0
