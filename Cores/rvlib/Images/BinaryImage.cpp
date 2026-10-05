@@ -24,49 +24,6 @@ using utl::MutableByteView;
 using utl::IOError;
 using utl::Compressor;
 
-namespace {
-
-// Compresses or uncompresses a buffer
-void
-compress(utl::Buffer<u8> &buffer, Compressor compressor)
-{
-    try {
-
-        switch (compressor) {
-
-            case Compressor::NONE:  break;
-            case Compressor::GZIP:  buffer.gzip(); break;
-            case Compressor::LZ4:   buffer.lz4();  break;
-            case Compressor::RLE2:  buffer.rle2(); break;
-            case Compressor::RLE3:  buffer.rle3(); break;
-        }
-
-    } catch (std::exception &err) {
-        throw utl::IOError(utl::IOError::ZLIB_ERROR, err.what());
-    }
-}
-
-void
-uncompress(utl::Buffer<u8> &buffer, Compressor compressor)
-{
-    try {
-
-        switch (compressor) {
-
-            case Compressor::NONE:  break;
-            case Compressor::GZIP:  buffer.gunzip(); break;
-            case Compressor::LZ4:   buffer.unlz4();  break;
-            case Compressor::RLE2:  buffer.unrle2(); break;
-            case Compressor::RLE3:  buffer.unrle3(); break;
-        }
-
-    } catch (std::exception &err) {
-        throw utl::IOError(utl::IOError::ZLIB_ERROR, err.what());
-    }
-}
-
-}
-
 void
 BinaryImage::init(isize len)
 {
@@ -90,7 +47,7 @@ BinaryImage::init(const fs::path &p, Compressor compressor)
         if (bytes.empty())
             throw utl::IOError(utl::IOError::FILE_CANT_READ, p);
 
-        uncompress(bytes, compressor);
+        bytes.uncompress(compressor);
 
         init(bytes.ptr, bytes.size);
         path.clear();
@@ -126,7 +83,7 @@ BinaryImage::init(const u8 *buf, isize len, Compressor compressor)
     if (compressor != Compressor::NONE) {
 
         utl::Buffer<u8> bytes(buf, len);
-        uncompress(bytes, compressor);
+        bytes.uncompress(compressor);
         init(bytes.ptr, bytes.size);
         return;
     }
@@ -205,7 +162,7 @@ BinaryImage::copy(std::ostream &stream, isize offset, isize len, Compressor comp
     if (compressor != Compressor::NONE) {
 
         utl::Buffer<u8> bytes((const u8 *)byteView(offset, len).data(), len);
-        compress(bytes, compressor);
+        bytes.compress(compressor);
         stream.write((const char *)bytes.ptr, bytes.size);
 
         return bytes.size;

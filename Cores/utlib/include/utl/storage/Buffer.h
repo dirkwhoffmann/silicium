@@ -134,6 +134,28 @@ template <class T> struct Buffer : public Hashable, public Dumpable {
         uncompress(Compressible::unrle3, offset, sizeEstimate);
     }
 
+    // Compresses or uncompresses a buffer with the given compressor
+    void compress(Compressor compressor, isize offset = 0) {
+        switch (compressor) {
+
+            case Compressor::NONE:  break;
+            case Compressor::GZIP:  gzip(offset); break;
+            case Compressor::LZ4:   lz4(offset);  break;
+            case Compressor::RLE2:  rle2(offset); break;
+            case Compressor::RLE3:  rle3(offset); break;
+        }
+    }
+    void uncompress(Compressor compressor, isize offset = 0, isize sizeEstimate = 0) {
+        switch (compressor) {
+
+            case Compressor::NONE:  break;
+            case Compressor::GZIP:  gunzip(offset, sizeEstimate); break;
+            case Compressor::LZ4:   unlz4(offset, sizeEstimate);  break;
+            case Compressor::RLE2:  unrle2(offset, sizeEstimate); break;
+            case Compressor::RLE3:  unrle3(offset, sizeEstimate); break;
+        }
+    }
+
     // Exports the buffer
     void write(std::ostream &stream) const { write(stream, 0, size); }
     void write(std::ostream &stream, isize offset, isize len) const;
