@@ -61,6 +61,10 @@ SiAmController::SiAmController()
     connect(&inputManager, &InputManager::captureMouseChanged,    this, &SiAmController::captureChanged);
     connect(&inputManager, &InputManager::captureKeyboardChanged, this, &SiAmController::captureChanged);
 
+    // Connect control port 0 to the mouse (device 1, see
+    // InputManager::updateDevices()), the usual setup on an Amiga
+    inputManager.setPort0(1);
+
     m_activityController = make_unique<SiAmActivityController>(this);
     m_configController = make_unique<SiAmConfigController>(this);
     m_keyboardController = make_unique<SiAmKeyboardController>(this);

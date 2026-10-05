@@ -112,7 +112,7 @@ QtObject {
     // Monospaced family for consoles and text logs (RetroShell, serial output, ...)
     readonly property string terminal: {
 
-        switch (SulfurSettings.consoleFontTheme) {
+        switch (SulfurSettings.terminalFontTheme) {
 
             case 1: return dejaVuMonoFont.name;
 

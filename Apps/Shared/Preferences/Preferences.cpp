@@ -141,7 +141,7 @@ Preferences::loadAppearanceSettings()
     // every existing installation's RetroShell and debugger views.
     // "monoFontTheme" is the former name of "dataFontTheme"
     dataFontTheme = s.value("dataFontTheme", s.value("monoFontTheme", 1)).toInt();
-    consoleFontTheme = s.value("consoleFontTheme", dataFontTheme).toInt();
+    terminalFontTheme = s.value("terminalFontTheme", dataFontTheme).toInt();
 
     // Stored under "menuStyle" and "titleBar" before these settings were renamed
     chromeLayout = s.value("chromeLayout", s.value("menuStyle", 0)).toInt();
@@ -425,7 +425,7 @@ Preferences::saveAppearanceSettings()
     s.setValue("colorTheme", colorTheme);
     s.setValue("fontTheme", fontTheme);
     s.setValue("dataFontTheme", dataFontTheme);
-    s.setValue("consoleFontTheme", consoleFontTheme);
+    s.setValue("terminalFontTheme", terminalFontTheme);
 
     s.setValue("chromeLayout", chromeLayout);
     s.setValue("chromePlacement", chromePlacement);

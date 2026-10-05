@@ -81,10 +81,7 @@ class InputManagerDelegate {
     virtual bool detectShakeDxDy(float dx, float dy) { return false; }
     virtual void shakeDetected() { };
 
-    // Gamepad events
-    // Called when the joystick state of a port changes. Both the new and the
-    // previous state are passed (up, down, left, right, fire), so delegates
-    // that act on transitions don't have to keep a copy of their own.
+    // Gamepad events (called when the joystick state of a port changes)
     virtual void joystickMotionEvent(int port, u64 timestamp, bool state[5], bool prev[5]) { };
 };
 
@@ -151,8 +148,11 @@ class InputManager : public QObject, SiObject, SDLManagerDelegate {
 
     struct PortState {
 
-        // Mouse: latest (scaled) motion and the three buttons. The motion
-        // falls back to zero once the mouse stops moving.
+        // Mouse: latest absolute (screen) position, latest (scaled) motion
+        // and the three buttons. The motion falls back to zero once the
+        // mouse stops moving; the position stays.
+        float x = 0;
+        float y = 0;
         float dx = 0;
         float dy = 0;
         bool mb[3] = {};

@@ -332,6 +332,8 @@ InputManager::dispatchMouseMotion(u64 timestamp, float x, float y, float dx, flo
     if (auto *device = getPort0Device(); device->type == GamepadType::Mouse) {
 
         delegate->mouseXY(0, timestamp, x, y);
+        m_portState[0].x = x;
+        m_portState[0].y = y;
         m_portState[0].dx = sdx;
         m_portState[0].dy = sdy;
         emit mouseStateChanged();
@@ -341,6 +343,8 @@ InputManager::dispatchMouseMotion(u64 timestamp, float x, float y, float dx, flo
     if (auto *device = getPort1Device(); device->type == GamepadType::Mouse) {
 
         delegate->mouseXY(1, timestamp, x, y);
+        m_portState[1].x = x;
+        m_portState[1].y = y;
         m_portState[1].dx = sdx;
         m_portState[1].dy = sdy;
         emit mouseStateChanged();
@@ -424,7 +428,7 @@ InputManager::getMouseState() const
     for (const auto &s : m_portState) {
 
         list.append(QVariantMap {
-            { "dx", s.dx }, { "dy", s.dy },
+            { "x", s.x }, { "y", s.y }, { "dx", s.dx }, { "dy", s.dy },
             { "left", s.mb[0] }, { "middle", s.mb[1] }, { "right", s.mb[2] }
         });
     }

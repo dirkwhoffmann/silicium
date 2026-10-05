@@ -39,7 +39,7 @@ class SulfurSettings : public QObject {
     // Font families for ordinary text, data views and consoles (see Fonts.qml)
     Q_PROPERTY(int fontTheme READ fontTheme WRITE setFontTheme NOTIFY changed)
     Q_PROPERTY(int dataFontTheme READ dataFontTheme WRITE setDataFontTheme NOTIFY changed)
-    Q_PROPERTY(int consoleFontTheme READ consoleFontTheme WRITE setConsoleFontTheme NOTIFY changed)
+    Q_PROPERTY(int terminalFontTheme READ terminalFontTheme WRITE setTerminalFontTheme NOTIFY changed)
 
     // Draws layout debug aids (see DebugRect, HSpacer, VSpacer)
     Q_PROPERTY(bool debug READ debug WRITE setDebug NOTIFY changed)
@@ -53,7 +53,7 @@ class SulfurSettings : public QObject {
     int m_colorTheme = 0;
     int m_fontTheme = 0;
     int m_dataFontTheme = 0;
-    int m_consoleFontTheme = 0;
+    int m_terminalFontTheme = 0;
     bool m_debug = false;
     QUrl m_dialogIcon;
     QUrl m_dialogBadge;
@@ -80,8 +80,8 @@ public:
     int dataFontTheme() const { return m_dataFontTheme; }
     void setDataFontTheme(int value) { update(m_dataFontTheme, value); }
 
-    int consoleFontTheme() const { return m_consoleFontTheme; }
-    void setConsoleFontTheme(int value) { update(m_consoleFontTheme, value); }
+    int terminalFontTheme() const { return m_terminalFontTheme; }
+    void setTerminalFontTheme(int value) { update(m_terminalFontTheme, value); }
 
     bool debug() const { return m_debug; }
     void setDebug(bool value) { update(m_debug, value); }

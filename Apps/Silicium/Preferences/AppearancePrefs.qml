@@ -129,9 +129,9 @@ PrefPage {
                 "Serif"
             ]
 
-            currentIndex: Preferences.consoleFontTheme
+            currentIndex: Preferences.terminalFontTheme
             onCurrentIndexChanged: {
-                Preferences.consoleFontTheme = currentIndex
+                Preferences.terminalFontTheme = currentIndex
             }
         }
     }

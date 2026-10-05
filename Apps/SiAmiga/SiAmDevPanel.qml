@@ -177,6 +177,12 @@ Rectangle {
 
             // Latest activity of the devices in control port 1 | port 2
             KeyValue {
+                key: "Mouse (x/y)"
+                value: AppController.inputManager.mouseState
+                    .map(s => Math.round(s.x) + "/" + Math.round(s.y)).join("  |  ")
+            }
+
+            KeyValue {
                 key: "Mouse (dx/dy)"
                 value: AppController.inputManager.mouseState
                     .map(s => Math.round(s.dx) + "/" + Math.round(s.dy)).join("  |  ")
