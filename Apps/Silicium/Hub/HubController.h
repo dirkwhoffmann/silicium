@@ -10,6 +10,7 @@
 #pragma once
 
 #include "AppController.h"
+#include "HubControllerTypes.h"
 #include "HubSidebarController.h"
 #include <QtQml>
 #include <QQuickWindow>
@@ -27,17 +28,8 @@ class HubController : public Controller {
     // Quick references
     VirtualMachineLibrary &library = Silicium::instance().getLibrary();
 
-    // A running SiC64 helper process and the state it last reported of
-    // itself. SiC64 has no controller of its own yet, so the Hub tracks its
-    // state from "GUI <state>" lines sent over the process's stdout -- see
-    // launch() and lookupState(). Temporary until SiC64 gets a proper
-    // controller wrapping the process + JSON-RPC link.
-    struct SiC64Process {
-        QProcess *process = nullptr;
-        UUID vUUID;
-        VMState state = VMState::HIBERNATED;
-    };
-    vector<SiC64Process> m_sic64Processes;
+    // The running emulator processes and the state each last reported
+    vector<VMProcess> m_processes;
 
     // Resource path to all pre-installed virtual machines
     fs::path m_showcases;
@@ -80,15 +72,15 @@ class HubController : public Controller {
     Q_PROPERTY(HubSidebarController *sidebarController READ sidebarController CONSTANT)
 
     // Returns the current state of a tracked virtual machine (see
-    // m_sic64Processes), or VMState::HIBERNATED if it isn't running.
+    // m_processes), or VMState::HIBERNATED if it isn't running.
     VMState lookupState(UUID uuid) const;
 
   private:
 
     HubSidebarController *sidebarController() { return &m_sidebarController; }
 
-    // Finds the tracked SiC64 process for a running machine, or nullptr.
-    const SiC64Process *findSiC64Process(UUID uuid) const;
+    // Finds the tracked emulator process for a running machine, or nullptr.
+    const VMProcess *findProcess(UUID uuid) const;
 
 
     //
@@ -166,7 +158,7 @@ class HubController : public Controller {
     void select(UUID uuid);
 
     int vCount() const;
-    int numOpen() const { return (int)m_sic64Processes.size(); }
+    int numOpen() const { return (int)m_processes.size(); }
 
     bool vSelected() const { return !m_vUUID.isZero() && m_sUUID.isZero(); }
     bool sSelected() const { return !m_sUUID.isZero(); }
@@ -177,7 +169,7 @@ class HubController : public Controller {
     int sCount() const;
     QVariantMap sInfo() const { return m_sInfo; }
 
-    bool isOpen(UUID uuid) const { return findSiC64Process(uuid) != nullptr; }
+    bool isOpen(UUID uuid) const { return findProcess(uuid) != nullptr; }
     bool isOpen() const { return isOpen(m_vUUID); }
 
     // Returns a vector with all open virtual machines
@@ -234,38 +226,38 @@ class HubController : public Controller {
     // Launches a new virtual machine in a new emulator window
     void launch(UUID vUUID, UUID sUUID);
 
-    /* Creates and wires up a QProcess for a new SiC64 instance: hooks its
+    /* Creates and wires up a QProcess for a new emulator instance: hooks its
      * stdout/stderr/started/finished signals and registers it in
-     * m_sic64Processes. 'sUUID', if set, is loaded via RPC once the process
+     * m_processes. 'sUUID', if set, is loaded via RPC once the process
      * has started. The caller still has to start() it.
      */
     QProcess *createProcess(UUID vUUID, UUID sUUID);
 
-    /* Assembles the SiC64 command line: the SVM path plus the --exec
+    /* Assembles the emulator command line: the SVM path plus the --exec
      * commands that bring up its RPC server and start the machine running.
      * 'sUUID', if set, is loaded via RPC after startup (see createProcess),
      * so no boot instruction is added here for that case.
      */
     static QStringList buildArguments(const QString &svmPath, const Manifest &manifest, UUID sUUID);
 
-    // Processes a JSON-RPC packet received from a SiC64 process
+    // Processes a JSON-RPC packet received from an emulator process
     void processRpcPacket(QProcess *process, UUID vUUID, const QJsonObject &rpc);
 
     // Sends a JSON-RPC "prefsChanged" notification for the given settings
-    // group to every running SiC64 process, prompting each to re-read that
+    // group to every running emulator process, prompting each to re-read that
     // group from the shared settings file.
     void broadcastPrefsChange(const QString &group);
 
-    // Sends a fire-and-forget JSON-RPC notification to every running SiC64
+    // Sends a fire-and-forget JSON-RPC notification to every running emulator
     // process. 'params' is omitted from the packet entirely when left null.
     void broadcastRpc(const QString &method, const QJsonValue &params = QJsonValue());
 
-    // Sends a fire-and-forget JSON-RPC notification to a single SiC64
+    // Sends a fire-and-forget JSON-RPC notification to a single emulator
     // process (no "id", so its RPC server sends no reply). 'params' is
     // omitted from the packet entirely when left null.
     void sendRpc(QProcess *process, const QString &method, const QJsonValue &params = QJsonValue());
 
-    /* Tells the SiC64 instance running 'vUUID', if any, that we just rewrote
+    /* Tells the emulator instance running 'vUUID', if any, that we just rewrote
      * its SVM file. Call after every Hub-side write -- see the definition for
      * why a silent write is a bug rather than a missed refresh.
      */

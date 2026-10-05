@@ -23,8 +23,8 @@ using retro::vault::PlatformEnum;
 
 HubController::HubController() : Controller()
 {
-    // Propagate preference changes to running SiC64 instances. Silicium and
-    // SiC64 share one settings file, so rather than shipping values we tell
+    // Propagate preference changes to running emulator instances. Silicium and
+    // the emulators share one settings file, so rather than shipping values we tell
     // each instance which group changed and let it re-read that group from
     // disk (see broadcastPrefsChange and Preferences::reloadGroup).
     auto &prefs = preferences();
@@ -479,18 +479,18 @@ HubController::openVMs() const
 {
     std::vector<UUID> result;
 
-    for (const auto &sic64 : m_sic64Processes) {
-        result.push_back(sic64.vUUID);
+    for (const auto &proc : m_processes) {
+        result.push_back(proc.vUUID);
     }
 
     return result;
 }
 
-const HubController::SiC64Process *
-HubController::findSiC64Process(UUID uuid) const
+const VMProcess *
+HubController::findProcess(UUID uuid) const
 {
-    for (const auto &sic64 : m_sic64Processes) {
-        if (sic64.vUUID == uuid) return &sic64;
+    for (const auto &proc : m_processes) {
+        if (proc.vUUID == uuid) return &proc;
     }
 
     return nullptr;
@@ -499,7 +499,7 @@ HubController::findSiC64Process(UUID uuid) const
 VMState
 HubController::lookupState(UUID uuid) const
 {
-    if (auto *sic64 = findSiC64Process(uuid)) return sic64->state;
+    if (auto *proc = findProcess(uuid)) return proc->state;
 
     return VMState::HIBERNATED;
 }
@@ -642,13 +642,13 @@ HubController::open(UUID vUUID, UUID sUUID)
 
         LogTask task("Opening virtual machine...");
 
-        if (auto *sic64 = findSiC64Process(vUUID)) {
+        if (auto *proc = findProcess(vUUID)) {
 
             qCDebug(siLog) << "Machine already running, raising its window.";
-            sendRpc(sic64->process, "raise");
+            sendRpc(proc->process, "raise");
 
             if (sUUID) {
-                sendRpc(sic64->process, "loadSnapshot", QString::fromStdString(sUUID.toString()));
+                sendRpc(proc->process, "loadSnapshot", QString::fromStdString(sUUID.toString()));
             }
 
         } else {
@@ -667,7 +667,7 @@ HubController::createProcess(UUID vUUID, UUID sUUID)
 {
     auto *process = new QProcess(this);
 
-    // SiC64 runs its RPC server on the stdio transport, so JSON-RPC
+    // The emulators run their RPC server on the stdio transport, so JSON-RPC
     // packets arrive on the process's stdout. State changes come in
     // as newline-terminated "vmState" notifications -- pick them out
     // to keep our tracked state (and the sidebar icon) in sync.
@@ -685,7 +685,7 @@ HubController::createProcess(UUID vUUID, UUID sUUID)
 
             if (parseError.error != QJsonParseError::NoError || !doc.isObject()) {
 
-                // qCDebug(siLog).noquote() << "SiC64:" << line;
+                // qCDebug(siLog).noquote() << "Emulator:" << line;
                 continue;
             }
 
@@ -710,18 +710,18 @@ HubController::createProcess(UUID vUUID, UUID sUUID)
     });
 
     connect(process, &QProcess::readyReadStandardError, this, [process]() {
-        qCWarning(siLog).noquote() << "SiC64 (stderr):" << QString::fromUtf8(process->readAllStandardError());
+        qCWarning(siLog).noquote() << "Emulator (stderr):" << QString::fromUtf8(process->readAllStandardError());
     });
 
     connect(process, &QProcess::errorOccurred, this, [this](QProcess::ProcessError error) {
-        emit showError("Failed to launch SiC64", QString::number(error));
+        emit showError("Failed to launch the emulator", QString::number(error));
     });
 
     if (sUUID) {
 
         // Writing to the process's stdin before it has actually started
         // isn't guaranteed to arrive, so defer this until Qt confirms the
-        // process is up -- the packet then sits in the pipe until SiC64's
+        // process is up -- the packet then sits in the pipe until the emulator's
         // RPC server (enabled by the first --exec commands in launch())
         // starts reading it, so it's safe to send this before that point.
         connect(process, &QProcess::started, this, [this, process, sUUID]() {
@@ -731,10 +731,10 @@ HubController::createProcess(UUID vUUID, UUID sUUID)
 
     connect(process, &QProcess::finished, this, [this, process, vUUID](int exitCode, QProcess::ExitStatus exitStatus) {
 
-        qCDebug(siLog) << "SiC64 finished with exit code" << exitCode
+        qCDebug(siLog) << "Emulator finished with exit code" << exitCode
                        << "status" << (exitStatus == QProcess::NormalExit ? "NormalExit" : "CrashExit");
 
-        std::erase_if(m_sic64Processes, [process](const auto &p) { return p.process == process; });
+        std::erase_if(m_processes, [process](const auto &p) { return p.process == process; });
         emit openChanged();
         process->deleteLater();
 
@@ -751,7 +751,7 @@ HubController::createProcess(UUID vUUID, UUID sUUID)
      * what made the quit dialog report 0 running machines however many were
      * actually up: the binding still held the value it read at startup.
      */
-    m_sic64Processes.push_back({ process, vUUID, VMState::HIBERNATED });
+    m_processes.push_back({ process, vUUID, VMState::HIBERNATED });
     emit openChanged();
 
     return process;
@@ -766,7 +766,7 @@ HubController::buildArguments(const QString &svmPath, const Manifest &manifest, 
     argv << "--exec" << "server rpc set TRANSPORT STDIO";
     argv << "--exec" << "server rpc set ENABLE true";
 
-    // Instruct SiC64 to run the startup script or power up -- unless a
+    // Instruct the emulator to run the startup script or power up -- unless a
     // specific snapshot was requested, in which case the state it captures
     // (including whether the machine was running) replaces both, so booting
     // fresh would just be immediately overwritten.
@@ -831,13 +831,13 @@ HubController::processRpcPacket(QProcess *process, UUID vUUID, const QJsonObject
         auto state = VMStateEnum::parseEnum(rpc["params"].toString().toStdString());
         if (!state) return;
 
-        for (auto &sic64 : m_sic64Processes) {
+        for (auto &proc : m_processes) {
 
-            if (sic64.process != process) continue;
+            if (proc.process != process) continue;
 
-            sic64.state = *state;
+            proc.state = *state;
 
-            if (sic64.vUUID == m_vUUID) {
+            if (proc.vUUID == m_vUUID) {
                 m_vInfo["state"] = VMStateEnum::key(*state);
                 emit selectionChanged();
             }
@@ -861,16 +861,16 @@ HubController::processRpcPacket(QProcess *process, UUID vUUID, const QJsonObject
          * archive, since only the Hub knew where it was. Writing from both
          * sides is now just a way to race the emulator for its own manifest.
          */
-        for (auto &sic64 : m_sic64Processes) {
+        for (auto &proc : m_processes) {
 
-            if (sic64.process != process) continue;
+            if (proc.process != process) continue;
 
-            if (auto *vm = library.resolve(sic64.vUUID).first) {
+            if (auto *vm = library.resolve(proc.vUUID).first) {
 
                 if (vm->isOutdated()) vm->reload();
 
                 m_sidebarController.rebuild();
-                if (sic64.vUUID == m_vUUID) select(m_vUUID);
+                if (proc.vUUID == m_vUUID) select(m_vUUID);
             }
             break;
         }
@@ -900,15 +900,15 @@ HubController::processRpcPacket(QProcess *process, UUID vUUID, const QJsonObject
             qCWarning(siLog).noquote() << "Malformed snapshot uuid in svmChanged packet:" << e.what();
         }
 
-        for (auto &sic64 : m_sic64Processes) {
+        for (auto &proc : m_processes) {
 
-            if (sic64.process != process) continue;
+            if (proc.process != process) continue;
 
-            // The SVM file was rewritten on disk by the SiC64 instance that
+            // The SVM file was rewritten on disk by the emulator instance that
             // owns it (workspace or snapshot save). Our in-memory manifest
             // for that machine is now stale -- re-read it and, if it's the
             // one currently on screen, refresh the detail view too.
-            auto *vm = library.resolve(sic64.vUUID).first;
+            auto *vm = library.resolve(proc.vUUID).first;
             if (vm) {
 
                 vm->reload();
@@ -939,12 +939,12 @@ HubController::processRpcPacket(QProcess *process, UUID vUUID, const QJsonObject
                      * must not yank the user away from whatever they are
                      * currently inspecting.
                      */
-                    if (sic64.vUUID == m_vUUID) select(sUUID);
+                    if (proc.vUUID == m_vUUID) select(sUUID);
 
-                    emit snapshotSaved(QString::fromStdString(sic64.vUUID.toString()),
+                    emit snapshotSaved(QString::fromStdString(proc.vUUID.toString()),
                                        QString::fromStdString(sUUID.toString()));
 
-                } else if (sic64.vUUID == m_vUUID) {
+                } else if (proc.vUUID == m_vUUID) {
 
                     // Refresh the detail view against the reloaded manifest.
                     select(m_vUUID);
@@ -957,14 +957,14 @@ HubController::processRpcPacket(QProcess *process, UUID vUUID, const QJsonObject
 
     if (method == "fatalError") {
 
-        // A SiC64 instance hit something it cannot carry on from and handed
+        // An emulator instance hit something it cannot carry on from and handed
         // us the message to show, because its own window is in no state to
         // show it (see C64Controller::notifyFatalError).
         const QJsonObject params = rpc["params"].toObject();
         const QString title = params["title"].toString();
         const QString text = params["text"].toString();
 
-        qCCritical(siLog).noquote() << "SiC64 reported a fatal error:" << title << "-" << text;
+        qCCritical(siLog).noquote() << "Emulator reported a fatal error:" << title << "-" << text;
         emit showError(title, text);
         return;
     }
@@ -982,30 +982,30 @@ HubController::broadcastPrefsChange(const QString &group)
 void
 HubController::broadcastRpc(const QString &method, const QJsonValue &params)
 {
-    for (auto &sic64 : m_sic64Processes) {
+    for (auto &proc : m_processes) {
 
-        sendRpc(sic64.process, method, params);
+        sendRpc(proc.process, method, params);
     }
 }
 
 void
 HubController::notifySvmChanged(UUID vUUID)
 {
-    /* The Hub and a running SiC64 instance each hold their own SVMFile for the
+    /* The Hub and a running emulator instance each hold their own SVMFile for the
      * same file on disk. Whenever the Hub writes -- a rename, a deleted
      * snapshot -- the instance's copy silently goes stale, and it keeps making
      * decisions from the manifest it read at startup: counting a snapshot the
      * user just deleted, and so refusing to save a new one against a capacity
      * that is no longer full.
      *
-     * This is the mirror image of the notification SiC64 sends the other way
+     * This is the mirror image of the notification the emulator sends the other way
      * after it writes (see C64Controller::notifySvmChanged), and it carries no
      * params for the same reason that one carries a kind: there is nothing to
      * reveal or select here, the receiver simply re-reads.
      */
-    for (auto &sic64 : m_sic64Processes) {
+    for (auto &proc : m_processes) {
 
-        if (sic64.vUUID == vUUID) sendRpc(sic64.process, "svmChanged");
+        if (proc.vUUID == vUUID) sendRpc(proc.process, "svmChanged");
     }
 }
 
@@ -1014,7 +1014,7 @@ HubController::sendRpc(QProcess *process, const QString &method, const QJsonValu
 {
     if (!process || process->state() != QProcess::Running) return;
 
-    // Fire-and-forget JSON-RPC notification (no "id", so SiC64's RPC server
+    // Fire-and-forget JSON-RPC notification (no "id", so the emulator's RPC server
     // sends no reply). The newline lets the receiver frame the packet.
     QJsonObject rpc {
         { "jsonrpc", "2.0" },
@@ -1038,21 +1038,21 @@ HubController::closeWindow(const QString &uuid)
 void
 HubController::shutdown(UUID uuid)
 {
-    // Cleanup (erasing the process's m_sic64Processes entry, refreshing the
+    // Cleanup (erasing the process's m_processes entry, refreshing the
     // sidebar, updating vInfo if this machine is selected) happens in the
     // QProcess::finished handler installed in launch(), triggered once the
     // process actually exits below.
     //
-    // Uses kill() (SIGKILL) rather than terminate() (SIGTERM): SiC64 doesn't
+    // Uses kill() (SIGKILL) rather than terminate() (SIGTERM): the emulator doesn't
     // install a signal handler yet, so terminate() is silently ignored and
     // the process lingers -- confirmed by hand while testing this. Revisit
-    // once SiC64 has a JSON-RPC link and can be asked to close gracefully.
-    if (auto *sic64 = findSiC64Process(uuid)) {
+    // once the emulator has a JSON-RPC link and can be asked to close gracefully.
+    if (auto *proc = findProcess(uuid)) {
 
         // No openChanged here: nothing has changed yet. The process is still
         // in the vector at this point and only leaves it when the kill lands
         // and the finished handler runs, which is where the signal belongs.
-        sic64->process->kill();
+        proc->process->kill();
 
     } else {
 
