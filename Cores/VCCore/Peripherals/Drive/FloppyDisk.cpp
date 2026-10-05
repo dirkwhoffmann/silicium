@@ -726,7 +726,7 @@ FloppyDisk::writeToFile(const fs::path& path, ImageFormat fmt)
 {
     switch (fmt) {
 
-        case ImageFormat::D64: Codec::makeD64(*this)->writeToFile(path); break;
+        case ImageFormat::D64: Codec::makeD64(*this)->copy(path); break;
 
         default:
             throw IOError(IOError::FILE_TYPE_UNSUPPORTED);

@@ -15,8 +15,6 @@
 
 namespace retro::vault {
 
-class LinearDevice;
-
 /* An image that is a contiguous block of bytes.
  *
  * This is what almost every format in this library is: a floppy image, a hard
@@ -31,10 +29,12 @@ class LinearDevice;
  *
  * What lazy loading means for an image read from a file:
  *
- * - The image keeps the file open for as long as it lives.
- * - It is not a snapshot. Parts not loaded yet are read when first asked for,
- *   so nobody else may change the file in the meantime. Writing the image to
- *   its own file (save(), writeToFile()) is safe; that case is handled.
+ * - The image keeps the file open for as long as it lives. Parts not loaded
+ *   yet are read when first asked for, so nobody else may change the file in
+ *   the meantime.
+ *
+ * - Writing the image to its own file (save(), copy()) is safe; that case is
+ *   handled.
  *
  * The bytes are private. Everything, subclasses included, reaches them through
  * two views:
@@ -47,15 +47,17 @@ class LinearDevice;
  *
  * Compression:
  *
- * An image knows nothing about compression. It only meets it when it is
- * created from, or written to, a compressed byte stream: the functions that
- * do so take a utl::Compressor, which defaults to NONE. A compressed file is
- * uncompressed into memory on the way in, so an image created from one is
- * memory backed and remembers nothing about the file. On the way out, the
- * bytes are compressed before they are written. Which file name stands for
- * which compressor is not decided here (see AnyImage::compressorFor()).
+ * Images are independent of compression. Compression is handled by the import
+ * and export functions, which accept a `utl::Compressor` and default to `NONE`.
+ * When importing a compressed byte stream, the data is uncompressed into memory
+ * before the image is created. The resulting image is therefore memory-backed
+ * and has no knowledge of the original file or its compression. When exporting,
+ * the image data is compressed before it is written to the output stream.
  */
+
 class BinaryImage : public AnyImage, public utl::Dumpable {
+
+    using Compressor = utl::Compressor;
 
     // The raw data of this file
     utl::BackedBuffer data;
@@ -78,7 +80,7 @@ public:
      * If a compressor is given, the bytes are the compressed form of the
      * image and are uncompressed first.
      */
-    void init(const u8 *buf, isize len, utl::Compressor compressor = utl::Compressor::NONE);
+    void init(const u8 *buf, isize len, Compressor compressor = Compressor::NONE);
 
     /* Creates an image on top of a file, loading its contents lazily.
      *
@@ -87,7 +89,7 @@ public:
      * result in memory: it is not file backed, has no path, and save() has
      * nowhere to write to (use saveAs() with the compressor).
      */
-    void init(const fs::path& p, utl::Compressor compressor = utl::Compressor::NONE);
+    void init(const fs::path& p, Compressor compressor = Compressor::NONE);
 
     /* Initializes the image with the contents of a device.
      *
@@ -95,7 +97,7 @@ public:
      * them, so this works for any device, including ones that do not keep the
      * whole image in memory. All of them are copied.
      */
-    void init(const LinearDevice& device);
+    void init(const class LinearDevice& device);
 
 protected:
 
@@ -157,10 +159,6 @@ public:
     // Turns a file backed image into a memory backed image
     void detach();
 
-    // Copies the file contents into a buffer
-    virtual void copy(u8 *dst, isize offset = 0) const;
-    virtual void copy(u8 *dst, isize offset, isize len) const;
-
 
     //
     // Exporting
@@ -175,31 +173,38 @@ public:
      */
     void save() override;
 
-    /* Writes the entire image to a new file and continues on top of it.
+    /* Writes the entire image to a new, plain file and continues on top of it.
      *
      * Later calls to save() go to the new file. The file is written before
      * the image switches over, so if writing fails, nothing changes. Views
-     * taken before the call must not be used after it.
+     * taken before the call must not be used after it. To write a copy
+     * instead, which leaves the image where it is, use copy().
+     */
+    void saveAs(const fs::path &path);
+
+    /* Writes bytes [offset, offset + len), or the entire image, into a buffer,
+     * to a stream or a file, compressed if a compressor is given.
      *
-     * A compressed file cannot be built on. If a compressor is given, the
-     * file is written compressed and the image is left in memory, as if it
-     * had been created from that file (see init()).
+     * The image is not changed in any way, in particular it keeps its backing
+     * file. The result is the number of bytes written, which is the compressed
+     * size if the data was compressed.
      */
-    void saveAs(const fs::path &path, utl::Compressor compressor = utl::Compressor::NONE);
+    void copy(u8 *dst, isize offset = 0) const;
+    void copy(u8 *dst, isize offset, isize len) const;
 
-    /* Writes bytes [offset, offset + len), or the entire image, to a stream or
-     * a file, compressed if a compressor is given. The result is the number
-     * of bytes written, which is the compressed size in that case.
-     */
-    virtual isize writeToStream(std::ostream &stream,
-                                utl::Compressor compressor = utl::Compressor::NONE) const;
-    virtual isize writeToFile(const fs::path &path,
-                              utl::Compressor compressor = utl::Compressor::NONE) const;
+    isize copy(std::ostream &stream,
+               Compressor compressor = Compressor::NONE) const;
+    isize copy(std::ostream &stream, isize offset, isize len,
+               Compressor compressor = Compressor::NONE) const;
 
-    virtual isize writeToStream(std::ostream &stream, isize offset, isize len,
-                                utl::Compressor compressor = utl::Compressor::NONE) const;
-    virtual isize writeToFile(const fs::path &path, isize offset, isize len,
-                              utl::Compressor compressor = utl::Compressor::NONE) const;
+    isize copy(const fs::path &path,
+               Compressor compressor = Compressor::NONE) const;
+    isize copy(const fs::path &path, isize offset, isize len,
+               Compressor compressor = Compressor::NONE) const;
+
+    //
+    // Delegates
+    //
 
 private:
 

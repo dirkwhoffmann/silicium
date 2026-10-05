@@ -916,7 +916,9 @@ public:
     /** @brief  Writes the disk to a file and continues on top of it
      *  @param  path    Path of the file to create
      *  @note   Unlike writeToFile(), which exports a copy and leaves the
-     *          drive where it is.
+     *          drive where it is. A compressed file name (.hdz) is refused,
+     *          because the drive cannot live in a compressed file; use
+     *          writeToFile() to export one.
      */
     void saveAs(const std::filesystem::path &path);
 

@@ -1040,14 +1040,19 @@ HardDrive::saveAs(const fs::path &path)
 {
     if (!image || path.empty()) return;
 
-    image->saveAs(path, AnyImage::compressorFor(path));
+    // The drive goes on living on the new file, which cannot be a compressed one
+    if (AnyImage::compressorFor(path) != utl::Compressor::NONE) {
+        throw IOError(IOError::FILE_TYPE_UNSUPPORTED);
+    }
+
+    image->saveAs(path);
 }
 
 void
 HardDrive::writeToFile(const fs::path &path)
 {
     // Write straight from the image, in the format the file name asks for
-    if (image && !path.empty()) image->writeToFile(path, 0, size(), AnyImage::compressorFor(path));
+    if (image && !path.empty()) image->copy(path, 0, size(), AnyImage::compressorFor(path));
 }
 
 std::unique_ptr<HardDiskImage>

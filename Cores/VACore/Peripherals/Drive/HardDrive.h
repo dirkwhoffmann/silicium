@@ -494,7 +494,8 @@ public:
      * From then on the disk lives in that file, which holds it in full --
      * unlike writeToFile(), which exports a copy and leaves the drive where
      * it is. The file is written before the drive switches over, so a
-     * failure changes nothing.
+     * failure changes nothing. A compressed file name (.hdz) is refused,
+     * because the drive cannot live in a compressed file.
      */
     void saveAs(const fs::path &path);
 

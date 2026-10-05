@@ -187,20 +187,12 @@ BinaryImage::save()
 }
 
 void
-BinaryImage::saveAs(const fs::path &newPath, Compressor compressor)
+BinaryImage::saveAs(const fs::path &newPath)
 {
     auto size = getSize();
 
-    if (compressor != Compressor::NONE) {
-
-        // A compressed file cannot be built on: write it and carry on in memory
-        writeToFile(newPath, 0, size, compressor);
-        detach();
-        return;
-    }
-
     // Write the entire image first, so that a failure changes nothing
-    writeToFile(newPath);
+    copy(newPath);
 
     // Continue on top of the new file, which now holds exactly this image
     path = newPath;
@@ -208,7 +200,7 @@ BinaryImage::saveAs(const fs::path &newPath, Compressor compressor)
 }
 
 isize
-BinaryImage::writeToStream(std::ostream &stream, isize offset, isize len, Compressor compressor) const
+BinaryImage::copy(std::ostream &stream, isize offset, isize len, Compressor compressor) const
 {
     if (compressor != Compressor::NONE) {
 
@@ -225,7 +217,7 @@ BinaryImage::writeToStream(std::ostream &stream, isize offset, isize len, Compre
 }
 
 isize
-BinaryImage::writeToFile(const fs::path &p, isize offset, isize len, Compressor compressor) const
+BinaryImage::copy(const fs::path &p, isize offset, isize len, Compressor compressor) const
 {
     if (utl::isDirectory(p)) {
         throw utl::IOError(utl::IOError::FILE_IS_DIRECTORY);
@@ -243,7 +235,7 @@ BinaryImage::writeToFile(const fs::path &p, isize offset, isize len, Compressor 
 
     // Compress first, so that a failure here leaves the target alone
     std::stringstream compressed;
-    if (compressor != Compressor::NONE) writeToStream(compressed, offset, len, compressor);
+    if (compressor != Compressor::NONE) copy(compressed, offset, len, compressor);
 
     std::ofstream stream(p, std::ofstream::binary);
 
@@ -259,22 +251,22 @@ BinaryImage::writeToFile(const fs::path &p, isize offset, isize len, Compressor 
         return isize(bytes.size());
     }
 
-    isize result = writeToStream(stream, offset, len);
+    isize result = copy(stream, offset, len);
     assert(result == len);
 
     return result;
 }
 
 isize
-BinaryImage::writeToStream(std::ostream &stream, Compressor compressor) const
+BinaryImage::copy(std::ostream &stream, Compressor compressor) const
 {
-    return writeToStream(stream, 0, getSize(), compressor);
+    return copy(stream, 0, getSize(), compressor);
 }
 
 isize
-BinaryImage::writeToFile(const fs::path &p, Compressor compressor) const
+BinaryImage::copy(const fs::path &p, Compressor compressor) const
 {
-    return writeToFile(p, 0, getSize(), compressor);
+    return copy(p, 0, getSize(), compressor);
 }
 
 }
