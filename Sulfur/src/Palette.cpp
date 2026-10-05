@@ -201,27 +201,14 @@ Palette::getColor(Color c) const
     return m_colors[size_t(m_theme)][darkMode()][size_t(c)];
 }
 
-void
-Palette::computeColorTables()
-{
-    for (std::size_t i = 0; i < m_colors[0][0].size(); ++i) {
-
-        for (std::size_t j = 0; j < 2; ++j) {
-
-            m_colors[0][j][i] = computeDefaultColor(Color(i), j);
-            m_colors[1][j][i] = computeSolarisColor(Color(i), j);
-        }
-    }
-}
-
-QColor
-Palette::computeDefaultColor(Color c, bool darkMode) const
+template <> QColor
+Palette::computeColor<Palette::Theme::AppDefault>(Color c, bool darkMode) const
 {
     auto lighter = [&](Color col, int factor = 115) {
-        return computeDefaultColor(col, darkMode).lighter(factor);
+        return computeColor<Theme::AppDefault>(col, darkMode).lighter(factor);
     };
     auto darker = [&](Color col, int factor = 115) {
-        return computeDefaultColor(col, darkMode).darker(factor);
+        return computeColor<Theme::AppDefault>(col, darkMode).darker(factor);
     };
 
     if (darkMode) {
@@ -324,14 +311,14 @@ Palette::computeDefaultColor(Color c, bool darkMode) const
     }
 }
 
-QColor
-Palette::computeSolarisColor(Color c, bool darkMode) const
+template <> QColor
+Palette::computeColor<Palette::Theme::Solaris>(Color c, bool darkMode) const
 {
     auto lighter = [&](Color col, int factor = 115) {
-        return computeSolarisColor(col, darkMode).lighter(factor);
+        return computeColor<Theme::Solaris>(col, darkMode).lighter(factor);
     };
     auto darker = [&](Color col, int factor = 115) {
-        return computeSolarisColor(col, darkMode).darker(factor);
+        return computeColor<Theme::Solaris>(col, darkMode).darker(factor);
     };
 
     if (darkMode) {
@@ -433,5 +420,18 @@ Palette::computeSolarisColor(Color c, bool darkMode) const
         }
     }
 
-    return computeDefaultColor(c, darkMode);
+    return computeColor<Theme::AppDefault>(c, darkMode);
+}
+
+void
+Palette::computeColorTables()
+{
+    for (std::size_t i = 0; i < m_colors[0][0].size(); ++i) {
+
+        for (std::size_t j = 0; j < 2; ++j) {
+
+            m_colors[size_t(Theme::AppDefault)][j][i] = computeColor<Theme::AppDefault>(Color(i), j);
+            m_colors[size_t(Theme::Solaris)][j][i] = computeColor<Theme::Solaris>(Color(i), j);
+        }
+    }
 }

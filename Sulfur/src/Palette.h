@@ -210,6 +210,5 @@ Q_SIGNALS:
     //
 
     void computeColorTables();
-    QColor computeDefaultColor(Color c, bool darkMode) const;
-    QColor computeSolarisColor(Color c, bool darkMode) const;
+    template <Theme T> QColor computeColor(Color c, bool darkMode) const;
 };
