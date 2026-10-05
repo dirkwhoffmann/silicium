@@ -9,6 +9,7 @@
 
 import QtQuick
 import QtQuick.Effects
+import Sulfur
 
 /* A pill-shaped banner that floats over the machine, like the "Press Esc to
  * exit" banner browsers show.
@@ -59,8 +60,8 @@ Item {
         height: ticker.implicitHeight + 2 * Style.largeSpacing
         radius: height / 2
 
-        color: "#A0000000"
-        border.color: "#50ffffff"
+        color: Palette.overlay
+        border.color: Palette.overlayBorder
 
         layer.enabled: true
         layer.effect: MultiEffect {

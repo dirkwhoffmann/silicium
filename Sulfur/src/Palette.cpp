@@ -243,8 +243,8 @@ Palette::computeDefaultColor(Color c, bool darkMode) const
             case Color::SurfaceBorder:          return QColor("#6C6B6B");
             case Color::SurfaceElevated:        return lighter(Color::Surface);
             case Color::Tint:                   return QColor("#99ccff");
-            case Color::Toolbar:                return lighter(Color::Background, 110);
-            case Color::ToolbarBorder:          return lighter(Color::Toolbar);
+            case Color::Toolbar:                return darker(Color::Surface, 100); // lighter(Color::Background, 110);
+            case Color::ToolbarBorder:          return darker(Color::SurfaceBorder, 100); // lighter(Color::Toolbar);
 
             case Color::AccentText:             return QColor("#FFFFFF");
             case Color::Primary:                return QColor("#ffffff");
@@ -264,7 +264,7 @@ Palette::computeDefaultColor(Color c, bool darkMode) const
             case Color::InsetBorder:          return lighter(Color::Inset,140);
             case Color::InsetBorderFocused:   return lighter(Color::InsetFocused,150);
 
-            case Color::Overlay:                return QColor("#C0000000");
+            case Color::Overlay:                return QColor("#A0000000");
             case Color::OverlayElevated:        return QColor("#E0000000");
             case Color::OverlayBorder:          return QColor("#50ffffff");
             case Color::OverlayBorderElevated:  return QColor("#90ffffff");
@@ -292,8 +292,8 @@ Palette::computeDefaultColor(Color c, bool darkMode) const
             case Color::SurfaceBorder:          return QColor("#c8c8c8");
             case Color::SurfaceElevated:        return darker(Color::Surface);
             case Color::Tint:                   return QColor("#CFDDFF");
-            case Color::Toolbar:                return darker(Color::Background, 104);
-            case Color::ToolbarBorder:          return darker(Color::Toolbar);
+            case Color::Toolbar:                return darker(Color::Surface, 100); // darker(Color::Background, 104);
+            case Color::ToolbarBorder:          return darker(Color::SurfaceBorder, 100); //darker(Color::Toolbar);
 
             case Color::AccentText:             return QColor("#FFFFFF");
             case Color::Primary:                return QColor("#000000");
@@ -313,7 +313,7 @@ Palette::computeDefaultColor(Color c, bool darkMode) const
             case Color::InsetBorder:          return darker(Color::Inset);
             case Color::InsetBorderFocused:  return darker(Color::InsetBorder);
 
-            case Color::Overlay:                return QColor("#C0000000");
+            case Color::Overlay:                return QColor("#A0000000");
             case Color::OverlayElevated:        return QColor("#E0000000");
             case Color::OverlayBorder:          return QColor("#50ffffff");
             case Color::OverlayBorderElevated:  return QColor("#90ffffff");
@@ -374,7 +374,7 @@ Palette::computeSolarisColor(Color c, bool darkMode) const
             case Color::InsetBorder:          return darker(Color::Inset, 150); //, 140);
             case Color::InsetBorderFocused:  return darker(Color::InsetBorder);
 
-            case Color::Overlay:                return QColor("#C0000000");
+            case Color::Overlay:                return QColor("#A0000000");
             case Color::OverlayElevated:        return QColor("#E0000000");
             case Color::OverlayBorder:          return QColor("#50ffffff");
             case Color::OverlayBorderElevated:  return QColor("#90ffffff");
@@ -423,7 +423,7 @@ Palette::computeSolarisColor(Color c, bool darkMode) const
             case Color::InsetBorder:          return darker(Color::Inset, 150); //, 140);
             case Color::InsetBorderFocused:  return darker(Color::InsetBorder);
 
-            case Color::Overlay:                return QColor("#C0000000");
+            case Color::Overlay:                return QColor("#A0000000");
             case Color::OverlayElevated:        return QColor("#E0000000");
             case Color::OverlayBorder:          return QColor("#50ffffff");
             case Color::OverlayBorderElevated:  return QColor("#90ffffff");
