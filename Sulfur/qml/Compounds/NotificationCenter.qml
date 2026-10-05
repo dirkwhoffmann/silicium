@@ -23,7 +23,7 @@ Rectangle {
 
     visible: notificationsModel.count > 0
     radius: Style.radius
-    border.color: Palette.border
+    border.color: Palette.surfaceBorder
     color: Palette.background
     clip: true
 

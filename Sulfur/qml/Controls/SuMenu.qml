@@ -46,7 +46,7 @@ Menu {
 
         color: Qt.alpha(Palette.background, 0.96)
         radius: Style.radius
-        border.color: Palette.border
+        border.color: Palette.surfaceBorder
         border.width: 1
     }
 }

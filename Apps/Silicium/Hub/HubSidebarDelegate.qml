@@ -270,7 +270,7 @@ ItemDelegate {
                         ? Palette.accentText
                         : isCompatible
                             ? Palette.primary
-                            : Palette.warning
+                            : Palette.statusWarning
 
             verticalAlignment: Text.AlignVCenter
             Layout.alignment: Qt.AlignVCenter

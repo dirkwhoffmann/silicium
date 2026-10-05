@@ -89,7 +89,7 @@ SuDialog {
                 Layout.topMargin: Style.smallSpacing
                 Layout.bottomMargin: Style.smallSpacing
                 height: 1
-                color: Palette.border
+                color: Palette.surfaceBorder
             }
 
             SuLabeledComboBox {

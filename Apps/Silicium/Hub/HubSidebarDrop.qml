@@ -45,7 +45,7 @@ DropArea {
 
         anchors.fill: parent
         color: "transparent"
-        border.color: dragActive ? Palette.border : "transparent"
+        border.color: dragActive ? Palette.surfaceBorder : "transparent"
         border.width: 4
         radius: Style.radius
     }

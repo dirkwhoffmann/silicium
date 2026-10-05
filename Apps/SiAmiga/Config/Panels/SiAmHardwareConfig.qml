@@ -310,7 +310,7 @@ SettingsPage {
                 SuSymbol {
                     visible: root.badAgnus
                     symbol: "warning"
-                    color: Palette.warning
+                    color: Palette.statusWarning
                     ToolTip.visible: badAgnusHover.hovered
                     ToolTip.text: "Chip Ram is not fully usable. The selected Agnus revision is limited to address %1 KB.".arg(root.chipRamLimits[config.AGNUS_REVISION])
                     HoverHandler {

@@ -45,7 +45,7 @@ Rectangle {
         anchors.margins: Style.largeSpacing
 
         color: Palette.surface
-        border.color: Palette.border
+        border.color: Palette.surfaceBorder
         radius: 12
 
         Behavior on scale {

@@ -195,7 +195,7 @@ ApplicationWindow {
                                 implicitHeight: 32
                                 radius: Style.radius
                                 color: parent.parent.modelData.color
-                                border.color: Palette.border
+                                border.color: Palette.surfaceBorder
                             }
                         }
                     }

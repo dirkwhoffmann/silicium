@@ -242,7 +242,6 @@ Palette::computeDefaultColor(Color c, bool darkMode) const
             case Color::Surface:                return QColor("#3c3c3e"); // QColor("#2c2c2e");
             case Color::SurfaceBorder:          return QColor("#6C6B6B");
             case Color::SurfaceElevated:        return lighter(Color::Surface);
-            case Color::Border:                 return QColor("#6C6B6B");
             case Color::Tint:                   return QColor("#99ccff");
             case Color::Toolbar:                return lighter(Color::Background, 110);
             case Color::ToolbarBorder:          return lighter(Color::Toolbar);
@@ -253,9 +252,9 @@ Palette::computeDefaultColor(Color c, bool darkMode) const
             case Color::Tertiary:               return QColor("#80ffffff"); // alpha(Color::Primary, 128);
             case Color::Disabled:               return QColor("#40ffffff"); // alpha(Color::Primary, 64);
             case Color::Icon:                   return QColor("#d8d8d8");
-            case Color::Success:                return QColor("#66ff66");
-            case Color::Warning:                return QColor("#ffff66");
-            case Color::Error:                  return QColor("#ff6666");
+            case Color::StatusSuccess:          return QColor("#66ff66");
+            case Color::StatusWarning:          return QColor("#ffff66");
+            case Color::StatusError:            return QColor("#ff6666");
 
             case Color::Widget:                 return QColor("#363434");
             case Color::WidgetElevated:         return lighter(Color::Widget);
@@ -293,7 +292,6 @@ Palette::computeDefaultColor(Color c, bool darkMode) const
             case Color::Surface:                return QColor("#e2e2e2");
             case Color::SurfaceBorder:          return QColor("#c8c8c8");
             case Color::SurfaceElevated:        return darker(Color::Surface);
-            case Color::Border:                 return QColor("#c8c8c8");
             case Color::Tint:                   return QColor("#CFDDFF");
             case Color::Toolbar:                return darker(Color::Background, 104);
             case Color::ToolbarBorder:          return darker(Color::Toolbar);
@@ -304,9 +302,9 @@ Palette::computeDefaultColor(Color c, bool darkMode) const
             case Color::Tertiary:               return QColor("#80000000");
             case Color::Disabled:               return QColor("#40000000");
             case Color::Icon:                   return QColor("#7B7B7B");
-            case Color::Success:                return QColor("#00aa00");
-            case Color::Warning:                return QColor("#cccc00");
-            case Color::Error:                  return QColor("#ff0000");
+            case Color::StatusSuccess:          return QColor("#00aa00");
+            case Color::StatusWarning:          return QColor("#cccc00");
+            case Color::StatusError:            return QColor("#ff0000");
 
             case Color::Widget:                 return QColor("#dcdcdc");
             case Color::WidgetElevated:         return darker(Color::Widget);
@@ -365,9 +363,9 @@ Palette::computeSolarisColor(Color c, bool darkMode) const
             case Color::Secondary:              return QColor("#98FFFFFF");
             case Color::Tertiary:               return QColor("#80FFFFFF");
             case Color::Disabled:               return QColor("#40FFFFFF");
-            case Color::Success:                return QColor("#66ff66");
-            case Color::Warning:                return QColor("#A75376");
-            case Color::Error:                  return QColor("#ff6666");
+            case Color::StatusSuccess:          return QColor("#66ff66");
+            case Color::StatusWarning:          return QColor("#A75376");
+            case Color::StatusError:            return QColor("#ff6666");
 
             case Color::Widget:                 return QColor("#55556E"); // darker(Color::Tint, 100); // #6B6C76"); // #767882");
             case Color::WidgetElevated:         return lighter(Color::Widget);
@@ -414,9 +412,9 @@ Palette::computeSolarisColor(Color c, bool darkMode) const
             case Color::Secondary:              return QColor("#98000000");
             case Color::Tertiary:               return QColor("#80000000");
             case Color::Disabled:               return QColor("#40000000");
-            case Color::Success:                return QColor("#66ff66");
-            case Color::Warning:                return QColor("#A75376");
-            case Color::Error:                  return QColor("#ff6666");
+            case Color::StatusSuccess:          return QColor("#66ff66");
+            case Color::StatusWarning:          return QColor("#A75376");
+            case Color::StatusError:            return QColor("#ff6666");
 
             case Color::Widget:                 return QColor("#D4D5DF");
             case Color::WidgetElevated:         return lighter(Color::Widget);

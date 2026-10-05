@@ -22,7 +22,7 @@ MenuSeparator {
     contentItem: Rectangle {
 
         implicitHeight: 1
-        color: Palette.border
+        color: Palette.surfaceBorder
         opacity: 0.5
     }
 }

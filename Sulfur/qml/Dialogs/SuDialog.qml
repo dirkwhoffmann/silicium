@@ -93,7 +93,7 @@ Dialog {
 
         color: Palette.surface
         radius: Style.borderRadius
-        border.color: Palette.border
+        border.color: Palette.surfaceBorder
         layer.enabled: true
         layer.effect: DropShadow {
             transparentBorder: true

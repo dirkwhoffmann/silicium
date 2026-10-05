@@ -227,7 +227,7 @@ SiC64InspectorWindow {
                                 Layout.columnSpan: 2
                                 // visible: info.pcWarning
                                 text: qsTr("PC not in Fetch phase!")
-                                color: Palette.warning
+                                color: Palette.statusWarning
                                 opacity: info.pcWarning ? 1.0 : 0.0
                                 font.pixelSize: Style.small
                             }
@@ -252,7 +252,7 @@ SiC64InspectorWindow {
                                 Layout.columnSpan: 2
                                 // visible: info.pcWarning
                                 text: qsTr("PC not in Fetch phase!")
-                                color: Palette.warning
+                                color: Palette.statusWarning
                                 opacity: info.pcWarning ? 1.0 : 0.0
                                 font.pixelSize: Style.small
                             }

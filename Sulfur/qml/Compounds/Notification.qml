@@ -49,7 +49,7 @@ Item {
                 font.pixelSize: Style.large
                 font.family: Fonts.awesome
                 font.bold: true
-                color: root.severity === 0 ? Palette.accent : Palette.error;
+                color: root.severity === 0 ? Palette.accent : Palette.statusError;
             }
 
             SuText {

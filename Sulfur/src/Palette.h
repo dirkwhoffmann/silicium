@@ -32,7 +32,6 @@ class Palette : public QQuickAttachedPropertyPropagator {
         Background,
         BackgroundElevated,
         BackgroundBorder,
-        Border, // DEPRECATED
         Elevation,
         Surface,
         SurfaceElevated,
@@ -48,9 +47,11 @@ class Palette : public QQuickAttachedPropertyPropagator {
         Tertiary,
         Disabled,
         Icon,
-        Success,
-        Warning,
-        Error,
+
+        // Status colors
+        StatusSuccess,
+        StatusWarning,
+        StatusError,
 
         // Widgets
         Widget,
@@ -96,7 +97,6 @@ private:
     Q_PROPERTY(QColor background READ background NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor backgroundElevated READ backgroundElevated NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor backgroundBorder READ backgroundBorder NOTIFY themeChanged FINAL)
-    Q_PROPERTY(QColor border READ border NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor elevation READ elevation NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor surface READ surface NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor surfaceElevated READ surfaceElevated NOTIFY themeChanged FINAL)
@@ -111,9 +111,9 @@ private:
     Q_PROPERTY(QColor tertiary READ tertiary NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor disabled READ disabled NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor icon READ icon NOTIFY themeChanged FINAL)
-    Q_PROPERTY(QColor success READ success NOTIFY themeChanged FINAL)
-    Q_PROPERTY(QColor error READ error NOTIFY themeChanged FINAL)
-    Q_PROPERTY(QColor warning READ warning NOTIFY themeChanged FINAL)
+    Q_PROPERTY(QColor statusSuccess READ statusSuccess NOTIFY themeChanged FINAL)
+    Q_PROPERTY(QColor statusWarning READ statusWarning NOTIFY themeChanged FINAL)
+    Q_PROPERTY(QColor statusError READ statusError NOTIFY themeChanged FINAL)
 
     Q_PROPERTY(QColor widget READ widget NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor widgetElevated READ widgetElevated NOTIFY themeChanged FINAL)
@@ -162,7 +162,6 @@ private:
     QColor background() const { return getColor(Color::Background); }
     QColor backgroundElevated() const { return getColor(Color::BackgroundElevated); }
     QColor backgroundBorder() const { return getColor(Color::BackgroundBorder); }
-    QColor border() const { return getColor(Color::Border); }
     QColor elevation() const { return getColor(Color::Elevation); }
     QColor surface() const { return getColor(Color::Surface); }
     QColor surfaceElevated() const { return getColor(Color::SurfaceElevated); }
@@ -177,9 +176,9 @@ private:
     QColor tertiary() const { return getColor(Color::Tertiary); }
     QColor disabled() const { return getColor(Color::Disabled); }
     QColor icon() const { return getColor(Color::Icon); }
-    QColor success() const { return getColor(Color::Success); }
-    QColor error() const { return getColor(Color::Error); }
-    QColor warning() const { return getColor(Color::Warning); }
+    QColor statusSuccess() const { return getColor(Color::StatusSuccess); }
+    QColor statusWarning() const { return getColor(Color::StatusWarning); }
+    QColor statusError() const { return getColor(Color::StatusError); }
 
     QColor widget() const { return getColor(Color::Widget); }
     QColor widgetElevated() const { return getColor(Color::WidgetElevated); }
