@@ -92,31 +92,18 @@ BinaryImage::init(const fs::path &p, Compressor compressor)
 
         uncompress(bytes, compressor);
 
-        /* The format is asked how large the image is, and it needs a file to
-         * look into. Give it one, take the image into memory, and let the
-         * file go again.
-         */
-        utl::TempFile plain(".tmp");
-        bytes.write(plain.path());
-
-        data.init(imageSize(plain.path()), plain.path());
-        data.detach();
+        init(bytes.ptr, bytes.size);
         path.clear();
-
-        didInitialize();
         return;
     }
 
     if (utl::getSizeOfFile(p) <= 0)
         throw utl::IOError(utl::IOError::FILE_CANT_READ, p);
 
-    // Ask the format how large the image in that file is
-    auto size = imageSize(p);
-
     this->path = p;
 
     // Put the image on top of the file. Nothing is loaded yet.
-    data.init(size, p);
+    data.init(utl::getSizeOfFile(p), p);
     didInitialize();
 }
 
@@ -150,10 +137,10 @@ BinaryImage::init(const u8 *buf, isize len, Compressor compressor)
     didInitialize();
 }
 
-isize
-BinaryImage::imageSize(const fs::path &p) const
+void
+BinaryImage::resize(isize len)
 {
-    return utl::getSizeOfFile(p);
+    data.resize(len);
 }
 
 utl::ByteView

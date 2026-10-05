@@ -56,7 +56,7 @@ namespace utl {
  * The buffer reserves its full size up front, but the operating system only
  * provides memory for the pages that are touched, so a buffer far larger than
  * RAM costs what has been loaded. Views stay valid for as long as the buffer
- * holds its storage; nothing but dealloc() moves or frees it.
+ * holds its storage; nothing but dealloc() and resize() moves or frees it.
  *
  * Things this class does not do:
  *
@@ -132,6 +132,16 @@ public:
 
     void init(isize size);
     void init(isize size, const fs::path &path, bool readOnly = false);
+
+    /* Changes the size of the buffer, keeping its contents and its file.
+     *
+     * A buffer that grows reads the new bytes as it would have read them from
+     * the start: from the file where the file has them, zero elsewhere. One
+     * that shrinks forgets what lies beyond the new size, modifications
+     * included; the file is not touched until the next persist(). Views taken
+     * before the call must not be used after it.
+     */
+    void resize(isize size);
 
     // Detaches the connected drive (if any)
     void detach();

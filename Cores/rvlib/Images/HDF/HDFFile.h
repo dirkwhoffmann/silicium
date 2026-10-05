@@ -66,7 +66,6 @@ public:
     ImageFormat format() const noexcept override { return ImageFormat::HDF; }
     std::vector<string> describeImage() const noexcept override;
     void didInitialize() override;
-    isize imageSize(const fs::path &path) const override;
 
 
     //

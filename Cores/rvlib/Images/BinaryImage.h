@@ -67,7 +67,10 @@ class BinaryImage : public AnyImage, public utl::Dumpable {
 
 public:
 
-    // Creates an image of the given size, all zero
+    /* Creates an image of the given size.
+     *
+     * The image is initialized with all zeroes.
+     */
     void init(isize len);
 
     /* Creates an image holding a copy of the given bytes.
@@ -96,18 +99,8 @@ public:
 
 protected:
 
-    /* How large the image in a file is.
-     *
-     * By default exactly as large as the file, which is the normal case.
-     * Formats whose files are not the image itself override this: a short
-     * file may stand for a larger image. It is handed the file rather than
-     * its size, so a format can look inside first -- an HDF reads its rigid
-     * disk block to learn how large the drive is meant to be.
-     *
-     * The file it is given holds plain bytes: a compressed one has been
-     * uncompressed into a temporary file by then.
-     */
-    virtual isize imageSize(const fs::path &path) const;
+    // Changes the size of the image, keeping its contents
+    void resize(isize len);
 
 
     //
