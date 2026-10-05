@@ -1051,8 +1051,14 @@ HardDrive::saveAs(const fs::path &path)
 void
 HardDrive::writeToFile(const fs::path &path)
 {
+    if (!image || path.empty()) return;
+
+    // The file the drive lives in is updated in place
+    std::error_code ec;
+    if (fileBacked() && fs::equivalent(path, image->path, ec)) { image->save(); return; }
+
     // Write straight from the image, in the format the file name asks for
-    if (image && !path.empty()) image->copy(path, 0, size(), AnyImage::compressorFor(path));
+    image->copy(path, 0, size(), AnyImage::compressorFor(path));
 }
 
 std::unique_ptr<HardDiskImage>

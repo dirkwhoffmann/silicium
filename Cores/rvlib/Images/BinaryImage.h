@@ -33,8 +33,9 @@ namespace retro::vault {
  *   yet are read when first asked for, so nobody else may change the file in
  *   the meantime.
  *
- * - Writing the image to its own file (save(), copy()) is safe; that case is
- *   handled.
+ * - Writing the changes back to the file (save()) is safe. Copying the image
+ *   onto that file is refused, because the image would lose the bytes it has
+ *   not loaded yet.
  *
  * The bytes are private. Everything, subclasses included, reaches them through
  * two views:
@@ -87,7 +88,7 @@ public:
      * A compressed file cannot be read in pieces. If a compressor is given,
      * the file is therefore uncompressed in full, and the image holds the
      * result in memory: it is not file backed, has no path, and save() has
-     * nowhere to write to (use saveAs() with the compressor).
+     * nowhere to write to (use saveAs()).
      */
     void init(const fs::path& p, Compressor compressor = Compressor::NONE);
 
@@ -177,8 +178,9 @@ public:
      *
      * Later calls to save() go to the new file. The file is written before
      * the image switches over, so if writing fails, nothing changes. Views
-     * taken before the call must not be used after it. To write a copy
-     * instead, which leaves the image where it is, use copy().
+     * taken before the call must not be used after it. Saving as the file the
+     * image already lives in is the same as save(). To write a copy instead,
+     * which leaves the image where it is, use copy().
      */
     void saveAs(const fs::path &path);
 
@@ -186,8 +188,9 @@ public:
      * to a stream or a file, compressed if a compressor is given.
      *
      * The image is not changed in any way, in particular it keeps its backing
-     * file. The result is the number of bytes written, which is the compressed
-     * size if the data was compressed.
+     * file, which is also why it cannot be the target of a copy: copying onto
+     * the file the image lives in throws. The result is the number of bytes
+     * written, which is the compressed size if the data was compressed.
      */
     void copy(u8 *dst, isize offset = 0) const;
     void copy(u8 *dst, isize offset, isize len) const;

@@ -138,6 +138,10 @@ BinaryImage::save()
 void
 BinaryImage::saveAs(const fs::path &newPath)
 {
+    // Saving as the file the image already lives in is saving
+    std::error_code ec;
+    if (data.backed() && fs::equivalent(newPath, path, ec)) { save(); return; }
+
     // Write the entire image first, so that a failure changes nothing
     copy(newPath);
 
@@ -166,29 +170,21 @@ BinaryImage::copy(std::ostream &stream, isize offset, isize len, Compressor comp
 isize
 BinaryImage::copy(const fs::path &p, isize offset, isize len, Compressor compressor) const
 {
-    if (utl::isDirectory(p)) {
+    std::error_code ec;
+
+    if (utl::isDirectory(p))
         throw IOError(IOError::FILE_IS_DIRECTORY);
-    }
 
-    /* The target may be the very file this image is loaded from. Opening it
-     * for writing truncates it, so whatever is still in there only has to
-     * come in first. (A compressed stream is built before the file is opened.)
-     */
-    if (compressor == Compressor::NONE) {
+    if (data.backed() && fs::equivalent(p, path, ec))
+        throw IOError(IOError::FILE_IN_USE, p);
 
-        std::error_code ec;
-        if (fs::equivalent(p, path, ec)) (void)byteView(0, getSize());
-    }
-
-    // Compress first, so that a failure here leaves the target alone
     std::stringstream compressed;
     if (compressor != Compressor::NONE) copy(compressed, offset, len, compressor);
 
     std::ofstream stream(p, std::ofstream::binary);
 
-    if (!stream.is_open()) {
+    if (!stream.is_open())
         throw IOError(IOError::FILE_CANT_WRITE, p);
-    }
 
     if (compressor != Compressor::NONE) {
 
