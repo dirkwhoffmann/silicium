@@ -199,6 +199,10 @@ public:
     Q_INVOKABLE void run();
     Q_INVOKABLE void pause();
     Q_INVOKABLE void runOrPause() { isPaused() ? run() : pause(); }
+    /* Puts the machine away: saves a snapshot and/or the workspace, one
+     * after the other, in the background, with the progress shown in the
+     * status bar. Returns at once; hibernated() says when it is over.
+     */
     Q_INVOKABLE void hibernate(bool hibernateSnapshot, bool hibernateWorkspace);
 
     Q_INVOKABLE void reset();
@@ -232,15 +236,10 @@ public:
     Q_INVOKABLE void openInspector() {}
     Q_INVOKABLE void openKeyboard() {}
 
-    /* Writes the workspace.
-     *
-     * saveWorkspace() hands the writing to a thread of its own and reports
-     * what it is doing through the status bar's ticker. saveWorkspaceNow()
-     * does the same work on the calling thread, for hibernation, which is
-     * followed by the app quitting and so cannot wait for a thread.
+    /* Writes the workspace, on a thread of its own, and reports what it is
+     * doing through the status bar's ticker.
      */
     Q_INVOKABLE void saveWorkspace();
-    void saveWorkspaceNow();
     Q_INVOKABLE void saveSnapshot();
     Q_INVOKABLE void revertSnapshot();
 
@@ -368,12 +367,15 @@ public:
 
 private:
 
-    /* The unconditional half of saveSnapshot(): captures the machine and
-     * files the result. saveSnapshot() checks the capacity limit and asks the
-     * user first; hibernation evicts silently and comes straight here, because
-     * it runs on quit where a dialog would have nowhere to go.
+    /* The jobs behind saveSnapshot(), saveWorkspace() and hibernate(). Each
+     * runs in the background (see runTask); 'always' runs on this thread when
+     * the job is over, whether it worked or not, so jobs can be chained.
+     * saveSnapshot() checks the capacity limit and asks the user first;
+     * hibernation evicts silently and comes straight here, because it runs
+     * on quit where a dialog would have nowhere to go.
      */
-    void captureSnapshot();
+    void startSnapshot(std::function<void()> always = {});
+    void startWorkspace(std::function<void()> always = {});
 
 public:
 
@@ -441,6 +443,7 @@ signals:
     void debugPanelChanged();
     void captureChanged();
     void shutdown();
+    void hibernated();
 
     void cpuStateChanged();
     void retroShellTextChanged();

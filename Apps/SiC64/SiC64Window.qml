@@ -39,9 +39,6 @@ VMWindow {
     controllerRef: c64
     actionsRef: siActions
 
-    // Hibernating takes a moment: show a progress bar before going away
-    showHibernationProgress: true
-
     title: ""
 
     //

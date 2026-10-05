@@ -702,7 +702,7 @@ Rectangle {
                 Connections {
 
                     target: amiga
-                    function onShowProgress(what, percentage) { myTicker.show(what) }
+                    function onShowProgress(what, percentage, minTime) { myTicker.show(what, minTime < 0 ? undefined : minTime) }
                     function onShowTicker(what) { myTicker.show(what) }
                 }
             }

@@ -16,9 +16,9 @@ import Sulfur
  *
  *    1. Pause the machine
  *    2. Optional: ask what to save (hibernation dialog)
- *    3. hibernate()
- *    4. Optional: show a progress bar (showProgress)
- *    5. byebye()
+ *    3. hibernate(), which saves in the background and reports its progress
+ *       to the status bar, and says when it is done (onHibernated)
+ *    4. byebye()
  *
  * The window refuses the first close and goes away only once the machine has
  * been put away, because everything from here on is asynchronous: a dialog is
@@ -33,13 +33,8 @@ Item {
 
     id: root
 
-    /* The machine to put away. Needs a readOnly property and the methods
-     * pause(), hibernate(snapshot, workspace) and shutdown().
-     */
+    // The machine to put away
     required property var controller
-
-    // Whether to show a progress bar after hibernating, before going away
-    property bool showProgress: false
 
     // True once the controller reported that it has wound down
     property bool shutdownInProgress: false
@@ -65,20 +60,16 @@ Item {
 
     function hibernate(snapshot, workspace) {
 
+        // Asynchronous: the machine goes away from onHibernated
         if (snapshot || workspace) {
 
             controller.hibernate(snapshot, workspace)
-
-            if (showProgress) {
-                progressDialog.open()
-                return
-            }
+            return
         }
 
         byebye()
     }
 
-    // Tells the controller to wind down, which comes back as onShutdown
     function byebye() {
 
         controller.shutdown()
@@ -87,6 +78,11 @@ Item {
     Connections {
 
         target: root.controller
+
+        function onHibernated() {
+
+            root.byebye()
+        }
 
         function onShutdown() {
 
@@ -103,35 +99,5 @@ Item {
         parent: Overlay.overlay
 
         onConfirmed: (snapshot, workspace) => root.hibernate(snapshot, workspace)
-    }
-
-    SuProgressDialog {
-
-        id: progressDialog
-        parent: Overlay.overlay
-        text: qsTr("Hibernating virtual machine...")
-
-        onVisibleChanged: {
-
-            if (visible) {
-                progressDialog.progress = 0.0
-                fakeAnim.start()
-            } else {
-                fakeAnim.stop()
-            }
-        }
-
-        NumberAnimation {
-
-            id: fakeAnim
-            target: progressDialog
-            property: "progress"
-            from: 0.0
-            to: 1.0
-            duration: 1200.0
-            easing.type: Easing.Linear
-
-            onFinished: root.byebye()
-        }
     }
 }

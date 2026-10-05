@@ -31,6 +31,13 @@ protected:
     // Handle to the associated window
     QQuickWindow *m_window = nullptr;
 
+    /* How long the messages about saving a snapshot and a workspace stay on
+     * screen at least, in milliseconds. Kept long enough to read them; set
+     * them to 0 to let them flash by.
+     */
+    static constexpr int SNAPSHOT_MIN_TIME = 250;
+    static constexpr int WORKSPACE_MIN_TIME = 500;
+
     // Whether a job is running (see runTask)
     bool m_busy = false;
 
@@ -89,14 +96,24 @@ public:
      * given title, and 'done' then does not run.
      *
      * 'done' is the part that has to happen on this thread once the work is
-     * over -- touching the manifest, telling the world. Returns false if a
-     * job is already running, in which case nothing is started: one at a
-     * time, because they would be reporting over each other.
+     * over -- touching the manifest, telling the world. 'always' runs after
+     * 'done', or after the error was reported, so whoever chains jobs hears
+     * about the end of this one whichever way it went. Returns false if a
+     * job is already running, in which case nothing is started (and 'always'
+     * does not run): one at a time, because they would be reporting over
+     * each other.
+     *
+     * 'minTime' is how long, in milliseconds, the message is worth: the
+     * ticker shows it at least that long, and the job does not count as over
+     * before then. A job that is done in a blink would otherwise flash its
+     * message too briefly to read. Negative means the ticker's own default.
      */
     bool runTask(const QString &what,
                  const QString &failure,
                  std::function<void()> body,
-                 std::function<void()> done = {});
+                 std::function<void()> done = {},
+                 std::function<void()> always = {},
+                 int minTime = -1);
 
     /* Says what the job is doing now, and how far along it is.
      *
@@ -131,7 +148,7 @@ public:
 private:
 
     // Says it, on this object's thread, unless it has just been said
-    void announce(const QString &what, qreal percentage);
+    void announce(const QString &what, qreal percentage, int minTime = -1);
 
 signals:
 
@@ -140,5 +157,5 @@ signals:
     void showFatalError(const QString &what, const QString &why);
     void showNotification(const QString &title, const QString &message);
     void showTicker(const QString &what);
-    void showProgress(const QString &what, qreal percentage);
+    void showProgress(const QString &what, qreal percentage, int minTime);
 };

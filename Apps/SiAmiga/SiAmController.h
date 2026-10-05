@@ -221,6 +221,10 @@ public:
     Q_INVOKABLE void run();
     Q_INVOKABLE void pause();
     Q_INVOKABLE void runOrPause() { isPaused() ? run() : pause(); }
+    /* Puts the machine away: saves a snapshot and/or the workspace, one
+     * after the other, in the background, with the progress shown in the
+     * status bar. Returns at once; hibernated() says when it is over.
+     */
     Q_INVOKABLE void hibernate(bool hibernateSnapshot, bool hibernateWorkspace);
 
     Q_INVOKABLE void reset();
@@ -257,9 +261,8 @@ public:
      * what it is doing through the status bar's ticker, because a
      * machine with hard drives attached takes long enough to freeze the
      * window. saveWorkspaceNow() does the same work on the calling thread,
-     * for the two places that cannot wait for a thread: hibernation, which
-     * is followed by the app quitting, and a job that is already running off
-     * the window's thread (see SiAmMediaController::attachHdAsync).
+     * for a job that is already running off the window's thread (see
+     * SiAmMediaController::attachHdAsync).
      */
     Q_INVOKABLE void saveWorkspace();
     void saveWorkspaceNow();
@@ -396,12 +399,15 @@ public:
 
 private:
 
-    /* The unconditional half of saveSnapshot(): captures the machine and
-     * files the result. saveSnapshot() checks the capacity limit and asks the
-     * user first; hibernation evicts silently and comes straight here, because
-     * it runs on quit where a dialog would have nowhere to go.
+    /* The jobs behind saveSnapshot(), saveWorkspace() and hibernate(). Each
+     * runs in the background (see runTask); 'always' runs on this thread when
+     * the job is over, whether it worked or not, so jobs can be chained.
+     * saveSnapshot() checks the capacity limit and asks the user first;
+     * hibernation evicts silently and comes straight here, because it runs
+     * on quit where a dialog would have nowhere to go.
      */
-    void captureSnapshot();
+    void startSnapshot(std::function<void()> always = {});
+    void startWorkspace(std::function<void()> always = {});
 
 public:
 
@@ -468,6 +474,7 @@ signals:
     void stateChanged();
     void rendererChanged();
     void shutdown();
+    void hibernated();
     void captureChanged();
     void warpingChanged();
     void debugPanelChanged();
