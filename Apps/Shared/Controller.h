@@ -71,8 +71,11 @@ protected:
     Q_PROPERTY(QString progress READ progress NOTIFY progressChanged)
     Q_PROPERTY(qreal percentage READ percentage NOTIFY progressChanged)
 
-    const QString &progress() const { return m_progress; }
-    qreal percentage() const { return m_percentage; }
+    /* Like busy(), these cover the sub-controllers: the window is handed the
+     * machine's controller only, but its media controller's jobs report, too.
+     */
+    QString progress() const { return reporter()->m_progress; }
+    qreal percentage() const { return reporter()->m_percentage; }
 
     Q_INVOKABLE virtual void start() { }
     Q_INVOKABLE virtual void stop() { }
@@ -102,7 +105,6 @@ public:
         return false;
     }
 
-    // Like busy(), this covers the sub-controllers' jobs, too
     qreal elapsed() const {
 
         qreal result = m_elapsed;
@@ -113,12 +115,23 @@ public:
         return result;
     }
 
+    // The controller whose report is the one to show: this one, or a child with something to say
+    const Controller *reporter() const {
+
+        if (!m_progress.isEmpty()) return this;
+
+        for (auto *child : findChildren<Controller *>(Qt::FindDirectChildrenOnly)) {
+            if (!child->m_progress.isEmpty()) return child;
+        }
+        return this;
+    }
+
     /* Runs a job on a thread of its own, and says so.
      *
      * Anything that would hold up the window for longer than a frame belongs
      * here: saving a workspace, copying a disk image. The body runs on a
      * QtConcurrent thread and says what it is doing through report(), which
-     * reaches the window as showProgress(); the display goes away when the
+     * reaches the window as progress and percentage; the display goes away when the
      * job does. A body that throws is reported through showError(), and
      * 'done' then does not run.
      *
@@ -153,7 +166,7 @@ public:
         connect(child, &Controller::showError, this, &Controller::showError);
         connect(child, &Controller::showFatalError, this, &Controller::showFatalError);
         connect(child, &Controller::showNotification, this, &Controller::showNotification);
-        connect(child, &Controller::showProgress, this, &Controller::showProgress);
+        connect(child, &Controller::progressChanged, this, &Controller::progressChanged);
         connect(child, &Controller::showTicker, this, &Controller::showTicker);
         connect(child, &Controller::busyChanged, this, &Controller::busyChanged);
         connect(child, &Controller::elapsedChanged, this, &Controller::elapsedChanged);
@@ -173,5 +186,4 @@ signals:
     void showFatalError(const QString &what, const QString &why);
     void showNotification(const QString &title, const QString &message);
     void showTicker(const QString &what);
-    void showProgress(const QString &what, qreal percentage);
 };

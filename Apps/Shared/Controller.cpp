@@ -80,7 +80,6 @@ Controller::runTask(std::function<void()> body,
             m_progress = { };
             m_percentage = 0.0;
             emit progressChanged();
-            emit showProgress({ }, 0.0);
         }
 
         if (error->isEmpty()) {
@@ -114,7 +113,6 @@ Controller::report(const QString &what, qreal percentage)
         m_percentage = percentage;
 
         emit progressChanged();
-        emit showProgress(what, percentage);
 
     }, Qt::QueuedConnection);
 }
