@@ -129,11 +129,6 @@ public:
     // Signals
     //
 
-private:
-
-    // Says it, on this object's thread, unless it has just been said
-    void announce(const QString &what, qreal percentage);
-
 signals:
 
     void busyChanged();

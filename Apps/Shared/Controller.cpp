@@ -59,7 +59,13 @@ Controller::runTask(std::function<void()> body,
         m_busy = false;
         emit busyChanged();
 
-        announce({ }, 0.0);
+        // The display goes away with the job
+        if (!m_progress.isEmpty() || m_percentage != 0.0) {
+
+            m_progress = { };
+            m_percentage = 0.0;
+            emit showProgress({ }, 0.0);
+        }
 
         if (error->isEmpty()) {
 
@@ -82,22 +88,16 @@ Controller::report(const QString &what, qreal percentage)
     // Off this object's thread, so the message is queued rather than said
     QMetaObject::invokeMethod(this, [this, what, percentage] {
 
-        announce(what, percentage);
+        /* A step that takes a while keeps its text and moves its bar, so both
+         * are compared. A hundredth of a bar is under a pixel wide; anything
+         * finer than that is not worth waking the window for.
+         */
+        if (what == m_progress && std::abs(percentage - m_percentage) < 0.01) return;
+
+        m_progress = what;
+        m_percentage = percentage;
+
+        emit showProgress(what, percentage);
 
     }, Qt::QueuedConnection);
-}
-
-void
-Controller::announce(const QString &what, qreal percentage)
-{
-    /* A step that takes a while keeps its text and moves its bar, so both
-     * are compared. A hundredth of a bar is under a pixel wide; anything
-     * finer than that is not worth waking the window for.
-     */
-    if (what == m_progress && std::abs(percentage - m_percentage) < 0.01) return;
-
-    m_progress = what;
-    m_percentage = percentage;
-
-    emit showProgress(what, percentage);
 }
