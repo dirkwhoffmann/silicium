@@ -191,9 +191,9 @@ SiAmMediaController::attachHdAsync(int nr, const QUrl &url)
     fs::path source = url.toLocalFile().toStdWString();
     fs::path target = wspace / ("hd" + std::to_string(nr) + ".hdf");
 
-    runTask(tr("Copying the hard drive into the virtual machine..."),
-            tr("Failed to attach hard drive."),
-            [this, nr, source, target] {
+    runTask([this, nr, source, target] {
+
+                report(tr("Copying the hard drive into the virtual machine..."));
 
                 // Copy the hard drive image into the virtual machine folder
                 fs::copy_file(source, target, fs::copy_options::overwrite_existing);
@@ -217,9 +217,9 @@ SiAmMediaController::attachHdAsync(int nr, int megabytes, int fsFormat, const QS
     fs::path wspace = parent->workspaceFolder();
     fs::path target = wspace / ("hd" + std::to_string(nr) + ".hdf");
 
-    runTask(tr("Creating the hard drive..."),
-            tr("Failed to create hard drive."),
-            [this, nr, megabytes, fsFormat, name, importUrl, target] {
+    runTask([this, nr, megabytes, fsFormat, name, importUrl, target] {
+
+                report(tr("Creating the hard drive..."));
 
                 // Create new HDF
                 createHd(nr, megabytes, fsFormat, name, importUrl);
@@ -499,9 +499,9 @@ void
 SiAmMediaController::installEmuTOS()
 {
     // REMOVE ASAP
-    runTask(tr("Hello, world..."),
-            tr("Failed"),
-            [this] {
+    runTask([this] {
+
+                report(tr("Hello, world..."));
                 report(tr("Some task..."));
                 sleep(3);
                 report(tr("Another task..."));

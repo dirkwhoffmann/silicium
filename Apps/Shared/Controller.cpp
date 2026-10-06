@@ -9,8 +9,6 @@
 
 #include "Controller.h"
 #include <QtConcurrent>
-#include <QElapsedTimer>
-#include <QTimer>
 #include <cmath>
 
 /*
@@ -30,19 +28,14 @@ Controller::Controller(QObject *parent) : QObject(parent)
 }
 
 bool
-Controller::runTask(const QString &what,
-                    const QString &failure,
-                    std::function<void()> body,
+Controller::runTask(std::function<void()> body,
                     std::function<void()> done,
-                    std::function<void()> always,
-                    int minTime)
+                    std::function<void()> always)
 {
     if (m_busy) return false;
 
     m_busy = true;
     emit busyChanged();
-
-    announce(what, 0.0, minTime);
 
     /* The body says what went wrong itself, rather than letting the
      * exception travel: QFuture hands a foreign exception on wrapped in a
@@ -61,34 +54,23 @@ Controller::runTask(const QString &what,
      * this object's thread, because what it touches -- the manifest, the
      * window -- belongs to it.
      */
-    auto started = std::make_shared<QElapsedTimer>();
-    started->start();
-
     QtConcurrent::task(std::move(guarded)).spawn().then(this, [=, this] {
 
-        // A job that is quicker than its message is worth waits for the message
-        const auto wait = minTime > 0 ? minTime - int(started->elapsed()) : 0;
+        m_busy = false;
+        emit busyChanged();
 
-        auto finish = [=, this] {
+        announce({ }, 0.0);
 
-            m_busy = false;
-            emit busyChanged();
+        if (error->isEmpty()) {
 
-            announce({ }, 0.0);
+            if (done) done();
 
-            if (error->isEmpty()) {
+        } else {
 
-                if (done) done();
+            emit showError(tr("The operation failed."), *error == "?" ? tr("Unknown error") : *error);
+        }
 
-            } else {
-
-                emit showError(failure, *error == "?" ? tr("Unknown error") : *error);
-            }
-
-            if (always) always();
-        };
-
-        if (wait > 0) QTimer::singleShot(wait, this, finish); else finish();
+        if (always) always();
     });
 
     return true;
@@ -106,7 +88,7 @@ Controller::report(const QString &what, qreal percentage)
 }
 
 void
-Controller::announce(const QString &what, qreal percentage, int minTime)
+Controller::announce(const QString &what, qreal percentage)
 {
     /* A step that takes a while keeps its text and moves its bar, so both
      * are compared. A hundredth of a bar is under a pixel wide; anything
@@ -117,5 +99,5 @@ Controller::announce(const QString &what, qreal percentage, int minTime)
     m_progress = what;
     m_percentage = percentage;
 
-    emit showProgress(what, percentage, minTime);
+    emit showProgress(what, percentage);
 }

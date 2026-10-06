@@ -568,7 +568,7 @@ Rectangle {
                 Connections {
 
                     target: root.c64
-                    function onShowProgress(what, percentage, minTime) { myTicker.show(what, minTime < 0 ? undefined : minTime) }
+                    function onShowProgress(what, percentage) { myTicker.show(what) }
                     function onShowTicker(what) { myTicker.show(what) }
                 }
             }

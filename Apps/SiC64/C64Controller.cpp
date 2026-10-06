@@ -815,14 +815,15 @@ C64Controller::startWorkspace(std::function<void()> always)
     auto screenshot = m_renderer ? m_renderer->grabScreenshot() : QImage();
     auto saved = std::make_shared<std::atomic<bool>>(false);
 
-    bool started = runTask(tr("Saving workspace..."), tr("Failed to save workspace."),
+    bool started = runTask(
 
             [this, folder, screenshot, saved] {
 
+                report(tr("Saving workspace..."));
                 *saved = writeWorkspace(folder, screenshot);
             },
             [this, saved] { workspaceWritten(*saved); },
-            always, WORKSPACE_MIN_TIME);
+            always);
 
     if (!started && always) always();
 }
@@ -875,9 +876,11 @@ C64Controller::startSnapshot(std::function<void()> always)
         const auto screenshotPath = snapshotFolder / info.screenshot;
         const auto snapshotPath   = snapshotFolder / info.binary;
 
-        bool started = runTask(tr("Saving snapshot..."), tr("Failed to save snapshot."),
+        bool started = runTask(
 
-            [snap, image, snapshotFolder, screenshotPath, snapshotPath] {
+            [this, snap, image, snapshotFolder, screenshotPath, snapshotPath] {
+
+                report(tr("Saving snapshot..."));
 
                 /* Bring the snapshot folder into being. Nothing else creates
                  * it, and the first snapshot of an SVM is exactly the case
@@ -903,7 +906,7 @@ C64Controller::startSnapshot(std::function<void()> always)
                 emit snapshotSaved(QString::fromStdString(info.uuid.toString()));
                 notifySvmChanged("snapshot", QString::fromStdString(info.uuid.toString()));
             },
-            always, SNAPSHOT_MIN_TIME);
+            always);
 
         if (!started && always) always();
 
