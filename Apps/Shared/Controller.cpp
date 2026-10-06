@@ -30,7 +30,7 @@ Controller::Controller(QObject *parent) : QObject(parent)
 bool
 Controller::runTask(std::function<void()> body,
                     std::function<void()> done,
-                    std::function<void()> always)
+                    std::function<void()> failed)
 {
     if (m_busy) return false;
 
@@ -68,9 +68,9 @@ Controller::runTask(std::function<void()> body,
         } else {
 
             emit showError(tr("The operation failed."), *error == "?" ? tr("Unknown error") : *error);
-        }
 
-        if (always) always();
+            if (failed) failed();
+        }
     });
 
     return true;

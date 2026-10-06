@@ -89,16 +89,15 @@ public:
      * 'done' then does not run.
      *
      * 'done' is the part that has to happen on this thread once the work is
-     * over -- touching the manifest, telling the world. 'always' runs after
-     * 'done', or after the error was reported, so whoever chains jobs hears
-     * about the end of this one whichever way it went. Returns false if a
-     * job is already running, in which case nothing is started (and 'always'
-     * does not run): one at a time, because they would be reporting over
-     * each other.
+     * over -- touching the manifest, telling the world. 'failed' runs instead
+     * of it, after the error was reported, if the body threw. Returns false
+     * if a job is already running, in which case nothing is started (and
+     * 'failed' does not run): one at a time, because they would be reporting
+     * over each other.
      */
     bool runTask(std::function<void()> body,
                  std::function<void()> done = {},
-                 std::function<void()> always = {});
+                 std::function<void()> failed = {});
 
     /* Says what the job is doing now, and how far along it is.
      *

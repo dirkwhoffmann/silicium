@@ -566,7 +566,11 @@ SiAmController::startWorkspace(std::function<void()> always)
                 report(tr("Saving workspace..."));
                 *saved = writeWorkspace(folder, screenshot);
             },
-            [this, saved] { workspaceWritten(*saved); },
+            [this, saved, always] {
+
+                workspaceWritten(*saved);
+                if (always) always();
+            },
             always);
 
     if (!started && always) always();
@@ -639,7 +643,7 @@ SiAmController::startSnapshot(std::function<void()> always)
 
                 snap->writeToFile(snapshotPath);
             },
-            [this, info] {
+            [this, info, always] {
 
                 // The manifest belongs to this thread
                 qCDebug(siLog) << "Registering snapshot " << info.uuid.toString();
@@ -649,6 +653,7 @@ SiAmController::startSnapshot(std::function<void()> always)
                 notifyPersist();
                 emit snapshotSaved(QString::fromStdString(info.uuid.toString()));
                 notifySvmChanged("snapshot", QString::fromStdString(info.uuid.toString()));
+                if (always) always();
             },
             always);
 
