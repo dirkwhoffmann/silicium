@@ -13,7 +13,6 @@
 #include "OpenRoms.h"
 #include "Preferences.h"
 #include "SleepGuard.h"
-#include "SuDialogController.h"
 #include "Images/ImageError.h"
 #include "Roms/RomManager.h"
 #include "utl/abilities/Hashable.h"
@@ -24,7 +23,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMetaObject>
-#include <QPointer>
 #include <QThread>
 #include <QStandardPaths>
 #include <fstream>
@@ -347,21 +345,13 @@ C64Controller::setRetroShell(bool value)
 }
 
 void
-C64Controller::testProgressDialog(QObject *dialog)
+C64Controller::testProgressDialog()
 {
-    auto *controller = dialog ? dialog->property("controller").value<SuDialogController *>() : nullptr;
-    if (!controller) return;
-
-    QPointer<QObject> target = dialog;
-
-    controller->run([target] {
+    runTask([this] {
 
         for (int i = 1; i <= 4; i++) {
 
-            // The text belongs to the GUI thread
-            QMetaObject::invokeMethod(target, [=] {
-                if (target) target->setProperty("text", QObject::tr("Step %1 of 4").arg(i));
-            });
+            report(tr("Step %1 of 4").arg(i));
             QThread::msleep(700);
         }
     });

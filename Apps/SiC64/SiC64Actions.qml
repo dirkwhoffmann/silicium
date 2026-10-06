@@ -297,10 +297,10 @@ Item {
 
             c64.toggleDebugPanel()
 
-            // Test of SuDialogController (temporary)
+            // Test of runTask (temporary)
             progressDialogRef.text = qsTr("Starting...")
             progressDialogRef.open()
-            c64.testProgressDialog(progressDialogRef)
+            c64.testProgressDialog()
         }
     }
 

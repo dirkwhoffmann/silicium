@@ -170,14 +170,21 @@ VMWindow {
     }
 
     //
-    // Progress dialog (test of SuDialogController)
+    // Progress dialog (test of runTask)
     //
 
     SuProgressDialog {
 
         id: progressDialog
         text: ""
-        onTaskFinished: close()
+
+        Connections {
+
+            target: root.c64
+            enabled: progressDialog.visible
+            function onShowProgress(what, percentage) { if (what !== "") progressDialog.text = what }
+            function onBusyChanged() { if (!root.c64.busy) progressDialog.close() }
+        }
     }
 
     //
