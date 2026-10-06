@@ -176,7 +176,7 @@ VMWindow {
     SuProgressDialog {
 
         id: progressDialog
-        visible: root.c64.busy
+        visible: root.c64.elapsed > 0.25
         text: root.c64.progress
         progress: root.c64.percentage
     }

@@ -24,6 +24,14 @@ Controller::setWindow(QQuickWindow *ptr)
 */
 Controller::Controller(QObject *parent) : QObject(parent)
 {
+    m_ticker = new QTimer(this);
+    m_ticker->setInterval(ELAPSED_TICK);
+
+    connect(m_ticker, &QTimer::timeout, this, [this] {
+
+        m_elapsed = m_stopwatch.elapsed() / 1000.0;
+        emit elapsedChanged();
+    });
 
 }
 
@@ -35,6 +43,9 @@ Controller::runTask(std::function<void()> body,
     if (m_busy) return false;
 
     m_busy = true;
+    m_elapsed = 0.0;
+    m_stopwatch.start();
+    m_ticker->start();
     emit busyChanged();
 
     /* The body says what went wrong itself, rather than letting the
@@ -57,6 +68,10 @@ Controller::runTask(std::function<void()> body,
     QtConcurrent::task(std::move(guarded)).spawn().then(this, [=, this] {
 
         m_busy = false;
+        m_ticker->stop();
+        m_stopwatch.invalidate();
+        m_elapsed = 0.0;
+        emit elapsedChanged();
         emit busyChanged();
 
         // The display goes away with the job

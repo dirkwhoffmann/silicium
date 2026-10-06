@@ -15,6 +15,9 @@
 #include <QObject>
 #include <functional>
 #include <QQuickWindow>
+#include <QElapsedTimer>
+#include <QTimer>
+#include <algorithm>
 
 
 using QUUID = QString;
@@ -34,6 +37,12 @@ protected:
     // Whether a job is running (see runTask)
     bool m_busy = false;
 
+    // How long it has been running, in seconds, updated while it runs
+    qreal m_elapsed = 0.0;
+    QElapsedTimer m_stopwatch;
+    QTimer *m_ticker = nullptr;
+    static constexpr int ELAPSED_TICK = 100;
+
     // What was last said about it, so the same thing is not said twice
     QString m_progress;
     qreal m_percentage = 0.0;
@@ -50,6 +59,13 @@ protected:
     Q_PROPERTY(QQuickWindow *window MEMBER m_window)
 
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
+
+    /* How long the running job has been going, in seconds; 0 when there is
+     * none. It is updated every ELAPSED_TICK milliseconds, which lets a view
+     * hold back until a job has lasted long enough to deserve one, e.g.
+     * "visible: elapsed > 0.25".
+     */
+    Q_PROPERTY(qreal elapsed READ elapsed NOTIFY elapsedChanged)
 
     // What the running job last reported (see report), and how far along it is
     Q_PROPERTY(QString progress READ progress NOTIFY progressChanged)
@@ -84,6 +100,17 @@ public:
             if (child->m_busy) return true;
         }
         return false;
+    }
+
+    // Like busy(), this covers the sub-controllers' jobs, too
+    qreal elapsed() const {
+
+        qreal result = m_elapsed;
+
+        for (auto *child : findChildren<Controller *>(Qt::FindDirectChildrenOnly)) {
+            result = std::max(result, child->m_elapsed);
+        }
+        return result;
     }
 
     /* Runs a job on a thread of its own, and says so.
@@ -129,6 +156,7 @@ public:
         connect(child, &Controller::showProgress, this, &Controller::showProgress);
         connect(child, &Controller::showTicker, this, &Controller::showTicker);
         connect(child, &Controller::busyChanged, this, &Controller::busyChanged);
+        connect(child, &Controller::elapsedChanged, this, &Controller::elapsedChanged);
     }
 
 
@@ -139,6 +167,7 @@ public:
 signals:
 
     void busyChanged();
+    void elapsedChanged();
     void progressChanged();
     void showError(const QString &what, const QString &why);
     void showFatalError(const QString &what, const QString &why);
