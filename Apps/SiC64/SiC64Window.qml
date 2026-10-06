@@ -176,15 +176,9 @@ VMWindow {
     SuProgressDialog {
 
         id: progressDialog
-        text: ""
-
-        Connections {
-
-            target: root.c64
-            enabled: progressDialog.visible
-            function onShowProgress(what, percentage) { if (what !== "") progressDialog.text = what }
-            function onBusyChanged() { if (!root.c64.busy) progressDialog.close() }
-        }
+        visible: root.c64.busy
+        text: root.c64.progress
+        progress: root.c64.percentage
     }
 
     //

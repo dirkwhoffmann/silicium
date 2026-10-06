@@ -298,7 +298,6 @@ Item {
             c64.toggleDebugPanel()
 
             // Test of runTask (temporary)
-            progressDialogRef.text = qsTr("Starting...")
             progressDialogRef.open()
             c64.testProgressDialog()
         }

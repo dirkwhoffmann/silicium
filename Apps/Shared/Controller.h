@@ -51,6 +51,13 @@ protected:
 
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
 
+    // What the running job last reported (see report), and how far along it is
+    Q_PROPERTY(QString progress READ progress NOTIFY progressChanged)
+    Q_PROPERTY(qreal percentage READ percentage NOTIFY progressChanged)
+
+    const QString &progress() const { return m_progress; }
+    qreal percentage() const { return m_percentage; }
+
     Q_INVOKABLE virtual void start() { }
     Q_INVOKABLE virtual void stop() { }
 
@@ -132,6 +139,7 @@ public:
 signals:
 
     void busyChanged();
+    void progressChanged();
     void showError(const QString &what, const QString &why);
     void showFatalError(const QString &what, const QString &why);
     void showNotification(const QString &title, const QString &message);

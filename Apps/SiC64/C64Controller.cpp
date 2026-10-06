@@ -351,7 +351,7 @@ C64Controller::testProgressDialog()
 
         for (int i = 1; i <= 4; i++) {
 
-            report(tr("Step %1 of 4").arg(i));
+            report(tr("Step %1 of 4").arg(i), i / 4.0);
             QThread::msleep(700);
         }
     });
