@@ -9,6 +9,7 @@
 
 #include "Controller.h"
 #include <QtConcurrent>
+#include <QThread>
 #include <cmath>
 
 Controller::Controller(QObject *parent) : QObject(parent)
@@ -105,4 +106,11 @@ Controller::report(const QString &what, qreal percentage)
         emit progressChanged();
 
     }, Qt::QueuedConnection);
+}
+
+void
+Controller::block(double elapsed)
+{
+    const auto remaining = elapsed - (utl::Time::now() - m_start).asSeconds();
+    if (remaining > 0.0) QThread::msleep(quint32(std::ceil(remaining * 1000.0)));
 }

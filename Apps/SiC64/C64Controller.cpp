@@ -350,13 +350,13 @@ C64Controller::testProgressDialog()
     runTask([this] {
 
         report(tr("Step 1"), 0.0);
-        QThread::msleep(700);
+        block(0.7);
         report(tr("Step 2"), 0.33);
-        QThread::msleep(700);
+        block(1.4);
         report(tr("Step 3"), 0.66);
-        QThread::msleep(700);
+        block(2.1);
         report(tr("Step 4"), 1.0);
-        QThread::msleep(700);
+        block(2.8);
     });
 }
 

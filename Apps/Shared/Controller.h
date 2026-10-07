@@ -109,7 +109,10 @@ public:
     // Describes the subtask
     void report(const QString &what, qreal percentage = 0.0);
 
-    // Blocks the subtask until at least 'elapsed' seconds have elapsed
+    /* Blocks the calling job until at least 'elapsed' seconds have passed since it
+     * started, which keeps a quick step on screen long enough to be read. Returns
+     * at once if that time is already over. Call it from the body only.
+     */
     void block(double elapsed);
 
 
