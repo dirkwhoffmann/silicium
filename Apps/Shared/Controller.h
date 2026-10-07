@@ -55,23 +55,6 @@ protected:
     // Time stamps
     utl::Time m_start;
 
-    // Target time and percentage
-    qreal m_target_elapsed = 0.0;
-    qreal m_target_percentage = 0.0;
-
-    /* The current step runs the bar from m_currentProgress to m_targetProgress
-     * while the job's elapsed time goes from m_currentElapsed to
-     * m_targetElapsed (see report). m_percentage is where the bar is at the
-     * moment. Progress is a fraction of the whole job, elapsed times are in
-     * seconds since the job started.
-     */
-    /*
-    qreal m_currentProgress = 0.0;
-    qreal m_currentElapsed = 0.0;
-    qreal m_targetProgress = 0.0;
-    qreal m_targetElapsed = 0.0;
-    */
-
     //
     // Methods
     //
@@ -96,11 +79,8 @@ protected:
     Q_PROPERTY(qreal percentage READ percentage NOTIFY progressChanged)
 
 
-    /* Like busy(), these cover the sub-controllers: the window is handed the
-     * machine's controller only, but its media controller's jobs report, too.
-     */
-    QString progress() const { return reporter()->m_progress; }
-    qreal percentage() const { return reporter()->m_percentage; }
+    QString progress() const { return m_progress; }
+    qreal percentage() const { return m_percentage; }
 
     Q_INVOKABLE virtual void start() { }
     Q_INVOKABLE virtual void stop() { }
@@ -112,44 +92,10 @@ protected:
 
 public:
 
-    /* Whether a job is running: this controller's own, or one belonging to
-     * a sub-controller it adopted.
-     *
-     * The window is handed the machine's controller and nothing else, so
-     * what its media controller is busy with has to count as the machine
-     * being busy -- the same reason their messages are passed on (see
-     * adopt, which also forwards busyChanged).
-     */
-    bool busy() const {
+    // Whether a job is running on this controller
+    bool busy() const { return m_busy; }
 
-        if (m_busy) return true;
-
-        for (auto *child : findChildren<Controller *>(Qt::FindDirectChildrenOnly)) {
-            if (child->m_busy) return true;
-        }
-        return false;
-    }
-
-    qreal elapsed() const {
-
-        qreal result = m_elapsed;
-
-        for (auto *child : findChildren<Controller *>(Qt::FindDirectChildrenOnly)) {
-            result = std::max(result, child->m_elapsed);
-        }
-        return result;
-    }
-
-    // The controller whose report is the one to show: this one, or a child with something to say
-    const Controller *reporter() const {
-
-        if (!m_progress.isEmpty()) return this;
-
-        for (auto *child : findChildren<Controller *>(Qt::FindDirectChildrenOnly)) {
-            if (!child->m_progress.isEmpty()) return child;
-        }
-        return this;
-    }
+    qreal elapsed() const { return m_elapsed; }
 
     /* Runs a job on a thread of its own, and says so.
      *
@@ -171,35 +117,13 @@ public:
                  std::function<void()> done = {},
                  std::function<void()> failed = {});
 
-    /* Says what the job is doing now: 'what', and 'percentage', the part of
-     * the whole job (0.0 to 1.0) that is done once this step is. The parts add
-     * up over the steps. 'estimate' is how long the step takes, in seconds. If
-     * it is given, the bar is moved ahead gradually, from where it stands, by
-     * the ticker (see elapsed); without it, it jumps.
+    /* Says what the job is doing now: 'what', and 'percentage', how much of
+     * the whole job (0.0 to 1.0) is done, in absolute terms.
      *
      * Called from the body, which is on a thread of its own, so the message
      * is handed to this object's own thread before anyone hears it.
      */
-    void report(const QString &what, qreal percentage = 0.0, qreal estimate = 0.0);
-
-
-    /* Re-emits what a sub-controller reports as our own.
-     *
-     * A machine is split over a main controller and several smaller ones
-     * (media, config, ...), but the window only knows the one it was given.
-     * Without this, a message from a sub-controller has no listener and is
-     * lost -- an error dialog that never appears.
-     */
-    void adopt(Controller *child) {
-
-        connect(child, &Controller::showError, this, &Controller::showError);
-        connect(child, &Controller::showFatalError, this, &Controller::showFatalError);
-        connect(child, &Controller::showNotification, this, &Controller::showNotification);
-        connect(child, &Controller::progressChanged, this, &Controller::progressChanged);
-        connect(child, &Controller::showTicker, this, &Controller::showTicker);
-        connect(child, &Controller::busyChanged, this, &Controller::busyChanged);
-        connect(child, &Controller::elapsedChanged, this, &Controller::elapsedChanged);
-    }
+    void report(const QString &what, qreal percentage = 0.0);
 
 
     //
@@ -215,4 +139,15 @@ signals:
     void showFatalError(const QString &what, const QString &why);
     void showNotification(const QString &title, const QString &message);
     void showTicker(const QString &what);
+
+protected:
+
+    // Re-emits what a subcontroller reports
+    void adopt(Controller *child) {
+
+        connect(child, &Controller::showError, this, &Controller::showError);
+        connect(child, &Controller::showFatalError, this, &Controller::showFatalError);
+        connect(child, &Controller::showNotification, this, &Controller::showNotification);
+        connect(child, &Controller::showTicker, this, &Controller::showTicker);
+    }
 };

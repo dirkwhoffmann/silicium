@@ -191,9 +191,9 @@ SiAmMediaController::attachHdAsync(int nr, const QUrl &url)
     fs::path source = url.toLocalFile().toStdWString();
     fs::path target = wspace / ("hd" + std::to_string(nr) + ".hdf");
 
-    runTask([this, nr, source, target] {
+    parent->runTask([this, nr, source, target] {
 
-                report(tr("Copying the hard drive into the virtual machine..."));
+                parent->report(tr("Copying the hard drive into the virtual machine..."));
 
                 // Copy the hard drive image into the virtual machine folder
                 fs::copy_file(source, target, fs::copy_options::overwrite_existing);
@@ -217,9 +217,9 @@ SiAmMediaController::attachHdAsync(int nr, int megabytes, int fsFormat, const QS
     fs::path wspace = parent->workspaceFolder();
     fs::path target = wspace / ("hd" + std::to_string(nr) + ".hdf");
 
-    runTask([this, nr, megabytes, fsFormat, name, importUrl, target] {
+    parent->runTask([this, nr, megabytes, fsFormat, name, importUrl, target] {
 
-                report(tr("Creating the hard drive..."));
+                parent->report(tr("Creating the hard drive..."));
 
                 // Create new HDF
                 createHd(nr, megabytes, fsFormat, name, importUrl);
@@ -261,12 +261,12 @@ SiAmMediaController::copyHd(int nr, const QUrl &url)
     const auto src = fs::path(url.toLocalFile().toStdWString());
     const auto dest = hdImagePath(nr);
 
-    report(tr("Releasing the current hard drive..."));
+    parent->report(tr("Releasing the current hard drive..."));
 
     std::error_code ec;
     if (fs::equivalent(core.hd[nr]->path(), dest, ec)) core.hd[nr]->loadIntoMemory();
 
-    report(tr("Reading the disk image..."), 0.02);
+    parent->report(tr("Reading the disk image..."), 0.02);
     auto image = std::make_unique<HDFFile>(src);
 
     // Writing the image is the long part, so it gets most of the bar.
@@ -274,7 +274,7 @@ SiAmMediaController::copyHd(int nr, const QUrl &url)
     constexpr isize chunk = 1024 * 1024;
     const auto total = image->getSize();
 
-    report(tr("Copying the disk image..."), 0.02);
+    parent->report(tr("Copying the disk image..."), 0.02);
 
     std::ofstream os(dest, std::ios::binary | std::ios::trunc);
     if (!os) throw utl::IOError(utl::IOError::FILE_CANT_CREATE, dest);
@@ -285,7 +285,7 @@ SiAmMediaController::copyHd(int nr, const QUrl &url)
             const auto len = std::min(chunk, total - offset);
             image->writeToStream(os, offset, len);
 
-            report(tr("Copying the disk image..."),
+            parent->report(tr("Copying the disk image..."),
                    0.02 + copyShare * double(offset + len) / double(total));
         }
 
@@ -311,7 +311,7 @@ SiAmMediaController::createHd(int nr, int megabytes, int fsFormat, const QString
     auto fsType = amiga::FSFormat(fsFormat);
     auto geometry = retro::vault::GeometryDescriptor(isize(megabytes) * 1024 * 1024);
 
-    report(tr("Creating the disk image..."), 0.05);
+    parent->report(tr("Creating the disk image..."), 0.05);
 
     fs::path wspace = parent->workspaceFolder();
     fs::path target = wspace / ("hd" + std::to_string(nr) + ".hdf");
@@ -322,19 +322,19 @@ SiAmMediaController::createHd(int nr, int megabytes, int fsFormat, const QString
 
     try {
 
-        report(tr("Attaching the hard drive..."), 0.15);
+        parent->report(tr("Attaching the hard drive..."), 0.15);
         core.hd[nr]->attach(target);
 
-        report(tr("Creating the file system..."), 0.25);
+        parent->report(tr("Creating the file system..."), 0.25);
         core.hd[nr]->format(fsType, name.toStdString());
 
         if (fsType != amiga::FSFormat::NODOS && importUrl.isLocalFile()) {
 
-            report(tr("Importing files..."), 0.45);
+            parent->report(tr("Importing files..."), 0.45);
             core.hd[nr]->importFiles(fs::path(importUrl.toLocalFile().toStdWString()));
         }
 
-        report(tr("Writing the disk image..."), 0.60);
+        parent->report(tr("Writing the disk image..."), 0.60);
         core.hd[nr]->persist();
 
     } catch (...) {
@@ -357,7 +357,7 @@ SiAmMediaController::attachHd(int nr, const fs::path &path)
 {
     auto &core = SiAmController::core();
 
-    report(tr("Attaching the hard drive..."), 0.90);
+    parent->report(tr("Attaching the hard drive..."), 0.90);
     core.hd[nr]->attach(path);
 
     /* Plug the controller in afterwards, not before: the drive is ready by
@@ -380,7 +380,7 @@ SiAmMediaController::attachHd(int nr, const fs::path &path)
      */
     core.sync();
 
-    report(tr("Persisting the virtual machine..."), 0.95);
+    parent->report(tr("Persisting the virtual machine..."), 0.95);
 
     /* Write the machine out, so config.retrosh carries the attach line and the
      * drive is still there the next time the SVM is opened. The image itself
@@ -499,14 +499,14 @@ void
 SiAmMediaController::installEmuTOS()
 {
     // REMOVE ASAP
-    runTask([this] {
+    parent->runTask([this] {
 
-                report(tr("Hello, world..."));
-                report(tr("Some task..."));
+                parent->report(tr("Hello, world..."));
+                parent->report(tr("Some task..."));
                 sleep(3);
-                report(tr("Another task..."));
+                parent->report(tr("Another task..."));
                 sleep(2);
-                report(tr("Yet another task..."));
+                parent->report(tr("Yet another task..."));
                 sleep(2);
             });
 

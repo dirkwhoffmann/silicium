@@ -349,11 +349,14 @@ C64Controller::testProgressDialog()
 {
     runTask([this] {
 
-        for (int i = 1; i <= 4; i++) {
-
-            report(tr("Step %1 of 4").arg(i), 0.25, 0.7);
-            QThread::msleep(700);
-        }
+        report(tr("Step 1"), 0.0);
+        QThread::msleep(700);
+        report(tr("Step 2"), 0.33);
+        QThread::msleep(700);
+        report(tr("Step 3"), 0.66);
+        QThread::msleep(700);
+        report(tr("Step 4"), 1.0);
+        QThread::msleep(700);
     });
 }
 
