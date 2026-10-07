@@ -14,9 +14,8 @@ import Sulfur
 /* A pill-shaped banner that floats over the machine, like the "Press Esc to
  * exit" banner browsers show.
  *
- * What to show and for how long is the ticker's part (see SuTicker, whose
- * show() and hide() this passes on); this is what it looks like. SiAmiga
- * shows the same messages in its status bar ticker instead.
+ * show() puts a message on it, which takes itself away again after a while.
+ * A message shown while another is still up replaces it.
  */
 Item {
 
@@ -28,17 +27,25 @@ Item {
     // How long it takes to fade in and out
     property int fadeTime: 1000
 
-    // What a message is worth when show() is not told (see SuTicker)
-    property alias minimumTime: ticker.minimumTime
-    property alias maximumTime: ticker.maximumTime
+    // How long a message stays when show() is not told, in milliseconds
+    property int duration: 3000
 
     // What the banner is showing at the moment. Set it through show().
-    readonly property alias text: ticker.text
+    readonly property alias text: label.text
 
-    function show(message, minTime, maxTime) { ticker.show(message, minTime, maxTime) }
-    function hide() { ticker.hide() }
+    // Whether there is anything to see
+    readonly property bool showing: timer.running
 
-    opacity: ticker.showing ? 1.0 : 0.0
+    function show(message, time) {
+
+        label.text = message
+        timer.interval = time === undefined ? root.duration : time
+        timer.restart()
+    }
+
+    function hide() { timer.stop() }
+
+    opacity: showing ? 1.0 : 0.0
     visible: opacity > 0.01
 
     Behavior on opacity {
@@ -49,6 +56,8 @@ Item {
         }
     }
 
+    Timer { id: timer }
+
     Rectangle {
 
         anchors.horizontalCenter: parent.horizontalCenter
@@ -56,8 +65,8 @@ Item {
         anchors.bottom: root.alignment === Qt.AlignBottom ? parent.bottom : undefined
         anchors.bottomMargin: Style.largeSpacing * 2
 
-        width: ticker.implicitWidth + 2 * Style.largeSpacing
-        height: ticker.implicitHeight + 2 * Style.largeSpacing
+        width: label.implicitWidth + 2 * Style.largeSpacing
+        height: label.implicitHeight + 2 * Style.largeSpacing
         radius: height / 2
 
         color: Palette.overlay
@@ -72,9 +81,9 @@ Item {
             shadowVerticalOffset: 4
         }
 
-        SuTicker {
+        SuLabel {
 
-            id: ticker
+            id: label
             anchors.centerIn: parent
             color: "white"
             font.pixelSize: Style.huge

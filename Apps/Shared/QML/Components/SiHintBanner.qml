@@ -32,8 +32,8 @@ SuBanner {
     // Shows the banner with the given message for a few seconds
     function showHint(message) {
 
-        // Readable, and gone again three seconds later without being told
-        show(message, 500, 3000)
+        // Gone again three seconds later without being told
+        show(message, 3000)
     }
 
     Connections {

@@ -428,7 +428,7 @@ ApplicationWindow {
 
                     Sample {
                         caption: "SuBanner"
-                        SuButton { text: "Show banner"; onClicked: banner.show("A message that takes itself away", 500, 3000) }
+                        SuButton { text: "Show banner"; onClicked: banner.show("A message that takes itself away", 3000) }
                     }
                 }
 

@@ -542,45 +542,40 @@ Rectangle {
         }
 
         //
-        // Ticker
+        // Subtask of the running job
         //
 
         RowLayout {
 
-            visible: myTicker.text !== ""
+            visible: root.c64.busy
             Layout.fillWidth: true
 
+            /*
             BusyIndicator {
 
-                visible: root.c64.busy
                 implicitHeight: 22
                 implicitWidth: 22
                 padding: 3
-                running: myTicker.text !== ""
+                running: root.c64.busy
             }
+            */
+            
+            SuLabel {
 
-            SuTicker {
-
-                id: myTicker
                 Layout.fillWidth: true
                 size: Size.small
-
-                Connections {
-
-                    target: root.c64
-                    function onProgressChanged() { myTicker.show(root.c64.subtask) }
-                    function onShowTicker(what) { myTicker.show(what) }
-                }
+                elide: Text.ElideRight
+                text: root.c64.subtask
             }
         }
 
         //
-        // Peripherals and icons, while the ticker has nothing to say
+        // Peripherals and icons, while no job is running
         //
 
         RowLayout {
 
-            visible: myTicker.text === ""
+            visible: !root.c64.busy
             Layout.fillWidth: true
 
             //

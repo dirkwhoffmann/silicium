@@ -184,12 +184,6 @@ Rectangle {
     function hdGreenIcon(nr) { return hdWriting(nr) ? ledGreen : ledGray }
     function hdIcon(nr)      { return hdHasDisk(nr) ? hardDisk : "" }
 
-    Component.onCompleted: {
-
-        myTicker.show("Initializing...", 2000)
-        myTicker.hide()
-    }
-
     //
     // Pictogram
     //
@@ -676,35 +670,28 @@ Rectangle {
         }
 
         //
-        // Ticker
+        // Subtask of the running job
         //
 
         RowLayout {
 
-            visible: myTicker.text !== ""
+            visible: root.amiga.busy
             Layout.fillWidth: true
 
             BusyIndicator {
 
-                visible: root.amiga.busy
                 implicitHeight: 22
                 implicitWidth: 22
                 padding: 3
-                running: myTicker.text !== ""
+                running: root.amiga.busy
             }
 
-            SuTicker {
+            SuLabel {
 
-                id: myTicker
                 Layout.fillWidth: true
                 size: Size.small
-
-                Connections {
-
-                    target: amiga
-                    function onProgressChanged() { myTicker.show(amiga.subtask) }
-                    function onShowTicker(what) { myTicker.show(what) }
-                }
+                elide: Text.ElideRight
+                text: root.amiga.subtask
             }
         }
 
@@ -714,7 +701,7 @@ Rectangle {
 
         RowLayout {
 
-            visible: myTicker.text === ""
+            visible: !root.amiga.busy
 
             //
             // Floppy drives

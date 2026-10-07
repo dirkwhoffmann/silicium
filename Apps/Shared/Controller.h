@@ -135,7 +135,6 @@ signals:
     void showError(const QString &what, const QString &why);
     void showFatalError(const QString &what, const QString &why);
     void showNotification(const QString &title, const QString &message);
-    void showTicker(const QString &what);
 
 protected:
 
@@ -145,6 +144,5 @@ protected:
         connect(child, &Controller::showError, this, &Controller::showError);
         connect(child, &Controller::showFatalError, this, &Controller::showFatalError);
         connect(child, &Controller::showNotification, this, &Controller::showNotification);
-        connect(child, &Controller::showTicker, this, &Controller::showTicker);
     }
 };
