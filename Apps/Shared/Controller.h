@@ -92,40 +92,28 @@ protected:
 
 public:
 
-    // Whether a job is running on this controller
+    // Indicates whether a job is running
     bool busy() const { return m_busy; }
 
+    // Returns the elapsed time in seconds
     qreal elapsed() const { return m_elapsed; }
 
-    /* Runs a job on a thread of its own, and says so.
-     *
-     * Anything that would hold up the window for longer than a frame belongs
-     * here: saving a workspace, copying a disk image. The body runs on a
-     * QtConcurrent thread and says what it is doing through report(), which
-     * reaches the window as progress and percentage; the display goes away when the
-     * job does. A body that throws is reported through showError(), and
-     * 'done' then does not run.
-     *
-     * 'done' is the part that has to happen on this thread once the work is
-     * over -- touching the manifest, telling the world. 'failed' runs instead
-     * of it, after the error was reported, if the body threw. Returns false
-     * if a job is already running, in which case nothing is started (and
-     * 'failed' does not run): one at a time, because they would be reporting
-     * over each other.
-     */
-    bool runTask(std::function<void()> body,
-                 std::function<void()> done = {},
-                 std::function<void()> failed = {});
+    // Runs a job in another thread
+    bool runTask(std::function<void()> body, std::function<void()> done = {}, std::function<void()> failed = {});
 
-    /* Says what the job is doing now: 'what', and 'percentage', how much of
-     * the whole job (0.0 to 1.0) is done, in absolute terms.
-     *
-     * Called from the body, which is on a thread of its own, so the message
-     * is handed to this object's own thread before anyone hears it.
-     */
+
+    //
+    // Background job helpers (supposed to be caled within body())
+    //
+
+    // Describes the subtask
     void report(const QString &what, qreal percentage = 0.0);
 
+    // Blocks the subtask until at least 'elapsed' seconds have elapsed
+    void block(double elapsed);
 
+
+    //
     //
     // Signals
     //
