@@ -568,7 +568,7 @@ Rectangle {
                 Connections {
 
                     target: root.c64
-                    function onProgressChanged() { myTicker.show(root.c64.progress) }
+                    function onProgressChanged() { myTicker.show(root.c64.subtask) }
                     function onShowTicker(what) { myTicker.show(what) }
                 }
             }

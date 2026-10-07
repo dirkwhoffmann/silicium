@@ -349,14 +349,14 @@ C64Controller::testProgressDialog()
 {
     runTask([this] {
 
-        report(tr("Step 1"), 0.0);
+        report(tr("Running a test"), tr("Step 1"), 0.0);
         block(0.7);
         report(tr("Step 2"), 0.33);
         block(1.4);
         report(tr("Step 3"), 0.66);
         block(2.1);
         report(tr("Step 4"), 1.0);
-        block(2.8);
+        block(12.8);
     });
 }
 

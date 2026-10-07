@@ -6,30 +6,57 @@ import Sulfur
 SuDialog {
 
     id: root
-    property alias text: label.text
+
+    // What the job is doing, as a whole and at the moment
+    property alias task: taskLabel.text
+    property alias subtask: subtaskLabel.text
+
+    // How far along the job is, from 0.0 to 1.0
     property real progress: 0.0
 
-    ColumnLayout {
+    RowLayout {
 
-        id: column
         Layout.fillWidth: true
-        spacing: 10
+        spacing: Style.largeSpacing
 
-        SuText {
+        BusyIndicator {
 
-            id: label
-            Layout.fillWidth: true
-            horizontalAlignment: Text.AlignLeft
-            wrapMode: Text.WordWrap
-            font.pixelSize: Style.regular
-            font.bold: false
+            running: root.visible
+            implicitWidth: 40
+            implicitHeight: 40
+            Layout.alignment: Qt.AlignVCenter
         }
 
-        SuProgressBar {
+        ColumnLayout {
 
-            id: control
             Layout.fillWidth: true
-            value: root.progress
+            spacing: 10
+
+            SuText {
+
+                id: taskLabel
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignLeft
+                wrapMode: Text.WordWrap
+                font.pixelSize: Style.regular
+                font.bold: true
+            }
+
+            SuProgressBar {
+
+                Layout.fillWidth: true
+                value: root.progress
+            }
+
+            SuText {
+
+                id: subtaskLabel
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignLeft
+                wrapMode: Text.WordWrap
+                font.pixelSize: Style.regular
+                font.bold: false
+            }
         }
     }
 }

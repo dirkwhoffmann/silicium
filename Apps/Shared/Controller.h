@@ -47,7 +47,8 @@ protected:
     qreal m_percentage = 0.0;
 
     // Current task description
-    QString m_progress;
+    QString m_task;
+    QString m_subtask;
 
     // Update timer
     QTimer *m_ticker = nullptr;
@@ -75,11 +76,13 @@ protected:
     Q_PROPERTY(qreal elapsed READ elapsed NOTIFY elapsedChanged)
 
     // What the running job last reported (see report), and how far along it is
-    Q_PROPERTY(QString progress READ progress NOTIFY progressChanged)
+    Q_PROPERTY(QString task READ task NOTIFY progressChanged)
+    Q_PROPERTY(QString subtask READ subtask NOTIFY progressChanged)
     Q_PROPERTY(qreal percentage READ percentage NOTIFY progressChanged)
 
 
-    QString progress() const { return m_progress; }
+    QString task() const { return m_task; }
+    QString subtask() const { return m_subtask; }
     qreal percentage() const { return m_percentage; }
 
     Q_INVOKABLE virtual void start() { }
@@ -106,8 +109,11 @@ public:
     // Background job helpers (supposed to be caled within body())
     //
 
-    // Describes the subtask
-    void report(const QString &what, qreal percentage = 0.0);
+    // Describes the subtask (the task stays as it is)
+    void report(const QString &subtask, qreal percentage = 0.0);
+
+    // Describes the task and the subtask
+    void report(const QString &task, const QString &subtask, qreal percentage = 0.0);
 
     /* Blocks the calling job until at least 'elapsed' seconds have passed since it
      * started, which keeps a quick step on screen long enough to be read. Returns

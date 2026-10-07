@@ -469,7 +469,7 @@ ApplicationWindow {
     SuProgressDialog {
 
         id: progressDialog
-        text: "Working..."
+        task: "Working..."
 
         NumberAnimation {
 

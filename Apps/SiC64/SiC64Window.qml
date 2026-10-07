@@ -177,7 +177,8 @@ VMWindow {
 
         id: progressDialog
         visible: root.c64.busy // root.c64.elapsed > 0.25
-        text: root.c64.progress
+        task: root.c64.task
+        subtask: root.c64.subtask
         progress: root.c64.percentage
     }
 

@@ -22,8 +22,6 @@ Controller::Controller(QObject *parent) : QObject(parent)
         // Compute the elapsed time
         m_elapsed = (utl::Time::now() - m_start).asSeconds();
 
-        printf("Ticker: %f\n", m_elapsed);
-
         emit elapsedChanged();
     });
 }
@@ -38,6 +36,8 @@ Controller::runTask(std::function<void()> body,
     m_busy = true;
     m_elapsed = 0.0;
     m_percentage = 0.0;
+    m_task.clear();
+    m_subtask.clear();
     m_start = utl::Time::now();
 
     m_ticker->start();
@@ -88,20 +88,34 @@ Controller::runTask(std::function<void()> body,
 }
 
 void
-Controller::report(const QString &what, qreal percentage)
+Controller::report(const QString &subtask, qreal percentage)
 {
-    // This functions is intended to be called in a worker thread.
+    // This function is intended to be called in a worker thread.
     // Execute the body in the GUI thread...
 
-    QMetaObject::invokeMethod(this, [this, what, percentage] {
+    QMetaObject::invokeMethod(this, [this, subtask, percentage] {
 
         // A report that arrives after its job is over has nothing to show
         if (!m_busy) return;
 
-        printf("Report: %f\n", percentage);
+        m_percentage = percentage;
+        m_subtask = subtask;
+
+        emit progressChanged();
+
+    }, Qt::QueuedConnection);
+}
+
+void
+Controller::report(const QString &task, const QString &subtask, qreal percentage)
+{
+    QMetaObject::invokeMethod(this, [this, task, subtask, percentage] {
+
+        if (!m_busy) return;
 
         m_percentage = percentage;
-        m_progress = what;
+        m_task = task;
+        m_subtask = subtask;
 
         emit progressChanged();
 

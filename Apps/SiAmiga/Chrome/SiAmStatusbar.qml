@@ -702,7 +702,7 @@ Rectangle {
                 Connections {
 
                     target: amiga
-                    function onProgressChanged() { myTicker.show(amiga.progress) }
+                    function onProgressChanged() { myTicker.show(amiga.subtask) }
                     function onShowTicker(what) { myTicker.show(what) }
                 }
             }
