@@ -12,10 +12,11 @@
 #include "SiObject.h"
 #include "AppServices.h"
 #include "AudioController.h"
+#include "utl/chrono.h"
 #include <QObject>
 #include <functional>
 #include <QQuickWindow>
-#include <QElapsedTimer>
+#include <chrono>
 #include <QTimer>
 #include <algorithm>
 
@@ -34,19 +35,42 @@ protected:
     // Handle to the associated window
     QQuickWindow *m_window = nullptr;
 
-    // Whether a job is running (see runTask)
+    //
+    // Async tasks
+    //
+
+    // Indicates whether a job is running
     bool m_busy = false;
 
-    // How long it has been running, in seconds, updated while it runs
+    // Elapsed time and progress
     qreal m_elapsed = 0.0;
-    QElapsedTimer m_stopwatch;
-    QTimer *m_ticker = nullptr;
-    static constexpr int ELAPSED_TICK = 100;
-
-    // What was last said about it, so the same thing is not said twice
-    QString m_progress;
     qreal m_percentage = 0.0;
 
+    // Current task description
+    QString m_progress;
+
+    // Update timer
+    QTimer *m_ticker = nullptr;
+
+    // Time stamps
+    utl::Time m_start;
+
+    // Target time and percentage
+    qreal m_target_elapsed = 0.0;
+    qreal m_target_percentage = 0.0;
+
+    /* The current step runs the bar from m_currentProgress to m_targetProgress
+     * while the job's elapsed time goes from m_currentElapsed to
+     * m_targetElapsed (see report). m_percentage is where the bar is at the
+     * moment. Progress is a fraction of the whole job, elapsed times are in
+     * seconds since the job started.
+     */
+    /*
+    qreal m_currentProgress = 0.0;
+    qreal m_currentElapsed = 0.0;
+    qreal m_targetProgress = 0.0;
+    qreal m_targetElapsed = 0.0;
+    */
 
     //
     // Methods
@@ -70,6 +94,7 @@ protected:
     // What the running job last reported (see report), and how far along it is
     Q_PROPERTY(QString progress READ progress NOTIFY progressChanged)
     Q_PROPERTY(qreal percentage READ percentage NOTIFY progressChanged)
+
 
     /* Like busy(), these cover the sub-controllers: the window is handed the
      * machine's controller only, but its media controller's jobs report, too.
@@ -146,12 +171,16 @@ public:
                  std::function<void()> done = {},
                  std::function<void()> failed = {});
 
-    /* Says what the job is doing now, and how far along it is.
+    /* Says what the job is doing now: 'what', and 'percentage', the part of
+     * the whole job (0.0 to 1.0) that is done once this step is. The parts add
+     * up over the steps. 'estimate' is how long the step takes, in seconds. If
+     * it is given, the bar is moved ahead gradually, from where it stands, by
+     * the ticker (see elapsed); without it, it jumps.
      *
      * Called from the body, which is on a thread of its own, so the message
      * is handed to this object's own thread before anyone hears it.
      */
-    void report(const QString &what, qreal percentage = 0.0);
+    void report(const QString &what, qreal percentage = 0.0, qreal estimate = 0.0);
 
 
     /* Re-emits what a sub-controller reports as our own.
