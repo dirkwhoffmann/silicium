@@ -22,15 +22,15 @@ SuDialog {
         BusyIndicator {
 
             running: root.visible
-            implicitWidth: 40
-            implicitHeight: 40
+            implicitWidth: 64
+            implicitHeight: 64
             Layout.alignment: Qt.AlignVCenter
         }
 
         ColumnLayout {
 
             Layout.fillWidth: true
-            spacing: 10
+            spacing: Style.smallSpacing
 
             SuText {
 
@@ -38,13 +38,14 @@ SuDialog {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignLeft
                 wrapMode: Text.WordWrap
-                font.pixelSize: Style.regular
+                font.pixelSize: Style.large // regular
                 font.bold: true
             }
 
             SuProgressBar {
 
                 Layout.fillWidth: true
+                implicitHeight: 4
                 value: root.progress
             }
 
@@ -54,7 +55,8 @@ SuDialog {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignLeft
                 wrapMode: Text.WordWrap
-                font.pixelSize: Style.regular
+                color: Palette.secondary
+                font.pixelSize: Style.small // regular
                 font.bold: false
             }
         }

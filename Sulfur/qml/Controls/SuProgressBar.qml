@@ -11,7 +11,7 @@ ProgressBar {
     property alias backgroundColor: bgRect.color
     property int size: Size.regular
 
-    implicitHeight: size === Size.regular ? 18 : Size.controlHeight(size)
+    implicitHeight: Size.controlHeight(size) // size === Size.regular ? 18 : Size.controlHeight(size)
     palette.highlight: Palette.accent
 
     background: Rectangle {
