@@ -22,7 +22,6 @@ Item {
 
     readonly property C64Controller c64: C64Controller
     required property var configWindowRef
-    required property var progressDialogRef
     required property var keyboardSheetRef
     required property var keyboardWindowRef
     required property var eventsInspectorRef
@@ -298,7 +297,6 @@ Item {
             c64.toggleDebugPanel()
 
             // Test of runTask (temporary)
-            progressDialogRef.open()
             c64.testProgressDialog()
         }
     }

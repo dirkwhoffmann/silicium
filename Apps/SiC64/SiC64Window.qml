@@ -146,7 +146,6 @@ VMWindow {
 
         id: siActions
         configWindowRef: configWindow
-        progressDialogRef: progressDialog
         keyboardSheetRef: keyboardSheet
         keyboardWindowRef: keyboardWindow
         eventsInspectorRef: eventsInspectorWindow
@@ -170,16 +169,13 @@ VMWindow {
     }
 
     //
-    // Progress dialog (test of runTask)
+    // Busy box, shown while a job is running
     //
 
-    SuProgressDialog {
+    SuBusyDialog {
 
-        id: progressDialog
-        visible: root.c64.busy // root.c64.elapsed > 0.25
-        task: root.c64.task
-        subtask: root.c64.subtask
-        progress: root.c64.percentage
+        id: busyDialog
+        visible: root.c64.busy
     }
 
     //
