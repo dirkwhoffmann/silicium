@@ -10,6 +10,8 @@
 #pragma once
 
 #include "VirtualC64.h"
+#include <QThread>
+#include <exception>
 #include "Controller.h"
 #include "AudioController.h"
 #include "SVMFile.h"
@@ -239,11 +241,19 @@ public:
     Q_INVOKABLE void openInspector() {}
     Q_INVOKABLE void openKeyboard() {}
 
-    /* Writes the workspace, on a thread of its own, and reports what it is
-     * doing through the status bar's ticker.
+    /* Save the workspace or a snapshot on the calling thread, and report what
+     * they are doing (see report). They throw if something goes wrong. The
+     * parts that belong to the GUI thread are handed over to it, so they can
+     * be run from a job body, too.
      */
-    Q_INVOKABLE void saveWorkspace();
-    Q_INVOKABLE void saveSnapshot();
+    void saveWorkspace();
+    void saveSnapshot();
+
+    /* The same, as a job of its own (see runTask). saveSnapshotAsync() checks
+     * the capacity limit and asks the user first.
+     */
+    Q_INVOKABLE void saveWorkspaceAsync();
+    Q_INVOKABLE void saveSnapshotAsync();
     Q_INVOKABLE void revertSnapshot();
 
     Q_PROPERTY(SiC64ActivityController *activityController READ getActivityController CONSTANT)
@@ -370,15 +380,20 @@ public:
 
 private:
 
-    /* The jobs behind saveSnapshot(), saveWorkspace() and hibernate(). Each
-     * runs in the background (see runTask); 'always' runs on this thread when
-     * the job is over, whether it worked or not, so jobs can be chained.
-     * saveSnapshot() checks the capacity limit and asks the user first;
-     * hibernation evicts silently and comes straight here, because it runs
-     * on quit where a dialog would have nowhere to go.
-     */
-    void startSnapshot(std::function<void()> always = {});
-    void startWorkspace(std::function<void()> always = {});
+    // Runs a function on the GUI thread and waits for it (directly, if we are on it)
+    template <typename F> void onGuiThread(F &&function) {
+
+        if (QThread::currentThread() == thread()) { function(); return; }
+
+        std::exception_ptr error;
+        QMetaObject::invokeMethod(this, [&] {
+
+            try { function(); } catch (...) { error = std::current_exception(); }
+
+        }, Qt::BlockingQueuedConnection);
+
+        if (error) std::rethrow_exception(error);
+    }
 
 public:
 
@@ -435,8 +450,8 @@ public:
 private:
 
     // The file writing, and the bookkeeping that follows it. Split because
-    // only the first half may leave this thread (see saveWorkspace).
-    bool writeWorkspace(const fs::path &folder, const QImage &screenshot);
+    // only the first half may leave the GUI thread (see saveWorkspace).
+    bool writeWorkspace(const fs::path &folder);
     void workspaceWritten(bool screenshotSaved);
 
 signals:

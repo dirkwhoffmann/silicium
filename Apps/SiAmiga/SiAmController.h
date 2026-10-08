@@ -267,6 +267,10 @@ public:
     Q_INVOKABLE void saveWorkspace();
     void saveWorkspaceNow();
     Q_INVOKABLE void saveSnapshot();
+
+    // Same as saveWorkspace() and saveSnapshot(), under the names the shared QML uses
+    Q_INVOKABLE void saveWorkspaceAsync() { saveWorkspace(); }
+    Q_INVOKABLE void saveSnapshotAsync() { saveSnapshot(); }
     Q_INVOKABLE void revertSnapshot();
 
     Q_PROPERTY(SiAmActivityController *activityController READ getActivityController CONSTANT)

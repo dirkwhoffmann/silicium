@@ -298,7 +298,7 @@ ApplicationWindow {
             userDialog.acceptedCallback = function () {
 
                 root.controllerRef.shrinkSnapshotStorage(Preferences.maxSnapshots - 1)
-                root.controllerRef.saveSnapshot()
+                root.controllerRef.saveSnapshotAsync()
             }
             userDialog.open()
         }

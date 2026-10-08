@@ -249,14 +249,14 @@ Item {
 
         id: saveWorkspaceAction
         text: qsTr("Save Workspace")
-        onTriggered: c64.saveWorkspace()
+        onTriggered: c64.saveWorkspaceAsync()
     }
 
     Action {
 
         id: saveSnapshotAction
         text: qsTr("Save Snapshot")
-        onTriggered: c64.saveSnapshot()
+        onTriggered: c64.saveSnapshotAsync()
     }
 
     Action {
