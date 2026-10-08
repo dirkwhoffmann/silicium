@@ -13,32 +13,69 @@ import QtQuick.Effects
 import Sulfur
 
 /* A square box with a busy indicator in it, looking like a SuBanner. It is
- * shown while something is going on that the user can only wait for. As it is
- * modal, nothing underneath reacts to the mouse until it goes away, and it
- * cannot be dismissed by the user: whoever shows it takes it away again.
+ * shown while something is going on that the user can only wait for. While it
+ * is active, nothing underneath reacts to the mouse or the keyboard, and the
+ * user cannot dismiss it: whoever activates it deactivates it again.
+ *
+ * This is not a Popup, on purpose. A modal popup blocks the whole window, and
+ * a window that draws its own title bar is moved by dragging that bar. Here,
+ * the blocking item simply starts below it ('topInset'), so the window can be
+ * moved all the time.
+ *
+ * Fill the window with it; it should sit above everything else.
  */
-Popup {
+Item {
 
     id: root
 
+    // Whether the box is up
+    property bool active: false
+
     property int boxSize: 160
 
-    anchors.centerIn: Overlay.overlay
-    width: boxSize
-    height: boxSize
-    padding: 0
+    // The height of the strip along the top edge that is left alone
+    property real topInset: 0
 
-    modal: true
-    closePolicy: Popup.NoAutoClose
+    // How long it takes to fade in and out
+    property int fadeTime: 150
 
-    enter: Transition {
-        NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 150 }
+    anchors.fill: parent
+    z: 100
+
+    opacity: active ? 1.0 : 0.0
+    visible: opacity > 0.01
+
+    Behavior on opacity { NumberAnimation { duration: root.fadeTime } }
+
+    // Takes in everything the items below would have got
+    MouseArea {
+
+        anchors.fill: parent
+        anchors.topMargin: root.topInset
+        enabled: root.active
+        hoverEnabled: true
+        acceptedButtons: Qt.AllButtons
+        preventStealing: true
+        onWheel: (wheel) => wheel.accepted = true
     }
-    exit: Transition {
-        NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 150 }
+
+    // Keeps the keyboard from reaching the items below
+    FocusScope {
+
+        anchors.fill: parent
+        focus: root.active
+        onFocusChanged: if (focus) forceActiveFocus()
+
+        Keys.onPressed: (event) => event.accepted = true
+        Keys.onReleased: (event) => event.accepted = true
     }
 
-    background: Rectangle {
+    Rectangle {
+
+        anchors.centerIn: parent
+        anchors.verticalCenterOffset: root.topInset / 2
+        width: root.boxSize
+        height: root.boxSize
 
         radius: Style.largeSpacing * 2
         color: Palette.overlay
@@ -52,9 +89,6 @@ Popup {
             shadowBlur: 0.8
             shadowVerticalOffset: 4
         }
-    }
-
-    contentItem: Item {
 
         BusyIndicator {
 

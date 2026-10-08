@@ -175,7 +175,8 @@ VMWindow {
     SuBusyDialog {
 
         id: busyDialog
-        visible: root.c64.busy
+        active: root.c64.busy
+        topInset: chrome.titleBarInset
     }
 
     //
