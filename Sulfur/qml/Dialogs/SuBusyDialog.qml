@@ -93,9 +93,9 @@ Item {
         BusyIndicator {
 
             anchors.centerIn: parent
-            implicitWidth: root.boxSize / 2
-            implicitHeight: root.boxSize / 2
-            palette.dark: "white"
+            implicitWidth: root.boxSize * 0.8
+            implicitHeight: root.boxSize * 0.8
+            palette.text: "white"
             running: root.visible
         }
     }
