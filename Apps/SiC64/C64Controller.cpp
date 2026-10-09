@@ -23,10 +23,9 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMetaObject>
-#include <QThread>
-#include <QThread>
 #include <QStandardPaths>
 #include <fstream>
+#include <exception>
 
 using namespace vc64;
 using retro::vault::ImageError;
@@ -720,9 +719,8 @@ C64Controller::toggleWarp()
 void
 C64Controller::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
 {
-    /* Both jobs run in the background and report to the status bar, one after
-     * the other: the snapshot first, then the workspace. hibernated() is
-     * emitted when the last of them is over, however it went.
+    /* One job saves both and reports to the status bar. hibernated() is
+     * emitted when it is over, however it went.
      */
     if (hibernateSnapshot) {
 
@@ -733,156 +731,13 @@ C64Controller::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
         }
     }
 
-    auto finished = [this] { emit hibernated(); };
-
-    bool started = runTask([=, this] {
-
-        // A failing snapshot must not keep the workspace from being saved
-        std::exception_ptr error;
-
-        if (hibernateSnapshot) {
-            try { saveSnapshot(); } catch (...) { error = std::current_exception(); }
-        }
-        if (hibernateWorkspace) {
-            try { saveWorkspace(); } catch (...) { if (!error) error = std::current_exception(); }
-        }
-        if (error) std::rethrow_exception(error);
-
-    }, finished, finished);
-
-    if (!started) finished();
-}
-
-bool
-C64Controller::writeWorkspace(const fs::path &folder)
-{
-    // Start from scratch
-    fs::remove_all(folder);
-    fs::create_directories(folder);
-
-    // Save assets
-    core().c64.saveWorkspace(folder);
-
-    /* Refresh the VM's screenshot. This is the only place it is written:
-     * it depicts the machine as the workspace left it, so it lives in the
-     * workspace folder and is rewritten by the same operation that
-     * rewrites the workspace. Taking a snapshot captures a moment the
-     * workspace knows nothing about and deliberately leaves it alone.
-     *
-     * It has to be written after the folder is cleared above, which would
-     * otherwise wipe it. The path is stored relative to the workspace
-     * folder; that folder lives inside a randomized temp directory
-     * recreated every time the SVM is opened, so an absolute path would
-     * go stale as soon as this session ends.
-     */
-    QImage screenshot;
-    onGuiThread([&] { screenshot = m_renderer ? m_renderer->grabScreenshot() : QImage(); });
-
-    if (screenshot.isNull()) return false;
-
-    if (!screenshot.save(QString::fromStdString((folder / "screenshot.jpg").string()))) {
-
-        qCWarning(siLog) << "Failed to save workspace screenshot.";
-        return false;
-    }
-    return true;
-}
-
-void
-C64Controller::workspaceWritten(bool screenshotSaved)
-{
-    // The manifest is read by the window, so it is only ever written here,
-    // on the window's own thread.
-    if (screenshotSaved) svm->getManifest().screenshot = "screenshot.jpg";
-
-    svm->persist();
-    emit workspaceSaved();
-    notifyPersist();
-    notifySvmChanged("workspace");
-}
-
-void
-C64Controller::saveWorkspace()
-{
-    const auto folder = svm->root() / SVMFile::workspaceDir;
-
-    report(tr("Saving workspace..."));
-    bool saved = writeWorkspace(folder);
-
-    // The manifest belongs to the GUI thread
-    onGuiThread([&] { workspaceWritten(saved); });
+    saveAsync(hibernateWorkspace, hibernateSnapshot, [this] { emit hibernated(); });
 }
 
 void
 C64Controller::saveWorkspaceAsync()
 {
-    runTask([this] { saveWorkspace(); });
-}
-
-void
-C64Controller::saveSnapshot()
-{
-    if (svm->isReadOnly()) throw ImageError(ImageError::VM_READ_ONLY);
-
-    /* Taking the snapshot and the screenshot is quick and touches the
-     * machine, so it happens on the GUI thread. Writing them out is the slow
-     * part. The screenshot is copied: it must not point into the snapshot.
-     */
-    std::shared_ptr<Snapshot> snap;
-    QImage image;
-    SnapshotInfo info {};
-
-    onGuiThread([&] {
-
-        qCDebug(siLog) << "Taking snapshot...";
-        snap = core().c64.takeSnapshot(Compressor::LZ4);
-
-        qCDebug(siLog) << "Taking screenshot...";
-        auto thumbnail = snap->getHeader()->screenshot;
-        image = QImage((uchar *)thumbnail.screen,
-                       (int)thumbnail.width,
-                       (int)thumbnail.height,
-                       QImage::Format_ARGB32).copy();
-
-        // Assemble snapshot info
-        info.version    = VirtualC64::snapshotVersion();
-        info.uuid       = utl::UUID::v4();
-        info.platform   = Platform::C64;
-        info.created    = thumbnail.timestamp;
-        info.modified   = thumbnail.timestamp;
-        info.screenshot = fs::path(info.uuid.toString() + ".jpg");
-        info.binary     = fs::path(info.uuid.toString() + ".vcsnap");
-    });
-
-    const auto snapshotFolder = svm->root() / SVMFile::snapshotDir;
-    const auto screenshotPath = snapshotFolder / info.screenshot;
-    const auto snapshotPath   = snapshotFolder / info.binary;
-
-    report(tr("Saving snapshot..."));
-
-    /* Bring the snapshot folder into being. Nothing else creates it, and the
-     * first snapshot of an SVM is exactly the case where it is not there yet.
-     */
-    std::error_code ec;
-    fs::create_directories(snapshotFolder, ec);
-    if (ec) throw utl::IOError(utl::IOError::DIR_CANT_CREATE, snapshotFolder);
-
-    if (!image.save(QString::fromStdString(screenshotPath.string())))
-        throw utl::IOError(utl::IOError::FILE_CANT_WRITE, screenshotPath);
-
-    snap->writeToFile(snapshotPath);
-
-    // The manifest belongs to the GUI thread
-    onGuiThread([&] {
-
-        qCDebug(siLog) << "Registering snapshot " << info.uuid.toString();
-        svm->getManifest().appendSnapshot(info);
-
-        svm->persist();
-        notifyPersist();
-        emit snapshotSaved(QString::fromStdString(info.uuid.toString()));
-        notifySvmChanged("snapshot", QString::fromStdString(info.uuid.toString()));
-    });
+    saveAsync(true, false);
 }
 
 void
@@ -893,8 +748,158 @@ C64Controller::saveSnapshotAsync()
     if (m.numSnapshots() >= preferences().getMaxSnapshots() && !preferences().getAutoDeleteSnapshots()) {
         emit snapshotLimitReached();
     } else {
-        runTask([this] { saveSnapshot(); });
+        saveAsync(false, true);
     }
+}
+
+void
+C64Controller::saveAsync(bool workspace, bool snapshot, std::function<void()> always)
+{
+    /* What the job leaves behind for the bookkeeping, which has to happen on
+     * this thread. A part that fails does not keep the other from being
+     * saved; the first error is shown once the job is over.
+     */
+    struct Result {
+
+        SnapshotInfo info {};
+        bool workspaceWritten = false;
+        bool screenshotSaved = false;
+        bool snapshotWritten = false;
+        std::exception_ptr error;
+    };
+    auto result = std::make_shared<Result>();
+
+    const auto workspaceFolder = svm->root() / SVMFile::workspaceDir;
+    const auto snapshotFolder = svm->root() / SVMFile::snapshotDir;
+
+    //
+    // Everything that touches the core happens in the job
+    //
+
+    auto body = [=, this] {
+
+        // Take the screenshot
+        QImage screenshot = m_renderer ? m_renderer->grabScreenshot() : QImage();
+
+        if (workspace) {
+
+            try {
+
+                report(tr("Saving workspace..."), 0.0);
+
+                // Start from scratch
+                fs::remove_all(workspaceFolder);
+                fs::create_directories(workspaceFolder);
+
+                // Save assets
+                core().c64.saveWorkspace(workspaceFolder);
+
+                if (!screenshot.isNull()) {
+
+                    result->screenshotSaved =
+                        screenshot.save(QString::fromStdString((workspaceFolder / "screenshot.jpg").string()));
+
+                    if (!result->screenshotSaved) qCWarning(siLog) << "Failed to save workspace screenshot.";
+                }
+                result->workspaceWritten = true;
+
+            } catch (...) {
+
+                result->error = std::current_exception();
+            }
+        }
+
+        if (snapshot) {
+
+            try {
+
+                report(tr("Saving snapshot..."), workspace ? 0.5 : 0.0);
+
+                if (svm->isReadOnly()) throw ImageError(ImageError::VM_READ_ONLY);
+
+                qCDebug(siLog) << "Taking snapshot...";
+                std::shared_ptr snap = core().c64.takeSnapshot(Compressor::LZ4);
+
+                // The screenshot is copied: it must not point into the snapshot
+                auto thumbnail = snap->getHeader()->screenshot;
+                QImage image = QImage((uchar *)thumbnail.screen,
+                                      (int)thumbnail.width,
+                                      (int)thumbnail.height,
+                                      QImage::Format_ARGB32).copy();
+
+                // Assemble snapshot info
+                auto &info = result->info;
+                info.version    = VirtualC64::snapshotVersion();
+                info.uuid       = utl::UUID::v4();
+                info.platform   = Platform::C64;
+                info.created    = thumbnail.timestamp;
+                info.modified   = thumbnail.timestamp;
+                info.screenshot = fs::path(info.uuid.toString() + ".jpg");
+                info.binary     = fs::path(info.uuid.toString() + ".vcsnap");
+
+                /* Bring the snapshot folder into being. Nothing else creates
+                 * it, and the first snapshot of an SVM is exactly the case
+                 * where it is not there yet.
+                 */
+                std::error_code ec;
+                fs::create_directories(snapshotFolder, ec);
+                if (ec) throw utl::IOError(utl::IOError::DIR_CANT_CREATE, snapshotFolder);
+
+                const auto screenshotPath = snapshotFolder / info.screenshot;
+                if (!image.save(QString::fromStdString(screenshotPath.string())))
+                    throw utl::IOError(utl::IOError::FILE_CANT_WRITE, screenshotPath);
+
+                snap->writeToFile(snapshotFolder / info.binary);
+                result->snapshotWritten = true;
+
+            } catch (...) {
+
+                if (!result->error) result->error = std::current_exception();
+            }
+        }
+    };
+
+    //
+    // The bookkeeping. The manifest is read by the window, so it is only ever
+    // written on the window's own thread.
+    //
+
+    auto done = [=, this] {
+
+        if (result->workspaceWritten) {
+
+            if (result->screenshotSaved) svm->getManifest().screenshot = "screenshot.jpg";
+
+            svm->persist();
+            emit workspaceSaved();
+            notifyPersist();
+            notifySvmChanged("workspace");
+        }
+
+        if (result->snapshotWritten) {
+
+            const auto &info = result->info;
+            qCDebug(siLog) << "Registering snapshot " << info.uuid.toString();
+            svm->getManifest().appendSnapshot(info);
+
+            svm->persist();
+            notifyPersist();
+            emit snapshotSaved(QString::fromStdString(info.uuid.toString()));
+            notifySvmChanged("snapshot", QString::fromStdString(info.uuid.toString()));
+        }
+
+        if (result->error) {
+
+            try {
+                std::rethrow_exception(result->error);
+            } catch (const std::exception &e) {
+                showError(tr("Failed to save."), e.what());
+            }
+        }
+        if (always) always();
+    };
+
+    if (!runTask(body, done, always) && always) always();
 }
 
 void

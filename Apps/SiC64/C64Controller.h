@@ -10,8 +10,6 @@
 #pragma once
 
 #include "VirtualC64.h"
-#include <QThread>
-#include <exception>
 #include "Controller.h"
 #include "AudioController.h"
 #include "SVMFile.h"
@@ -241,17 +239,16 @@ public:
     Q_INVOKABLE void openInspector() {}
     Q_INVOKABLE void openKeyboard() {}
 
-    /* Save the workspace or a snapshot on the calling thread, and report what
-     * they are doing (see report). They throw if something goes wrong. The
-     * parts that belong to the GUI thread are handed over to it, so they can
-     * be run from a job body, too.
+    /* Saves the workspace and/or a snapshot in a job of its own (see
+     * runTask), reporting what it is doing. Everything that touches the core
+     * happens in the job; the bookkeeping follows on the GUI thread. One part
+     * failing does not keep the other from being saved. 'always' is called
+     * when the job is over, whether it worked or not. The Q_INVOKABLE
+     * variants are for QML; saveSnapshotAsync() checks the capacity limit and
+     * asks the user first.
      */
-    void saveWorkspace();
-    void saveSnapshot();
+    void saveAsync(bool workspace, bool snapshot, std::function<void()> always = {});
 
-    /* The same, as a job of its own (see runTask). saveSnapshotAsync() checks
-     * the capacity limit and asks the user first.
-     */
     Q_INVOKABLE void saveWorkspaceAsync();
     Q_INVOKABLE void saveSnapshotAsync();
     Q_INVOKABLE void revertSnapshot();
@@ -378,23 +375,6 @@ public:
 
     Q_INVOKABLE void shrinkSnapshotStorage(int count);
 
-private:
-
-    // Runs a function on the GUI thread and waits for it (directly, if we are on it)
-    template <typename F> void onGuiThread(F &&function) {
-
-        if (QThread::currentThread() == thread()) { function(); return; }
-
-        std::exception_ptr error;
-        QMetaObject::invokeMethod(this, [&] {
-
-            try { function(); } catch (...) { error = std::current_exception(); }
-
-        }, Qt::BlockingQueuedConnection);
-
-        if (error) std::rethrow_exception(error);
-    }
-
 public:
 
     //
@@ -446,13 +426,6 @@ public:
      * takes a title and a body.
      */
     Q_INVOKABLE void notifyFatalError(const QString &title, const QString &text);
-
-private:
-
-    // The file writing, and the bookkeeping that follows it. Split because
-    // only the first half may leave the GUI thread (see saveWorkspace).
-    bool writeWorkspace(const fs::path &folder);
-    void workspaceWritten(bool screenshotSaved);
 
 signals:
 
