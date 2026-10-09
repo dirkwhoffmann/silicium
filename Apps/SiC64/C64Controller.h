@@ -357,25 +357,27 @@ public:
 
     Q_INVOKABLE void shrinkSnapshotStorage(int count);
 
+    /* Save the workspace or a snapshot in a job of its own (see runTask),
+     * reporting what it is doing. Everything that touches the core happens in
+     * the job; the bookkeeping follows on the GUI thread. The handlers are
+     * called when the job is over: one if it worked, the other if it failed
+     * (or could not be started), which is what lets jobs be chained.
+     *
+     * saveSnapshotAsync() deletes the oldest snapshots if the storage is full
+     * and the preferences say so. Otherwise it emits snapshotLimitReached(),
+     * so the user can decide, calls the error handler and starts nothing. The
+     * versions without arguments are for QML.
+     */
+    void saveWorkspaceAsync(std::function<void()> completionHandler,
+                            std::function<void()> errorHandler = {});
+    void saveSnapshotAsync(std::function<void()> completionHandler,
+                           std::function<void()> errorHandler = {});
     Q_INVOKABLE void saveWorkspaceAsync();
     Q_INVOKABLE void saveSnapshotAsync();
+
     Q_INVOKABLE void hibernate(bool hibernateSnapshot, bool hibernateWorkspace);
 
     Q_INVOKABLE void revertSnapshot();
-
-private:
-
-    /* Saves the workspace and/or a snapshot in a job of its own (see
-    * runTask), reporting what it is doing. Everything that touches the core
-    * happens in the job; the bookkeeping follows on the GUI thread. One part
-    * failing does not keep the other from being saved. If the snapshot
-    * storage is full, the oldest snapshots are deleted when the preferences
-    * say so; otherwise this throws, before anything is started. 'always' is called
-    * when the job is over, whether it worked or not. The Q_INVOKABLE
-    * variants are for QML; saveSnapshotAsync() checks the capacity limit and
-    * asks the user first.
-    */
-    void saveAsync(bool workspace, bool snapshot, std::function<void()> always = {});
 
 
     //
