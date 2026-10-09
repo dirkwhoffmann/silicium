@@ -26,6 +26,7 @@
 #include <QStandardPaths>
 #include <fstream>
 #include <exception>
+#include <stdexcept>
 
 using namespace vc64;
 using retro::vault::ImageError;
@@ -716,22 +717,36 @@ C64Controller::toggleWarp()
     }
 }
 
+namespace {
+
+// Thrown by saveAsync() when a snapshot has no room and nothing may be deleted
+struct SnapshotLimitReached : std::runtime_error {
+
+    SnapshotLimitReached() : std::runtime_error("The snapshot storage is full.") { }
+};
+
+}
+
 void
 C64Controller::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
 {
     /* One job saves both and reports to the status bar. hibernated() is
-     * emitted when it is over, however it went.
+     * emitted when it is over, however it went. This runs on quit, where a
+     * dialog would have nowhere to go: if no room can be made for the
+     * snapshot, it is skipped.
      */
-    if (hibernateSnapshot) {
+    auto finished = [this] { emit hibernated(); };
 
-        try {
-            shrinkSnapshotStorage(preferences().getMaxSnapshots() - 1);
-        } catch (std::exception &e) {
-            qCWarning(siLog) << "Failed to make room for a snapshot:" << e.what();
-        }
+    try {
+
+        saveAsync(hibernateWorkspace, hibernateSnapshot, finished);
+
+    } catch (const std::exception &e) {
+
+        qCWarning(siLog) << "Not saving a snapshot:" << e.what();
+
+        if (hibernateWorkspace) saveAsync(true, false, finished); else finished();
     }
-
-    saveAsync(hibernateWorkspace, hibernateSnapshot, [this] { emit hibernated(); });
 }
 
 void
@@ -743,18 +758,40 @@ C64Controller::saveWorkspaceAsync()
 void
 C64Controller::saveSnapshotAsync()
 {
-    auto &m = svm->getManifest();
+    try {
 
-    if (m.numSnapshots() >= preferences().getMaxSnapshots() && !preferences().getAutoDeleteSnapshots()) {
-        emit snapshotLimitReached();
-    } else {
         saveAsync(false, true);
+
+    } catch (const SnapshotLimitReached &) {
+
+        // Ask the user first
+        emit snapshotLimitReached();
+
+    } catch (const std::exception &e) {
+
+        showError(tr("Failed to save."), e.what());
     }
 }
 
 void
 C64Controller::saveAsync(bool workspace, bool snapshot, std::function<void()> always)
 {
+    /* The snapshot storage is full: make room, or give up if the user does
+     * not want snapshots deleted without being asked. This touches the
+     * manifest, so it happens here and not in the job.
+     */
+    if (snapshot) {
+
+        const int limit = preferences().getMaxSnapshots();
+
+        if (svm->getManifest().numSnapshots() >= limit) {
+
+            if (!preferences().getAutoDeleteSnapshots()) throw SnapshotLimitReached();
+
+            shrinkSnapshotStorage(limit - 1);
+        }
+    }
+
     /* What the job leaves behind for the bookkeeping, which has to happen on
      * this thread. A part that fails does not keep the other from being
      * saved; the first error is shown once the job is over.

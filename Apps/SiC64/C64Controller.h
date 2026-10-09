@@ -242,7 +242,9 @@ public:
     /* Saves the workspace and/or a snapshot in a job of its own (see
      * runTask), reporting what it is doing. Everything that touches the core
      * happens in the job; the bookkeeping follows on the GUI thread. One part
-     * failing does not keep the other from being saved. 'always' is called
+     * failing does not keep the other from being saved. If the snapshot
+     * storage is full, the oldest snapshots are deleted when the preferences
+     * say so; otherwise this throws, before anything is started. 'always' is called
      * when the job is over, whether it worked or not. The Q_INVOKABLE
      * variants are for QML; saveSnapshotAsync() checks the capacity limit and
      * asks the user first.
