@@ -766,16 +766,10 @@ void
 C64Controller::saveWorkspaceAsync(std::function<void()> completionHandler,
                                   std::function<void()> errorHandler)
 {
-    struct Result {
-
-        bool screenshotSaved = false;
-    };
-    auto result = std::make_shared<Result>();
-
     const auto folder = svm->root() / SVMFile::workspaceDir;
 
     // Everything that touches the core happens in the job
-    auto body = [this, folder, result] {
+    auto body = [this, folder] {
 
         report(tr("Saving workspace..."), 0.0);
 
@@ -790,21 +784,17 @@ C64Controller::saveWorkspaceAsync(std::function<void()> completionHandler,
         core().c64.saveWorkspace(folder);
 
         // Save screenshot
-        if (!screenshot.isNull()) {
+        const auto screenshotPath = folder / "screenshot.jpg";
+        screenshot.save(QString::fromStdString(screenshotPath.string()));
 
-            result->screenshotSaved =
-                screenshot.save(QString::fromStdString((folder / "screenshot.jpg").string()));
-
-            if (!result->screenshotSaved) qCWarning(siLog) << "Failed to save workspace screenshot.";
-        }
+        // Update the manifest
+        svm->getManifest().screenshot = "screenshot.jpg";
+        svm->persist();
     };
 
-    // The manifest is read by the window, so it is only ever written here
-    auto completion = [this, result, completionHandler] {
+    // Tell the world
+    auto completion = [this, completionHandler] {
 
-        if (result->screenshotSaved) svm->getManifest().screenshot = "screenshot.jpg";
-
-        svm->persist();
         emit workspaceSaved();
         notifyPersist();
         notifySvmChanged("workspace");
@@ -878,15 +868,16 @@ C64Controller::saveSnapshotAsync(std::function<void()> completionHandler,
             throw utl::IOError(utl::IOError::FILE_CANT_WRITE, screenshotPath);
 
         snap->writeToFile(folder / info->binary);
-    };
 
-    // The manifest is read by the window, so it is only ever written here
-    auto completion = [this, info, completionHandler] {
-
+        // Register the snapshot
         qCDebug(siLog) << "Registering snapshot " << info->uuid.toString();
         svm->getManifest().appendSnapshot(*info);
-
         svm->persist();
+    };
+
+    // Tell the world
+    auto completion = [this, info, completionHandler] {
+
         notifyPersist();
         emit snapshotSaved(QString::fromStdString(info->uuid.toString()));
         notifySvmChanged("snapshot", QString::fromStdString(info->uuid.toString()));
