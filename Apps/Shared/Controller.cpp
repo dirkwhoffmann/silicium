@@ -28,8 +28,8 @@ Controller::Controller(QObject *parent) : QObject(parent)
 
 bool
 Controller::runTask(std::function<void()> body,
-                    std::function<void()> done,
-                    std::function<void()> failed)
+                    std::function<void()> completionHandler,
+                    std::function<void()> errorHandler)
 {
     if (m_busy) return false;
 
@@ -74,13 +74,13 @@ Controller::runTask(std::function<void()> body,
 
         if (error->isEmpty()) {
 
-            if (done) done();
+            if (completionHandler) completionHandler();
 
         } else {
 
             emit showError(tr("The operation failed."), *error == "?" ? tr("Unknown error") : *error);
 
-            if (failed) failed();
+            if (errorHandler) errorHandler();
         }
     });
 

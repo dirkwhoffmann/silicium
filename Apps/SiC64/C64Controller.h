@@ -199,11 +199,6 @@ public:
     Q_INVOKABLE void run();
     Q_INVOKABLE void pause();
     Q_INVOKABLE void runOrPause() { isPaused() ? run() : pause(); }
-    /* Puts the machine away: saves a snapshot and/or the workspace, one
-     * after the other, in the background, with the progress shown in the
-     * status bar. Returns at once; hibernated() says when it is over.
-     */
-    Q_INVOKABLE void hibernate(bool hibernateSnapshot, bool hibernateWorkspace);
 
     Q_INVOKABLE void reset();
     Q_INVOKABLE void softReset();
@@ -239,22 +234,6 @@ public:
     Q_INVOKABLE void openInspector() {}
     Q_INVOKABLE void openKeyboard() {}
 
-    /* Saves the workspace and/or a snapshot in a job of its own (see
-     * runTask), reporting what it is doing. Everything that touches the core
-     * happens in the job; the bookkeeping follows on the GUI thread. One part
-     * failing does not keep the other from being saved. If the snapshot
-     * storage is full, the oldest snapshots are deleted when the preferences
-     * say so; otherwise this throws, before anything is started. 'always' is called
-     * when the job is over, whether it worked or not. The Q_INVOKABLE
-     * variants are for QML; saveSnapshotAsync() checks the capacity limit and
-     * asks the user first.
-     */
-    void saveAsync(bool workspace, bool snapshot, std::function<void()> always = {});
-
-    Q_INVOKABLE void saveWorkspaceAsync();
-    Q_INVOKABLE void saveSnapshotAsync();
-    Q_INVOKABLE void revertSnapshot();
-
     Q_PROPERTY(SiC64ActivityController *activityController READ getActivityController CONSTANT)
     Q_PROPERTY(SiC64BusController *busController READ getBusController CONSTANT)
     Q_PROPERTY(SiC64CIAController *ciaController READ getCIAController CONSTANT)
@@ -286,22 +265,6 @@ public:
 
     C64MediaController *media() const { return m_mediaController.get(); }
 
-
-    //
-    // Controlling input devices
-    //
-
-public:
-
-    Q_PROPERTY(bool keyboardCaptured READ keyboardCaptured NOTIFY captureChanged)
-    Q_PROPERTY(bool mouseCaptured READ mouseCaptured NOTIFY captureChanged)
-
-    Q_INVOKABLE void captureMouse();
-    Q_INVOKABLE void releaseMouse();
-    Q_INVOKABLE void captureOrReleaseMouse() { mouseCaptured() ? releaseMouse() : captureMouse(); }
-
-    bool mouseCaptured();
-    bool keyboardCaptured();
 
     //
     // Managing the shared display state
@@ -339,6 +302,23 @@ public:
 
 
     //
+    // Controlling input devices
+    //
+
+public:
+
+    Q_PROPERTY(bool keyboardCaptured READ keyboardCaptured NOTIFY captureChanged)
+    Q_PROPERTY(bool mouseCaptured READ mouseCaptured NOTIFY captureChanged)
+
+    Q_INVOKABLE void captureMouse();
+    Q_INVOKABLE void releaseMouse();
+    Q_INVOKABLE void captureOrReleaseMouse() { mouseCaptured() ? releaseMouse() : captureMouse(); }
+
+    bool mouseCaptured();
+    bool keyboardCaptured();
+
+
+    //
     // Methods from InputManagerDelegate
     //
 
@@ -370,18 +350,39 @@ public:
 
 
     //
-    // Snapshots and workspaces
+    // Managing snapshots and workspaces
     //
 
 public:
 
     Q_INVOKABLE void shrinkSnapshotStorage(int count);
 
-public:
+    Q_INVOKABLE void saveWorkspaceAsync();
+    Q_INVOKABLE void saveSnapshotAsync();
+    Q_INVOKABLE void hibernate(bool hibernateSnapshot, bool hibernateWorkspace);
+
+    Q_INVOKABLE void revertSnapshot();
+
+private:
+
+    /* Saves the workspace and/or a snapshot in a job of its own (see
+    * runTask), reporting what it is doing. Everything that touches the core
+    * happens in the job; the bookkeeping follows on the GUI thread. One part
+    * failing does not keep the other from being saved. If the snapshot
+    * storage is full, the oldest snapshots are deleted when the preferences
+    * say so; otherwise this throws, before anything is started. 'always' is called
+    * when the job is over, whether it worked or not. The Q_INVOKABLE
+    * variants are for QML; saveSnapshotAsync() checks the capacity limit and
+    * asks the user first.
+    */
+    void saveAsync(bool workspace, bool snapshot, std::function<void()> always = {});
+
 
     //
     // Processing messages
     //
+
+public:
 
     // Receives messages from the emulator thread (see windowDidOpen()) and
     // marshals them onto the GUI thread.

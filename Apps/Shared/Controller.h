@@ -102,7 +102,7 @@ public:
     qreal elapsed() const { return m_elapsed; }
 
     // Runs a job in another thread
-    bool runTask(std::function<void()> body, std::function<void()> done = {}, std::function<void()> failed = {});
+    bool runTask(std::function<void()> body, std::function<void()> completionHandler = {}, std::function<void()> errorHandler = {});
 
 
     //
