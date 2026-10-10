@@ -14,6 +14,7 @@
 #include "Option.h"
 #include "Media.h"
 #include "utl/chrono.h"
+#include "utl/gfx/Images.h"
 #include "utl/io.h"
 #include <algorithm>
 #include <format>
@@ -379,6 +380,17 @@ Amiga::saveWorkspace(const fs::path &path)
         }
     };
 
+    auto exportPreview = [&]() {
+
+        // Save the most recent frame, cropped to the largest visible area
+        // (no HBLANK, no VBLANK)
+        auto pal = agnus.isPAL();
+        videoPort.saveTexture(path / "preview.png",
+                              8 * HBLANK_CNT, 8 * HPOS_CNT,
+                              pal ? PAL::VBLANK_CNT : NTSC::VBLANK_CNT,
+                              (pal ? PAL::VPOS_CNT : NTSC::VPOS_CNT) - 1);
+    };
+
     auto isLiveDriveImage = [&](const fs::path &file) {
 
         for (auto *drive : { &hd0, &hd1, &hd2, &hd3 }) {
@@ -442,6 +454,9 @@ Amiga::saveWorkspace(const fs::path &path)
         ss << "\n# Hard drives\n\n";
         ss << hd.str();
     }
+
+    // Add a preview image to the workspace bundle
+    try { exportPreview(); } catch (...) { }
 
     // Write the script into the workspace bundle
     std::ofstream file(path / "config.retrosh");
@@ -962,6 +977,8 @@ Amiga::update(CmdQueue &queue)
             case Cmd::ALARM_ABS:
             case Cmd::ALARM_REL:
             case Cmd::INSPECTION_TARGET:
+            case Cmd::SAVE_WORKSPACE:
+            case Cmd::SAVE_SNAPSHOT:
 
                 processCommand(cmd);
                 break;
@@ -1271,6 +1288,9 @@ void
 Amiga::saveSnapshot(const fs::path &path)
 {
     Snapshot(*this, config.snapshotCompressor).writeToFile(path);
+
+    // Inform the GUI
+    msgQueue.put(Msg::SNAPSHOT_SAVED);
 }
 
 void
@@ -1293,6 +1313,25 @@ Amiga::processCommand(const Command &cmd)
             setAutoInspectionMask(cmd.value);
             break;
 
+        case Cmd::SAVE_WORKSPACE:
+            
+            try {
+                saveWorkspace(cmd.str);
+            } catch (const std::exception &e) {
+                msgQueue.put(Msg::WORKSPACE_SAVED, -1, 0, e.what());
+            }
+            break;
+        
+    
+        case Cmd::SAVE_SNAPSHOT:
+            
+            try {
+                saveSnapshot(cmd.str);
+            } catch (const std::exception &e) {
+                msgQueue.put(Msg::SNAPSHOT_SAVED, -1, 0, e.what());
+            }
+            break;
+        
         case Cmd::HARD_RESET:
             
             emulator.hardReset();

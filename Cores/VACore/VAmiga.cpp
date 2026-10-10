@@ -1059,6 +1059,46 @@ VideoPortAPI::getXrayTexture() const
 }
 
 void
+VideoPortAPI::saveTexture(const fs::path &path) const
+{
+    VAMIGA_PUBLIC
+    emu->lockTexture();
+    try { videoPort->saveTexture(path); }
+    catch (...) { emu->unlockTexture(); throw; }
+    emu->unlockTexture();
+}
+
+void
+VideoPortAPI::saveTexture(const fs::path &path, isize x1, isize x2, isize y1, isize y2) const
+{
+    VAMIGA_PUBLIC
+    emu->lockTexture();
+    try { videoPort->saveTexture(path, x1, x2, y1, y2); }
+    catch (...) { emu->unlockTexture(); throw; }
+    emu->unlockTexture();
+}
+
+void
+VideoPortAPI::saveXrayTexture(const fs::path &path) const
+{
+    VAMIGA_PUBLIC
+    emu->lockTexture();
+    try { videoPort->saveXrayTexture(path); }
+    catch (...) { emu->unlockTexture(); throw; }
+    emu->unlockTexture();
+}
+
+void
+VideoPortAPI::saveXrayTexture(const fs::path &path, isize x1, isize x2, isize y1, isize y2) const
+{
+    VAMIGA_PUBLIC
+    emu->lockTexture();
+    try { videoPort->saveXrayTexture(path, x1, x2, y1, y2); }
+    catch (...) { emu->unlockTexture(); throw; }
+    emu->unlockTexture();
+}
+
+void
 VideoPortAPI::findInnerArea(isize &x1, isize &x2, isize &y1, isize &y2) const
 {
     VAMIGA_PUBLIC_SUSPEND
@@ -2397,10 +2437,10 @@ VAmiga::exportConfig(std::ostream &stream, bool diff) const
 }
 
 void
-VAmiga::put(const Command &cmd)
+VAmiga::put(const Command &cmd, const std::string &str)
 {
     VAMIGA_PUBLIC
-    emu->put(cmd);
+    emu->put(cmd, str);
 }
 
 
@@ -2427,6 +2467,13 @@ AmigaAPI::saveWorkspace(const fs::path &path) const
 {
     VAMIGA_PUBLIC_SUSPEND
     amiga->saveWorkspace(path);
+}
+
+void
+AmigaAPI::saveWorkspaceAsync(const fs::path &path) const
+{
+    VAMIGA_PUBLIC
+    emu->put(Cmd::SAVE_WORKSPACE, path.string());
 }
 
 void
@@ -2467,6 +2514,13 @@ AmigaAPI::saveSnapshot(const fs::path &path) const
     VAMIGA_PUBLIC_SUSPEND
     amiga->saveSnapshot(path);
     
+}
+
+void
+AmigaAPI::saveSnapshotAsync(const fs::path &path) const
+{
+    VAMIGA_PUBLIC
+    emu->put(Cmd::SAVE_SNAPSHOT, path.string());
 }
 
 u64

@@ -14,7 +14,7 @@
 
 #include "DmaDebuggerTypes.h"
 #include "SubComponent.h"
-#include "utl/color/Colors.h"
+#include "utl/gfx/Colors.h"
 
 namespace vc64 {
 

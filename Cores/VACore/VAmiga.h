@@ -98,6 +98,16 @@ public:
      */
     void saveWorkspace(const std::filesystem::path &path) const;
 
+    /** @brief  Saves a workspace to disk asynchronously.
+     *
+     *  The request is handed to the emulator thread, which carries it out
+     *  when it processes its command queue. The function returns immediately.
+     *  The GUI is informed by a WORKSPACE_SAVED message.
+     *
+     *  @param  path    Destination path
+     */
+    void saveWorkspaceAsync(const std::filesystem::path &path) const;
+
     /** @brief  Takes a snapshot
      *
      *  @param  compressor   The snapshot compression method
@@ -128,6 +138,16 @@ public:
      *  @param  path    Destination path
      */
     void saveSnapshot(const std::filesystem::path &path) const;
+
+    /** @brief  Saves a snapshot to disk asynchronously.
+     *
+     *  The request is handed to the emulator thread, which carries it out
+     *  when it processes its command queue. The function returns immediately.
+     *  The GUI is informed by a SNAPSHOT_SAVED message.
+     *
+     *  @param  path    Destination path
+     */
+    void saveSnapshotAsync(const std::filesystem::path &path) const;
 
     
     /// @}
@@ -1271,14 +1291,27 @@ public:
 
     /** @brief  Returns a pointer to the most recent stable X-Ray texture
      *
-     * Holds the X-Ray debugger's raw, unblended visualization -- either the
-     * per-channel DMA colors (Opt::XRAY_MODE == XRayMode::XRAY_DMA) or the
-     * cut-out graphics layers (XRayMode::XRAY_LAYERS) -- independent of
-     * whether Opt::XRAY_OVERLAY is also blending it into getTexture()'s
-     * picture. Same dimensions as getTexture(). Black while
-     * Opt::XRAY_MODE is XRayMode::XRAY_NONE.
+     * The texture dimensions are given by constants vamiga::Texture::width
+     * and vamiga::Texture::height texels. Each texel is represented by a
+     * 32 bit color value.
      */
     const u32 *getXrayTexture() const;
+
+    /** @brief  Saves the most recent stable texture as a PNG file
+     *
+     * The cutout is given in texels of the texture (x: super-hires pixels,
+     * y: lines). The upper bounds x2 and y2 are exclusive. Without a cutout,
+     * the entire texture is saved.
+     */
+    void saveTexture(const std::filesystem::path &path) const;
+    void saveTexture(const std::filesystem::path &path,
+                     isize x1, isize x2, isize y1, isize y2) const;
+
+    /** @brief  Saves the most recent stable X-Ray texture as a PNG file
+     */
+    void saveXrayTexture(const std::filesystem::path &path) const;
+    void saveXrayTexture(const std::filesystem::path &path,
+                         isize x1, isize x2, isize y1, isize y2) const;
 
     /** @brief Experimental
      */
@@ -2096,7 +2129,8 @@ public:
     
     /** @brief  Feeds a command into the command queue.
      */
-    void put(const Command &cmd);
+    void put(const Command &cmd, const std::string &str = "");
+    void put(Cmd type, const std::string &str) { put(Command(type), str); }
     void put(Cmd type, i64 payload = 0, i64 payload2 = 0) { put(Command(type, payload, payload2)); }
     void put(Cmd type, ConfigCmd payload)  { put(Command(type, payload)); }
     void put(Cmd type, KeyCmd payload)  { put(Command(type, payload)); }
