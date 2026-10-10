@@ -89,8 +89,8 @@ class C64Controller : public Controller {
      */
     bool m_savingWorkspace = false;
     bool m_savingSnapshot = false;
-    std::function<void()> m_workspaceCompletion, m_workspaceError;
-    std::function<void()> m_snapshotCompletion, m_snapshotError;
+    bool m_hibernating = false;
+    bool m_hibernateWorkspace = false;
     retro::vault::SnapshotInfo m_snapshotInfo;
     QImage m_snapshotScreenshot;
 
@@ -369,26 +369,20 @@ public:
 
     Q_INVOKABLE void shrinkSnapshotStorage(int count);
 
-    /* Save the workspace or a snapshot in a job of its own (see runTask),
-     * reporting what it is doing. Everything that touches the core happens in
-     * the job; the bookkeeping follows on the GUI thread. The handlers are
-     * called when the job is over: one if it worked, the other if it failed
-     * (or could not be started), which is what lets jobs be chained.
+    /* Ask the emulator thread to save the workspace or a snapshot. The
+     * functions return at once; busy() is true until the core reports the
+     * result (see workspaceDidSave, snapshotDidSave). They return false if
+     * nothing was started.
      *
      * saveSnapshotAsync() deletes the oldest snapshots if the storage is full
      * and the preferences say so. Otherwise it emits snapshotLimitReached(),
-     * so the user can decide, calls the error handler and starts nothing. The
-     * versions without arguments are for QML.
+     * so the user can decide, and starts nothing.
      */
-    void saveWorkspaceAsync(std::function<void()> completionHandler,
-                            std::function<void()> errorHandler = {});
-    void saveSnapshotAsync(std::function<void()> completionHandler,
-                           std::function<void()> errorHandler = {});
+    Q_INVOKABLE bool saveWorkspaceAsync();
+    Q_INVOKABLE bool saveSnapshotAsync();
+
     // A job is running, or the emulator thread is saving
     bool busy() const override { return m_savingWorkspace || m_savingSnapshot || Controller::busy(); }
-
-    Q_INVOKABLE void saveWorkspaceAsync();
-    Q_INVOKABLE void saveSnapshotAsync();
 
     Q_INVOKABLE void hibernate(bool hibernateSnapshot, bool hibernateWorkspace);
 
@@ -408,6 +402,9 @@ public:
     // Called when the emulator thread reports the result of a save
     void workspaceDidSave(int code, const std::string &what);
     void snapshotDidSave(int code, const std::string &what);
+
+    // Moves hibernation on to the workspace, or ends it
+    void hibernateStep();
 
 
     void update();

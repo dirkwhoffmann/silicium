@@ -720,75 +720,50 @@ void
 C64Controller::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
 {
     /* The snapshot is saved first and the workspace after it, each in a job
-     * of its own, which reports to the status bar. hibernated() is emitted
-     * when the last of them is over, however it went.
+     * of its own. snapshotDidSave() and workspaceDidSave() keep the sequence
+     * going, and hibernated() is emitted when the last of them is over,
+     * however it went.
      */
-    auto finished = [this] { emit hibernated(); };
+    m_hibernating = true;
+    m_hibernateWorkspace = hibernateWorkspace;
 
-    auto workspace = [this, hibernateWorkspace, finished] {
-
-        if (hibernateWorkspace) saveWorkspaceAsync(finished, finished); else finished();
-    };
-
-    if (!hibernateSnapshot) { workspace(); return; }
-
-    try {
-
-        saveSnapshotAsync(workspace, workspace);
-
-    } catch (const std::exception &e) {
-
-        qCWarning(siLog) << "Not saving a snapshot:" << e.what();
-        workspace();
-    }
+    if (!hibernateSnapshot || !saveSnapshotAsync()) hibernateStep();
 }
 
 void
+C64Controller::hibernateStep()
+{
+    // The workspace is the last step
+    if (m_hibernateWorkspace && saveWorkspaceAsync()) return;
+
+    m_hibernating = false;
+    emit hibernated();
+}
+
+bool
 C64Controller::saveWorkspaceAsync()
 {
-    saveWorkspaceAsync({}, {});
-}
-
-void
-C64Controller::saveSnapshotAsync()
-{
-    try {
-
-        saveSnapshotAsync({}, {});
-
-    } catch (const std::exception &e) {
-
-        showError(tr("Failed to save."), e.what());
-    }
-}
-
-void
-C64Controller::saveWorkspaceAsync(std::function<void()> completionHandler,
-                                  std::function<void()> errorHandler)
-{
-    if (busy()) { if (errorHandler) errorHandler(); return; }
-
-    const auto folder = svm->root() / SVMFile::workspaceDir;
+    if (busy()) return false;
 
     try {
 
         // Start from scratch
+        const auto folder = svm->root() / SVMFile::workspaceDir;
         fs::remove_all(folder);
         fs::create_directories(folder);
 
-        m_workspaceCompletion = completionHandler;
-        m_workspaceError = errorHandler;
         m_savingWorkspace = true;
         emit busyChanged();
 
         core().c64.saveWorkspaceAsync(folder);
+        return true;
 
     } catch (const std::exception &e) {
 
         m_savingWorkspace = false;
         emit busyChanged();
         showError(tr("Failed to save the workspace."), e.what());
-        if (errorHandler) errorHandler();
+        return false;
     }
 }
 
@@ -801,9 +776,6 @@ C64Controller::workspaceDidSave(int code, const std::string &what)
     m_savingWorkspace = false;
     emit busyChanged();
 
-    auto completionHandler = std::exchange(m_workspaceCompletion, nullptr);
-    auto errorHandler = std::exchange(m_workspaceError, nullptr);
-
     try {
 
         if (code != 0) throw std::runtime_error(what);
@@ -812,23 +784,20 @@ C64Controller::workspaceDidSave(int code, const std::string &what)
         svm->getManifest().screenshot = "preview.png";
         svm->persist();
 
+        emit workspaceSaved();
+        notifyPersist();
+        notifySvmChanged("workspace");
+
     } catch (const std::exception &e) {
 
         showError(tr("Failed to save the workspace."), e.what());
-        if (errorHandler) errorHandler();
-        return;
     }
 
-    emit workspaceSaved();
-    notifyPersist();
-    notifySvmChanged("workspace");
-
-    if (completionHandler) completionHandler();
+    if (m_hibernating) hibernateStep();
 }
 
-void
-C64Controller::saveSnapshotAsync(std::function<void()> completionHandler,
-                                 std::function<void()> errorHandler)
+bool
+C64Controller::saveSnapshotAsync()
 {
     /* The snapshot storage is full: make room, or ask the user if snapshots
      * may not be deleted without being asked.
@@ -840,25 +809,20 @@ C64Controller::saveSnapshotAsync(std::function<void()> completionHandler,
         if (!preferences().getAutoDeleteSnapshots()) {
 
             emit snapshotLimitReached();
-            if (errorHandler) errorHandler();
-            return;
+            return false;
         }
         shrinkSnapshotStorage(limit - 1);
     }
 
-    if (busy()) { if (errorHandler) errorHandler(); return; }
-
-    const auto folder = svm->root() / SVMFile::snapshotDir;
+    if (busy()) return false;
 
     try {
 
         if (svm->isReadOnly()) throw ImageError(ImageError::VM_READ_ONLY);
 
-        /* Bring the snapshot folder into being. Nothing else creates it, and
-         * the first snapshot of an SVM is exactly the case where it is not
-         * there yet.
-         */
+        // Create the snapshot folder if needed
         std::error_code ec;
+        const auto folder = svm->root() / SVMFile::snapshotDir;
         fs::create_directories(folder, ec);
         if (ec) throw utl::IOError(utl::IOError::DIR_CANT_CREATE, folder);
 
@@ -876,19 +840,18 @@ C64Controller::saveSnapshotAsync(std::function<void()> completionHandler,
         info.screenshot = fs::path(info.uuid.toString() + ".jpg");
         info.binary     = fs::path(info.uuid.toString() + ".vcsnap");
 
-        m_snapshotCompletion = completionHandler;
-        m_snapshotError = errorHandler;
         m_savingSnapshot = true;
         emit busyChanged();
 
         core().c64.saveSnapshotAsync(folder / info.binary, Compressor::LZ4);
+        return true;
 
     } catch (const std::exception &e) {
 
         m_savingSnapshot = false;
         emit busyChanged();
         showError(tr("Failed to save the snapshot."), e.what());
-        if (errorHandler) errorHandler();
+        return false;
     }
 }
 
@@ -900,8 +863,6 @@ C64Controller::snapshotDidSave(int code, const std::string &what)
     m_savingSnapshot = false;
     emit busyChanged();
 
-    auto completionHandler = std::exchange(m_snapshotCompletion, nullptr);
-    auto errorHandler = std::exchange(m_snapshotError, nullptr);
     auto screenshot = std::exchange(m_snapshotScreenshot, QImage());
     const auto &info = m_snapshotInfo;
 
@@ -919,18 +880,16 @@ C64Controller::snapshotDidSave(int code, const std::string &what)
         svm->getManifest().appendSnapshot(info);
         svm->persist();
 
+        notifyPersist();
+        emit snapshotSaved(QString::fromStdString(info.uuid.toString()));
+        notifySvmChanged("snapshot", QString::fromStdString(info.uuid.toString()));
+
     } catch (const std::exception &e) {
 
         showError(tr("Failed to save the snapshot."), e.what());
-        if (errorHandler) errorHandler();
-        return;
     }
 
-    notifyPersist();
-    emit snapshotSaved(QString::fromStdString(info.uuid.toString()));
-    notifySvmChanged("snapshot", QString::fromStdString(info.uuid.toString()));
-
-    if (completionHandler) completionHandler();
+    if (m_hibernating) hibernateStep();
 }
 
 void
