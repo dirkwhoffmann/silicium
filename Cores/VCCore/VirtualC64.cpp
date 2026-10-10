@@ -605,6 +605,20 @@ C64API::saveSnapshotAsync(const fs::path &path, Compressor compressor) const
 }
 
 void
+C64API::hibernate(const fs::path &path, bool snapshot, bool workspace) const
+{
+    VC64_PUBLIC_SUSPEND
+    c64->hibernate(path, snapshot, workspace);
+}
+
+void
+C64API::hibernateAsync(const fs::path &path, bool snapshot, bool workspace) const
+{
+    VC64_PUBLIC
+    emu->put(Command(Cmd::HIBERNATE, i64(snapshot) | i64(workspace) << 1), path.string());
+}
+
+void
 C64API::loadRom(const fs::path &path)
 {
     VC64_PUBLIC_SUSPEND

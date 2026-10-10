@@ -719,25 +719,94 @@ C64Controller::toggleWarp()
 void
 C64Controller::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
 {
-    /* The snapshot is saved first and the workspace after it, each in a job
-     * of its own. snapshotDidSave() and workspaceDidSave() keep the sequence
-     * going, and hibernated() is emitted when the last of them is over,
-     * however it went.
+    /* The emulator thread does the work in one go and reports with a
+     * HIBERNATED message (see hibernateDidFinish). hibernated() is emitted
+     * when that has been dealt with, however it went, and at once if there is
+     * nothing to do.
      */
-    m_hibernating = true;
+    if (hibernateSnapshot && !makeRoomForSnapshot()) hibernateSnapshot = false;
+
+    if (busy() || (!hibernateSnapshot && !hibernateWorkspace)) {
+
+        emit hibernated();
+        return;
+    }
+
+    m_hibernateSnapshot = hibernateSnapshot;
     m_hibernateWorkspace = hibernateWorkspace;
 
-    if (!hibernateSnapshot || !saveSnapshotAsync()) hibernateStep();
+    try {
+
+        // The core reads the manifest from disk
+        svm->persist();
+
+        m_hibernating = true;
+        emit busyChanged();
+
+        core().c64.hibernateAsync(svm->root(), hibernateSnapshot, hibernateWorkspace);
+
+    } catch (const std::exception &e) {
+
+        m_hibernating = false;
+        emit busyChanged();
+        showError(tr("Failed to hibernate."), e.what());
+        emit hibernated();
+    }
 }
 
 void
-C64Controller::hibernateStep()
+C64Controller::hibernateDidFinish(int code, const std::string &what)
 {
-    // The workspace is the last step
-    if (m_hibernateWorkspace && saveWorkspaceAsync()) return;
+    if (!m_hibernating) return;
 
     m_hibernating = false;
+    emit busyChanged();
+
+    try {
+
+        if (code != 0) throw std::runtime_error(what);
+
+        // The core has updated the manifest on disk
+        svm->readManifest();
+
+        if (m_hibernateWorkspace) emit workspaceSaved();
+
+        if (m_hibernateSnapshot) {
+
+            if (auto *info = svm->getManifest().lookupLatestSnapshot()) {
+
+                emit snapshotSaved(QString::fromStdString(info->uuid.toString()));
+                notifySvmChanged("snapshot", QString::fromStdString(info->uuid.toString()));
+            }
+        }
+        notifyPersist();
+        if (m_hibernateWorkspace) notifySvmChanged("workspace");
+
+    } catch (const std::exception &e) {
+
+        showError(tr("Failed to hibernate."), e.what());
+    }
+
     emit hibernated();
+}
+
+bool
+C64Controller::makeRoomForSnapshot()
+{
+    /* The snapshot storage is full: make room, or ask the user if snapshots
+     * may not be deleted without being asked.
+     */
+    const int limit = preferences().getMaxSnapshots();
+
+    if (svm->getManifest().numSnapshots() < limit) return true;
+
+    if (!preferences().getAutoDeleteSnapshots()) {
+
+        emit snapshotLimitReached();
+        return false;
+    }
+    shrinkSnapshotStorage(limit - 1);
+    return true;
 }
 
 bool
@@ -792,27 +861,12 @@ C64Controller::workspaceDidSave(int code, const std::string &what)
 
         showError(tr("Failed to save the workspace."), e.what());
     }
-
-    if (m_hibernating) hibernateStep();
 }
 
 bool
 C64Controller::saveSnapshotAsync()
 {
-    /* The snapshot storage is full: make room, or ask the user if snapshots
-     * may not be deleted without being asked.
-     */
-    const int limit = preferences().getMaxSnapshots();
-
-    if (svm->getManifest().numSnapshots() >= limit) {
-
-        if (!preferences().getAutoDeleteSnapshots()) {
-
-            emit snapshotLimitReached();
-            return false;
-        }
-        shrinkSnapshotStorage(limit - 1);
-    }
+    if (!makeRoomForSnapshot()) return false;
 
     if (busy()) return false;
 
@@ -888,8 +942,6 @@ C64Controller::snapshotDidSave(int code, const std::string &what)
 
         showError(tr("Failed to save the snapshot."), e.what());
     }
-
-    if (m_hibernating) hibernateStep();
 }
 
 void
@@ -1100,6 +1152,12 @@ C64Controller::process(const Message &msg, const string &attachment)
         case Msg::SNAPSHOT_SAVED: {
 
             snapshotDidSave(value(), attachment);
+            break;
+        }
+
+        case Msg::HIBERNATED: {
+
+            hibernateDidFinish(value(), attachment);
             break;
         }
 

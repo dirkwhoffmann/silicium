@@ -90,6 +90,7 @@ class C64Controller : public Controller {
     bool m_savingWorkspace = false;
     bool m_savingSnapshot = false;
     bool m_hibernating = false;
+    bool m_hibernateSnapshot = false;
     bool m_hibernateWorkspace = false;
     retro::vault::SnapshotInfo m_snapshotInfo;
     QImage m_snapshotScreenshot;
@@ -382,7 +383,7 @@ public:
     Q_INVOKABLE bool saveSnapshotAsync();
 
     // A job is running, or the emulator thread is saving
-    bool busy() const override { return m_savingWorkspace || m_savingSnapshot || Controller::busy(); }
+    bool busy() const override { return m_savingWorkspace || m_savingSnapshot || m_hibernating || Controller::busy(); }
 
     Q_INVOKABLE void hibernate(bool hibernateSnapshot, bool hibernateWorkspace);
 
@@ -403,8 +404,11 @@ public:
     void workspaceDidSave(int code, const std::string &what);
     void snapshotDidSave(int code, const std::string &what);
 
-    // Moves hibernation on to the workspace, or ends it
-    void hibernateStep();
+    // Called when the emulator thread reports that it has hibernated
+    void hibernateDidFinish(int code, const std::string &what);
+
+    // Makes room for another snapshot, or asks the user to; false if there is none
+    bool makeRoomForSnapshot();
 
 
     void update();

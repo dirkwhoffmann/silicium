@@ -1214,6 +1214,27 @@ struct C64API : public API {
      */
     void saveSnapshotAsync(const std::filesystem::path &path, Compressor compressor) const;
 
+    /** @brief  Hibernates the machine into a virtual machine bundle
+     *
+     *  Saves the workspace (if workspace is true) and a snapshot including a
+     *  screenshot (if snapshot is true) into the SVM, and updates its
+     *  manifest.
+     *
+     *  @param  path        Path of the SVM
+     *  @param  snapshot    Save a snapshot
+     *  @param  workspace   Save the workspace
+     */
+    void hibernate(const std::filesystem::path &path, bool snapshot, bool workspace) const;
+
+    /** @brief  Hibernates the machine asynchronously.
+     *
+     *  The request is handed to the emulator thread, which carries it out
+     *  when it processes its command queue. The function returns immediately.
+     *  The GUI is informed by a HIBERNATED message, which carries an error
+     *  code and description if the operation failed.
+     */
+    void hibernateAsync(const std::filesystem::path &path, bool snapshot, bool workspace) const;
+
 
     /// @}
     /// @name Handling ROMs

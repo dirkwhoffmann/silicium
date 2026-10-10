@@ -684,6 +684,19 @@ public:
     // Saves the current workspace to a file
     void saveWorkspace(const fs::path &path);
 
+    /* Hibernates the machine into the SVM at the given path: saves the
+     * workspace and/or a snapshot (including a screenshot), updates the
+     * manifest, and informs the GUI with a HIBERNATED message.
+     */
+    void hibernate(const fs::path &path, bool snapshot, bool workspace);
+
+private:
+
+    // Writes the workspace into a folder
+    void writeWorkspace(const fs::path &path);
+
+public:
+
     // Called by (hidden) RetroShell 'workspace' commands
     void initWorkspace();
     void activateWorkspace();

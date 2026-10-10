@@ -18,6 +18,7 @@
 #include "OpenRoms.h"
 #include "utl/abilities/Hashable.h"
 #include "utl/chrono.h"
+#include "SVMFile.h"
 #include <algorithm>
 #include <format>
 #include <queue>
@@ -702,6 +703,7 @@ C64::update(CmdQueue &queue)
                 case Cmd::INSPECTION_TARGET:
                 case Cmd::SAVE_WORKSPACE:
                 case Cmd::SAVE_SNAPSHOT:
+                case Cmd::HIBERNATE:
 
                     processCommand(cmd);
                     break;
@@ -1233,6 +1235,22 @@ C64::processCommand(const Command &cmd)
             setAutoInspectionMask(cmd.value);
             break;
 
+        case Cmd::HIBERNATE:
+        {
+            // Reports success to the GUI itself, a failure with the same message
+            try {
+
+                hibernate(cmd.str, cmd.value & 1, cmd.value & 2);
+
+            } catch (const std::exception &e) {
+
+                auto *error = dynamic_cast<const utl::Error *>(&e);
+                i64 code = error && error->fault() != 0 ? error->fault() : -1;
+                msgQueue.put(Msg::HIBERNATED, code, 0, e.what());
+            }
+            break;
+        }
+
         case Cmd::SAVE_WORKSPACE:
         case Cmd::SAVE_SNAPSHOT:
         {
@@ -1493,6 +1511,15 @@ C64::loadWorkspace(const fs::path &path)
 void
 C64::saveWorkspace(const fs::path &path)
 {
+    writeWorkspace(path);
+
+    // Inform the GUI
+    msgQueue.put(Msg::WORKSPACE_SAVED);
+}
+
+void
+C64::writeWorkspace(const fs::path &path)
+{
     std::stringstream ss, tap;
 
     auto exportG64 = [&](Drive& drive) {
@@ -1611,9 +1638,60 @@ C64::saveWorkspace(const fs::path &path)
     // Write the script into the workspace bundle
     std::ofstream file(path / "config.retrosh");
     file << ss.str();
+}
+
+void
+C64::hibernate(const fs::path &path, bool snapshot, bool workspace)
+{
+    using namespace retro::vault;
+
+    SVMFile svm(SVMFile::Open, path);
+    auto &manifest = svm.getManifest();
+
+    if (snapshot && svm.isReadOnly()) throw utl::Error(0, "The virtual machine is read-only.");
+
+    if (workspace) {
+
+        // Start from scratch
+        auto folder = svm.root() / SVMFile::workspaceDir;
+        fs::remove_all(folder);
+        fs::create_directories(folder);
+
+        writeWorkspace(folder);
+
+        // The preview image has been written along with the workspace
+        manifest.screenshot = "preview.png";
+    }
+
+    if (snapshot) {
+
+        /* Bring the snapshot folder into being. Nothing else creates it, and
+         * the first snapshot of an SVM is exactly the case where it is not
+         * there yet.
+         */
+        auto folder = svm.root() / SVMFile::snapshotDir;
+        fs::create_directories(folder);
+
+        SnapshotInfo info {};
+        info.version    = snapshotVersion();
+        info.uuid       = utl::UUID::v4();
+        info.platform   = Platform::C64;
+        info.created    = time(nullptr);
+        info.modified   = info.created;
+        info.screenshot = fs::path(info.uuid.toString() + ".png");
+        info.binary     = fs::path(info.uuid.toString() + ".vcsnap");
+
+        // Take the screenshot and the snapshot, both of the same moment
+        videoPort.saveTexture(folder / info.screenshot, 104, 487, 16, vic.pal() ? 299 : 249);
+        Snapshot(*this, Compressor::LZ4).writeToFile(folder / info.binary);
+
+        manifest.appendSnapshot(info);
+    }
+
+    svm.persist();
 
     // Inform the GUI
-    msgQueue.put(Msg::WORKSPACE_SAVED);
+    msgQueue.put(Msg::HIBERNATED);
 }
 
 void
