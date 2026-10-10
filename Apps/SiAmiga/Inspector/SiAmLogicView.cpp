@@ -164,7 +164,7 @@ SiAmLogicView::cacheData()
     try { count = core.agnus.logicAnalyzer.getTraceCount(); } catch (...) { return; }
     if (count > segments) count = segments;
 
-    // Owner-tint colors, decoded from the packed XRAY_DMA_COLORx options
+    // Owner-tint colors, decoded from the packed XRAY_COLORx options
     // the same way SiAmConfigController::dmaColor() does (r<<24|g<<16|b<<8
     // -- see Core/Components/Denise/Colors.h's RgbColor(u32) constructor).
     auto ownerColor = [&core](Opt opt) -> QColor {

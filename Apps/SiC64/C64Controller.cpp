@@ -1273,7 +1273,8 @@ C64Controller::process(const Message &msg, const string &attachment)
         }
 
         case Msg::SNAPSHOT_TAKEN:
-        case Msg::SNAPSHOT_RESTORED: {
+        case Msg::SNAPSHOT_RESTORED:
+        case Msg::SNAPSHOT_SAVED: {
 
             break;
         }

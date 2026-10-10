@@ -180,7 +180,7 @@ class SiAmLogicView : public QQuickPaintedItem {
     // analyzer ring buffer -- bus owner, address/data bus and the four probe
     // values all come out of the sample itself (see LogicView.cacheData()'s
     // owner->label/color switch, reproduced here) -- plus the DMA Debugger's
-    // channel colors (read straight from the packed XRAY_DMA_COLORx option,
+    // channel colors (read straight from the packed XRAY_COLORx option,
     // decoded the same way SiAmConfigController::dmaColor() does).
     void cacheData();
 

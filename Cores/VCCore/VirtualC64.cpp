@@ -393,17 +393,17 @@ VirtualC64::launch(const void *listener, Callback *func)
 }
 
 void
-VirtualC64::setListener(const void *listener, Callback *func)
-{
-    VC64_PUBLIC
-    emu->main.msgQueue.setListener(listener, func);
-}
-
-void
 VirtualC64::removeListener()
 {
     VC64_PUBLIC
     emu->main.msgQueue.setListener(nullptr, nullptr);
+}
+
+void
+VirtualC64::setListener(const void *listener, Callback *func)
+{
+    VC64_PUBLIC
+    emu->main.msgQueue.setListener(listener, func);
 }
 
 bool
@@ -468,10 +468,10 @@ VirtualC64::exportConfig(std::ostream &stream) const
 }
 
 void
-VirtualC64::put(const Command &cmd)
+VirtualC64::put(const Command &cmd, const std::string &str)
 {
     VC64_PUBLIC
-    emu->put(cmd);
+    emu->put(cmd, str);
 }
 
 
@@ -542,6 +542,13 @@ C64API::saveWorkspace(const fs::path &path) const
     c64->saveWorkspace(path);
 }
 
+void
+C64API::saveWorkspaceAsync(const fs::path &path) const
+{
+    VC64_PUBLIC
+    emu->put(Cmd::SAVE_WORKSPACE, path.string());
+}
+
 std::unique_ptr<Snapshot>
 C64API::takeSnapshot(Compressor compressor, isize delay, bool repeat)
 {
@@ -588,6 +595,13 @@ C64API::saveSnapshot(const fs::path &path, Compressor compressor) const
     VC64_PUBLIC_SUSPEND
     c64->saveSnapshot(path, compressor);
 
+}
+
+void
+C64API::saveSnapshotAsync(const fs::path &path, Compressor compressor) const
+{
+    VC64_PUBLIC
+    emu->put(Command(Cmd::SAVE_SNAPSHOT, i64(compressor)), path.string());
 }
 
 void
@@ -976,6 +990,46 @@ VideoPortAPI::getXrayTexture(isize *nr, isize *width, isize *height) const
     *height = isize(Texture::height);
 
     return (u32 *)texture.pixels.ptr;
+}
+
+void
+VideoPortAPI::saveTexture(const fs::path &path) const
+{
+    VC64_PUBLIC
+    emu->lockTexture();
+    try { videoPort->saveTexture(path); }
+    catch (...) { emu->unlockTexture(); throw; }
+    emu->unlockTexture();
+}
+
+void
+VideoPortAPI::saveTexture(const fs::path &path, isize x1, isize x2, isize y1, isize y2) const
+{
+    VC64_PUBLIC
+    emu->lockTexture();
+    try { videoPort->saveTexture(path, x1, x2, y1, y2); }
+    catch (...) { emu->unlockTexture(); throw; }
+    emu->unlockTexture();
+}
+
+void
+VideoPortAPI::saveXrayTexture(const fs::path &path) const
+{
+    VC64_PUBLIC
+    emu->lockTexture();
+    try { videoPort->saveXrayTexture(path); }
+    catch (...) { emu->unlockTexture(); throw; }
+    emu->unlockTexture();
+}
+
+void
+VideoPortAPI::saveXrayTexture(const fs::path &path, isize x1, isize x2, isize y1, isize y2) const
+{
+    VC64_PUBLIC
+    emu->lockTexture();
+    try { videoPort->saveXrayTexture(path, x1, x2, y1, y2); }
+    catch (...) { emu->unlockTexture(); throw; }
+    emu->unlockTexture();
 }
 
 void

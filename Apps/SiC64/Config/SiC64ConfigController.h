@@ -596,12 +596,12 @@ class SiC64ConfigController : public Controller {
     Q_PROPERTY(bool XRAY_DMA_CHANNEL3 READ dmaDebugChannel3 WRITE setDmaDebugChannel3 NOTIFY configChanged)
     Q_PROPERTY(bool XRAY_DMA_CHANNEL4 READ dmaDebugChannel4 WRITE setDmaDebugChannel4 NOTIFY configChanged)
     Q_PROPERTY(bool XRAY_DMA_CHANNEL5 READ dmaDebugChannel5 WRITE setDmaDebugChannel5 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_DMA_COLOR0 READ dmaDebugColor0 WRITE setDmaDebugColor0 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_DMA_COLOR1 READ dmaDebugColor1 WRITE setDmaDebugColor1 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_DMA_COLOR2 READ dmaDebugColor2 WRITE setDmaDebugColor2 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_DMA_COLOR3 READ dmaDebugColor3 WRITE setDmaDebugColor3 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_DMA_COLOR4 READ dmaDebugColor4 WRITE setDmaDebugColor4 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_DMA_COLOR5 READ dmaDebugColor5 WRITE setDmaDebugColor5 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR0 READ dmaDebugColor0 WRITE setDmaDebugColor0 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR1 READ dmaDebugColor1 WRITE setDmaDebugColor1 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR2 READ dmaDebugColor2 WRITE setDmaDebugColor2 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR3 READ dmaDebugColor3 WRITE setDmaDebugColor3 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR4 READ dmaDebugColor4 WRITE setDmaDebugColor4 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR5 READ dmaDebugColor5 WRITE setDmaDebugColor5 NOTIFY configChanged)
 
     int xrayMode() const { return (int)get(vc64::Opt::XRAY_MODE); }
     void setXrayMode(int value) { set(vc64::Opt::XRAY_MODE, (i64)value); }
@@ -623,18 +623,18 @@ class SiC64ConfigController : public Controller {
     void setDmaDebugChannel4(bool value) { set(vc64::Opt::XRAY_DMA_CHANNEL4, (i64)value); }
     bool dmaDebugChannel5() const { return (bool)get(vc64::Opt::XRAY_DMA_CHANNEL5); }
     void setDmaDebugChannel5(bool value) { set(vc64::Opt::XRAY_DMA_CHANNEL5, (i64)value); }
-    QColor dmaDebugColor0() const { return dmaColor(vc64::Opt::XRAY_DMA_COLOR0); }
-    void setDmaDebugColor0(const QColor &c) { setDmaColor(vc64::Opt::XRAY_DMA_COLOR0, c); }
-    QColor dmaDebugColor1() const { return dmaColor(vc64::Opt::XRAY_DMA_COLOR1); }
-    void setDmaDebugColor1(const QColor &c) { setDmaColor(vc64::Opt::XRAY_DMA_COLOR1, c); }
-    QColor dmaDebugColor2() const { return dmaColor(vc64::Opt::XRAY_DMA_COLOR2); }
-    void setDmaDebugColor2(const QColor &c) { setDmaColor(vc64::Opt::XRAY_DMA_COLOR2, c); }
-    QColor dmaDebugColor3() const { return dmaColor(vc64::Opt::XRAY_DMA_COLOR3); }
-    void setDmaDebugColor3(const QColor &c) { setDmaColor(vc64::Opt::XRAY_DMA_COLOR3, c); }
-    QColor dmaDebugColor4() const { return dmaColor(vc64::Opt::XRAY_DMA_COLOR4); }
-    void setDmaDebugColor4(const QColor &c) { setDmaColor(vc64::Opt::XRAY_DMA_COLOR4, c); }
-    QColor dmaDebugColor5() const { return dmaColor(vc64::Opt::XRAY_DMA_COLOR5); }
-    void setDmaDebugColor5(const QColor &c) { setDmaColor(vc64::Opt::XRAY_DMA_COLOR5, c); }
+    QColor dmaDebugColor0() const { return dmaColor(vc64::Opt::XRAY_COLOR0); }
+    void setDmaDebugColor0(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR0, c); }
+    QColor dmaDebugColor1() const { return dmaColor(vc64::Opt::XRAY_COLOR1); }
+    void setDmaDebugColor1(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR1, c); }
+    QColor dmaDebugColor2() const { return dmaColor(vc64::Opt::XRAY_COLOR2); }
+    void setDmaDebugColor2(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR2, c); }
+    QColor dmaDebugColor3() const { return dmaColor(vc64::Opt::XRAY_COLOR3); }
+    void setDmaDebugColor3(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR3, c); }
+    QColor dmaDebugColor4() const { return dmaColor(vc64::Opt::XRAY_COLOR4); }
+    void setDmaDebugColor4(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR4, c); }
+    QColor dmaDebugColor5() const { return dmaColor(vc64::Opt::XRAY_COLOR5); }
+    void setDmaDebugColor5(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR5, c); }
 
     //
     // Helpers

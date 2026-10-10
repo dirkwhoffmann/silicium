@@ -97,49 +97,49 @@ SiC64InspectorWindow {
                 ChannelRow {
 
                     label: qsTr("Refresh cycles")
-                    on: cc.XRAY_DMA_CHANNEL0; swatch: cc.XRAY_DMA_COLOR0
+                    on: cc.XRAY_DMA_CHANNEL0; swatch: cc.XRAY_COLOR0
                     onToggled: (value) => cc.XRAY_DMA_CHANNEL0 = value
-                    onColorPicked: (value) => cc.XRAY_DMA_COLOR0 = value
+                    onColorPicked: (value) => cc.XRAY_COLOR0 = value
                 }
 
                 ChannelRow {
 
                     label: qsTr("Idle reads")
-                    on: cc.XRAY_DMA_CHANNEL1; swatch: cc.XRAY_DMA_COLOR1
+                    on: cc.XRAY_DMA_CHANNEL1; swatch: cc.XRAY_COLOR1
                     onToggled: (value) => cc.XRAY_DMA_CHANNEL1 = value
-                    onColorPicked: (value) => cc.XRAY_DMA_COLOR1 = value
+                    onColorPicked: (value) => cc.XRAY_COLOR1 = value
                 }
 
                 ChannelRow {
 
                     label: qsTr("Character accesses")
-                    on: cc.XRAY_DMA_CHANNEL2; swatch: cc.XRAY_DMA_COLOR2
+                    on: cc.XRAY_DMA_CHANNEL2; swatch: cc.XRAY_COLOR2
                     onToggled: (value) => cc.XRAY_DMA_CHANNEL2 = value
-                    onColorPicked: (value) => cc.XRAY_DMA_COLOR2 = value
+                    onColorPicked: (value) => cc.XRAY_COLOR2 = value
                 }
 
                 ChannelRow {
 
                     label: qsTr("Graphics accesses")
-                    on: cc.XRAY_DMA_CHANNEL3; swatch: cc.XRAY_DMA_COLOR3
+                    on: cc.XRAY_DMA_CHANNEL3; swatch: cc.XRAY_COLOR3
                     onToggled: (value) => cc.XRAY_DMA_CHANNEL3 = value
-                    onColorPicked: (value) => cc.XRAY_DMA_COLOR3 = value
+                    onColorPicked: (value) => cc.XRAY_COLOR3 = value
                 }
 
                 ChannelRow {
 
                     label: qsTr("Sprite-pointer accesses")
-                    on: cc.XRAY_DMA_CHANNEL4; swatch: cc.XRAY_DMA_COLOR4
+                    on: cc.XRAY_DMA_CHANNEL4; swatch: cc.XRAY_COLOR4
                     onToggled: (value) => cc.XRAY_DMA_CHANNEL4 = value
-                    onColorPicked: (value) => cc.XRAY_DMA_COLOR4 = value
+                    onColorPicked: (value) => cc.XRAY_COLOR4 = value
                 }
 
                 ChannelRow {
 
                     label: qsTr("Sprite-data accesses")
-                    on: cc.XRAY_DMA_CHANNEL5; swatch: cc.XRAY_DMA_COLOR5
+                    on: cc.XRAY_DMA_CHANNEL5; swatch: cc.XRAY_COLOR5
                     onToggled: (value) => cc.XRAY_DMA_CHANNEL5 = value
-                    onColorPicked: (value) => cc.XRAY_DMA_COLOR5 = value
+                    onColorPicked: (value) => cc.XRAY_COLOR5 = value
                 }
 
                 VSpacer { size: Style.mediumSpacing }

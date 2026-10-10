@@ -43,12 +43,12 @@ class DmaDebugger final : public SubComponent {
         Opt::XRAY_DMA_CHANNEL3,
         Opt::XRAY_DMA_CHANNEL4,
         Opt::XRAY_DMA_CHANNEL5,
-        Opt::XRAY_DMA_COLOR0,
-        Opt::XRAY_DMA_COLOR1,
-        Opt::XRAY_DMA_COLOR2,
-        Opt::XRAY_DMA_COLOR3,
-        Opt::XRAY_DMA_COLOR4,
-        Opt::XRAY_DMA_COLOR5
+        Opt::XRAY_COLOR0,
+        Opt::XRAY_COLOR1,
+        Opt::XRAY_COLOR2,
+        Opt::XRAY_COLOR3,
+        Opt::XRAY_COLOR4,
+        Opt::XRAY_COLOR5
     };
 
     // Current configuration
@@ -130,7 +130,7 @@ public:
     //
 
     // 'color' is the fixed, portable ABGR encoding the option system stores
-    // (see Defaults.cpp / XRAY_DMA_COLORn) -- independent of the live
+    // (see Defaults.cpp / XRAY_COLORn) -- independent of the live
     // HOST_TEX_FORMAT. Re-derives the four shades in debugColor[][] in
     // whatever format the host is actually running in right now.
     void setDmaDebugColor(MemAccess type, GpuColor<TexelFormat::ABGR> color);
