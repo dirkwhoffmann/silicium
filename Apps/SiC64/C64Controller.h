@@ -84,13 +84,15 @@ class C64Controller : public Controller {
 
     /* Saves that the emulator thread carries out (see saveWorkspaceAsync).
      * A flag is set while one is under way and cleared by the message that
-     * reports its result; the job is what is to be done then.
+     * reports its result (see workspaceDidSave, snapshotDidSave). What is to
+     * happen afterwards is kept until then.
      */
-    using SaveJob = std::function<void(int code, const std::string &what)>;
     bool m_savingWorkspace = false;
     bool m_savingSnapshot = false;
-    SaveJob m_workspaceJob;
-    SaveJob m_snapshotJob;
+    std::function<void()> m_workspaceCompletion, m_workspaceError;
+    std::function<void()> m_snapshotCompletion, m_snapshotError;
+    retro::vault::SnapshotInfo m_snapshotInfo;
+    QImage m_snapshotScreenshot;
 
 
     //
@@ -402,6 +404,10 @@ public:
     // Receives messages from the emulator thread (see windowDidOpen()) and
     // marshals them onto the GUI thread.
     void process(const vc64::Message &msg, const string &attachment = "");
+
+    // Called when the emulator thread reports the result of a save
+    void workspaceDidSave(int code, const std::string &what);
+    void snapshotDidSave(int code, const std::string &what);
 
 
     void update();
