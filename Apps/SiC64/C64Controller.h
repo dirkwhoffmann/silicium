@@ -82,6 +82,16 @@ class C64Controller : public Controller {
     // Indicates whether the debug panel is visible
     bool m_debugPanel = false;
 
+    /* Saves that the emulator thread carries out (see saveWorkspaceAsync).
+     * A flag is set while one is under way and cleared by the message that
+     * reports its result; the job is what is to be done then.
+     */
+    using SaveJob = std::function<void(int code, const std::string &what)>;
+    bool m_savingWorkspace = false;
+    bool m_savingSnapshot = false;
+    SaveJob m_workspaceJob;
+    SaveJob m_snapshotJob;
+
 
     //
     // Shared inspector state
@@ -372,6 +382,9 @@ public:
                             std::function<void()> errorHandler = {});
     void saveSnapshotAsync(std::function<void()> completionHandler,
                            std::function<void()> errorHandler = {});
+    // A job is running, or the emulator thread is saving
+    bool busy() const override { return m_savingWorkspace || m_savingSnapshot || Controller::busy(); }
+
     Q_INVOKABLE void saveWorkspaceAsync();
     Q_INVOKABLE void saveSnapshotAsync();
 
@@ -389,6 +402,8 @@ public:
     // Receives messages from the emulator thread (see windowDidOpen()) and
     // marshals them onto the GUI thread.
     void process(const vc64::Message &msg, const string &attachment = "");
+
+
     void update();
 
 private:

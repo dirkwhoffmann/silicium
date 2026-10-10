@@ -96,7 +96,7 @@ protected:
 public:
 
     // Indicates whether a job is running
-    bool busy() const { return m_busy; }
+    virtual bool busy() const { return m_busy; }
 
     // Returns the elapsed time in seconds
     qreal elapsed() const { return m_elapsed; }

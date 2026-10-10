@@ -766,34 +766,33 @@ void
 C64Controller::saveWorkspaceAsync(std::function<void()> completionHandler,
                                   std::function<void()> errorHandler)
 {
+    if (busy()) { if (errorHandler) errorHandler(); return; }
+
+    // The screenshot is taken now, as it shows the machine as it is asked for
+    QImage screenshot = m_renderer->grabScreenshot();
+
     const auto folder = svm->root() / SVMFile::workspaceDir;
 
-    // Everything that touches the core happens in the job
-    auto body = [this, folder] {
+    // Called when the emulator thread is done, on this thread
+    auto job = [=, this](int code, const std::string &what) {
 
-        report(tr("Saving workspace..."), 0.0);
+        try {
 
-        // Take the screenshot
-        QImage screenshot = m_renderer ? m_renderer->grabScreenshot() : QImage();
+            if (code != 0) throw std::runtime_error(what);
 
-        // Start from scratch
-        fs::remove_all(folder);
-        fs::create_directories(folder);
+            // Save screenshot
+            screenshot.save(QString::fromStdString((folder / "screenshot.jpg").string()));
 
-        // Save assets
-        core().c64.saveWorkspace(folder);
+            // Update the manifest
+            svm->getManifest().screenshot = "screenshot.jpg";
+            svm->persist();
 
-        // Save screenshot
-        const auto screenshotPath = folder / "screenshot.jpg";
-        screenshot.save(QString::fromStdString(screenshotPath.string()));
+        } catch (const std::exception &e) {
 
-        // Update the manifest
-        svm->getManifest().screenshot = "screenshot.jpg";
-        svm->persist();
-    };
-
-    // Tell the world
-    auto completion = [this, completionHandler] {
+            showError(tr("Failed to save the workspace."), e.what());
+            if (errorHandler) errorHandler();
+            return;
+        }
 
         emit workspaceSaved();
         notifyPersist();
@@ -802,7 +801,25 @@ C64Controller::saveWorkspaceAsync(std::function<void()> completionHandler,
         if (completionHandler) completionHandler();
     };
 
-    if (!runTask(body, completion, errorHandler) && errorHandler) errorHandler();
+    try {
+
+        // Start from scratch
+        fs::remove_all(folder);
+        fs::create_directories(folder);
+
+        m_workspaceJob = job;
+        m_savingWorkspace = true;
+        emit busyChanged();
+
+        core().c64.saveWorkspaceAsync(folder);
+
+    } catch (const std::exception &e) {
+
+        m_savingWorkspace = false;
+        emit busyChanged();
+        showError(tr("Failed to save the workspace."), e.what());
+        if (errorHandler) errorHandler();
+    }
 }
 
 void
@@ -810,8 +827,7 @@ C64Controller::saveSnapshotAsync(std::function<void()> completionHandler,
                                  std::function<void()> errorHandler)
 {
     /* The snapshot storage is full: make room, or ask the user if snapshots
-     * may not be deleted without being asked. This touches the manifest, so
-     * it happens here and not in the job.
+     * may not be deleted without being asked.
      */
     const int limit = preferences().getMaxSnapshots();
 
@@ -826,34 +842,57 @@ C64Controller::saveSnapshotAsync(std::function<void()> completionHandler,
         shrinkSnapshotStorage(limit - 1);
     }
 
-    auto info = std::make_shared<SnapshotInfo>();
+    if (busy()) { if (errorHandler) errorHandler(); return; }
+
+    // The screenshot is taken now, as it shows the machine as it is asked for
+    QImage screenshot = m_renderer->grabScreenshot();
+
+    // Assemble snapshot info
+    SnapshotInfo info {};
+    info.version    = VirtualC64::snapshotVersion();
+    info.uuid       = utl::UUID::v4();
+    info.platform   = Platform::C64;
+    info.created    = time(nullptr);
+    info.modified   = info.created;
+    info.screenshot = fs::path(info.uuid.toString() + ".jpg");
+    info.binary     = fs::path(info.uuid.toString() + ".vcsnap");
+
     const auto folder = svm->root() / SVMFile::snapshotDir;
 
-    // Everything that touches the core happens in the job
-    auto body = [this, folder, info] {
+    // Called when the emulator thread is done, on this thread
+    auto job = [=, this](int code, const std::string &what) {
 
-        report(tr("Saving snapshot..."), 0.0);
+        try {
+
+            if (code != 0) throw std::runtime_error(what);
+
+            // Save screenshot
+            const auto screenshotPath = folder / info.screenshot;
+            if (!screenshot.save(QString::fromStdString(screenshotPath.string())))
+                throw utl::IOError(utl::IOError::FILE_CANT_WRITE, screenshotPath);
+
+            // Register the snapshot
+            qCDebug(siLog) << "Registering snapshot " << info.uuid.toString();
+            svm->getManifest().appendSnapshot(info);
+            svm->persist();
+
+        } catch (const std::exception &e) {
+
+            showError(tr("Failed to save the snapshot."), e.what());
+            if (errorHandler) errorHandler();
+            return;
+        }
+
+        notifyPersist();
+        emit snapshotSaved(QString::fromStdString(info.uuid.toString()));
+        notifySvmChanged("snapshot", QString::fromStdString(info.uuid.toString()));
+
+        if (completionHandler) completionHandler();
+    };
+
+    try {
 
         if (svm->isReadOnly()) throw ImageError(ImageError::VM_READ_ONLY);
-
-        qCDebug(siLog) << "Taking snapshot...";
-        std::shared_ptr snap = core().c64.takeSnapshot(Compressor::LZ4);
-
-        // The screenshot is copied: it must not point into the snapshot
-        auto thumbnail = snap->getHeader()->screenshot;
-        QImage image = QImage((uchar *)thumbnail.screen,
-                              (int)thumbnail.width,
-                              (int)thumbnail.height,
-                              QImage::Format_ARGB32).copy();
-
-        // Assemble snapshot info
-        info->version    = VirtualC64::snapshotVersion();
-        info->uuid       = utl::UUID::v4();
-        info->platform   = Platform::C64;
-        info->created    = thumbnail.timestamp;
-        info->modified   = thumbnail.timestamp;
-        info->screenshot = fs::path(info->uuid.toString() + ".jpg");
-        info->binary     = fs::path(info->uuid.toString() + ".vcsnap");
 
         /* Bring the snapshot folder into being. Nothing else creates it, and
          * the first snapshot of an SVM is exactly the case where it is not
@@ -863,29 +902,19 @@ C64Controller::saveSnapshotAsync(std::function<void()> completionHandler,
         fs::create_directories(folder, ec);
         if (ec) throw utl::IOError(utl::IOError::DIR_CANT_CREATE, folder);
 
-        const auto screenshotPath = folder / info->screenshot;
-        if (!image.save(QString::fromStdString(screenshotPath.string())))
-            throw utl::IOError(utl::IOError::FILE_CANT_WRITE, screenshotPath);
+        m_snapshotJob = job;
+        m_savingSnapshot = true;
+        emit busyChanged();
 
-        snap->writeToFile(folder / info->binary);
+        core().c64.saveSnapshotAsync(folder / info.binary, Compressor::LZ4);
 
-        // Register the snapshot
-        qCDebug(siLog) << "Registering snapshot " << info->uuid.toString();
-        svm->getManifest().appendSnapshot(*info);
-        svm->persist();
-    };
+    } catch (const std::exception &e) {
 
-    // Tell the world
-    auto completion = [this, info, completionHandler] {
-
-        notifyPersist();
-        emit snapshotSaved(QString::fromStdString(info->uuid.toString()));
-        notifySvmChanged("snapshot", QString::fromStdString(info->uuid.toString()));
-
-        if (completionHandler) completionHandler();
-    };
-
-    if (!runTask(body, completion, errorHandler) && errorHandler) errorHandler();
+        m_savingSnapshot = false;
+        emit busyChanged();
+        showError(tr("Failed to save the snapshot."), e.what());
+        if (errorHandler) errorHandler();
+    }
 }
 
 void
@@ -1087,6 +1116,33 @@ C64Controller::process(const Message &msg, const string &attachment)
 
     switch (msg.type) {
 
+        case Msg::WORKSPACE_SAVED: {
+
+            // The core reports this for the synchronous save, too; only ours counts
+            if (!m_savingWorkspace) break;
+
+            m_savingWorkspace = false;
+            emit busyChanged();
+
+            SaveJob job;
+            std::swap(job, m_workspaceJob);
+            if (job) job(value(), attachment);
+            break;
+        }
+
+        case Msg::SNAPSHOT_SAVED: {
+
+            if (!m_savingSnapshot) break;
+
+            m_savingSnapshot = false;
+            emit busyChanged();
+
+            SaveJob job;
+            std::swap(job, m_snapshotJob);
+            if (job) job(value(), attachment);
+            break;
+        }
+
         case Msg::CONFIG: {
 
             m_configIsDirty = true;
@@ -1273,14 +1329,12 @@ C64Controller::process(const Message &msg, const string &attachment)
         }
 
         case Msg::SNAPSHOT_TAKEN:
-        case Msg::SNAPSHOT_RESTORED:
-        case Msg::SNAPSHOT_SAVED: {
+        case Msg::SNAPSHOT_RESTORED: {
 
             break;
         }
 
-        case Msg::WORKSPACE_LOADED:
-        case Msg::WORKSPACE_SAVED: {
+        case Msg::WORKSPACE_LOADED: {
 
             break;
         }
