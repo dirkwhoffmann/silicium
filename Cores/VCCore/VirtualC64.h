@@ -1174,6 +1174,18 @@ struct C64API : public API {
      */
     void saveWorkspaceAsync(const std::filesystem::path &path) const;
 
+    /** @brief  Loads, saves, or asynchronously saves the workspace of an SVM
+     *
+     *  These work on the workspace folder of an SVM that is already open.
+     *  Saving replaces the workspace, notes its preview image in the manifest
+     *  and persists the SVM. As with hibernateAsync, the object is used on
+     *  the emulator thread and must stay alive, and untouched, until the
+     *  WORKSPACE_SAVED message has arrived.
+     */
+    void loadWorkspace(retro::vault::SVMFile &svm);
+    void saveWorkspace(retro::vault::SVMFile &svm) const;
+    void saveWorkspaceAsync(retro::vault::SVMFile &svm) const;
+
     /** @brief  Takes a snapshot
      *
      *  @param  compressor   The snapshot compression method

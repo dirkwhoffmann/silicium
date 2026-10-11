@@ -458,7 +458,7 @@ C64Controller::windowDidOpen()
     // one, so the failure must be caught here rather than left to propagate.
     try {
 
-        core().c64.loadWorkspace(svm->root() / SVMFile::workspaceDir);
+        core().c64.loadWorkspace(*svm);
 
     } catch (const std::exception &e) {
 
@@ -806,15 +806,11 @@ C64Controller::saveWorkspaceAsync()
 
     try {
 
-        // Start from scratch
-        const auto folder = svm->root() / SVMFile::workspaceDir;
-        fs::remove_all(folder);
-        fs::create_directories(folder);
-
         m_savingWorkspace = true;
         emit busyChanged();
 
-        core().c64.saveWorkspaceAsync(folder);
+        // The core replaces the workspace and updates the manifest itself
+        core().c64.saveWorkspaceAsync(*svm);
         return true;
 
     } catch (const std::exception &e) {
@@ -838,10 +834,6 @@ C64Controller::workspaceDidSave(int code, const std::string &what)
     try {
 
         if (code != 0) throw std::runtime_error(what);
-
-        // Update the manifest. The core has saved the screenshot into the workspace.
-        svm->getManifest().screenshot = "preview.png";
-        svm->persist();
 
         emit workspaceSaved();
         notifyPersist();

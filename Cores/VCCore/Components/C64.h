@@ -685,9 +685,11 @@ public:
 
     // Loads a workspace from a file
     void loadWorkspace(const fs::path &path);
+    void loadWorkspace(retro::vault::SVMFile &svm);
 
     // Saves the current workspace to a file
     void saveWorkspace(const fs::path &path);
+    void saveWorkspace(retro::vault::SVMFile &svm);
 
     // Hibernates the machine
     void hibernate(const fs::path &path, bool snapshot, bool workspace);
@@ -697,6 +699,9 @@ private:
 
     // Writes the workspace into a folder
     void writeWorkspace(const fs::path &path);
+
+    // Replaces the workspace of an SVM and notes it in the manifest
+    void updateWorkspace(retro::vault::SVMFile &svm);
 
 public:
 

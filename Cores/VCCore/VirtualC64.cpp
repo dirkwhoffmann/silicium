@@ -13,6 +13,7 @@
 #include "vcconfig.h"
 #include "VirtualC64.h"
 #include "Emulator.h"
+#include "SVMFile.h"
 
 namespace vc64 {
 
@@ -547,6 +548,27 @@ C64API::saveWorkspaceAsync(const fs::path &path) const
 {
     VC64_PUBLIC
     emu->put(Cmd::SAVE_WORKSPACE, path.string());
+}
+
+void
+C64API::loadWorkspace(retro::vault::SVMFile &svm)
+{
+    VC64_PUBLIC_SUSPEND
+    c64->loadWorkspace(svm);
+}
+
+void
+C64API::saveWorkspace(retro::vault::SVMFile &svm) const
+{
+    VC64_PUBLIC_SUSPEND
+    c64->saveWorkspace(svm);
+}
+
+void
+C64API::saveWorkspaceAsync(retro::vault::SVMFile &svm) const
+{
+    VC64_PUBLIC
+    emu->put(Command(Cmd::SAVE_WORKSPACE, i64(0), i64(&svm)));
 }
 
 std::unique_ptr<Snapshot>

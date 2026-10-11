@@ -1267,7 +1267,12 @@ C64::processCommand(const Command &cmd)
             try {
 
                 if (cmd.type == Cmd::SAVE_WORKSPACE) {
-                    saveWorkspace(cmd.str);
+                    // An SVM that is already open travels as a pointer, otherwise as a path
+                    if (cmd.value2) {
+                        saveWorkspace(*reinterpret_cast<retro::vault::SVMFile *>(cmd.value2));
+                    } else {
+                        saveWorkspace(cmd.str);
+                    }
                 } else {
                     saveSnapshot(cmd.str, Compressor(cmd.value));
                 }
@@ -1645,6 +1650,34 @@ C64::writeWorkspace(const fs::path &path)
 }
 
 void
+C64::loadWorkspace(retro::vault::SVMFile &svm)
+{
+    loadWorkspace(svm.root() / retro::vault::SVMFile::workspaceDir);
+}
+
+void
+C64::saveWorkspace(retro::vault::SVMFile &svm)
+{
+    updateWorkspace(svm);
+    svm.persist();
+
+    // Inform the GUI
+    msgQueue.put(Msg::WORKSPACE_SAVED);
+}
+
+void
+C64::updateWorkspace(retro::vault::SVMFile &svm)
+{
+    using namespace retro::vault;
+
+    auto folder = svm.root() / SVMFile::workspaceDir;
+    fs::remove_all(folder);
+    writeWorkspace(folder);
+
+    svm.getManifest().screenshot = "preview.png";
+}
+
+void
 C64::hibernate(const fs::path &path, bool snapshot, bool workspace)
 {
     using namespace retro::vault;
@@ -1662,18 +1695,7 @@ C64::hibernate(retro::vault::SVMFile &svm, bool snapshot, bool workspace)
 
     if (snapshot && svm.isReadOnly()) throw utl::Error(0, "The virtual machine is read-only.");
 
-    if (workspace) {
-
-        // Start from scratch
-        auto folder = svm.root() / SVMFile::workspaceDir;
-        fs::remove_all(folder);
-        fs::create_directories(folder);
-
-        writeWorkspace(folder);
-
-        // The preview image has been written along with the workspace
-        manifest.screenshot = "preview.png";
-    }
+    if (workspace) updateWorkspace(svm);
 
     if (snapshot) {
 
