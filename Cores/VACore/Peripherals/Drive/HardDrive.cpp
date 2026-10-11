@@ -14,6 +14,7 @@
 #include "DeviceError.h"
 #include "Memory.h"
 #include "MsgQueue.h"
+#include "SVMFile.h"
 #include "utl/io.h"
 
 namespace vamiga {
@@ -261,6 +262,42 @@ HardDrive::init(const fs::path &path)
     auto hdf = std::make_unique<HDFFile>(path);
 
     init(std::move(hdf));
+}
+
+void
+HardDrive::init(const fs::path &path, retro::vault::SVMFile &svm)
+{
+    using namespace retro::vault;
+
+    // A folder cannot be copied, only imported
+    if (fs::is_directory(path)) { init(path); return; }
+
+    auto folder = svm.root() / SVMFile::workspaceDir;
+    auto target = folder / std::format("hd{}.hdf", objid);
+
+    fs::create_directories(folder);
+
+    // Leave the file alone if it is the one that is to be attached
+    std::error_code ec;
+    if (!(fs::exists(target) && fs::equivalent(path, target, ec))) {
+
+        // Copy next to the target first, so a failure leaves the old file as it was
+        auto temp = target;
+        temp += ".tmp";
+
+        if (AnyImage::compressorFor(path) != utl::Compressor::NONE) {
+
+            // Uncompresses the file when reading it
+            HDFFile(path).copy(temp);
+
+        } else {
+
+            fs::copy_file(path, temp, fs::copy_options::overwrite_existing);
+        }
+        fs::rename(temp, target);
+    }
+
+    init(target);
 }
 
 void

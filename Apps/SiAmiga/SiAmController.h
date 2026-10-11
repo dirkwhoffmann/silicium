@@ -139,6 +139,9 @@ public:
      */
     fs::path workspaceFolder() const;
 
+    // The SVM file this machine belongs to
+    SVMFile &svmFile() { return *svm; }
+
     // Parses the command line, opens the SVM file it names into 'svm', and
     // collects any --exec (-e) commands into execCommands. Returns false if
     // no SVM file was given or it could not be opened, in which case

@@ -952,6 +952,21 @@ public:
      */
     void attach(const std::filesystem::path &path);
 
+    /** @brief  Attaches a hard drive provided by a media file and makes it
+     *          part of the workspace of an SVM.
+     *
+     *  The file is copied into the workspace folder of the SVM, under the name
+     *  of the drive (hd0.hdf for drive 0, and so on), and the drive is attached
+     *  to the copy. A compressed file (.hdz) is uncompressed on the way. A
+     *  folder is imported as it is.
+     *
+     *  @param  path    Path to the media file.
+     *  @param  svm     The SVM whose workspace takes the file
+     *  @note   Saving the workspace afterwards makes the drive part of its
+     *          configuration.
+     */
+    void attach(const std::filesystem::path &path, retro::vault::SVMFile &svm);
+
     /** @brief  Attaches a hard drive with a particular geometry.
      *  @param  c       Number of cylinders
      *  @param  h       Number of heads

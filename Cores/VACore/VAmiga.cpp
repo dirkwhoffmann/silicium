@@ -1417,6 +1417,13 @@ HardDriveAPI::attach(const fs::path &path)
 }
 
 void
+HardDriveAPI::attach(const fs::path &path, retro::vault::SVMFile &svm)
+{
+    VAMIGA_PUBLIC_SUSPEND
+    drive->init(path, svm);
+}
+
+void
 HardDriveAPI::attach(isize c, isize h, isize s, isize b)
 {
     VAMIGA_PUBLIC_SUSPEND

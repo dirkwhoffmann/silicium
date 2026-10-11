@@ -187,19 +187,14 @@ SiAmMediaController::attachHdAsync(int nr, const QUrl &url)
 {
     if (!url.isLocalFile()) return;
 
-    fs::path wspace = parent->workspaceFolder();
     fs::path source = url.toLocalFile().toStdWString();
-    fs::path target = wspace / ("hd" + std::to_string(nr) + ".hdf");
 
-    parent->runTask([this, nr, source, target] {
+    parent->runTask([this, nr, source] {
 
                 parent->report(tr("Copying the hard drive into the virtual machine..."));
 
-                // Copy the hard drive image into the virtual machine folder
-                fs::copy_file(source, target, fs::copy_options::overwrite_existing);
-
-                // Attach the copied image
-                attachHd(nr, target);
+                // The core copies the image into the virtual machine folder and attaches it
+                attachHd(nr, source);
             } /*,
             [this, nr] {
 
@@ -358,7 +353,7 @@ SiAmMediaController::attachHd(int nr, const fs::path &path)
     auto &core = SiAmController::core();
 
     parent->report(tr("Attaching the hard drive..."), 0.90);
-    core.hd[nr]->attach(path);
+    core.hd[nr]->attach(path, parent->svmFile());
 
     /* Plug the controller in afterwards, not before: the drive is ready by
      * the time anything can look at it, and nothing done here to the drive
