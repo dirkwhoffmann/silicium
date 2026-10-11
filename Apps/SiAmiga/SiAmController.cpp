@@ -368,7 +368,7 @@ void
 SiAmController::windowDidOpen()
 {
     try {
-        core().amiga.loadWorkspace(svm->root() / SVMFile::workspaceDir);
+        core().amiga.loadWorkspace(*svm);
     } catch (const std::exception &e) {
         showError("Failed to load workspace.", e.what());
     }
@@ -461,66 +461,69 @@ SiAmController::getName() const
 void
 SiAmController::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
 {
-    /* Both jobs run in the background and report to the status bar, one after
-     * the other: the snapshot first, then the workspace. hibernated() is
-     * emitted when the last of them is over, however it went.
+    /* The emulator thread reports each part as it is done (see
+     * workspaceDidSave, snapshotDidSave) and the whole at the end (see
+     * hibernateDidFinish). hibernated() is emitted when that has been dealt
+     * with, however it went, and at once if there is nothing to do.
      */
-    auto workspace = [this, hibernateWorkspace] {
+    if (hibernateSnapshot && !makeRoomForSnapshot()) hibernateSnapshot = false;
 
-        auto finished = [this] { emit hibernated(); };
+    if (busy() || (!hibernateSnapshot && !hibernateWorkspace)) {
 
-        if (hibernateWorkspace) startWorkspace(finished); else finished();
-    };
-
-    if (hibernateSnapshot) {
-
-        try {
-            shrinkSnapshotStorage(preferences().getMaxSnapshots() - 1);
-        } catch (std::exception &e) {
-            qCWarning(siLog) << "Failed to make room for a snapshot:" << e.what();
-        }
-        startSnapshot(workspace);
-
-    } else {
-
-        workspace();
+        emit hibernated();
+        return;
     }
-}
 
-bool
-SiAmController::writeWorkspace(const fs::path &folder, const QImage &screenshot)
-{
-    /* The folder is not emptied here. Amiga::saveWorkspace() clears it
-     * itself, and it is the one that knows which files to spare: a hard
-     * drive loaded from one of them writes its changes back into it, so
-     * deleting it first would lose the drive.
-     */
-    std::error_code ec;
-    fs::create_directories(folder, ec);
+    try {
 
-    core().amiga.saveWorkspace(folder);
+        m_hibernating = true;
+        m_savingWorkspace = hibernateWorkspace;
+        m_savingSnapshot = hibernateSnapshot;
+        emit busyChanged();
 
-    if (screenshot.isNull()) return false;
+        core().amiga.hibernateAsync(*svm, hibernateSnapshot, hibernateWorkspace);
 
-    if (!screenshot.save(QString::fromStdString((folder / "screenshot.jpg").string()))) {
+    } catch (const std::exception &e) {
 
-        qCWarning(siLog) << "Failed to save workspace screenshot.";
-        return false;
+        m_hibernating = m_savingWorkspace = m_savingSnapshot = false;
+        emit busyChanged();
+
+        showError(tr("Failed to hibernate."), e.what());
+        emit hibernated();
     }
-    return true;
 }
 
 void
-SiAmController::workspaceWritten(bool screenshotSaved)
+SiAmController::hibernateDidFinish(int code, const std::string &what)
 {
-    // The manifest is read by the window, so it is only ever written here,
-    // on the window's own thread.
-    if (screenshotSaved) svm->getManifest().screenshot = "screenshot.jpg";
+    if (!m_hibernating) return;
 
-    svm->persist();
-    emit workspaceSaved();
-    notifyPersist();
-    notifySvmChanged("workspace");
+    // Parts that were not reached because of an error are still marked
+    m_hibernating = m_savingWorkspace = m_savingSnapshot = false;
+    emit busyChanged();
+
+    if (code != 0) showError(tr("Failed to hibernate."), what.c_str());
+
+    emit hibernated();
+}
+
+bool
+SiAmController::makeRoomForSnapshot()
+{
+    /* The snapshot storage is full: make room, or ask the user if snapshots
+     * may not be deleted without being asked.
+     */
+    const int limit = preferences().getMaxSnapshots();
+
+    if (svm->getManifest().numSnapshots() < limit) return true;
+
+    if (!preferences().getAutoDeleteSnapshots()) {
+
+        emit snapshotLimitReached();
+        return false;
+    }
+    shrinkSnapshotStorage(limit - 1);
+    return true;
 }
 
 void
@@ -530,10 +533,12 @@ SiAmController::saveWorkspaceNow()
 
     try {
 
-        const auto folder = svm->root() / SVMFile::workspaceDir;
-        auto screenshot = m_renderer ? m_renderer->grabScreenshot() : QImage();
+        // The core replaces the workspace and updates the manifest itself
+        core().amiga.saveWorkspace(*svm);
 
-        workspaceWritten(writeWorkspace(folder, screenshot));
+        emit workspaceSaved();
+        notifyPersist();
+        notifySvmChanged("workspace");
 
     } catch (const std::exception &e) {
 
@@ -541,128 +546,96 @@ SiAmController::saveWorkspaceNow()
     }
 }
 
-void
-SiAmController::saveWorkspace()
+bool
+SiAmController::saveWorkspaceAsync()
 {
-    startWorkspace();
-}
+    if (busy()) return false;
 
-void
-SiAmController::startWorkspace(std::function<void()> always)
-{
-    const auto folder = svm->root() / SVMFile::workspaceDir;
+    try {
 
-    /* The screenshot is taken here rather than in the job: it has to show the
-     * machine as it is at the moment the workspace is asked for, not as it
-     * happens to be once a thread gets round to it.
-     */
-    auto screenshot = m_renderer ? m_renderer->grabScreenshot() : QImage();
-    auto saved = std::make_shared<std::atomic<bool>>(false);
+        m_savingWorkspace = true;
+        emit busyChanged();
 
-    bool started = runTask(
+        // The core replaces the workspace and updates the manifest itself
+        core().amiga.saveWorkspaceAsync(*svm);
+        return true;
 
-            [this, folder, screenshot, saved] {
+    } catch (const std::exception &e) {
 
-                report(tr("Saving workspace..."));
-                *saved = writeWorkspace(folder, screenshot);
-            },
-            [this, saved, always] {
-
-                workspaceWritten(*saved);
-                if (always) always();
-            },
-            always);
-
-    if (!started && always) always();
-}
-
-void
-SiAmController::saveSnapshot()
-{
-    auto &m = svm->getManifest();
-
-    if (m.numSnapshots() >= preferences().getMaxSnapshots() && !preferences().getAutoDeleteSnapshots()) {
-        emit snapshotLimitReached();
-    } else {
-        startSnapshot();
+        m_savingWorkspace = false;
+        emit busyChanged();
+        showError(tr("Failed to save the workspace."), e.what());
+        return false;
     }
 }
 
 void
-SiAmController::startSnapshot(std::function<void()> always)
+SiAmController::workspaceDidSave(int code, const std::string &what)
 {
+    // The core reports this for the synchronous save, too; only ours counts
+    if (!m_savingWorkspace) return;
+
+    m_savingWorkspace = false;
+    emit busyChanged();
+
+    if (code != 0) {
+
+        showError(tr("Failed to save the workspace."), what.c_str());
+        return;
+    }
+
+    emit workspaceSaved();
+    notifyPersist();
+    notifySvmChanged("workspace");
+}
+
+bool
+SiAmController::saveSnapshotAsync()
+{
+    if (!makeRoomForSnapshot()) return false;
+
+    if (busy()) return false;
+
     try {
 
-        if (svm->isReadOnly()) throw ImageError(ImageError::VM_READ_ONLY);
+        m_savingSnapshot = true;
+        emit busyChanged();
 
-        /* Taking the snapshot and the screenshot is quick and touches the
-         * machine, so it happens here. Writing them out is the slow part and
-         * happens in the job, which is why the screenshot is copied: it must
-         * not point into the snapshot.
-         */
-        qCDebug(siLog) << "Taking snapshot...";
-        std::shared_ptr snap = core().amiga.takeSnapshot(Compressor::LZ4);
-
-        qCDebug(siLog) << "Taking screenshot...";
-        auto thumbnail = snap->getHeader()->screenshot;
-        QImage image = QImage((uchar *)thumbnail.screen,
-                              (int)thumbnail.width,
-                              (int)thumbnail.height,
-                              QImage::Format_ARGB32).copy();
-
-        // Assemble snapshot info
-        SnapshotInfo info {};
-        info.version    = VAmiga::snapshotVersion();
-        info.uuid       = utl::UUID::v4();
-        info.platform   = Platform::AMIGA;
-        info.created    = thumbnail.timestamp;
-        info.modified   = thumbnail.timestamp;
-        info.screenshot = fs::path(info.uuid.toString() + ".jpg");
-        info.binary     = fs::path(info.uuid.toString() + ".vasnap");
-
-        const auto snapshotFolder = svm->root() / SVMFile::snapshotDir;
-        const auto screenshotPath = snapshotFolder / info.screenshot;
-        const auto snapshotPath   = snapshotFolder / info.binary;
-
-        bool started = runTask(
-
-            [this, snap, image, snapshotFolder, screenshotPath, snapshotPath] {
-
-                report(tr("Saving snapshot..."));
-
-                /* Bring the snapshot folder into being. Nothing else creates
-                 * it, and the first snapshot of an SVM is exactly the case
-                 * where it is not there yet.
-                 */
-                std::error_code ec;
-                fs::create_directories(snapshotFolder, ec);
-                if (ec) throw utl::IOError(utl::IOError::DIR_CANT_CREATE, snapshotFolder);
-
-                if (!image.save(QString::fromStdString(screenshotPath.string())))
-                    throw utl::IOError(utl::IOError::FILE_CANT_WRITE, screenshotPath);
-
-                snap->writeToFile(snapshotPath);
-            },
-            [this, info, always] {
-
-                // The manifest belongs to this thread
-                qCDebug(siLog) << "Registering snapshot " << info.uuid.toString();
-                svm->getManifest().appendSnapshot(info);
-
-                svm->persist();
-                notifyPersist();
-                emit snapshotSaved(QString::fromStdString(info.uuid.toString()));
-                notifySvmChanged("snapshot", QString::fromStdString(info.uuid.toString()));
-                if (always) always();
-            },
-            always);
-
-        if (!started && always) always();
+        // The core adds the snapshot to the manifest itself
+        core().amiga.saveSnapshotAsync(*svm);
+        return true;
 
     } catch (const std::exception &e) {
 
-        showError("Failed to save snapshot.", e.what());
-        if (always) always();
+        m_savingSnapshot = false;
+        emit busyChanged();
+        showError(tr("Failed to save the snapshot."), e.what());
+        return false;
+    }
+}
+
+void
+SiAmController::snapshotDidSave(int code, const std::string &what)
+{
+    // The core reports this for the synchronous save, too; only ours counts
+    if (!m_savingSnapshot) return;
+
+    m_savingSnapshot = false;
+    emit busyChanged();
+
+    if (code != 0) {
+
+        showError(tr("Failed to save the snapshot."), what.c_str());
+        return;
+    }
+
+    if (auto *info = svm->getManifest().lookupLatestSnapshot()) {
+
+        const auto uuid = QString::fromStdString(info->uuid.toString());
+
+        notifyPersist();
+        emit snapshotSaved(uuid);
+        notifySvmChanged("snapshot", uuid);
     }
 }
 
@@ -1088,6 +1061,21 @@ void
 SiAmController::process(const Message &msg, const string &attachment)
 {
     switch (msg.type) {
+
+        case Msg::WORKSPACE_SAVED:
+
+            workspaceDidSave((int)msg.value, attachment);
+            break;
+
+        case Msg::SNAPSHOT_SAVED:
+
+            snapshotDidSave((int)msg.value, attachment);
+            break;
+
+        case Msg::HIBERNATED:
+
+            hibernateDidFinish((int)msg.value, attachment);
+            break;
 
         case Msg::CONFIG:
 

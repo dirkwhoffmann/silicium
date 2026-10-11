@@ -452,14 +452,14 @@ Item {
 
         id: saveWorkspaceAction
         text: qsTr("Save Workspace")
-        onTriggered: amiga.saveWorkspace()
+        onTriggered: amiga.saveWorkspaceAsync()
     }
 
     Action {
 
         id: saveSnapshotAction
         text: qsTr("Save Snapshot")
-        onTriggered: amiga.saveSnapshot()
+        onTriggered: amiga.saveSnapshotAsync()
     }
 
     Action {

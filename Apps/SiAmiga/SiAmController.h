@@ -94,6 +94,16 @@ class SiAmController : public Controller {
     // Indicates whether the debug panel is visible
     bool m_debugPanel = false;
 
+    /* Saves that the emulator thread carries out (see saveWorkspaceAsync).
+     * A flag is set while one is under way and cleared by the message that
+     * reports its result (see workspaceDidSave, snapshotDidSave). A
+     * hibernation sets both, plus its own, which the final message clears
+     * (see hibernateDidFinish).
+     */
+    bool m_savingWorkspace = false;
+    bool m_savingSnapshot = false;
+    bool m_hibernating = false;
+
     // Sampled once per rendered frame (see update()) rather than read
     // straight off the core, so the status bar's warp icon gets a change
     // notification instead of having to poll.
@@ -255,22 +265,26 @@ public:
 
     Q_INVOKABLE void toggleDebugPanel() { setDebugPanel(!m_debugPanel); }
 
-    /* Writes the workspace.
+    /* Ask the emulator thread to save the workspace or a snapshot. The
+     * functions return at once; busy() is true until the core reports the
+     * result (see workspaceDidSave, snapshotDidSave). They return false if
+     * nothing was started.
      *
-     * saveWorkspace() hands the writing to a thread of its own and reports
-     * what it is doing through the status bar's ticker, because a
-     * machine with hard drives attached takes long enough to freeze the
-     * window. saveWorkspaceNow() does the same work on the calling thread,
-     * for a job that is already running off the window's thread (see
-     * SiAmMediaController::attachHdAsync).
+     * saveSnapshotAsync() deletes the oldest snapshots if the storage is full
+     * and the preferences say so. Otherwise it emits snapshotLimitReached(),
+     * so the user can decide, and starts nothing.
      */
-    Q_INVOKABLE void saveWorkspace();
-    void saveWorkspaceNow();
-    Q_INVOKABLE void saveSnapshot();
+    Q_INVOKABLE bool saveWorkspaceAsync();
+    Q_INVOKABLE bool saveSnapshotAsync();
 
-    // Same as saveWorkspace() and saveSnapshot(), under the names the shared QML uses
-    Q_INVOKABLE void saveWorkspaceAsync() { saveWorkspace(); }
-    Q_INVOKABLE void saveSnapshotAsync() { saveSnapshot(); }
+    /* Saves the workspace on the calling thread, for a job that is already
+     * running off the window's thread (see SiAmMediaController::attachHdAsync).
+     */
+    void saveWorkspaceNow();
+
+    // A job is running, or the emulator thread is saving
+    bool busy() const override { return m_savingWorkspace || m_savingSnapshot || m_hibernating || Controller::busy(); }
+
     Q_INVOKABLE void revertSnapshot();
 
     Q_PROPERTY(SiAmActivityController *activityController READ getActivityController CONSTANT)
@@ -401,18 +415,6 @@ public:
 
     Q_INVOKABLE void shrinkSnapshotStorage(int count);
 
-private:
-
-    /* The jobs behind saveSnapshot(), saveWorkspace() and hibernate(). Each
-     * runs in the background (see runTask); 'always' runs on this thread when
-     * the job is over, whether it worked or not, so jobs can be chained.
-     * saveSnapshot() checks the capacity limit and asks the user first;
-     * hibernation evicts silently and comes straight here, because it runs
-     * on quit where a dialog would have nowhere to go.
-     */
-    void startSnapshot(std::function<void()> always = {});
-    void startWorkspace(std::function<void()> always = {});
-
 public:
 
     //
@@ -422,6 +424,17 @@ public:
     // Receives messages from the emulator thread (see initialize()) and
     // marshals them onto the GUI thread.
     void process(const vamiga::Message &msg, const string &attachment = "");
+
+    // Called when the emulator thread reports the result of a save
+    void workspaceDidSave(int code, const std::string &what);
+    void snapshotDidSave(int code, const std::string &what);
+
+    // Called when the emulator thread reports that it has hibernated
+    void hibernateDidFinish(int code, const std::string &what);
+
+    // Makes room for another snapshot, or asks the user to; false if there is none
+    bool makeRoomForSnapshot();
+
     void update();
 
 private:
@@ -465,13 +478,6 @@ public:
      * takes a title and a body.
      */
     Q_INVOKABLE void notifyFatalError(const QString &title, const QString &text);
-
-private:
-
-    // The file writing, and the bookkeeping that follows it. Split because
-    // only the first half may leave this thread (see saveWorkspace).
-    bool writeWorkspace(const fs::path &folder, const QImage &screenshot);
-    void workspaceWritten(bool screenshotSaved);
 
 signals:
 
