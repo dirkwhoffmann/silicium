@@ -66,6 +66,11 @@
 #include "RetroShell.h"
 #include "RshServer.h"
 
+namespace retro::vault {
+
+    class SVMFile;
+}
+
 namespace retro::vault::cbm {
 
     class FileSystem;
@@ -684,11 +689,9 @@ public:
     // Saves the current workspace to a file
     void saveWorkspace(const fs::path &path);
 
-    /* Hibernates the machine into the SVM at the given path: saves the
-     * workspace and/or a snapshot (including a screenshot), updates the
-     * manifest, and informs the GUI with a HIBERNATED message.
-     */
+    // Hibernates the machine
     void hibernate(const fs::path &path, bool snapshot, bool workspace);
+    void hibernate(retro::vault::SVMFile &svm, bool snapshot, bool workspace);
 
 private:
 

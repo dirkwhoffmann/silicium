@@ -1240,7 +1240,11 @@ C64::processCommand(const Command &cmd)
             // Reports success to the GUI itself, a failure with the same message
             try {
 
-                hibernate(cmd.str, cmd.value & 1, cmd.value & 2);
+                if (cmd.value2) {
+                    hibernate(*reinterpret_cast<retro::vault::SVMFile *>(cmd.value2), cmd.value & 1, cmd.value & 2);
+                } else {
+                    hibernate(cmd.str, cmd.value & 1, cmd.value & 2);
+                }
 
             } catch (const std::exception &e) {
 
@@ -1646,6 +1650,14 @@ C64::hibernate(const fs::path &path, bool snapshot, bool workspace)
     using namespace retro::vault;
 
     SVMFile svm(SVMFile::Open, path);
+    hibernate(svm, snapshot, workspace);
+}
+
+void
+C64::hibernate(retro::vault::SVMFile &svm, bool snapshot, bool workspace)
+{
+    using namespace retro::vault;
+
     auto &manifest = svm.getManifest();
 
     if (snapshot && svm.isReadOnly()) throw utl::Error(0, "The virtual machine is read-only.");

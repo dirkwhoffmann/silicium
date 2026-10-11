@@ -20,6 +20,8 @@
 
 using retro::vault::cbm::FSFormat;
 
+namespace retro::vault { class SVMFile; }
+
 namespace vc64 {
 
 using peddle::Guard;
@@ -1234,6 +1236,16 @@ struct C64API : public API {
      *  code and description if the operation failed.
      */
     void hibernateAsync(const std::filesystem::path &path, bool snapshot, bool workspace) const;
+
+    /** @brief  Hibernates the machine into an SVM that is already open
+     *
+     *  Works like the versions that take a path, but updates and persists the
+     *  given object, so its manifest is current afterwards. The asynchronous
+     *  version uses the object on the emulator thread: it must stay alive
+     *  and must not be touched until the HIBERNATED message has arrived.
+     */
+    void hibernate(retro::vault::SVMFile &svm, bool snapshot, bool workspace) const;
+    void hibernateAsync(retro::vault::SVMFile &svm, bool snapshot, bool workspace) const;
 
 
     /// @}

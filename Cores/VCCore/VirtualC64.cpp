@@ -619,6 +619,20 @@ C64API::hibernateAsync(const fs::path &path, bool snapshot, bool workspace) cons
 }
 
 void
+C64API::hibernate(retro::vault::SVMFile &svm, bool snapshot, bool workspace) const
+{
+    VC64_PUBLIC_SUSPEND
+    c64->hibernate(svm, snapshot, workspace);
+}
+
+void
+C64API::hibernateAsync(retro::vault::SVMFile &svm, bool snapshot, bool workspace) const
+{
+    VC64_PUBLIC
+    emu->put(Command(Cmd::HIBERNATE, i64(snapshot) | i64(workspace) << 1, i64(&svm)));
+}
+
+void
 C64API::loadRom(const fs::path &path)
 {
     VC64_PUBLIC_SUSPEND

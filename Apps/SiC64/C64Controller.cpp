@@ -719,11 +719,6 @@ C64Controller::toggleWarp()
 void
 C64Controller::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
 {
-    /* The emulator thread does the work in one go and reports with a
-     * HIBERNATED message (see hibernateDidFinish). hibernated() is emitted
-     * when that has been dealt with, however it went, and at once if there is
-     * nothing to do.
-     */
     if (hibernateSnapshot && !makeRoomForSnapshot()) hibernateSnapshot = false;
 
     if (busy() || (!hibernateSnapshot && !hibernateWorkspace)) {
@@ -737,18 +732,16 @@ C64Controller::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
 
     try {
 
-        // The core reads the manifest from disk
-        svm->persist();
-
         m_hibernating = true;
         emit busyChanged();
 
-        core().c64.hibernateAsync(svm->root(), hibernateSnapshot, hibernateWorkspace);
+        core().c64.hibernateAsync(*svm, hibernateSnapshot, hibernateWorkspace);
 
     } catch (const std::exception &e) {
 
         m_hibernating = false;
         emit busyChanged();
+
         showError(tr("Failed to hibernate."), e.what());
         emit hibernated();
     }
@@ -765,9 +758,6 @@ C64Controller::hibernateDidFinish(int code, const std::string &what)
     try {
 
         if (code != 0) throw std::runtime_error(what);
-
-        // The core has updated the manifest on disk
-        svm->readManifest();
 
         if (m_hibernateWorkspace) emit workspaceSaved();
 
