@@ -169,13 +169,13 @@ VMWindow {
     }
 
     //
-    // Busy box, shown while a job is running
+    // Busy box, shown while the machine has a status to report
     //
 
     SuBusyDialog {
 
         id: busyDialog
-        active: root.c64.busy
+        active: root.c64.status !== ""
         topInset: chrome.titleBarInset
     }
 

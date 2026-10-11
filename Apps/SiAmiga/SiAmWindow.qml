@@ -142,6 +142,17 @@ VMWindow {
     }
 
     //
+    // Busy box, shown while the machine has a status to report
+    //
+
+    SuBusyDialog {
+
+        id: busyDialog
+        active: root.amiga.status !== ""
+        topInset: chrome.titleBarInset
+    }
+
+    //
     // Actions
     //
 
