@@ -984,23 +984,17 @@ public:
 
     /** @brief  Creates a new hard drive in the workspace of an SVM
      *
-     *  An empty image of the given size is created as hdN.hdf, attached,
-     *  formatted, and filled with the files of a folder if one is given. The
-     *  asynchronous version hands the work to the emulator thread and reports
-     *  with an HDR_ATTACH message, as attachAsync() does. The SVM is used on
-     *  the emulator thread: it must stay alive, and untouched, until the
-     *  message has arrived.
+     *  An empty image of the given size is created as hdN.hdf, attached, and
+     *  formatted. This is quick, even for a large drive. Use importFolder()
+     *  to fill it.
      *
      *  @param  svm         The SVM whose workspace takes the image
      *  @param  megabytes   Size of the drive
      *  @param  fs          File system to install (NODOS leaves the drive blank)
      *  @param  name        Name of the volume
-     *  @param  importPath  Optional folder to import into the file system
      */
     void create(retro::vault::SVMFile &svm, isize megabytes, amiga::FSFormat fs,
-                const string &name, const std::filesystem::path &importPath = {});
-    void createAsync(retro::vault::SVMFile &svm, isize megabytes, amiga::FSFormat fs,
-                     const string &name, const std::filesystem::path &importPath = {});
+                const string &name);
 
     /** @brief  Attaches a hard drive with a particular geometry.
      *  @param  c       Number of cylinders
@@ -1019,7 +1013,18 @@ public:
     /** @brief  Imports files from a folder
      *  @note   All existing files are deleted prior to importing the folder.
      */
-    void importFiles(const std::filesystem::path &path);
+    void importFolder(const std::filesystem::path &path);
+
+    /** @brief  Imports files from a folder asynchronously
+     *
+     *  The request is handed to the emulator thread, which carries it out
+     *  when it processes its command queue. The function returns immediately.
+     *  The GUI is informed by an HDR_IMPORTED message, which carries the
+     *  number of the drive and, if the operation failed, an error code and
+     *  description. When it succeeds, the changes have been written to the
+     *  image file.
+     */
+    void importFolderAsync(const std::filesystem::path &path);
 
     /** @brief  Returns the file the disk lives in
      *  @note   The path is empty for a drive that was built in memory.

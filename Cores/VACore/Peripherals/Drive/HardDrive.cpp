@@ -111,7 +111,7 @@ HardDrive::init(const GeometryDescriptor &geometry)
     // Create an empty disk in memory
     image = std::make_shared<HDFFile>(geometry.numBytes());
 
-    announce();
+    msgQueue.put(Msg::HDR_ATTACH, objid);
 }
 
 void
@@ -234,7 +234,7 @@ HardDrive::init(std::unique_ptr<HDFFile> hdf)
     // Take over the image. Nothing is copied, and nothing is read yet.
     image = std::move(hdf);
 
-    announce();
+    msgQueue.put(Msg::HDR_ATTACH, objid);
 
     // Print some debug information
     logmsg(LOG_HDR, "%zu (needed) file system drivers\n", drivers.size());
@@ -301,14 +301,8 @@ HardDrive::init(const fs::path &path, retro::vault::SVMFile &svm)
 }
 
 void
-HardDrive::announce()
-{
-    if (!silent) msgQueue.put(Msg::HDR_ATTACH, objid);
-}
-
-void
 HardDrive::create(retro::vault::SVMFile &svm, isize megabytes, amiga::FSFormat fsType,
-                  const string &name, const fs::path &importPath)
+                  const string &name)
 {
     using namespace retro::vault;
 
@@ -322,31 +316,21 @@ HardDrive::create(retro::vault::SVMFile &svm, isize megabytes, amiga::FSFormat f
         throw IOError(IOError::FILE_CANT_CREATE, target);
     }
 
-    // The drive is announced once, when it is complete
-    silent = true;
-
     try {
 
         init(target);
         format(fsType, FSName(name));
-
-        if (fsType != amiga::FSFormat::NODOS && !importPath.empty()) importFolder(importPath);
-
         persist();
 
     } catch (...) {
 
         // Remove the file if anything went wrong
-        silent = false;
         detach();
 
         std::error_code ec;
         fs::remove(target, ec);
         throw;
     }
-
-    silent = false;
-    announce();
 }
 
 void

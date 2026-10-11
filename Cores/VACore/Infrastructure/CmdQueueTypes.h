@@ -47,7 +47,7 @@ enum class Cmd : long
     SAVE_SNAPSHOT,          ///< Save a snapshot to a file (path attached)
     HIBERNATE,              ///< Hibernate into an SVM (path attached, value = bit 0: snapshot, bit 1: workspace)
     HDR_ATTACH,             ///< Attach a hard drive and put it into an SVM (path attached, value = drive, value2 = SVM)
-    HDR_CREATE,             ///< Create a hard drive in an SVM (value = drive | file system << 8 | megabytes << 16, value2 = SVM, "name\nimport path" attached)
+    HDR_IMPORT,             ///< Import a folder into a hard drive (path attached, value = drive)
     
     // CPU (Breakpoints, Watchpoints, Catchpoints)
     GUARD_SET_AT,
@@ -125,7 +125,7 @@ struct CmdEnum : Reflectable<CmdEnum, Cmd> {
             case Cmd::SAVE_SNAPSHOT:         return "SAVE_SNAPSHOT";
             case Cmd::HIBERNATE:             return "HIBERNATE";
             case Cmd::HDR_ATTACH:            return "HDR_ATTACH";
-            case Cmd::HDR_CREATE:            return "HDR_CREATE";
+            case Cmd::HDR_IMPORT:            return "HDR_IMPORT";
                 
             case Cmd::GUARD_SET_AT:          return "GUARD_SET_AT";
             case Cmd::GUARD_MOVE_NR:         return "GUARD_MOVE_TO";

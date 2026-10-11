@@ -98,7 +98,8 @@ enum class Msg : long
     HDC_STATE,
     
     // Hard drives
-    HDR_ATTACH,
+    HDR_ATTACH,         // A hard drive has been attached (value: drive, value2: error code, str: error description)
+    HDR_IMPORTED,       // A folder has been imported (value: drive, value2: error code, str: error description)
     HDR_DETACH,
     HDR_STEP,
     HDR_READ,
@@ -223,6 +224,7 @@ struct MsgEnum : Reflectable<MsgEnum, Msg>
             case Msg::HDC_STATE:             return "HDC_STATE";
                 
             case Msg::HDR_ATTACH:            return "HDR_ATTACH";
+            case Msg::HDR_IMPORTED:          return "HDR_IMPORTED";
             case Msg::HDR_DETACH:            return "HDR_DETACH";
             case Msg::HDR_STEP:              return "HDR_STEP";
             case Msg::HDR_READ:              return "HDR_READ";

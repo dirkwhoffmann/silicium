@@ -196,7 +196,7 @@ SiAmMediaController::attachHdAsync(int nr, int megabytes, int fsFormat, const QS
                                    const QUrl &importUrl)
 {
     // The core creates the image in the virtual machine folder and attaches it
-    parent->createHdAsync(nr, megabytes, fsFormat, name.toStdString(),
+    parent->createHd(nr, megabytes, fsFormat, name.toStdString(),
                           importUrl.isLocalFile() ? fs::path(importUrl.toLocalFile().toStdWString()) : fs::path());
 }
 

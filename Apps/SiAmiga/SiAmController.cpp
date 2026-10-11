@@ -554,28 +554,84 @@ SiAmController::attachHdAsync(int nr, const fs::path &path)
 }
 
 bool
-SiAmController::createHdAsync(int nr, int megabytes, int fsFormat, const std::string &name,
-                              const fs::path &importPath)
+SiAmController::createHd(int nr, int megabytes, int fsFormat, const std::string &name,
+                         const fs::path &importPath)
 {
     if (busy()) return false;
 
+    auto fsType = amiga::FSFormat(fsFormat);
+
     try {
 
-        m_attachingHd = nr;
-        setStatus(tr("Creating the hard drive..."));
+        // Quick, even for a large drive
+        core().hd[nr]->create(*svm, megabytes, fsType, name);
+
+        if (fsType == amiga::FSFormat::NODOS || importPath.empty()) {
+
+            hdDidArrive(nr);
+            return true;
+        }
+
+        // Copying the files takes as long as it takes
+        m_importingHd = nr;
+        setStatus(tr("Importing files..."));
         emit busyChanged();
 
-        core().hd[nr]->createAsync(*svm, megabytes, amiga::FSFormat(fsFormat), name, importPath);
+        core().hd[nr]->importFolderAsync(importPath);
         return true;
 
     } catch (const std::exception &e) {
 
-        m_attachingHd = -1;
+        m_importingHd = -1;
         setStatus({});
         emit busyChanged();
         showError(tr("Failed to create the hard drive."), e.what());
         return false;
     }
+}
+
+void
+SiAmController::hdImportDidFinish(int nr, int code, const std::string &what)
+{
+    // The core reports this for every import; only ours counts, errors always
+    if (nr != m_importingHd) {
+
+        if (code != 0) showError(tr("Failed to import the files."), what.c_str());
+        return;
+    }
+
+    m_importingHd = -1;
+
+    if (code != 0) {
+
+        setStatus({});
+        emit busyChanged();
+        showError(tr("Failed to import the files."), what.c_str());
+        return;
+    }
+
+    hdDidArrive(nr);
+}
+
+void
+SiAmController::hdDidArrive(int nr)
+{
+    /* Plug the controller in afterwards, not before: the drive is ready by
+     * the time anything can look at it. A hard reset rather than a power
+     * cycle: the machine has to go round again to notice a drive that was not
+     * there when it booted, but it does not have to be switched off for that.
+     */
+    if (!core().get(Opt::HDC_CONNECT, nr)) core().set(Opt::HDC_CONNECT, true, nr);
+    core().hardReset();
+
+    /* Write the machine out, so config.retrosh carries the attach line and the
+     * drive is still there the next time the SVM is opened. These are all
+     * commands for the emulator thread, which carries them out in this order,
+     * so the saved configuration describes a machine with the drive. The
+     * image itself is left alone -- see Amiga::saveWorkspace(), which keeps
+     * the file a drive is sitting on.
+     */
+    if (!saveWorkspaceAsync()) { setStatus({}); emit busyChanged(); }
 }
 
 void
@@ -598,22 +654,7 @@ SiAmController::hdAttachDidFinish(int nr, int code, const std::string &what)
         return;
     }
 
-    /* Plug the controller in afterwards, not before: the drive is ready by
-     * the time anything can look at it. A hard reset rather than a power
-     * cycle: the machine has to go round again to notice a drive that was not
-     * there when it booted, but it does not have to be switched off for that.
-     */
-    if (!core().get(Opt::HDC_CONNECT, nr)) core().set(Opt::HDC_CONNECT, true, nr);
-    core().hardReset();
-
-    /* Write the machine out, so config.retrosh carries the attach line and the
-     * drive is still there the next time the SVM is opened. These are all
-     * commands for the emulator thread, which carries them out in this order,
-     * so the saved configuration describes a machine with the drive. The
-     * image itself is left alone -- see Amiga::saveWorkspace(), which keeps
-     * the file a drive is sitting on.
-     */
-    if (!saveWorkspaceAsync()) { setStatus({}); emit busyChanged(); }
+    hdDidArrive(nr);
 }
 
 bool
@@ -1210,6 +1251,11 @@ SiAmController::process(const Message &msg, const string &attachment)
         case Msg::HDC_STATE:
 
             m_infoIsDirty = true;
+            break;
+
+        case Msg::HDR_IMPORTED:
+
+            hdImportDidFinish((int)msg.value, (int)msg.value2, attachment);
             break;
 
         case Msg::HDR_ATTACH:

@@ -1092,7 +1092,7 @@ Amiga::update(CmdQueue &queue)
             case Cmd::SAVE_SNAPSHOT:
             case Cmd::HIBERNATE:
             case Cmd::HDR_ATTACH:
-            case Cmd::HDR_CREATE:
+            case Cmd::HDR_IMPORT:
 
                 processCommand(cmd);
                 break;
@@ -1465,26 +1465,17 @@ Amiga::processCommand(const Command &cmd)
             }
             break;
 
-        case Cmd::HDR_CREATE: {
+        case Cmd::HDR_IMPORT:
 
-            // The drive, the file system and the size travel in the value, the names in the string
-            auto drive = cmd.value & 0xFF;
-            auto fsType = amiga::FSFormat((cmd.value >> 8) & 0xFF);
-            auto megabytes = cmd.value >> 16;
-            string text = cmd.str;
-            auto split = text.find('\n');
-            string name = text.substr(0, split);
-            string import = split == string::npos ? "" : text.substr(split + 1);
-
-            // Success is reported by the drive itself, a failure with the same message
+            // Reports the result to the GUI, together with the drive's number
             try {
-                hd[drive]->create(*reinterpret_cast<retro::vault::SVMFile *>(cmd.value2),
-                                  megabytes, fsType, name, import);
+                hd[cmd.value]->importFolder(cmd.str);
+                hd[cmd.value]->persist();
+                msgQueue.put(Msg::HDR_IMPORTED, cmd.value);
             } catch (const std::exception &e) {
-                msgQueue.put(Msg::HDR_ATTACH, drive, -1, e.what());
+                msgQueue.put(Msg::HDR_IMPORTED, cmd.value, -1, e.what());
             }
             break;
-        }
 
         case Cmd::HIBERNATE:
 

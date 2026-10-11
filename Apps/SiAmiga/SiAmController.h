@@ -107,6 +107,9 @@ class SiAmController : public Controller {
     // The hard drive that is being attached (-1 if none)
     int m_attachingHd = -1;
 
+    // The hard drive that files are imported into (-1 if none)
+    int m_importingHd = -1;
+
     // Sampled once per rendered frame (see update()) rather than read
     // straight off the core, so the status bar's warp icon gets a change
     // notification instead of having to poll.
@@ -290,14 +293,16 @@ public:
      */
     bool attachHdAsync(int nr, const fs::path &path);
 
-    /* The same for a new drive, which the core creates in the workspace. See
-     * VAmiga's HardDriveAPI::createAsync() for the arguments.
+    /* The same for a new drive, which the core creates in the workspace. The
+     * creation is quick and happens right away. Files are imported by the
+     * emulator thread afterwards, if a folder is given (see
+     * hdImportDidFinish). Returns false if nothing was started.
      */
-    bool createHdAsync(int nr, int megabytes, int fsFormat, const std::string &name,
-                       const fs::path &importPath = {});
+    bool createHd(int nr, int megabytes, int fsFormat, const std::string &name,
+                  const fs::path &importPath = {});
 
     // A job is running, or the emulator thread is saving
-    bool busy() const override { return m_savingWorkspace || m_savingSnapshot || m_hibernating || m_attachingHd >= 0; }
+    bool busy() const override { return m_savingWorkspace || m_savingSnapshot || m_hibernating || m_attachingHd >= 0 || m_importingHd >= 0; }
 
     Q_INVOKABLE void revertSnapshot();
 
@@ -446,11 +451,17 @@ public:
     // Called when the emulator thread reports that it has attached a hard drive
     void hdAttachDidFinish(int nr, int code, const std::string &what);
 
+    // Called when the emulator thread reports that it has imported files into a hard drive
+    void hdImportDidFinish(int nr, int code, const std::string &what);
+
     // Called when the emulator thread reports that it has hibernated
     void hibernateDidFinish(int code, const std::string &what);
 
     // Makes room for another snapshot, or asks the user to; false if there is none
     bool makeRoomForSnapshot();
+
+    // Lets the machine see a hard drive that is there now, and saves the workspace
+    void hdDidArrive(int nr);
 
     void update();
 
