@@ -967,6 +967,21 @@ public:
      */
     void attach(const std::filesystem::path &path, retro::vault::SVMFile &svm);
 
+    /** @brief  Attaches a hard drive asynchronously and makes it part of the
+     *          workspace of an SVM (see the version of attach() above).
+     *
+     *  The request is handed to the emulator thread, which carries it out
+     *  when it processes its command queue. The function returns immediately.
+     *  The GUI is informed by an HDR_ATTACH message, which carries the number
+     *  of the drive and, if the operation failed, an error code and
+     *  description. The SVM is used on the emulator thread: it must stay
+     *  alive, and untouched, until the message has arrived.
+     *
+     *  @param  path    Path to the media file.
+     *  @param  svm     The SVM whose workspace takes the file
+     */
+    void attachAsync(const std::filesystem::path &path, retro::vault::SVMFile &svm);
+
     /** @brief  Attaches a hard drive with a particular geometry.
      *  @param  c       Number of cylinders
      *  @param  h       Number of heads

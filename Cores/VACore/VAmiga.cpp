@@ -1424,6 +1424,13 @@ HardDriveAPI::attach(const fs::path &path, retro::vault::SVMFile &svm)
 }
 
 void
+HardDriveAPI::attachAsync(const fs::path &path, retro::vault::SVMFile &svm)
+{
+    VAMIGA_PUBLIC
+    emu->put(Command(Cmd::HDR_ATTACH, i64(drive->objid), i64(&svm)), path.string());
+}
+
+void
 HardDriveAPI::attach(isize c, isize h, isize s, isize b)
 {
     VAMIGA_PUBLIC_SUSPEND

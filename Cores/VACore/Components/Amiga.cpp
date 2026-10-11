@@ -1091,6 +1091,7 @@ Amiga::update(CmdQueue &queue)
             case Cmd::SAVE_WORKSPACE:
             case Cmd::SAVE_SNAPSHOT:
             case Cmd::HIBERNATE:
+            case Cmd::HDR_ATTACH:
 
                 processCommand(cmd);
                 break;
@@ -1450,6 +1451,16 @@ Amiga::processCommand(const Command &cmd)
                 }
             } catch (const std::exception &e) {
                 msgQueue.put(Msg::SNAPSHOT_SAVED, -1, 0, e.what());
+            }
+            break;
+
+        case Cmd::HDR_ATTACH:
+
+            // Success is reported by the drive itself, a failure with the same message
+            try {
+                hd[cmd.value]->init(cmd.str, *reinterpret_cast<retro::vault::SVMFile *>(cmd.value2));
+            } catch (const std::exception &e) {
+                msgQueue.put(Msg::HDR_ATTACH, cmd.value, -1, e.what());
             }
             break;
 
