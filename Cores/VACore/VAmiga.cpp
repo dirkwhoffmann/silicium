@@ -1424,6 +1424,25 @@ HardDriveAPI::attach(const fs::path &path, retro::vault::SVMFile &svm)
 }
 
 void
+HardDriveAPI::create(retro::vault::SVMFile &svm, isize megabytes, amiga::FSFormat fs,
+                     const string &name, const fs::path &importPath)
+{
+    VAMIGA_PUBLIC_SUSPEND
+    drive->create(svm, megabytes, fs, name, importPath);
+}
+
+void
+HardDriveAPI::createAsync(retro::vault::SVMFile &svm, isize megabytes, amiga::FSFormat fs,
+                          const string &name, const fs::path &importPath)
+{
+    VAMIGA_PUBLIC
+
+    // The numbers travel in the value, the names in the string
+    i64 value = i64(drive->objid) | i64(fs) << 8 | i64(megabytes) << 16;
+    emu->put(Command(Cmd::HDR_CREATE, value, i64(&svm)), name + "\n" + importPath.string());
+}
+
+void
 HardDriveAPI::attachAsync(const fs::path &path, retro::vault::SVMFile &svm)
 {
     VAMIGA_PUBLIC

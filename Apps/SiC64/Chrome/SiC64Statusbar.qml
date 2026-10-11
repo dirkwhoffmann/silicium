@@ -542,40 +542,30 @@ Rectangle {
         }
 
         //
-        // Subtask of the running job
+        // Status of the running job
         //
 
         RowLayout {
 
-            visible: root.c64.busy
+            visible: root.c64.status !== ""
             Layout.fillWidth: true
 
-            /*
-            BusyIndicator {
-
-                implicitHeight: 22
-                implicitWidth: 22
-                padding: 3
-                running: root.c64.busy
-            }
-            */
-            
             SuLabel {
 
                 Layout.fillWidth: true
                 size: Size.small
                 elide: Text.ElideRight
-                text: root.c64.subtask
+                text: root.c64.status
             }
         }
 
         //
-        // Peripherals and icons, while no job is running
+        // Peripherals and icons, while there is no status to show
         //
 
         RowLayout {
 
-            visible: !root.c64.busy
+            visible: root.c64.status === ""
             Layout.fillWidth: true
 
             //

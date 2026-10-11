@@ -290,8 +290,14 @@ public:
      */
     bool attachHdAsync(int nr, const fs::path &path);
 
+    /* The same for a new drive, which the core creates in the workspace. See
+     * VAmiga's HardDriveAPI::createAsync() for the arguments.
+     */
+    bool createHdAsync(int nr, int megabytes, int fsFormat, const std::string &name,
+                       const fs::path &importPath = {});
+
     // A job is running, or the emulator thread is saving
-    bool busy() const override { return m_savingWorkspace || m_savingSnapshot || m_hibernating || m_attachingHd >= 0 || Controller::busy(); }
+    bool busy() const override { return m_savingWorkspace || m_savingSnapshot || m_hibernating || m_attachingHd >= 0; }
 
     Q_INVOKABLE void revertSnapshot();
 

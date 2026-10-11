@@ -77,9 +77,6 @@ public:
 
 private:
 
-    // Creates a new image file and installes a file system if requested
-    void createHd(int nr, int megabytes, int fsFormat, const QString &name, const QUrl &importUrl = {});
-
 public:
 
     //

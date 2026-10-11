@@ -295,9 +295,6 @@ Item {
         onTriggered: {
 
             c64.toggleDebugPanel()
-
-            // Test of runTask (temporary)
-            c64.testProgressDialog()
         }
     }
 

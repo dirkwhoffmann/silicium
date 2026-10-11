@@ -477,6 +477,7 @@ SiAmController::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
     try {
 
         m_hibernating = true;
+        setStatus(tr("Hibernating..."));
         m_savingWorkspace = hibernateWorkspace;
         m_savingSnapshot = hibernateSnapshot;
         emit busyChanged();
@@ -486,6 +487,7 @@ SiAmController::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
     } catch (const std::exception &e) {
 
         m_hibernating = m_savingWorkspace = m_savingSnapshot = false;
+        setStatus({});
         emit busyChanged();
 
         showError(tr("Failed to hibernate."), e.what());
@@ -500,6 +502,7 @@ SiAmController::hibernateDidFinish(int code, const std::string &what)
 
     // Parts that were not reached because of an error are still marked
     m_hibernating = m_savingWorkspace = m_savingSnapshot = false;
+    setStatus({});
     emit busyChanged();
 
     if (code != 0) showError(tr("Failed to hibernate."), what.c_str());
@@ -534,6 +537,7 @@ SiAmController::attachHdAsync(int nr, const fs::path &path)
     try {
 
         m_attachingHd = nr;
+        setStatus(tr("Attaching the hard drive..."));
         emit busyChanged();
 
         core().hd[nr]->attachAsync(path, *svm);
@@ -542,8 +546,34 @@ SiAmController::attachHdAsync(int nr, const fs::path &path)
     } catch (const std::exception &e) {
 
         m_attachingHd = -1;
+        setStatus({});
         emit busyChanged();
         showError(tr("Failed to attach the hard drive."), e.what());
+        return false;
+    }
+}
+
+bool
+SiAmController::createHdAsync(int nr, int megabytes, int fsFormat, const std::string &name,
+                              const fs::path &importPath)
+{
+    if (busy()) return false;
+
+    try {
+
+        m_attachingHd = nr;
+        setStatus(tr("Creating the hard drive..."));
+        emit busyChanged();
+
+        core().hd[nr]->createAsync(*svm, megabytes, amiga::FSFormat(fsFormat), name, importPath);
+        return true;
+
+    } catch (const std::exception &e) {
+
+        m_attachingHd = -1;
+        setStatus({});
+        emit busyChanged();
+        showError(tr("Failed to create the hard drive."), e.what());
         return false;
     }
 }
@@ -551,13 +581,18 @@ SiAmController::attachHdAsync(int nr, const fs::path &path)
 void
 SiAmController::hdAttachDidFinish(int nr, int code, const std::string &what)
 {
-    // The core reports this for every attach; only ours counts
-    if (nr != m_attachingHd) return;
+    // The core reports this for every attach; only ours counts, errors always
+    if (nr != m_attachingHd) {
+
+        if (code != 0) showError(tr("Failed to attach the hard drive."), what.c_str());
+        return;
+    }
 
     m_attachingHd = -1;
 
     if (code != 0) {
 
+        setStatus({});
         emit busyChanged();
         showError(tr("Failed to attach the hard drive."), what.c_str());
         return;
@@ -578,7 +613,7 @@ SiAmController::hdAttachDidFinish(int nr, int code, const std::string &what)
      * image itself is left alone -- see Amiga::saveWorkspace(), which keeps
      * the file a drive is sitting on.
      */
-    if (!saveWorkspaceAsync()) emit busyChanged();
+    if (!saveWorkspaceAsync()) { setStatus({}); emit busyChanged(); }
 }
 
 bool
@@ -589,6 +624,7 @@ SiAmController::saveWorkspaceAsync()
     try {
 
         m_savingWorkspace = true;
+        setStatus(tr("Saving workspace..."));
         emit busyChanged();
 
         // The core replaces the workspace and updates the manifest itself
@@ -598,6 +634,7 @@ SiAmController::saveWorkspaceAsync()
     } catch (const std::exception &e) {
 
         m_savingWorkspace = false;
+        setStatus({});
         emit busyChanged();
         showError(tr("Failed to save the workspace."), e.what());
         return false;
@@ -611,6 +648,7 @@ SiAmController::workspaceDidSave(int code, const std::string &what)
     if (!m_savingWorkspace) return;
 
     m_savingWorkspace = false;
+    if (!m_hibernating) setStatus({});
     emit busyChanged();
 
     if (code != 0) {
@@ -634,6 +672,7 @@ SiAmController::saveSnapshotAsync()
     try {
 
         m_savingSnapshot = true;
+        setStatus(tr("Saving snapshot..."));
         emit busyChanged();
 
         // The core adds the snapshot to the manifest itself
@@ -643,6 +682,7 @@ SiAmController::saveSnapshotAsync()
     } catch (const std::exception &e) {
 
         m_savingSnapshot = false;
+        setStatus({});
         emit busyChanged();
         showError(tr("Failed to save the snapshot."), e.what());
         return false;
@@ -656,6 +696,7 @@ SiAmController::snapshotDidSave(int code, const std::string &what)
     if (!m_savingSnapshot) return;
 
     m_savingSnapshot = false;
+    if (!m_hibernating) setStatus({});
     emit busyChanged();
 
     if (code != 0) {

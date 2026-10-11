@@ -195,21 +195,9 @@ void
 SiAmMediaController::attachHdAsync(int nr, int megabytes, int fsFormat, const QString &name,
                                    const QUrl &importUrl)
 {
-    fs::path wspace = parent->workspaceFolder();
-    fs::path target = wspace / ("hd" + std::to_string(nr) + ".hdf");
-
-    parent->runTask([this, nr, megabytes, fsFormat, name, importUrl] {
-
-                parent->report(tr("Creating the hard drive..."));
-
-                // Create new HDF
-                createHd(nr, megabytes, fsFormat, name, importUrl);
-            },
-            [this, nr, target] {
-
-                // The image is in the virtual machine folder already; attach it
-                parent->attachHdAsync(nr, target);
-            });
+    // The core creates the image in the virtual machine folder and attaches it
+    parent->createHdAsync(nr, megabytes, fsFormat, name.toStdString(),
+                          importUrl.isLocalFile() ? fs::path(importUrl.toLocalFile().toStdWString()) : fs::path());
 }
 
 /*
@@ -280,49 +268,6 @@ SiAmMediaController::copyHd(int nr, const QUrl &url)
     }
 }
 */
-
-void
-SiAmMediaController::createHd(int nr, int megabytes, int fsFormat, const QString &name,
-                              const QUrl &importUrl)
-{
-    auto &core = SiAmController::core();
-    auto fsType = amiga::FSFormat(fsFormat);
-    auto geometry = retro::vault::GeometryDescriptor(isize(megabytes) * 1024 * 1024);
-
-    parent->report(tr("Creating the disk image..."), 0.05);
-
-    fs::path wspace = parent->workspaceFolder();
-    fs::path target = wspace / ("hd" + std::to_string(nr) + ".hdf");
-
-    if (!utl::createEmptyFile(target, geometry.numBytes())) {
-        throw utl::IOError(utl::IOError::FILE_CANT_CREATE, target);
-    }
-
-    try {
-
-        parent->report(tr("Attaching the hard drive..."), 0.15);
-        core.hd[nr]->attach(target);
-
-        parent->report(tr("Creating the file system..."), 0.25);
-        core.hd[nr]->format(fsType, name.toStdString());
-
-        if (fsType != amiga::FSFormat::NODOS && importUrl.isLocalFile()) {
-
-            parent->report(tr("Importing files..."), 0.45);
-            core.hd[nr]->importFiles(fs::path(importUrl.toLocalFile().toStdWString()));
-        }
-
-        parent->report(tr("Writing the disk image..."), 0.60);
-        core.hd[nr]->persist();
-
-    } catch (...) {
-
-        // Remove file if anything went wrong
-        std::error_code ec;
-        fs::remove(target, ec);
-        throw;
-    }
-}
 
 void
 SiAmMediaController::detachHd(int nr)
@@ -432,18 +377,6 @@ SiAmMediaController::installDiagRom(quint32 crc32)
 void
 SiAmMediaController::installEmuTOS()
 {
-    // REMOVE ASAP
-    parent->runTask([this] {
-
-                parent->report(tr("Hello, world..."));
-                parent->report(tr("Some task..."));
-                sleep(3);
-                parent->report(tr("Another task..."));
-                sleep(2);
-                parent->report(tr("Yet another task..."));
-                sleep(2);
-            });
-
     try {
 
         // Version 1.3 (March 2024); the only version bundled here.

@@ -345,22 +345,6 @@ C64Controller::setRetroShell(bool value)
 }
 
 void
-C64Controller::testProgressDialog()
-{
-    runTask([this] {
-
-        report(tr("Running a test"), tr("Step 1"), 0.0);
-        block(0.7);
-        report(tr("Step 2"), 0.33);
-        block(1.4);
-        report(tr("Step 3"), 0.66);
-        block(2.1);
-        report(tr("Step 4"), 1.0);
-        block(12.8);
-    });
-}
-
-void
 C64Controller::setDebugPanel(bool value)
 {
     if (m_debugPanel != value) {
@@ -735,6 +719,7 @@ C64Controller::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
     try {
 
         m_hibernating = true;
+        setStatus(tr("Hibernating..."));
         m_savingWorkspace = hibernateWorkspace;
         m_savingSnapshot = hibernateSnapshot;
         emit busyChanged();
@@ -744,6 +729,7 @@ C64Controller::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
     } catch (const std::exception &e) {
 
         m_hibernating = m_savingWorkspace = m_savingSnapshot = false;
+        setStatus({});
         emit busyChanged();
 
         showError(tr("Failed to hibernate."), e.what());
@@ -758,6 +744,7 @@ C64Controller::hibernateDidFinish(int code, const std::string &what)
 
     // Parts that were not reached because of an error are still marked
     m_hibernating = m_savingWorkspace = m_savingSnapshot = false;
+    setStatus({});
     emit busyChanged();
 
     if (code != 0) showError(tr("Failed to hibernate."), what.c_str());
@@ -792,6 +779,7 @@ C64Controller::saveWorkspaceAsync()
     try {
 
         m_savingWorkspace = true;
+        setStatus(tr("Saving workspace..."));
         emit busyChanged();
 
         // The core replaces the workspace and updates the manifest itself
@@ -801,6 +789,7 @@ C64Controller::saveWorkspaceAsync()
     } catch (const std::exception &e) {
 
         m_savingWorkspace = false;
+        setStatus({});
         emit busyChanged();
         showError(tr("Failed to save the workspace."), e.what());
         return false;
@@ -814,6 +803,7 @@ C64Controller::workspaceDidSave(int code, const std::string &what)
     if (!m_savingWorkspace) return;
 
     m_savingWorkspace = false;
+    if (!m_hibernating) setStatus({});
     emit busyChanged();
 
     if (code != 0) {
@@ -837,6 +827,7 @@ C64Controller::saveSnapshotAsync()
     try {
 
         m_savingSnapshot = true;
+        setStatus(tr("Saving snapshot..."));
         emit busyChanged();
 
         // The core adds the snapshot to the manifest itself
@@ -846,6 +837,7 @@ C64Controller::saveSnapshotAsync()
     } catch (const std::exception &e) {
 
         m_savingSnapshot = false;
+        setStatus({});
         emit busyChanged();
         showError(tr("Failed to save the snapshot."), e.what());
         return false;
@@ -859,6 +851,7 @@ C64Controller::snapshotDidSave(int code, const std::string &what)
     if (!m_savingSnapshot) return;
 
     m_savingSnapshot = false;
+    if (!m_hibernating) setStatus({});
     emit busyChanged();
 
     if (code != 0) {

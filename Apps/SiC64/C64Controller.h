@@ -237,9 +237,6 @@ public:
 
     Q_INVOKABLE void toggleDebugPanel() { setDebugPanel(!m_debugPanel); }
 
-    // Test of runTask: reports four steps, 0.7 seconds apart
-    Q_INVOKABLE void testProgressDialog();
-
     Q_INVOKABLE void openConfigurator() {}
     Q_INVOKABLE void openInspector() {}
     Q_INVOKABLE void openKeyboard() {}
@@ -380,7 +377,7 @@ public:
     Q_INVOKABLE bool saveSnapshotAsync();
 
     // A job is running, or the emulator thread is saving
-    bool busy() const override { return m_savingWorkspace || m_savingSnapshot || m_hibernating || Controller::busy(); }
+    bool busy() const override { return m_savingWorkspace || m_savingSnapshot || m_hibernating; }
 
     Q_INVOKABLE void hibernate(bool hibernateSnapshot, bool hibernateWorkspace);
 

@@ -670,28 +670,20 @@ Rectangle {
         }
 
         //
-        // Subtask of the running job
+        // Status of the running job
         //
 
         RowLayout {
 
-            visible: root.amiga.busy
+            visible: root.amiga.status !== ""
             Layout.fillWidth: true
-
-            BusyIndicator {
-
-                implicitHeight: 22
-                implicitWidth: 22
-                padding: 3
-                running: root.amiga.busy
-            }
 
             SuLabel {
 
                 Layout.fillWidth: true
                 size: Size.small
                 elide: Text.ElideRight
-                text: root.amiga.subtask
+                text: root.amiga.status
             }
         }
 
@@ -701,7 +693,7 @@ Rectangle {
 
         RowLayout {
 
-            visible: !root.amiga.busy
+            visible: root.amiga.status === ""
 
             //
             // Floppy drives

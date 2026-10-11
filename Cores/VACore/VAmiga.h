@@ -982,6 +982,26 @@ public:
      */
     void attachAsync(const std::filesystem::path &path, retro::vault::SVMFile &svm);
 
+    /** @brief  Creates a new hard drive in the workspace of an SVM
+     *
+     *  An empty image of the given size is created as hdN.hdf, attached,
+     *  formatted, and filled with the files of a folder if one is given. The
+     *  asynchronous version hands the work to the emulator thread and reports
+     *  with an HDR_ATTACH message, as attachAsync() does. The SVM is used on
+     *  the emulator thread: it must stay alive, and untouched, until the
+     *  message has arrived.
+     *
+     *  @param  svm         The SVM whose workspace takes the image
+     *  @param  megabytes   Size of the drive
+     *  @param  fs          File system to install (NODOS leaves the drive blank)
+     *  @param  name        Name of the volume
+     *  @param  importPath  Optional folder to import into the file system
+     */
+    void create(retro::vault::SVMFile &svm, isize megabytes, amiga::FSFormat fs,
+                const string &name, const std::filesystem::path &importPath = {});
+    void createAsync(retro::vault::SVMFile &svm, isize megabytes, amiga::FSFormat fs,
+                     const string &name, const std::filesystem::path &importPath = {});
+
     /** @brief  Attaches a hard drive with a particular geometry.
      *  @param  c       Number of cylinders
      *  @param  h       Number of heads

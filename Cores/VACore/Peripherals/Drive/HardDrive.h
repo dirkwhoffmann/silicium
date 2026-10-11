@@ -186,6 +186,17 @@ public:
      */
     void init(const fs::path &path, retro::vault::SVMFile &svm);
 
+    /* Creates a new hard drive in the workspace of an SVM
+     *
+     * An empty image of the given size is created as hdN.hdf (N being the
+     * number of the drive), attached, formatted, and filled with the files of
+     * a folder if one is given. The drive is announced (see Msg::HDR_ATTACH)
+     * when it is complete, not before. If anything goes wrong, the image is
+     * removed again.
+     */
+    void create(retro::vault::SVMFile &svm, isize megabytes, amiga::FSFormat fsType,
+                const string &name, const fs::path &importPath = {});
+
     /* Takes the disk out of the drive, leaving it as it was before anything
      * was attached. The counterpart of the init() calls above; it says
      * nothing about the controller the drive hangs off, which is connected
@@ -349,6 +360,10 @@ private:
 
     // Returns true if the disk lives in a file
     bool fileBacked() const { return image && image->fileBacked(); }
+
+    // Tells the GUI that a drive has been attached, unless a job is not done yet
+    bool silent = false;
+    void announce();
 
     // Returns true if the drive is small enough to be stored in snapshots
     bool snapshotable() const;

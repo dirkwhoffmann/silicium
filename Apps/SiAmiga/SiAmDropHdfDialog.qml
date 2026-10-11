@@ -18,8 +18,8 @@ import Sulfur
  * Dropping a hard drive is not the quick, reversible thing dropping a floppy
  * is: it copies the image into the SVM, plugs in a controller if the slot
  * has none, resets the machine and rewrites the config script. So it asks
- * first, and then gets out of the way: the copy runs as a background job
- * whose progress the window's banner reports (see Controller::runTask).
+ * first, and then gets out of the way: the emulator thread does the copy
+ * while the window shows that it is busy (see SiAmController::attachHdAsync).
  *
  * Bind 'controller' and call openFor(driveNr, url).
  */
