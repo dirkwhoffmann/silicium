@@ -194,7 +194,20 @@ typedef struct
     
     // Flags
     bool writeProtected;
+
+    /* The guest has written to the disk since it was attached, or since it was
+     * last marked as unmodified (e.g. by exporting it). What an unsaved-changes
+     * warning wants to know; it also applies to a disk that has no file.
+     * Persisting does not clear it.
+     */
     bool modified;
+
+    /* The disk holds changes its file does not have yet, i.e. persist() has
+     * something to do. Only a disk that lives in a file can be dirty, and
+     * persisting clears it. Changes that do not come from the guest (formatting,
+     * importing a folder) make a disk dirty without making it modified.
+     */
+    bool dirty;
     
     // State
     HardDriveState state;

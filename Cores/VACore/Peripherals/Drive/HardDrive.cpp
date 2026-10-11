@@ -637,6 +637,7 @@ HardDrive::cacheInfo() const
     // Flags
     info.writeProtected = getFlag(DiskFlags::PROTECTED);
     info.modified = getFlag(DiskFlags::MODIFIED);
+    info.dirty = needsPersisting();
 
     // State
     info.state = state;
