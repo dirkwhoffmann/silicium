@@ -131,6 +131,9 @@ enum class Msg : long
     WORKSPACE_LOADED,
     WORKSPACE_SAVED,
 
+    // Hibernation
+    HIBERNATED,
+
     // DMA Debugging
     DMA_DEBUG,
     
@@ -242,6 +245,7 @@ struct MsgEnum : Reflectable<MsgEnum, Msg>
             case Msg::SNAPSHOT_TAKEN:        return "SNAPSHOT_TAKEN";
             case Msg::SNAPSHOT_RESTORED:     return "SNAPSHOT_RESTORED";
             case Msg::SNAPSHOT_SAVED:        return "SNAPSHOT_SAVED";
+            case Msg::HIBERNATED:            return "HIBERNATED";
                 
             case Msg::WORKSPACE_LOADED:      return "WORKSPACE_LOADED";
             case Msg::WORKSPACE_SAVED:       return "WORKSPACE_SAVED";

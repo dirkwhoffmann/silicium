@@ -45,6 +45,7 @@ enum class Cmd : long
     INSPECTION_TARGET,      ///< Sets the auto-inspection mask
     SAVE_WORKSPACE,         ///< Save the workspace to a folder (path attached)
     SAVE_SNAPSHOT,          ///< Save a snapshot to a file (path attached)
+    HIBERNATE,              ///< Hibernate into an SVM (path attached, value = bit 0: snapshot, bit 1: workspace)
     
     // CPU (Breakpoints, Watchpoints, Catchpoints)
     GUARD_SET_AT,
@@ -120,6 +121,7 @@ struct CmdEnum : Reflectable<CmdEnum, Cmd> {
             case Cmd::INSPECTION_TARGET:     return "INSPECTION_TARGET";
             case Cmd::SAVE_WORKSPACE:        return "SAVE_WORKSPACE";
             case Cmd::SAVE_SNAPSHOT:         return "SAVE_SNAPSHOT";
+            case Cmd::HIBERNATE:             return "HIBERNATE";
                 
             case Cmd::GUARD_SET_AT:          return "GUARD_SET_AT";
             case Cmd::GUARD_MOVE_NR:         return "GUARD_MOVE_TO";
