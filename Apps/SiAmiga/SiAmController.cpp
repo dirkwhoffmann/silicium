@@ -466,7 +466,7 @@ SiAmController::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
      * hibernateDidFinish). hibernated() is emitted when that has been dealt
      * with, however it went, and at once if there is nothing to do.
      */
-    if (hibernateSnapshot && !makeRoomForSnapshot()) hibernateSnapshot = false;
+    if (hibernateSnapshot && !makeRoomForSnapshot(true)) hibernateSnapshot = false;
 
     if (busy() || (!hibernateSnapshot && !hibernateWorkspace)) {
 
@@ -513,14 +513,21 @@ SiAmController::hibernateDidFinish(std::exception_ptr exception)
 bool
 SiAmController::makeRoomForSnapshot()
 {
+    return makeRoomForSnapshot(preferences().getAutoDeleteSnapshots());
+}
+
+bool
+SiAmController::makeRoomForSnapshot(bool autoDelete)
+{
     /* The snapshot storage is full: make room, or ask the user if snapshots
-     * may not be deleted without being asked.
+     * may not be deleted without being asked. Hibernation passes true, as it
+     * runs on quit, where a dialog would have nowhere to go.
      */
     const int limit = preferences().getMaxSnapshots();
 
     if (svm->getManifest().numSnapshots() < limit) return true;
 
-    if (!preferences().getAutoDeleteSnapshots()) {
+    if (!autoDelete) {
 
         emit snapshotLimitReached();
         return false;

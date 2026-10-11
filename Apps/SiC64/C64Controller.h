@@ -401,8 +401,12 @@ public:
     // Called when the emulator thread reports that it has hibernated
     void hibernateDidFinish(std::exception_ptr exception);
 
-    // Makes room for another snapshot, or asks the user to; false if there is none
+    /* Makes room for another snapshot by deleting the oldest ones if
+     * 'autoDelete' says so (the version without an argument asks the
+     * preferences), or asks the user to; false if there is no room.
+     */
     bool makeRoomForSnapshot();
+    bool makeRoomForSnapshot(bool autoDelete);
 
 
     void update();
