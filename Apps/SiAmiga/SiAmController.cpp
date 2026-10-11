@@ -526,24 +526,59 @@ SiAmController::makeRoomForSnapshot()
     return true;
 }
 
-void
-SiAmController::saveWorkspaceNow()
+bool
+SiAmController::attachHdAsync(int nr, const fs::path &path)
 {
-    LogTask task("Saving workspace...");
+    if (busy()) return false;
 
     try {
 
-        // The core replaces the workspace and updates the manifest itself
-        core().amiga.saveWorkspace(*svm);
+        m_attachingHd = nr;
+        emit busyChanged();
 
-        emit workspaceSaved();
-        notifyPersist();
-        notifySvmChanged("workspace");
+        core().hd[nr]->attachAsync(path, *svm);
+        return true;
 
     } catch (const std::exception &e) {
 
-        showError("Failed to save workspace.", e.what());
+        m_attachingHd = -1;
+        emit busyChanged();
+        showError(tr("Failed to attach the hard drive."), e.what());
+        return false;
     }
+}
+
+void
+SiAmController::hdAttachDidFinish(int nr, int code, const std::string &what)
+{
+    // The core reports this for every attach; only ours counts
+    if (nr != m_attachingHd) return;
+
+    m_attachingHd = -1;
+
+    if (code != 0) {
+
+        emit busyChanged();
+        showError(tr("Failed to attach the hard drive."), what.c_str());
+        return;
+    }
+
+    /* Plug the controller in afterwards, not before: the drive is ready by
+     * the time anything can look at it. A hard reset rather than a power
+     * cycle: the machine has to go round again to notice a drive that was not
+     * there when it booted, but it does not have to be switched off for that.
+     */
+    if (!core().get(Opt::HDC_CONNECT, nr)) core().set(Opt::HDC_CONNECT, true, nr);
+    core().hardReset();
+
+    /* Write the machine out, so config.retrosh carries the attach line and the
+     * drive is still there the next time the SVM is opened. These are all
+     * commands for the emulator thread, which carries them out in this order,
+     * so the saved configuration describes a machine with the drive. The
+     * image itself is left alone -- see Amiga::saveWorkspace(), which keeps
+     * the file a drive is sitting on.
+     */
+    if (!saveWorkspaceAsync()) emit busyChanged();
 }
 
 bool
@@ -1138,6 +1173,7 @@ SiAmController::process(const Message &msg, const string &attachment)
 
         case Msg::HDR_ATTACH:
 
+            hdAttachDidFinish((int)msg.value, (int)msg.value2, attachment);
             didHdrAttach(msg.value);
             m_infoIsDirty = true;
             break;

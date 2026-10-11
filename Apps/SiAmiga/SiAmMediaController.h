@@ -80,10 +80,6 @@ private:
     // Creates a new image file and installes a file system if requested
     void createHd(int nr, int megabytes, int fsFormat, const QString &name, const QUrl &importUrl = {});
 
-    // Attaches an image and lets the machine see it
-    void attachHd(int nr, const QUrl &url);
-    void attachHd(int nr, const fs::path &path);
-
 public:
 
     //

@@ -187,22 +187,8 @@ SiAmMediaController::attachHdAsync(int nr, const QUrl &url)
 {
     if (!url.isLocalFile()) return;
 
-    fs::path source = url.toLocalFile().toStdWString();
-
-    parent->runTask([this, nr, source] {
-
-                parent->report(tr("Copying the hard drive into the virtual machine..."));
-
-                // The core copies the image into the virtual machine folder and attaches it
-                attachHd(nr, source);
-            } /*,
-            [this, nr] {
-
-                // Show warning if a large hard drive has been attached
-                checkForLargeDrive(nr);
-            }
-            */
-            );
+    // The core copies the image into the virtual machine folder and attaches it
+    parent->attachHdAsync(nr, fs::path(url.toLocalFile().toStdWString()));
 }
 
 void
@@ -212,21 +198,18 @@ SiAmMediaController::attachHdAsync(int nr, int megabytes, int fsFormat, const QS
     fs::path wspace = parent->workspaceFolder();
     fs::path target = wspace / ("hd" + std::to_string(nr) + ".hdf");
 
-    parent->runTask([this, nr, megabytes, fsFormat, name, importUrl, target] {
+    parent->runTask([this, nr, megabytes, fsFormat, name, importUrl] {
 
                 parent->report(tr("Creating the hard drive..."));
 
                 // Create new HDF
                 createHd(nr, megabytes, fsFormat, name, importUrl);
+            },
+            [this, nr, target] {
 
-                // Attach the copied image
-                attachHd(nr, target);
-            } /*,
-            [this, nr] {
-
-                // Show warning if a large hard drive has been attached
-                checkForLargeDrive(nr);
-            }*/);
+                // The image is in the virtual machine folder already; attach it
+                parent->attachHdAsync(nr, target);
+            });
 }
 
 /*
@@ -339,50 +322,6 @@ SiAmMediaController::createHd(int nr, int megabytes, int fsFormat, const QString
         fs::remove(target, ec);
         throw;
     }
-}
-
-void
-SiAmMediaController::attachHd(int nr, const QUrl &url)
-{
-    attachHd(nr, fs::path(url.toLocalFile().toStdWString()));
-}
-
-void
-SiAmMediaController::attachHd(int nr, const fs::path &path)
-{
-    auto &core = SiAmController::core();
-
-    parent->report(tr("Attaching the hard drive..."), 0.90);
-    core.hd[nr]->attach(path, parent->svmFile());
-
-    /* Plug the controller in afterwards, not before: the drive is ready by
-     * the time anything can look at it, and nothing done here to the drive
-     * overlaps a command being drained on the emulator thread.
-     */
-    if (!core.get(Opt::HDC_CONNECT, nr)) core.set(Opt::HDC_CONNECT, true, nr);
-
-    /* A hard reset rather than a power cycle. The machine has to go round
-     * again to notice a drive that was not there when it booted, but it does
-     * not have to be switched off to do that, and a reset is the milder of
-     * the two.
-     */
-    core.hardReset();
-
-    /* Wait for all of that to have happened before writing the machine out.
-     * Option changes and the reset are handed to the emulator thread and take
-     * effect a frame or so later, so without this the exported configuration
-     * can still describe a machine with no hard drive controller.
-     */
-    core.sync();
-
-    parent->report(tr("Persisting the virtual machine..."), 0.95);
-
-    /* Write the machine out, so config.retrosh carries the attach line and the
-     * drive is still there the next time the SVM is opened. The image itself
-     * is left alone -- see Amiga::saveWorkspace(), which keeps the file a
-     * drive is sitting on.
-     */
-    parent->saveWorkspaceNow();
 }
 
 void

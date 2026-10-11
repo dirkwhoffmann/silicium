@@ -104,6 +104,9 @@ class SiAmController : public Controller {
     bool m_savingSnapshot = false;
     bool m_hibernating = false;
 
+    // The hard drive that is being attached (-1 if none)
+    int m_attachingHd = -1;
+
     // Sampled once per rendered frame (see update()) rather than read
     // straight off the core, so the status bar's warp icon gets a change
     // notification instead of having to poll.
@@ -280,13 +283,15 @@ public:
     Q_INVOKABLE bool saveWorkspaceAsync();
     Q_INVOKABLE bool saveSnapshotAsync();
 
-    /* Saves the workspace on the calling thread, for a job that is already
-     * running off the window's thread (see SiAmMediaController::attachHdAsync).
+    /* Asks the emulator thread to attach a hard drive and make it part of the
+     * workspace. busy() is true until the core reports the result (see
+     * hdAttachDidFinish), and the machine is then set up to see the drive.
+     * Returns false if nothing was started.
      */
-    void saveWorkspaceNow();
+    bool attachHdAsync(int nr, const fs::path &path);
 
     // A job is running, or the emulator thread is saving
-    bool busy() const override { return m_savingWorkspace || m_savingSnapshot || m_hibernating || Controller::busy(); }
+    bool busy() const override { return m_savingWorkspace || m_savingSnapshot || m_hibernating || m_attachingHd >= 0 || Controller::busy(); }
 
     Q_INVOKABLE void revertSnapshot();
 
@@ -431,6 +436,9 @@ public:
     // Called when the emulator thread reports the result of a save
     void workspaceDidSave(int code, const std::string &what);
     void snapshotDidSave(int code, const std::string &what);
+
+    // Called when the emulator thread reports that it has attached a hard drive
+    void hdAttachDidFinish(int nr, int code, const std::string &what);
 
     // Called when the emulator thread reports that it has hibernated
     void hibernateDidFinish(int code, const std::string &what);
