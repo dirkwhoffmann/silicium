@@ -1228,6 +1228,17 @@ struct C64API : public API {
      */
     void saveSnapshotAsync(const std::filesystem::path &path, Compressor compressor) const;
 
+    /** @brief  Saves a snapshot, including a screenshot, into an SVM
+     *
+     *  Works on an SVM that is already open: the snapshot is added to its
+     *  manifest, and the SVM is persisted. As with hibernateAsync, the object
+     *  is used on the emulator thread by the asynchronous version and must
+     *  stay alive, and untouched, until the SNAPSHOT_SAVED message has
+     *  arrived.
+     */
+    void saveSnapshot(retro::vault::SVMFile &svm, Compressor compressor) const;
+    void saveSnapshotAsync(retro::vault::SVMFile &svm, Compressor compressor) const;
+
     /** @brief  Hibernates the machine into a virtual machine bundle
      *
      *  Saves the workspace (if workspace is true) and a snapshot including a

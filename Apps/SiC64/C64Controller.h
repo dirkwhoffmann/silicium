@@ -84,16 +84,13 @@ class C64Controller : public Controller {
 
     /* Saves that the emulator thread carries out (see saveWorkspaceAsync).
      * A flag is set while one is under way and cleared by the message that
-     * reports its result (see workspaceDidSave, snapshotDidSave). What is to
-     * happen afterwards is kept until then.
+     * reports its result (see workspaceDidSave, snapshotDidSave). A
+     * hibernation sets both, plus its own, which the final message clears
+     * (see hibernateDidFinish).
      */
     bool m_savingWorkspace = false;
     bool m_savingSnapshot = false;
     bool m_hibernating = false;
-    bool m_hibernateSnapshot = false;
-    bool m_hibernateWorkspace = false;
-    retro::vault::SnapshotInfo m_snapshotInfo;
-    QImage m_snapshotScreenshot;
 
 
     //

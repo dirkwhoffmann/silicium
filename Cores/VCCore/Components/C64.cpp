@@ -1273,6 +1273,8 @@ C64::processCommand(const Command &cmd)
                     } else {
                         saveWorkspace(cmd.str);
                     }
+                } else if (cmd.value2) {
+                    saveSnapshot(*reinterpret_cast<retro::vault::SVMFile *>(cmd.value2), Compressor(cmd.value));
                 } else {
                     saveSnapshot(cmd.str, Compressor(cmd.value));
                 }
@@ -1689,43 +1691,65 @@ C64::hibernate(const fs::path &path, bool snapshot, bool workspace)
 void
 C64::hibernate(retro::vault::SVMFile &svm, bool snapshot, bool workspace)
 {
-    using namespace retro::vault;
-
-    auto &manifest = svm.getManifest();
-
+    // Refuse before anything is done
     if (snapshot && svm.isReadOnly()) throw utl::Error(0, "The virtual machine is read-only.");
 
-    if (workspace) updateWorkspace(svm);
+    // Each part is persisted and reported when it is done
+    if (workspace) {
+
+        updateWorkspace(svm);
+        svm.persist();
+        msgQueue.put(Msg::WORKSPACE_SAVED);
+    }
 
     if (snapshot) {
 
-        /* Bring the snapshot folder into being. Nothing else creates it, and
-         * the first snapshot of an SVM is exactly the case where it is not
-         * there yet.
-         */
-        auto folder = svm.root() / SVMFile::snapshotDir;
-        fs::create_directories(folder);
-
-        SnapshotInfo info {};
-        info.version    = snapshotVersion();
-        info.uuid       = utl::UUID::v4();
-        info.platform   = Platform::C64;
-        info.created    = time(nullptr);
-        info.modified   = info.created;
-        info.screenshot = fs::path(info.uuid.toString() + ".png");
-        info.binary     = fs::path(info.uuid.toString() + ".vcsnap");
-
-        // Take the screenshot and the snapshot, both of the same moment
-        videoPort.saveTexture(folder / info.screenshot, 104, 487, 16, vic.pal() ? 299 : 249);
-        Snapshot(*this, Compressor::LZ4).writeToFile(folder / info.binary);
-
-        manifest.appendSnapshot(info);
+        updateSnapshot(svm, Compressor::LZ4);
+        svm.persist();
+        msgQueue.put(Msg::SNAPSHOT_SAVED);
     }
-
-    svm.persist();
 
     // Inform the GUI
     msgQueue.put(Msg::HIBERNATED);
+}
+
+void
+C64::saveSnapshot(retro::vault::SVMFile &svm, Compressor compressor)
+{
+    updateSnapshot(svm, compressor);
+    svm.persist();
+
+    // Inform the GUI
+    msgQueue.put(Msg::SNAPSHOT_SAVED);
+}
+
+void
+C64::updateSnapshot(retro::vault::SVMFile &svm, Compressor compressor)
+{
+    using namespace retro::vault;
+
+    if (svm.isReadOnly()) throw utl::Error(0, "The virtual machine is read-only.");
+
+    /* Bring the snapshot folder into being. Nothing else creates it, and the
+     * first snapshot of an SVM is exactly the case where it is not there yet.
+     */
+    auto folder = svm.root() / SVMFile::snapshotDir;
+    fs::create_directories(folder);
+
+    SnapshotInfo info {};
+    info.version    = snapshotVersion();
+    info.uuid       = utl::UUID::v4();
+    info.platform   = Platform::C64;
+    info.created    = time(nullptr);
+    info.modified   = info.created;
+    info.screenshot = fs::path(info.uuid.toString() + ".png");
+    info.binary     = fs::path(info.uuid.toString() + ".vcsnap");
+
+    // Take the screenshot and the snapshot, both of the same moment
+    videoPort.saveTexture(folder / info.screenshot, 104, 487, 16, vic.pal() ? 299 : 249);
+    Snapshot(*this, compressor).writeToFile(folder / info.binary);
+
+    svm.getManifest().appendSnapshot(info);
 }
 
 void

@@ -719,6 +719,11 @@ C64Controller::toggleWarp()
 void
 C64Controller::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
 {
+    /* The emulator thread reports each part as it is done (see
+     * workspaceDidSave, snapshotDidSave) and the whole at the end (see
+     * hibernateDidFinish). hibernated() is emitted when that has been dealt
+     * with, however it went, and at once if there is nothing to do.
+     */
     if (hibernateSnapshot && !makeRoomForSnapshot()) hibernateSnapshot = false;
 
     if (busy() || (!hibernateSnapshot && !hibernateWorkspace)) {
@@ -727,19 +732,18 @@ C64Controller::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
         return;
     }
 
-    m_hibernateSnapshot = hibernateSnapshot;
-    m_hibernateWorkspace = hibernateWorkspace;
-
     try {
 
         m_hibernating = true;
+        m_savingWorkspace = hibernateWorkspace;
+        m_savingSnapshot = hibernateSnapshot;
         emit busyChanged();
 
         core().c64.hibernateAsync(*svm, hibernateSnapshot, hibernateWorkspace);
 
     } catch (const std::exception &e) {
 
-        m_hibernating = false;
+        m_hibernating = m_savingWorkspace = m_savingSnapshot = false;
         emit busyChanged();
 
         showError(tr("Failed to hibernate."), e.what());
@@ -752,30 +756,11 @@ C64Controller::hibernateDidFinish(int code, const std::string &what)
 {
     if (!m_hibernating) return;
 
-    m_hibernating = false;
+    // Parts that were not reached because of an error are still marked
+    m_hibernating = m_savingWorkspace = m_savingSnapshot = false;
     emit busyChanged();
 
-    try {
-
-        if (code != 0) throw std::runtime_error(what);
-
-        if (m_hibernateWorkspace) emit workspaceSaved();
-
-        if (m_hibernateSnapshot) {
-
-            if (auto *info = svm->getManifest().lookupLatestSnapshot()) {
-
-                emit snapshotSaved(QString::fromStdString(info->uuid.toString()));
-                notifySvmChanged("snapshot", QString::fromStdString(info->uuid.toString()));
-            }
-        }
-        notifyPersist();
-        if (m_hibernateWorkspace) notifySvmChanged("workspace");
-
-    } catch (const std::exception &e) {
-
-        showError(tr("Failed to hibernate."), e.what());
-    }
+    if (code != 0) showError(tr("Failed to hibernate."), what.c_str());
 
     emit hibernated();
 }
@@ -831,18 +816,15 @@ C64Controller::workspaceDidSave(int code, const std::string &what)
     m_savingWorkspace = false;
     emit busyChanged();
 
-    try {
+    if (code != 0) {
 
-        if (code != 0) throw std::runtime_error(what);
-
-        emit workspaceSaved();
-        notifyPersist();
-        notifySvmChanged("workspace");
-
-    } catch (const std::exception &e) {
-
-        showError(tr("Failed to save the workspace."), e.what());
+        showError(tr("Failed to save the workspace."), what.c_str());
+        return;
     }
+
+    emit workspaceSaved();
+    notifyPersist();
+    notifySvmChanged("workspace");
 }
 
 bool
@@ -854,32 +836,11 @@ C64Controller::saveSnapshotAsync()
 
     try {
 
-        if (svm->isReadOnly()) throw ImageError(ImageError::VM_READ_ONLY);
-
-        // Create the snapshot folder if needed
-        std::error_code ec;
-        const auto folder = svm->root() / SVMFile::snapshotDir;
-        fs::create_directories(folder, ec);
-        if (ec) throw utl::IOError(utl::IOError::DIR_CANT_CREATE, folder);
-
-        // The screenshot is taken now, as it shows the machine as it is asked for
-        m_snapshotScreenshot = m_renderer->grabScreenshot();
-
-        // Assemble snapshot info
-        auto &info = m_snapshotInfo;
-        info = SnapshotInfo {};
-        info.version    = VirtualC64::snapshotVersion();
-        info.uuid       = utl::UUID::v4();
-        info.platform   = Platform::C64;
-        info.created    = time(nullptr);
-        info.modified   = info.created;
-        info.screenshot = fs::path(info.uuid.toString() + ".jpg");
-        info.binary     = fs::path(info.uuid.toString() + ".vcsnap");
-
         m_savingSnapshot = true;
         emit busyChanged();
 
-        core().c64.saveSnapshotAsync(folder / info.binary, Compressor::LZ4);
+        // The core adds the snapshot to the manifest itself
+        core().c64.saveSnapshotAsync(*svm, Compressor::LZ4);
         return true;
 
     } catch (const std::exception &e) {
@@ -894,35 +855,25 @@ C64Controller::saveSnapshotAsync()
 void
 C64Controller::snapshotDidSave(int code, const std::string &what)
 {
+    // The core reports this for the synchronous save, too; only ours counts
     if (!m_savingSnapshot) return;
 
     m_savingSnapshot = false;
     emit busyChanged();
 
-    auto screenshot = std::exchange(m_snapshotScreenshot, QImage());
-    const auto &info = m_snapshotInfo;
+    if (code != 0) {
 
-    try {
+        showError(tr("Failed to save the snapshot."), what.c_str());
+        return;
+    }
 
-        if (code != 0) throw std::runtime_error(what);
+    if (auto *info = svm->getManifest().lookupLatestSnapshot()) {
 
-        // Save screenshot
-        const auto screenshotPath = svm->root() / SVMFile::snapshotDir / info.screenshot;
-        if (!screenshot.save(QString::fromStdString(screenshotPath.string())))
-            throw utl::IOError(utl::IOError::FILE_CANT_WRITE, screenshotPath);
-
-        // Register the snapshot
-        qCDebug(siLog) << "Registering snapshot " << info.uuid.toString();
-        svm->getManifest().appendSnapshot(info);
-        svm->persist();
+        const auto uuid = QString::fromStdString(info->uuid.toString());
 
         notifyPersist();
-        emit snapshotSaved(QString::fromStdString(info.uuid.toString()));
-        notifySvmChanged("snapshot", QString::fromStdString(info.uuid.toString()));
-
-    } catch (const std::exception &e) {
-
-        showError(tr("Failed to save the snapshot."), e.what());
+        emit snapshotSaved(uuid);
+        notifySvmChanged("snapshot", uuid);
     }
 }
 

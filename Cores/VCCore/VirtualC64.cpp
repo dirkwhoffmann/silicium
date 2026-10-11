@@ -627,6 +627,20 @@ C64API::saveSnapshotAsync(const fs::path &path, Compressor compressor) const
 }
 
 void
+C64API::saveSnapshot(retro::vault::SVMFile &svm, Compressor compressor) const
+{
+    VC64_PUBLIC_SUSPEND
+    c64->saveSnapshot(svm, compressor);
+}
+
+void
+C64API::saveSnapshotAsync(retro::vault::SVMFile &svm, Compressor compressor) const
+{
+    VC64_PUBLIC
+    emu->put(Command(Cmd::SAVE_SNAPSHOT, i64(compressor), i64(&svm)));
+}
+
+void
 C64API::hibernate(const fs::path &path, bool snapshot, bool workspace) const
 {
     VC64_PUBLIC_SUSPEND
