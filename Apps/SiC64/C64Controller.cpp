@@ -753,6 +753,12 @@ C64Controller::hibernateDidFinish(std::exception_ptr exception)
 }
 
 bool
+C64Controller::isSnapshotStorageFull() const
+{
+    return svm && svm->getManifest().numSnapshots() >= preferences().getMaxSnapshots();
+}
+
+bool
 C64Controller::makeRoomForSnapshot()
 {
     return makeRoomForSnapshot(preferences().getAutoDeleteSnapshots());

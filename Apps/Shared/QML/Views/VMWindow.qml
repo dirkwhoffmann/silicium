@@ -161,6 +161,8 @@ ApplicationWindow {
         id: hibernationDialog
         parent: Overlay.overlay
 
+        onAboutToShow: snapshotStorageFull = root.controllerRef.isSnapshotStorageFull()
+
         onConfirmed: (snapshot, workspace) => root.hibernate(snapshot, workspace)
     }
 

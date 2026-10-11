@@ -511,6 +511,12 @@ SiAmController::hibernateDidFinish(std::exception_ptr exception)
 }
 
 bool
+SiAmController::isSnapshotStorageFull() const
+{
+    return svm && svm->getManifest().numSnapshots() >= preferences().getMaxSnapshots();
+}
+
+bool
 SiAmController::makeRoomForSnapshot()
 {
     return makeRoomForSnapshot(preferences().getAutoDeleteSnapshots());

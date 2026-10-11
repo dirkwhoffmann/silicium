@@ -57,6 +57,10 @@ RowLayout {
     // accessory needs to stay live while the control itself is locked.
     property bool controlEnabled: true
 
+    // Where the text of the right label starts, within this element (e.g. to
+    // line up a note beneath a check box with the text of the check box)
+    readonly property real rightTextX: rightText.x + rightText.leftPadding
+
     // signal helpClicked()
 
     spacing: 0

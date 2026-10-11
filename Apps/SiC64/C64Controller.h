@@ -406,6 +406,9 @@ public:
      * preferences), or asks the user to; false if there is no room.
      */
     bool makeRoomForSnapshot();
+
+    // Indicates whether the snapshot storage has reached its limit
+    Q_INVOKABLE bool isSnapshotStorageFull() const;
     bool makeRoomForSnapshot(bool autoDelete);
 
 

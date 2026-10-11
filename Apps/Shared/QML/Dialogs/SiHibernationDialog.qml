@@ -9,6 +9,7 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import Silicium.Assets
 import Silicium.Preferences
 import Sulfur
@@ -30,18 +31,39 @@ SuUserDialog {
     // Emitted when the user confirms, with what they chose to save
     signal confirmed(bool snapshot, bool workspace)
 
+    // Whether the snapshot storage is full (the owner sets it before opening the dialog)
+    property bool snapshotStorageFull: false
+
     titleText: qsTr("Hibernate")
     badgeSource: Assets.iconUrl(Assets.Help)
     bodyText: qsTr("The virtual machine is about to hibernate. " +
                    "Would you like to save your current changes?")
 
-    SuLabeledCheckBox {
-        id: snapshotBox
-        r: qsTr("Save machine state as a snapshot")
-        checked: Preferences.hibernateSnapshot
+    ColumnLayout {
+
+        Layout.fillWidth: true
+        spacing: 0
+
+        SuLabeledCheckBox {
+
+            id: snapshotBox
+            r: qsTr("Save machine state as a snapshot")
+            checked: Preferences.hibernateSnapshot
+        }
+
+        SuLabel {
+
+            visible: root.snapshotStorageFull
+            Layout.fillWidth: true
+            Layout.leftMargin: snapshotBox.rightTextX
+            size: Size.tiny // small
+            wrapMode: Text.WordWrap
+            text: qsTr("The snapshot storage is full. Saving a new snapshot will delete the oldest one.")
+        }
     }
 
     SuLabeledCheckBox {
+
         id: workspaceBox
         r: qsTr("Save current workspace")
         checked: Preferences.hibernateWorkspace
