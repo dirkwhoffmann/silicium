@@ -1629,10 +1629,10 @@ MouseAPI::detectShakeDxDy(double dx, double dy)
 //
 
 bool
-MsgQueueAPI::getMsg(Message &msg)
+MsgQueueAPI::getMsg(Message &msg, std::exception_ptr &exception)
 {
     VAMIGA_PUBLIC
-    return msgQueue->get(msg);
+    return msgQueue->get(msg, exception);
 }
 
 void
@@ -1648,14 +1648,6 @@ MsgQueueAPI::unlockMsgQueue()
     VAMIGA_PUBLIC
     return msgQueue->unlock();
 }
-
-string
-MsgQueueAPI::getPayload(isize index)
-{
-    VAMIGA_PUBLIC
-    return msgQueue->getPayload(index);
-}
-
 
 //
 // DefaultsAPI
@@ -2631,10 +2623,10 @@ AmigaAPI::setAutoInspectionMask(u64 mask)
 }
 
 bool
-AmigaAPI::getMsg(Message &msg)
+AmigaAPI::getMsg(Message &msg, std::exception_ptr &exception)
 {
     VAMIGA_PUBLIC
-    return amiga->msgQueue.get(msg);
+    return amiga->msgQueue.get(msg, exception);
 }
 
 }

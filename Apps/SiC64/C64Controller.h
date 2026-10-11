@@ -392,14 +392,14 @@ public:
 
     // Receives messages from the emulator thread (see windowDidOpen()) and
     // marshals them onto the GUI thread.
-    void process(const vc64::Message &msg, const string &attachment = "");
+    void process(const vc64::Message &msg, const string &attachment = "", std::exception_ptr exception = nullptr);
 
     // Called when the emulator thread reports the result of a save
-    void workspaceDidSave(int code, const std::string &what);
-    void snapshotDidSave(int code, const std::string &what);
+    void workspaceDidSave(std::exception_ptr exception);
+    void snapshotDidSave(std::exception_ptr exception);
 
     // Called when the emulator thread reports that it has hibernated
-    void hibernateDidFinish(int code, const std::string &what);
+    void hibernateDidFinish(std::exception_ptr exception);
 
     // Makes room for another snapshot, or asks the user to; false if there is none
     bool makeRoomForSnapshot();

@@ -13,3 +13,17 @@ Controller::Controller(QObject *parent) : QObject(parent)
 {
 
 }
+
+QString
+Controller::errorText(std::exception_ptr exception)
+{
+    if (!exception) return { };
+
+    try {
+        std::rethrow_exception(exception);
+    } catch (const std::exception &e) {
+        return QString::fromUtf8(e.what());
+    } catch (...) {
+        return tr("Unknown error");
+    }
+}

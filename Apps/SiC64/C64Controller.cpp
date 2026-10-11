@@ -34,7 +34,7 @@ using retro::vault::Platform;
 
 // Receives messages from the emulator thread and marshals them onto the GUI thread
 static void
-process(const void *listener, const Message msg)
+process(const void *listener, const Message msg, std::exception_ptr exception)
 {
     /* Nothing to marshal onto once the application is gone.
      *
@@ -50,8 +50,8 @@ process(const void *listener, const Message msg)
     auto *con = static_cast<C64Controller *>(const_cast<void *>(listener));
 
     // Process message on the GUI thread
-    QMetaObject::invokeMethod(con, [con, msg, att = std::string(msg.str ? msg.str : "")] {
-        con->process(msg, att);
+    QMetaObject::invokeMethod(con, [con, msg, exception, att = std::string(msg.str ? msg.str : "")] {
+        con->process(msg, att, exception);
     }, Qt::QueuedConnection);
 }
 
@@ -738,7 +738,7 @@ C64Controller::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
 }
 
 void
-C64Controller::hibernateDidFinish(int code, const std::string &what)
+C64Controller::hibernateDidFinish(std::exception_ptr exception)
 {
     if (!m_hibernating) return;
 
@@ -747,7 +747,7 @@ C64Controller::hibernateDidFinish(int code, const std::string &what)
     setStatus({});
     emit busyChanged();
 
-    if (code != 0) showError(tr("Failed to hibernate."), what.c_str());
+    if (exception) showError(tr("Failed to hibernate."), errorText(exception));
 
     emit hibernated();
 }
@@ -797,7 +797,7 @@ C64Controller::saveWorkspaceAsync()
 }
 
 void
-C64Controller::workspaceDidSave(int code, const std::string &what)
+C64Controller::workspaceDidSave(std::exception_ptr exception)
 {
     // The core reports this for the synchronous save, too; only ours counts
     if (!m_savingWorkspace) return;
@@ -806,9 +806,9 @@ C64Controller::workspaceDidSave(int code, const std::string &what)
     if (!m_hibernating) setStatus({});
     emit busyChanged();
 
-    if (code != 0) {
+    if (exception) {
 
-        showError(tr("Failed to save the workspace."), what.c_str());
+        showError(tr("Failed to save the workspace."), errorText(exception));
         return;
     }
 
@@ -845,7 +845,7 @@ C64Controller::saveSnapshotAsync()
 }
 
 void
-C64Controller::snapshotDidSave(int code, const std::string &what)
+C64Controller::snapshotDidSave(std::exception_ptr exception)
 {
     // The core reports this for the synchronous save, too; only ours counts
     if (!m_savingSnapshot) return;
@@ -854,9 +854,9 @@ C64Controller::snapshotDidSave(int code, const std::string &what)
     if (!m_hibernating) setStatus({});
     emit busyChanged();
 
-    if (code != 0) {
+    if (exception) {
 
-        showError(tr("Failed to save the snapshot."), what.c_str());
+        showError(tr("Failed to save the snapshot."), errorText(exception));
         return;
     }
 
@@ -1063,7 +1063,7 @@ C64Controller::didShutdown()
 }
 
 void
-C64Controller::process(const Message &msg, const string &attachment)
+C64Controller::process(const Message &msg, const string &attachment, std::exception_ptr exception)
 {
     auto value = [&msg]() -> int { return static_cast<int>(msg.value); };
 
@@ -1071,19 +1071,19 @@ C64Controller::process(const Message &msg, const string &attachment)
 
         case Msg::WORKSPACE_SAVED: {
 
-            workspaceDidSave(value(), attachment);
+            workspaceDidSave(exception);
             break;
         }
 
         case Msg::SNAPSHOT_SAVED: {
 
-            snapshotDidSave(value(), attachment);
+            snapshotDidSave(exception);
             break;
         }
 
         case Msg::HIBERNATED: {
 
-            hibernateDidFinish(value(), attachment);
+            hibernateDidFinish(exception);
             break;
         }
 

@@ -13,6 +13,7 @@
 #include "AppServices.h"
 #include "AudioController.h"
 #include <QObject>
+#include <exception>
 #include <QQuickWindow>
 
 
@@ -69,6 +70,9 @@ signals:
     void showNotification(const QString &title, const QString &message);
 
 protected:
+
+    // Describes an exception in words (for the user)
+    static QString errorText(std::exception_ptr exception);
 
     void setStatus(const QString &status) {
 

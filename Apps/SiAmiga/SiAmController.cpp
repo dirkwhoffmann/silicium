@@ -32,7 +32,7 @@ using retro::vault::Platform;
 
 // Receives messages from the emulator thread and marshals them onto the GUI thread
 static void
-process(const void *listener, const Message msg)
+process(const void *listener, const Message msg, std::exception_ptr exception)
 {
     /* Nothing to marshal onto once the application is gone.
      *
@@ -47,8 +47,8 @@ process(const void *listener, const Message msg)
 
     auto *con = static_cast<SiAmController *>(const_cast<void *>(listener));
 
-    QMetaObject::invokeMethod(con, [con, msg, att = std::string(msg.str ? msg.str : "")] {
-        con->process(msg, att);
+    QMetaObject::invokeMethod(con, [con, msg, exception, att = std::string(msg.str ? msg.str : "")] {
+        con->process(msg, att, exception);
     }, Qt::QueuedConnection);
 }
 
@@ -496,7 +496,7 @@ SiAmController::hibernate(bool hibernateSnapshot, bool hibernateWorkspace)
 }
 
 void
-SiAmController::hibernateDidFinish(int code, const std::string &what)
+SiAmController::hibernateDidFinish(std::exception_ptr exception)
 {
     if (!m_hibernating) return;
 
@@ -505,7 +505,7 @@ SiAmController::hibernateDidFinish(int code, const std::string &what)
     setStatus({});
     emit busyChanged();
 
-    if (code != 0) showError(tr("Failed to hibernate."), what.c_str());
+    if (exception) showError(tr("Failed to hibernate."), errorText(exception));
 
     emit hibernated();
 }
@@ -591,22 +591,22 @@ SiAmController::createHd(int nr, int megabytes, int fsFormat, const std::string 
 }
 
 void
-SiAmController::hdImportDidFinish(int nr, int code, const std::string &what)
+SiAmController::hdImportDidFinish(int nr, std::exception_ptr exception)
 {
     // The core reports this for every import; only ours counts, errors always
     if (nr != m_importingHd) {
 
-        if (code != 0) showError(tr("Failed to import the files."), what.c_str());
+        if (exception) showError(tr("Failed to import the files."), errorText(exception));
         return;
     }
 
     m_importingHd = -1;
 
-    if (code != 0) {
+    if (exception) {
 
         setStatus({});
         emit busyChanged();
-        showError(tr("Failed to import the files."), what.c_str());
+        showError(tr("Failed to import the files."), errorText(exception));
         return;
     }
 
@@ -635,22 +635,22 @@ SiAmController::hdDidArrive(int nr)
 }
 
 void
-SiAmController::hdAttachDidFinish(int nr, int code, const std::string &what)
+SiAmController::hdAttachDidFinish(int nr, std::exception_ptr exception)
 {
     // The core reports this for every attach; only ours counts, errors always
     if (nr != m_attachingHd) {
 
-        if (code != 0) showError(tr("Failed to attach the hard drive."), what.c_str());
+        if (exception) showError(tr("Failed to attach the hard drive."), errorText(exception));
         return;
     }
 
     m_attachingHd = -1;
 
-    if (code != 0) {
+    if (exception) {
 
         setStatus({});
         emit busyChanged();
-        showError(tr("Failed to attach the hard drive."), what.c_str());
+        showError(tr("Failed to attach the hard drive."), errorText(exception));
         return;
     }
 
@@ -683,7 +683,7 @@ SiAmController::saveWorkspaceAsync()
 }
 
 void
-SiAmController::workspaceDidSave(int code, const std::string &what)
+SiAmController::workspaceDidSave(std::exception_ptr exception)
 {
     // The core reports this for the synchronous save, too; only ours counts
     if (!m_savingWorkspace) return;
@@ -692,9 +692,9 @@ SiAmController::workspaceDidSave(int code, const std::string &what)
     if (!m_hibernating) setStatus({});
     emit busyChanged();
 
-    if (code != 0) {
+    if (exception) {
 
-        showError(tr("Failed to save the workspace."), what.c_str());
+        showError(tr("Failed to save the workspace."), errorText(exception));
         return;
     }
 
@@ -731,7 +731,7 @@ SiAmController::saveSnapshotAsync()
 }
 
 void
-SiAmController::snapshotDidSave(int code, const std::string &what)
+SiAmController::snapshotDidSave(std::exception_ptr exception)
 {
     // The core reports this for the synchronous save, too; only ours counts
     if (!m_savingSnapshot) return;
@@ -740,9 +740,9 @@ SiAmController::snapshotDidSave(int code, const std::string &what)
     if (!m_hibernating) setStatus({});
     emit busyChanged();
 
-    if (code != 0) {
+    if (exception) {
 
-        showError(tr("Failed to save the snapshot."), what.c_str());
+        showError(tr("Failed to save the snapshot."), errorText(exception));
         return;
     }
 
@@ -1175,23 +1175,23 @@ SiAmController::didHdrAttach(i64 nr)
 }
 
 void
-SiAmController::process(const Message &msg, const string &attachment)
+SiAmController::process(const Message &msg, const string &attachment, std::exception_ptr exception)
 {
     switch (msg.type) {
 
         case Msg::WORKSPACE_SAVED:
 
-            workspaceDidSave((int)msg.value, attachment);
+            workspaceDidSave(exception);
             break;
 
         case Msg::SNAPSHOT_SAVED:
 
-            snapshotDidSave((int)msg.value, attachment);
+            snapshotDidSave(exception);
             break;
 
         case Msg::HIBERNATED:
 
-            hibernateDidFinish((int)msg.value, attachment);
+            hibernateDidFinish(exception);
             break;
 
         case Msg::CONFIG:
@@ -1255,12 +1255,12 @@ SiAmController::process(const Message &msg, const string &attachment)
 
         case Msg::HDR_IMPORTED:
 
-            hdImportDidFinish((int)msg.value, (int)msg.value2, attachment);
+            hdImportDidFinish((int)msg.value, exception);
             break;
 
         case Msg::HDR_ATTACH:
 
-            hdAttachDidFinish((int)msg.value, (int)msg.value2, attachment);
+            hdAttachDidFinish((int)msg.value, exception);
             didHdrAttach(msg.value);
             m_infoIsDirty = true;
             break;

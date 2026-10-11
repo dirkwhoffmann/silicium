@@ -106,13 +106,7 @@ RpcServer::process(const string &payload, bool blocking)
 
         json request = json::parse(payload);
 
-        /* Check the envelope. Only 'method' is required of every packet:
-         * 'params' is checked inside the branch that needs it, because what
-         * a method takes is the method's own business. Demanding it here
-         * would reject the parameterless app-level notifications that are
-         * none of the core's concern (Silicium's "svmChanged", say) before
-         * the fall-through below ever gets to ignore them.
-         */
+        // Check input format
         if (!request.contains("method")) {
             throw AppException(RPC::INVALID_REQUEST, "Missing 'method'");
         }
