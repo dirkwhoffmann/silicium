@@ -135,13 +135,13 @@ InputManager::InputManager() : QObject()
 void
 InputManager::setDelegate(InputManagerDelegate *ptr)
 {
-    delegate = ptr;
+    m_delegate = ptr;
 }
 
 void
 InputManager::removeDelegate(InputManagerDelegate *ptr)
 {
-    if (delegate == ptr) delegate = nullptr;
+    if (m_delegate == ptr) m_delegate = nullptr;
 }
 
 Gamepad *
@@ -311,10 +311,10 @@ InputManager::eventFilter(QObject *object, QEvent *event)
 void
 InputManager::dispatchMouseMotion(u64 timestamp, float x, float y, float dx, float dy)
 {
-    if (!delegate) return;
+    if (!m_delegate) return;
 
-    if (delegate->detectShakeDxDy(dx, dy)) {
-        delegate->shakeDetected();
+    if (m_delegate->detectShakeDxDy(dx, dy)) {
+        m_delegate->shakeDetected();
     }
 
     /* Apply the sensitivity to the relative motion only.
@@ -331,24 +331,24 @@ InputManager::dispatchMouseMotion(u64 timestamp, float x, float y, float dx, flo
 
     if (auto *device = getPort0Device(); device->type == GamepadType::Mouse) {
 
-        delegate->mouseXY(0, timestamp, x, y);
+        m_delegate->mouseXY(0, timestamp, x, y);
         m_portState[0].x = x;
         m_portState[0].y = y;
         m_portState[0].dx = sdx;
         m_portState[0].dy = sdy;
         emit mouseStateChanged();
-        delegate->mouseDxDy(0, timestamp, sdx, sdy);
+        m_delegate->mouseDxDy(0, timestamp, sdx, sdy);
     }
 
     if (auto *device = getPort1Device(); device->type == GamepadType::Mouse) {
 
-        delegate->mouseXY(1, timestamp, x, y);
+        m_delegate->mouseXY(1, timestamp, x, y);
         m_portState[1].x = x;
         m_portState[1].y = y;
         m_portState[1].dx = sdx;
         m_portState[1].dy = sdy;
         emit mouseStateChanged();
-        delegate->mouseDxDy(1, timestamp, sdx, sdy);
+        m_delegate->mouseDxDy(1, timestamp, sdx, sdy);
     }
 
     m_mouseRestTimer.start();
@@ -359,7 +359,7 @@ InputManager::poll()
 {
     m_sincePoll.restart();
 
-    sdlManager.poll();
+    m_sdl.poll();
     pollMouse();
 }
 
@@ -379,7 +379,7 @@ InputManager::pollMouse()
     int32_t dx = 0, dy = 0;
     CGGetLastMouseDelta(&dx, &dy);
 
-    if (delegate && (dx != 0 || dy != 0)) {
+    if (m_delegate && (dx != 0 || dy != 0)) {
 
         auto pos = QCursor::pos();
         dispatchMouseMotion(QDateTime::currentMSecsSinceEpoch(),
@@ -397,7 +397,7 @@ InputManager::sendMouseButton(int port, u64 timestamp, int button, bool down)
         emit mouseStateChanged();
     }
 
-    if (delegate) delegate->mouseButton(port, timestamp, button, down);
+    if (m_delegate) m_delegate->mouseButton(port, timestamp, button, down);
 }
 
 void
@@ -417,7 +417,7 @@ InputManager::sendJoystickState(int port, u64 timestamp, const bool state[5])
 
     emit joystickStateChanged();
 
-    if (delegate) delegate->joystickMotionEvent(port, timestamp, next, prev);
+    if (m_delegate) m_delegate->joystickMotionEvent(port, timestamp, next, prev);
 }
 
 QVariantList
@@ -455,7 +455,7 @@ InputManager::mouseEventFilter(QObject *object, QMouseEvent *event)
 {
     static QPointF lastPos = event->globalPosition();
 
-    if (delegate) {
+    if (m_delegate) {
 
 #ifdef __APPLE__
         // While captured, the motion is polled (see poll())
@@ -475,7 +475,7 @@ InputManager::mouseEventFilter(QObject *object, QMouseEvent *event)
 #ifndef __APPLE__
         if (m_captureMouse) {
 
-            delegate->warpToCenter();
+            m_delegate->warpToCenter();
             return true;
         }
 #endif
@@ -487,7 +487,7 @@ InputManager::mouseEventFilter(QObject *object, QMouseEvent *event)
 bool
 InputManager::mouseButtonEventFilter(QObject *obj, QMouseEvent *event)
 {
-    if (delegate) {
+    if (m_delegate) {
 
         bool down = event->type() == QEvent::MouseButtonPress;
 
@@ -521,13 +521,13 @@ InputManager::keyDownEventFilter(QObject *obj, QKeyEvent *event)
     // (feeding the machine, and swallowing the event).
     const bool capture = m_captureKeyboard && !editingText();
 
-    if (delegate && !isRepeat(event)) {
+    if (m_delegate && !isRepeat(event)) {
 
         rememberEvent(event);
 
         if (event->key() == Qt::Key_CapsLock) {
 
-            delegate->capsLock(true);
+            m_delegate->capsLock(true);
             return true;
         }
 
@@ -558,22 +558,22 @@ InputManager::keyDownEventFilter(QObject *obj, QKeyEvent *event)
 
                 case KeyCombo::CtrlAltL:
 
-                    delegate->keyCombo(KeyCombo::CtrlAltL, ++ctrlAltL);
+                    m_delegate->keyCombo(KeyCombo::CtrlAltL, ++m_ctrlAltL);
                     break;
 
                 case KeyCombo::CtrlAltR:
 
-                    delegate->keyCombo(KeyCombo::CtrlAltR, ++ctrlAltR);
+                    m_delegate->keyCombo(KeyCombo::CtrlAltR, ++m_ctrlAltR);
                     break;
 
                 case KeyCombo::CtrlMetaL:
 
-                    delegate->keyCombo(KeyCombo::CtrlMetaL, ++ctrlMetaL);
+                    m_delegate->keyCombo(KeyCombo::CtrlMetaL, ++m_ctrlMetaL);
                     break;
 
                 case KeyCombo::CtrlMetaR:
 
-                    delegate->keyCombo(KeyCombo::CtrlMetaR, ++ctrlMetaR);
+                    m_delegate->keyCombo(KeyCombo::CtrlMetaR, ++m_ctrlMetaR);
                     break;
 
                 default:
@@ -597,7 +597,7 @@ InputManager::keyDownEventFilter(QObject *obj, QKeyEvent *event)
 
             if (!isEmuKey || !preferences().getDisconnectEmulationKeys()) {
 
-                delegate->keyDown(event, m_mods);
+                m_delegate->keyDown(event, m_mods);
             }
         }
     }
@@ -624,13 +624,13 @@ InputManager::keyUpEventFilter(QObject *obj, QKeyEvent *event)
 {
     const bool capture = m_captureKeyboard && !editingText();
 
-    if (delegate && !isRepeat(event)) {
+    if (m_delegate && !isRepeat(event)) {
 
         rememberEvent(event);
 
         if (event->key() == Qt::Key_CapsLock) {
 
-            delegate->capsLock(false);
+            m_delegate->capsLock(false);
             return true;
         }
 
@@ -655,16 +655,16 @@ InputManager::keyUpEventFilter(QObject *obj, QKeyEvent *event)
 
         // printf("Key up event filter: %x %x %x\n", m_qKey, m_pKey, m_mods.bits());
 
-        if (ctrlAltL || ctrlAltR || ctrlMetaL || ctrlMetaR) {
+        if (m_ctrlAltL || m_ctrlAltR || m_ctrlMetaL || m_ctrlMetaR) {
 
-            if (ctrlAltL && !m_mods.ctrl() && !m_mods.leftAlt) {
-                delegate->keyCombo(KeyCombo::CtrlAltL, (ctrlAltL = 0));
-            } else if (ctrlAltR && !m_mods.ctrl() && !m_mods.rightAlt) {
-                delegate->keyCombo(KeyCombo::CtrlAltR, (ctrlAltR = 0));
-            } else if (ctrlMetaL && !m_mods.ctrl() && !m_mods.leftMeta) {
-                delegate->keyCombo(KeyCombo::CtrlMetaL, (ctrlMetaL = 0));
-            } else if (ctrlMetaR && !m_mods.ctrl() && !m_mods.rightMeta) {
-                delegate->keyCombo(KeyCombo::CtrlMetaR, (ctrlMetaR = 0));
+            if (m_ctrlAltL && !m_mods.ctrl() && !m_mods.leftAlt) {
+                m_delegate->keyCombo(KeyCombo::CtrlAltL, (m_ctrlAltL = 0));
+            } else if (m_ctrlAltR && !m_mods.ctrl() && !m_mods.rightAlt) {
+                m_delegate->keyCombo(KeyCombo::CtrlAltR, (m_ctrlAltR = 0));
+            } else if (m_ctrlMetaL && !m_mods.ctrl() && !m_mods.leftMeta) {
+                m_delegate->keyCombo(KeyCombo::CtrlMetaL, (m_ctrlMetaL = 0));
+            } else if (m_ctrlMetaR && !m_mods.ctrl() && !m_mods.rightMeta) {
+                m_delegate->keyCombo(KeyCombo::CtrlMetaR, (m_ctrlMetaR = 0));
             }
 
         } else {
@@ -685,7 +685,7 @@ InputManager::keyUpEventFilter(QObject *obj, QKeyEvent *event)
 
             if (!isEmuKey || !preferences().getDisconnectEmulationKeys()) {
 
-                delegate->keyUp(event, m_mods);
+                m_delegate->keyUp(event, m_mods);
             }
         }
     }
@@ -805,9 +805,9 @@ InputManager::updateDevices()
      * land in the SiC64 instances: the Hub broadcasts the settings group,
      * each instance reloads it, and ends up here.
      */
-    sdlManager.applyStoredMappings();
+    m_sdl.applyStoredMappings();
 
-    const QMap<int, Gamepad> &sdlPads = sdlManager.m_gamePads;
+    const QMap<int, Gamepad> &sdlPads = m_sdl.m_gamePads;
 
     for (auto it = sdlPads.begin(); it != sdlPads.end(); ++it) {
         m_devices.append(it.value());
@@ -981,14 +981,14 @@ InputManager::start()
         updateDevices();
 
         // Rebuild the device list when SDL reports a device change
-        connect(&sdlManager, &SDLManager::countChanged, this, &InputManager::updateDevices);
+        connect(&m_sdl, &SDLManager::countChanged, this, &InputManager::updateDevices);
 
         // Rebuild the device list when the device preferences change
         connect(&preferences(), &Preferences::devicesPrefsChanged, this, &InputManager::updateDevices);
 
         // Register as delegate
-        sdlManager.setDelegate(this);
-        sdlManager.start();
+        m_sdl.setDelegate(this);
+        m_sdl.start();
 
         m_sincePoll.restart();
         m_pollTimer.start();
@@ -1008,7 +1008,7 @@ InputManager::stop()
         setCaptureMouse(false);
 
         m_pollTimer.stop();
-        sdlManager.stop();
+        m_sdl.stop();
 
         m_running = false;
     }

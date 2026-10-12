@@ -30,6 +30,19 @@ enum class KeyCombo {
     CtrlMetaR
 };
 
+struct PortState {
+
+    // Current mouse state
+    float x = 0;
+    float y = 0;
+    float dx = 0;
+    float dy = 0;
+    bool mb[3] = {};
+
+    // Current joystick state (up, down, left, right, fire)
+    bool joy[5] = {};
+};
+
 struct KeyModifier {
 
     bool leftShift;
@@ -68,34 +81,46 @@ class InputManagerDelegate {
   public:
 
     // Keyboard events
-    virtual void keyDown(QKeyEvent *even, KeyModifier modifiers) { };
-    virtual void keyUp(QKeyEvent *even, KeyModifier modifiers) { };
-    virtual void keyCombo(KeyCombo combo, int count) { };
-    virtual void capsLock(bool state) { };
+    virtual void keyDown(QKeyEvent *event, KeyModifier modifiers) { }
+    virtual void keyUp(QKeyEvent *event, KeyModifier modifiers) { }
+    virtual void keyCombo(KeyCombo combo, int count) { }
+    virtual void capsLock(bool down) { }
+
+    // Gamepad events
+    virtual void joystickMotionEvent(int port, u64 timestamp, bool state[5], bool prev[5]) { }
 
     // Mouse events
-    virtual void mouseXY(int port, u64 timestamp, float x, float y) { };
-    virtual void mouseDxDy(int port, u64 timestamp, float dx, float dy) { };
-    virtual void mouseButton(int port, u64 timestamp, int button, bool down) { };
-    virtual void warpToCenter() { };
-    virtual bool detectShakeDxDy(float dx, float dy) { return false; }
-    virtual void shakeDetected() { };
+    virtual void mouseXY(int port, u64 timestamp, float x, float y) { }
+    virtual void mouseDxDy(int port, u64 timestamp, float dx, float dy) { }
+    virtual void mouseButton(int port, u64 timestamp, int button, bool down) { }
+    virtual void shakeDetected() { }
 
-    // Gamepad events (called when the joystick state of a port changes)
-    virtual void joystickMotionEvent(int port, u64 timestamp, bool state[5], bool prev[5]) { };
+    // Requests
+    virtual void warpToCenter() { }
+    virtual bool detectShakeDxDy(float dx, float dy) { return false; }
 };
 
 class InputManager : public QObject, SiObject, SDLManagerDelegate {
 
     Q_OBJECT
 
-    SDLManager sdlManager = SDLManager(this);
+    // Gateway to the SDL library
+    SDLManager m_sdl = SDLManager(this);
 
-    // Indicates whether the input manager is active
+    // Delegate
+    InputManagerDelegate *m_delegate = nullptr;
+
+    // The window whose cursor is blanked while the mouse is captured
+    QQuickWindow *m_captureWindow = nullptr;
+
+    // Indicates whether the input manager has been started
     bool m_running = false;
 
     // List of managed devices
     QList<Gamepad> m_devices;
+
+    // Current port state
+    PortState m_portState[2];
 
     // Port mapping (gameport -> device number)
     int m_port0 = 0;
@@ -112,10 +137,14 @@ class InputManager : public QObject, SiObject, SDLManagerDelegate {
     u32 m_latestKey = {};
 
     // Key combo counters
-    int ctrlAltL = 0;
-    int ctrlAltR = 0;
-    int ctrlMetaL = 0;
-    int ctrlMetaR = 0;
+    int m_ctrlAltL = 0;
+    int m_ctrlAltR = 0;
+    int m_ctrlMetaL = 0;
+    int m_ctrlMetaR = 0;
+
+    // Capture state
+    bool m_captureMouse = false;
+    bool m_captureKeyboard = false;
 
     /* Polling
      *
@@ -140,31 +169,6 @@ class InputManager : public QObject, SiObject, SDLManagerDelegate {
     // Reads the relative mouse motion while the mouse is captured
     void pollMouse();
 
-    /* What the input devices attached to the two control ports did last
-     * (see mouseState and joystickState). Kept here, and not in the
-     * controllers, because it describes the devices, not the virtual machine.
-     */
-  public:
-
-    struct PortState {
-
-        // Mouse: latest absolute (screen) position, latest (scaled) motion
-        // and the three buttons. The motion falls back to zero once the
-        // mouse stops moving; the position stays.
-        float x = 0;
-        float y = 0;
-        float dx = 0;
-        float dy = 0;
-        bool mb[3] = {};
-
-        // Joystick: up, down, left, right, fire
-        bool joy[5] = {};
-    };
-
-  private:
-
-    PortState m_portState[2];
-
     /* Returns the motion to rest.
      *
      * dx/dy hold the delta of the most recent motion event, so once the events
@@ -175,17 +179,6 @@ class InputManager : public QObject, SiObject, SDLManagerDelegate {
      */
     QTimer m_mouseRestTimer;
 
-    // Capturing modes
-    bool m_captureMouse = false;
-    bool m_captureKeyboard = false;
-
-    // The window whose cursor is blanked while the mouse is captured (see
-    // setCaptureMouse()). Set by whichever controller currently owns the
-    // emulator window (see C64Controller::attachWindow()).
-    QQuickWindow *m_captureWindow = nullptr;
-
-    // Delegate
-    InputManagerDelegate *delegate = nullptr;
 
     //
     // Static methods
@@ -193,6 +186,7 @@ class InputManager : public QObject, SiObject, SDLManagerDelegate {
 
   public:
 
+    static u32 physicalKeyCode(QKeyEvent *event);
     static bool leftShift(QKeyEvent *event);
     static bool rightShift(QKeyEvent *event);
     static bool leftMeta(QKeyEvent *event);
@@ -202,7 +196,6 @@ class InputManager : public QObject, SiObject, SDLManagerDelegate {
     static bool leftCtrl(QKeyEvent *event);
     static bool rightCtrl(QKeyEvent *event);
 
-    static u32 physicalKeyCode(QKeyEvent *event);
 
     //
     // Methods
@@ -210,18 +203,27 @@ class InputManager : public QObject, SiObject, SDLManagerDelegate {
 
 public:
 
+    InputManager();
+
+    void start();
+    void stop();
+
+    void setDelegate(InputManagerDelegate *ptr);
+    void removeDelegate(InputManagerDelegate *ptr);
+    void setCaptureWindow(QQuickWindow *window);
+
+
+    //
+    // Devices
+    //
+
+public:
+
     Q_PROPERTY(QVariantList deviceList READ deviceList NOTIFY devicesChanged)
+
     Q_PROPERTY(int port0 READ getPort0 WRITE setPort0 NOTIFY port0Changed)
     Q_PROPERTY(int port1 READ getPort1 WRITE setPort1 NOTIFY port1Changed)
-    /* These need their own notify signals.
-     *
-     * A Q_PROPERTY takes exactly one NOTIFY, and these used to name two
-     * (port0Changed and devicesChanged); moc silently kept the last and dropped
-     * the other, so swapping the device in a port never refreshed the info and
-     * the UI kept describing the previous one. The info depends on both which
-     * device sits in the port and on the device list itself, so both places
-     * emit these.
-     */
+
     Q_PROPERTY(QVariantMap port0Info READ getPort0Info NOTIFY port0InfoChanged)
     Q_PROPERTY(QVariantMap port1Info READ getPort1Info NOTIFY port1InfoChanged)
 
@@ -233,23 +235,9 @@ public:
     Q_PROPERTY(QVariantList mouseState READ getMouseState NOTIFY mouseStateChanged)
     Q_PROPERTY(QVariantList joystickState READ getJoystickState NOTIFY joystickStateChanged)
 
-    Q_PROPERTY(bool captureMouse READ getCaptureMouse WRITE setCaptureMouse NOTIFY captureMouseChanged)
-    Q_PROPERTY(bool captureKeyboard READ getCaptureKeyboard WRITE setCaptureKeyboard NOTIFY captureKeyboardChanged)
+    const PortState &portState(int port) const { return m_portState[port]; }
 
-    //
-    // Keyboard
-    //
-
-    Q_PROPERTY(int mods READ mods NOTIFY keyChanged)
-    Q_PROPERTY(uint qKey READ qKey NOTIFY keyChanged)
-    Q_PROPERTY(uint pKey READ pKey NOTIFY keyChanged)
-    Q_PROPERTY(QString sKey READ sKey NOTIFY keyChanged)
-
-    InputManager();
-    // ~InputManager();
-
-    void setDelegate(InputManagerDelegate *ptr);
-    void removeDelegate(InputManagerDelegate *ptr);
+    QVariantList deviceList() const;
 
     Gamepad *getDevice(int index);
     Gamepad *getPort0Device() { return getDevice(m_port0); }
@@ -263,14 +251,43 @@ public:
     QVariantMap getPort0Info() { return getDeviceInfo(m_port0); }
     QVariantMap getPort1Info() { return getDeviceInfo(m_port1); }
 
+    QVariantList getMouseState() const;
+    QVariantList getJoystickState() const;
+
+
+    //
+    // Keyboard
+    //
+
+public:
+
+    Q_PROPERTY(int mods READ mods NOTIFY keyChanged)
+    Q_PROPERTY(uint qKey READ qKey NOTIFY keyChanged)
+    Q_PROPERTY(uint pKey READ pKey NOTIFY keyChanged)
+    Q_PROPERTY(QString sKey READ sKey NOTIFY keyChanged)
+
+private:
+
+    int mods() { return m_mods.bits(); }
+    uint qKey() { return m_qKey ? *m_qKey : 0; }
+    uint pKey() { return m_pKey ? *m_pKey : 0; }
+    QString sKey() { return m_sKey ? *m_sKey : ""; }
+
+
+    //
+    // Capturing
+    //
+
+public:
+
+    Q_PROPERTY(bool captureMouse READ getCaptureMouse WRITE setCaptureMouse NOTIFY captureMouseChanged)
+    Q_PROPERTY(bool captureKeyboard READ getCaptureKeyboard WRITE setCaptureKeyboard NOTIFY captureKeyboardChanged)
+
     bool getCaptureMouse() { return m_captureMouse; }
     void setCaptureMouse(bool value);
 
-    // Tells the input manager which window's cursor to blank/restore when
-    // the mouse is captured/released. See C64Controller::attachWindow().
-    void setCaptureWindow(QQuickWindow *window);
-
     bool getCaptureKeyboard() { return m_captureKeyboard; }
+    void setCaptureKeyboard(bool value);
 
     /* Whether the focused item is one that takes typed text.
      *
@@ -279,15 +296,6 @@ public:
      * is being typed into right now. See the definition.
      */
     static bool editingText();
-    void setCaptureKeyboard(bool value);
-
-    int mods() { return m_mods.bits(); }
-    uint qKey() { return m_qKey ? *m_qKey : 0; }
-    uint pKey() { return m_pKey ? *m_pKey : 0; }
-    QString sKey() { return m_sKey ? *m_sKey : ""; }
-
-    void start();
-    void stop();
 
     // Updates the list of managed devices (m_devices)
     void updateDevices();
@@ -318,7 +326,6 @@ public:
     optional<KeyCombo> keyCombo(QKeyEvent *event) const;
 
     bool emulationKeyFilter(int port, QKeyEvent *event, bool down);
-    // bool emulationKeyFilter(int port, u64 timestamp, int key, int vkey, bool down);
 
     bool isRepeat(QKeyEvent *event) const;
     void rememberEvent(QKeyEvent *event);
@@ -328,13 +335,18 @@ public:
     // Methods from SDLManagerDelegate
     //
 
+private:
+
     void sdlAxisEvent(int id, u64 timestamp, int axis, int value, float normalize) override;
     void sdlMotionEvent(int id, u64 timestamp, char state[5]) override;
     void sdlButtonEvent(int id, u64 timestamp, int button, bool down) override;
 
-  public:
 
-    QVariantList deviceList() const;
+    //
+    // Polling
+    //
+
+  public:
 
     /* Polls the input devices that can't report events by themselves.
      *
@@ -347,10 +359,10 @@ public:
     void poll();
     void setAutoPoll(bool value);
 
-    const PortState &portState(int port) const { return m_portState[port]; }
 
-    QVariantList getMouseState() const;
-    QVariantList getJoystickState() const;
+    //
+    // Signals
+    //
 
   signals:
 
