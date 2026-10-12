@@ -77,6 +77,71 @@ set(ICON_FILE_C64 "${CMAKE_CURRENT_SOURCE_DIR}/Shared/Assets/icons/AppIconC64.ic
 set_source_files_properties(${ICON_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 set_source_files_properties(${ICON_FILE_C64} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
+# The flat icons are only for platforms without Icon Composer icons (see
+# si_app_icon() below).
+if(APPLE)
+    set(SI_FLAT_ICON "")
+    set(SI_FLAT_ICON_C64 "")
+else()
+    set(SI_FLAT_ICON ${ICON_FILE})
+    set(SI_FLAT_ICON_C64 ${ICON_FILE_C64})
+endif()
+
+# Gives a bundle the Icon Composer icon Shared/Assets/icons/<icon>.icon.
+#
+# macOS Tahoe puts every icon that is not one of those into a gray container,
+# so the icon is compiled into an asset catalog with actool and the catalog is
+# shipped in the bundle. actool also writes an .icns of the same name for older
+# systems. Qt's stock Info.plist has no CFBundleIconName, which is the key that
+# makes the system look the icon up in the catalog, so it is added after
+# linking. Nothing happens on other platforms.
+function(si_app_icon target icon)
+
+    if(NOT APPLE)
+        return()
+    endif()
+
+    set(source "${CMAKE_CURRENT_SOURCE_DIR}/Shared/Assets/icons/${icon}.icon")
+    set(output "${CMAKE_CURRENT_BINARY_DIR}/${icon}")
+
+    if(CMAKE_OSX_DEPLOYMENT_TARGET)
+        set(deployment "${CMAKE_OSX_DEPLOYMENT_TARGET}")
+    else()
+        set(deployment "15.0")
+    endif()
+
+    file(GLOB_RECURSE icon_files CONFIGURE_DEPENDS "${source}/*")
+
+    add_custom_command(
+        OUTPUT "${output}/Assets.car" "${output}/${icon}.icns"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${output}"
+        COMMAND xcrun actool "${source}"
+                --compile "${output}"
+                --output-format human-readable-text --notices --warnings --errors
+                --output-partial-info-plist "${output}/partial.plist"
+                --app-icon ${icon} --include-all-app-icons
+                --enable-on-demand-resources NO
+                --development-region en --target-device mac --platform macosx
+                --minimum-deployment-target "${deployment}"
+        DEPENDS ${icon_files}
+        COMMENT "Compiling the ${icon} app icon"
+        VERBATIM)
+
+    set_source_files_properties(
+        "${output}/Assets.car" "${output}/${icon}.icns"
+        PROPERTIES GENERATED TRUE MACOSX_PACKAGE_LOCATION "Resources")
+
+    target_sources(${target} PRIVATE "${output}/Assets.car" "${output}/${icon}.icns")
+    set_target_properties(${target} PROPERTIES MACOSX_BUNDLE_ICON_FILE ${icon})
+
+    add_custom_command(TARGET ${target} POST_BUILD
+        COMMAND chmod u+w "$<TARGET_BUNDLE_DIR:${target}>/Contents/Info.plist"
+        COMMAND plutil -replace CFBundleIconName -string ${icon}
+                "$<TARGET_BUNDLE_DIR:${target}>/Contents/Info.plist"
+        VERBATIM)
+
+endfunction()
+
 
 #
 # Silicium
@@ -85,7 +150,7 @@ set_source_files_properties(${ICON_FILE_C64} PROPERTIES MACOSX_PACKAGE_LOCATION 
 qt_add_executable(silicium
         MACOSX_BUNDLE
         "Silicium/main.cpp"
-        ${ICON_FILE})
+        ${SI_FLAT_ICON})
 
 # Silicium carries a plist of its own because it is the app that declares the
 # .svm/.svmz document types; SiC64 and SiAmiga stay on Qt's stock template.
@@ -98,6 +163,8 @@ set_target_properties(silicium PROPERTIES
         MACOSX_BUNDLE_SHORT_VERSION_STRING "${SI_VERSION}"
         MACOSX_BUNDLE_BUNDLE_VERSION "${SI_BUILD_VERSION}"
         MACOSX_BUNDLE_COPYRIGHT "${SI_COPYRIGHT}")
+
+si_app_icon(silicium SiIcon)
 
 # The binary dir carries the generated version.h, which config.h includes.
 target_include_directories(silicium PUBLIC
@@ -203,7 +270,7 @@ qt_add_qml_module(silicium
 qt_add_executable(SiC64
         MACOSX_BUNDLE
         "SiC64/main.cpp"
-        ${ICON_FILE_C64})
+        ${SI_FLAT_ICON_C64})
 
 # The target name matches this source subdirectory's name, which would
 # otherwise collide with the build-tree mirror CMake creates for it. Give
@@ -216,6 +283,8 @@ set_target_properties(SiC64 PROPERTIES
         MACOSX_BUNDLE_SHORT_VERSION_STRING "${SI_VERSION}"
         MACOSX_BUNDLE_BUNDLE_VERSION "${SI_BUILD_VERSION}"
         MACOSX_BUNDLE_COPYRIGHT "${SI_COPYRIGHT}")
+
+si_app_icon(SiC64 SiC64Icon)
 
 # The binary dir carries the generated version.h, which config.h includes.
 target_include_directories(SiC64 PUBLIC
@@ -271,14 +340,10 @@ qt_add_qml_module(SiC64
 # the build chain accommodates a third executable alongside silicium and
 # SiC64. The real Amiga backend (an equivalent of C64Controller and friends)
 # is built out in a later step, once the Amiga UI work begins in earnest.
-# There is no dedicated Amiga app icon yet, so this reuses silicium's
-# ICON_FILE rather than fabricating a placeholder asset.
-#
-
 qt_add_executable(SiAmiga
         MACOSX_BUNDLE
         "SiAmiga/main.cpp"
-        ${ICON_FILE})
+        ${SI_FLAT_ICON})
 
 # The target name matches this source subdirectory's name, which would
 # otherwise collide with the build-tree mirror CMake creates for it. Give
@@ -291,6 +356,8 @@ set_target_properties(SiAmiga PROPERTIES
         MACOSX_BUNDLE_SHORT_VERSION_STRING "${SI_VERSION}"
         MACOSX_BUNDLE_BUNDLE_VERSION "${SI_BUILD_VERSION}"
         MACOSX_BUNDLE_COPYRIGHT "${SI_COPYRIGHT}")
+
+si_app_icon(SiAmiga SiAmIcon)
 
 # The binary dir carries the generated version.h, which config.h includes.
 target_include_directories(SiAmiga PUBLIC
