@@ -67,13 +67,13 @@ VMWindow {
         onClicked: {
 
             if (Preferences.retainMouseByClicking && !canvasOverlay.visible) {
-                root.c64.captureMouse()
+                if (root.c64.isRunning) { root.c64.captureMouse() }
             }
         }
 
         onDoubleClicked: {
             if (Preferences.retainMouseByDoubleClicking && !canvasOverlay.visible) {
-                root.c64.captureMouse()
+                if (root.c64.isRunning) { root.c64.captureMouse() }
             }
         }
 
