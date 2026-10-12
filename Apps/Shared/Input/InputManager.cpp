@@ -23,6 +23,16 @@
 #include <CoreGraphics/CoreGraphics.h>
 #endif
 
+u32
+InputManager::physicalKeyCode(QKeyEvent *event)
+{
+    if constexpr (OS_MACOS) {
+        return event->nativeVirtualKey();
+    } else {
+        return event->nativeScanCode();
+    }
+}
+
 bool
 InputManager::leftShift(QKeyEvent *event)
 {
@@ -99,16 +109,6 @@ InputManager::rightCtrl(QKeyEvent *event)
     return false;
 }
 
-u32
-InputManager::physicalKeyCode(QKeyEvent *event)
-{
-    if constexpr (OS_MACOS) {
-        return event->nativeVirtualKey();
-    } else {
-        return event->nativeScanCode();
-    }
-}
-
 InputManager::InputManager() : QObject()
 {
     m_mouseRestTimer.setSingleShot(true);
@@ -129,6 +129,74 @@ InputManager::InputManager() : QObject()
 }
 
 void
+InputManager::start()
+{
+    if (!m_running) {
+
+        LogTask subtask("Starting InputManager...");
+
+        // Install event filter
+        QGuiApplication::instance()->installEventFilter(this);
+
+        /* Hand the mouse back when the app is sent to the background.
+         *
+         * Capturing the mouse is an arrangement with the window system, and
+         * the window system ends it on its own when the app deactivates: on
+         * macOS the CGDisplayHideCursor() hide count only takes effect while
+         * the app is frontmost, so Cmd+Tab puts the pointer back on screen
+         * no matter what we think. Without this, m_captureMouse stays true
+         * behind the app's back: the pointer is visible and owned by whatever
+         * the user switched to, while the event filter still warps it to the
+         * window center and swallows the clicks meant for that other app.
+         *
+         * Releasing here also rebalances the hide count (setCaptureMouse()
+         * calls CGDisplayShowCursor()), so the cursor does not vanish again
+         * the moment the user comes back.
+         */
+        connect(qGuiApp, &QGuiApplication::applicationStateChanged,
+                this, [this](Qt::ApplicationState state) {
+
+            if (state != Qt::ApplicationActive) setCaptureMouse(false);
+        });
+
+        // Initial population
+        updateDevices();
+
+        // Rebuild the device list when SDL reports a device change
+        connect(&m_sdl, &SDLManager::countChanged, this, &InputManager::updateDevices);
+
+        // Rebuild the device list when the device preferences change
+        connect(&preferences(), &Preferences::devicesPrefsChanged, this, &InputManager::updateDevices);
+
+        // Register as delegate
+        m_sdl.setDelegate(this);
+        m_sdl.start();
+
+        // Start in auto mode
+        m_pollTimer.start();
+
+        m_running = true;
+    }
+}
+
+void
+InputManager::stop()
+{
+    if (m_running) {
+
+        LogTask task("Stopping InputManager...");
+
+        // Gives the cursor back (see setCaptureMouse())
+        setCaptureMouse(false);
+
+        m_pollTimer.stop();
+        m_sdl.stop();
+
+        m_running = false;
+    }
+}
+
+void
 InputManager::setDelegate(InputManagerDelegate *ptr)
 {
     m_delegate = ptr;
@@ -138,6 +206,43 @@ void
 InputManager::removeDelegate(InputManagerDelegate *ptr)
 {
     if (m_delegate == ptr) m_delegate = nullptr;
+}
+
+void
+InputManager::setCaptureWindow(QQuickWindow *window)
+{
+    m_captureWindow = window;
+}
+
+QVariantList
+InputManager::deviceList() const
+{
+    QVariantList list;
+
+    auto icon = [](GamepadType type) {
+        switch (type) {
+            case GamepadType::None:
+                return "block";
+            case GamepadType::Mouse:
+                return "mouse";
+            case GamepadType::Joystick:
+                return "joystick";
+            case GamepadType::Paddle:
+                return "handheld_controller";
+            default:
+                return "stadia_controller";
+        }
+    };
+
+    for (const auto &pad : m_devices) {
+
+        QVariantMap map;
+        map["name"] = pad.name;
+        map["type"] = int(pad.type);
+        map["icon"] = icon(pad.type);
+        list.append(map);
+    }
+    return list;
 }
 
 Gamepad *
@@ -182,6 +287,80 @@ InputManager::setPort1(int index)
         emit port1Changed();
         emit port1InfoChanged();
     }
+}
+
+QVariantList
+InputManager::getMouseState() const
+{
+    QVariantList list;
+
+    for (const auto &s : m_portState) {
+
+        list.append(QVariantMap {
+            { "x", s.x }, { "y", s.y }, { "dx", s.dx }, { "dy", s.dy },
+            { "left", s.mb[0] }, { "middle", s.mb[1] }, { "right", s.mb[2] }
+        });
+    }
+    return list;
+}
+
+QVariantList
+InputManager::getJoystickState() const
+{
+    QVariantList list;
+
+    for (const auto &s : m_portState) {
+
+        list.append(QVariantMap {
+            { "up", s.joy[0] }, { "down", s.joy[1] },
+            { "left", s.joy[2] }, { "right", s.joy[3] }, { "fire", s.joy[4] }
+        });
+    }
+    return list;
+}
+
+void
+InputManager::poll(utl::Time interval)
+{
+    m_pollInterval = interval;
+    m_pollTimer.setInterval(int(interval.asMilliseconds()));
+
+    // Only a running manager has anything to poll
+    if (m_running) m_pollTimer.start();
+}
+
+void
+InputManager::poll()
+{
+    // The caller takes over
+    m_pollTimer.stop();
+
+    pollGamepads();
+    pollMouse();
+}
+
+void
+InputManager::pollGamepads()
+{
+    m_sdl.poll();
+}
+
+void
+InputManager::pollMouse()
+{
+#ifdef __APPLE__
+    if (!m_captureMouse) return;
+
+    int32_t dx = 0, dy = 0;
+    CGGetLastMouseDelta(&dx, &dy);
+
+    if (m_delegate && (dx != 0 || dy != 0)) {
+
+        auto pos = QCursor::pos();
+        recordMouseMotion(QDateTime::currentMSecsSinceEpoch(),
+                        pos.x(), pos.y(), dx, dy);
+    }
+#endif
 }
 
 void
@@ -231,12 +410,6 @@ InputManager::setCaptureMouse(bool value)
 }
 
 void
-InputManager::setCaptureWindow(QQuickWindow *window)
-{
-    m_captureWindow = window;
-}
-
-void
 InputManager::setCaptureKeyboard(bool value)
 {
     if (m_captureKeyboard != value) {
@@ -273,515 +446,6 @@ InputManager::editingText()
     QCoreApplication::sendEvent(focus, &query);
 
     return query.value(Qt::ImEnabled).toBool();
-}
-
-bool
-InputManager::eventFilter(QObject *object, QEvent *event)
-{
-    switch (event->type()) {
-
-        case QEvent::MouseMove:
-
-            return mouseEventFilter(object, static_cast<QMouseEvent *>(event));
-
-        case QEvent::MouseButtonPress:
-        case QEvent::MouseButtonRelease:
-
-            return mouseButtonEventFilter(object, static_cast<QMouseEvent *>(event));
-
-        case QEvent::KeyPress:
-
-            return keyDownEventFilter(object, static_cast<QKeyEvent *>(event));
-
-        case QEvent::KeyRelease:
-
-            return keyUpEventFilter(object, static_cast<QKeyEvent *>(event));
-
-        default:
-            break;
-    }
-
-    return QObject::eventFilter(object, event);
-}
-
-void
-InputManager::recordMouseMotion(u64 timestamp, float x, float y, float dx, float dy)
-{
-    if (m_delegate && m_delegate->detectShakeDxDy(dx, dy)) {
-        m_delegate->shakeDetected();
-    }
-
-    /* Apply the sensitivity to the relative motion only.
-     *
-     * mouseXY() gets the unscaled position: it is an absolute screen
-     * coordinate, and scaling it would displace the pointer rather than
-     * speed it up. Shake detection above stays on the raw deltas too, so
-     * the setting cannot make "shake to release the mouse" easier or
-     * harder to trigger than it is with the pointer itself.
-     */
-    auto sens = preferences().getMouseSensitivity();
-    auto sdx  = sens * dx;
-    auto sdy  = sens * dy;
-
-    for (int port = 0; port < 2; port++) {
-
-        auto *device = port == 0 ? getPort0Device() : getPort1Device();
-        if (device->type != GamepadType::Mouse) continue;
-
-        auto &state = m_portState[port];
-        state.x = x;
-        state.y = y;
-        state.dx = sdx;
-        state.dy = sdy;
-        state.moved = true;
-    }
-
-    dispatch(timestamp);
-
-    m_mouseRestTimer.start();
-}
-
-void
-InputManager::recordMouseButtonEvent(int port, u64 timestamp, int button, bool down)
-{
-    if (button < 0 || button >= 3) return;
-
-    m_portState[port].mb[button] = down;
-    dispatch(timestamp);
-}
-
-void
-InputManager::recordJoystickEvent(int port, u64 timestamp, const bool state[5])
-{
-    std::copy(state, state + 5, m_portState[port].joy);
-    dispatch(timestamp);
-}
-
-void
-InputManager::dispatch(u64 timestamp)
-{
-    bool mouseChanged = false;
-    bool joystickChanged = false;
-
-    for (int port = 0; port < 2; port++) {
-
-        auto &state = m_portState[port];
-        auto &prev = m_prevPortState[port];
-
-        // Mouse movement
-        if (state.moved) {
-
-            mouseChanged = true;
-
-            if (m_delegate) {
-                m_delegate->mouseXY(port, timestamp, state.x, state.y);
-                m_delegate->mouseDxDy(port, timestamp, state.dx, state.dy);
-            }
-        }
-
-        // Mouse buttons
-        for (int button = 0; button < 3; button++) {
-
-            if (state.mb[button] == prev.mb[button]) continue;
-
-            mouseChanged = true;
-            prev.mb[button] = state.mb[button];
-
-            if (m_delegate) m_delegate->mouseButton(port, timestamp, button, state.mb[button]);
-        }
-
-        // Joystick
-        if (!std::equal(state.joy, state.joy + 5, prev.joy)) {
-
-            joystickChanged = true;
-
-            bool before[5];
-            std::copy(prev.joy, prev.joy + 5, before);
-            std::copy(state.joy, state.joy + 5, prev.joy);
-
-            if (m_delegate) m_delegate->joystickMotion(port, timestamp, state.joy, before);
-        }
-
-        state.moved = false;
-    }
-
-    if (mouseChanged) emit mouseStateChanged();
-    if (joystickChanged) emit joystickStateChanged();
-}
-
-void
-InputManager::poll(utl::Time interval)
-{
-    m_pollInterval = interval;
-    m_pollTimer.setInterval(int(interval.asMilliseconds()));
-
-    // Only a running manager has anything to poll
-    if (m_running) m_pollTimer.start();
-}
-
-void
-InputManager::poll()
-{
-    // The caller takes over
-    m_pollTimer.stop();
-
-    pollGamepads();
-    pollMouse();
-}
-
-void
-InputManager::pollGamepads()
-{
-    m_sdl.poll();
-}
-
-void
-InputManager::pollMouse()
-{
-#ifdef __APPLE__
-    if (!m_captureMouse) return;
-
-    int32_t dx = 0, dy = 0;
-    CGGetLastMouseDelta(&dx, &dy);
-
-    if (m_delegate && (dx != 0 || dy != 0)) {
-
-        auto pos = QCursor::pos();
-        recordMouseMotion(QDateTime::currentMSecsSinceEpoch(),
-                        pos.x(), pos.y(), dx, dy);
-    }
-#endif
-}
-
-QVariantList
-InputManager::getMouseState() const
-{
-    QVariantList list;
-
-    for (const auto &s : m_portState) {
-
-        list.append(QVariantMap {
-            { "x", s.x }, { "y", s.y }, { "dx", s.dx }, { "dy", s.dy },
-            { "left", s.mb[0] }, { "middle", s.mb[1] }, { "right", s.mb[2] }
-        });
-    }
-    return list;
-}
-
-QVariantList
-InputManager::getJoystickState() const
-{
-    QVariantList list;
-
-    for (const auto &s : m_portState) {
-
-        list.append(QVariantMap {
-            { "up", s.joy[0] }, { "down", s.joy[1] },
-            { "left", s.joy[2] }, { "right", s.joy[3] }, { "fire", s.joy[4] }
-        });
-    }
-    return list;
-}
-
-bool
-InputManager::mouseEventFilter(QObject *object, QMouseEvent *event)
-{
-    static QPointF lastPos = event->globalPosition();
-
-    if (m_delegate) {
-
-#ifdef __APPLE__
-        // While captured, the motion is polled (see poll())
-        if (m_captureMouse) return true;
-#endif
-
-        auto current = event->globalPosition();
-        auto x       = static_cast<float>(current.x());
-        auto y       = static_cast<float>(current.y());
-        auto dx      = x - static_cast<float>(lastPos.x());
-        auto dy      = y - static_cast<float>(lastPos.y());
-
-        lastPos = current;
-
-        recordMouseMotion(event->timestamp(), x, y, dx, dy);
-
-#ifndef __APPLE__
-        if (m_captureMouse) {
-
-            m_delegate->warpToCenter();
-            return true;
-        }
-#endif
-    }
-
-    return QObject::eventFilter(object, event);
-}
-
-bool
-InputManager::mouseButtonEventFilter(QObject *obj, QMouseEvent *event)
-{
-    if (m_delegate) {
-
-        bool down = event->type() == QEvent::MouseButtonPress;
-
-        auto mappedButton = [](Qt::MouseButton btn) -> int {
-            if (btn == Qt::LeftButton) return 0;
-            if (btn == Qt::MiddleButton) return 1;
-            if (btn == Qt::RightButton) return 2;
-            return -1;
-        };
-
-        if (auto button = mappedButton(event->button()); button != -1) {
-
-            if (auto *device = getPort0Device(); device->type == GamepadType::Mouse) {
-                recordMouseButtonEvent(0, event->timestamp(), button, down);
-            }
-            if (auto *device = getPort1Device(); device->type == GamepadType::Mouse) {
-                recordMouseButtonEvent(1, event->timestamp(), button, down);
-            }
-
-            if (m_captureMouse) return true;
-        }
-    }
-
-    return QObject::eventFilter(obj, event);
-}
-
-bool
-InputManager::keyDownEventFilter(QObject *obj, QKeyEvent *event)
-{
-    // Who the key belongs to, asked once and used for both decisions below
-    // (feeding the machine, and swallowing the event).
-    const bool capture = m_captureKeyboard && !editingText();
-
-    if (m_delegate && !isRepeat(event)) {
-
-        rememberEvent(event);
-
-        if (event->key() == Qt::Key_CapsLock) {
-
-            m_delegate->capsLock(true);
-            return true;
-        }
-
-        optional<uint> newQKey = event->key();
-        optional<uint> newPKey = physicalKeyCode(event);
-        auto newMods = m_mods;
-
-        newMods.leftShift |= leftShift(event);
-        newMods.rightShift |= rightShift(event);
-        newMods.leftCtrl |= leftCtrl(event);
-        newMods.rightCtrl |= rightCtrl(event);
-        newMods.leftAlt |= leftAlt(event);
-        newMods.rightAlt |= rightAlt(event);
-        newMods.leftMeta |= leftMeta(event);
-        newMods.rightMeta |= rightMeta(event);
-
-        m_qKey = newQKey;
-        m_pKey = newPKey;
-        m_sKey = event->text();
-        m_mods = newMods;
-        emit keyChanged();
-
-        // printf("Key down event filter: %x %x %x\n", m_qKey, m_pKey, m_mods.bits());
-
-        if (auto combo = keyCombo(event)) {
-
-            switch (*combo) {
-
-                case KeyCombo::CtrlAltL:
-
-                    m_delegate->keyCombo(KeyCombo::CtrlAltL, ++m_ctrlAltL);
-                    break;
-
-                case KeyCombo::CtrlAltR:
-
-                    m_delegate->keyCombo(KeyCombo::CtrlAltR, ++m_ctrlAltR);
-                    break;
-
-                case KeyCombo::CtrlMetaL:
-
-                    m_delegate->keyCombo(KeyCombo::CtrlMetaL, ++m_ctrlMetaL);
-                    break;
-
-                case KeyCombo::CtrlMetaR:
-
-                    m_delegate->keyCombo(KeyCombo::CtrlMetaR, ++m_ctrlMetaR);
-                    break;
-
-                default:
-                    break;
-            }
-
-        } else if (capture) {
-
-            /* Only while the emulator owns the keyboard.
-             *
-             * m_captureKeyboard decides who a keystroke belongs to, and it has
-             * to gate this as well as the consumption below -- the two are the
-             * same question asked twice. Gating only the consumption would let
-             * a keystroke reach the app *and* the virtual machine: typing a
-             * RetroShell command would type it into the running C64 too, and
-             * WASD in any text field would nudge the joystick.
-             */
-
-            // Check if the pressed key is an emulation key
-            bool isEmuKey = emulationKeyFilter(0, event, true) || emulationKeyFilter(1, event, true);
-
-            if (!isEmuKey || !preferences().getDisconnectEmulationKeys()) {
-
-                m_delegate->keyDown(event, m_mods);
-            }
-        }
-    }
-
-    return capture || QObject::eventFilter(obj, event);
-}
-
-optional<KeyCombo>
-InputManager::keyCombo(QKeyEvent *event) const
-{
-    if (event->modifiers() & Qt::ControlModifier) {
-
-        if (leftAlt(event)) return KeyCombo::CtrlAltL;
-        if (rightAlt(event)) return KeyCombo::CtrlAltR;
-        if (leftMeta(event)) return KeyCombo::CtrlMetaL;
-        if (rightMeta(event)) return KeyCombo::CtrlMetaR;
-    }
-
-    return { };
-}
-
-bool
-InputManager::keyUpEventFilter(QObject *obj, QKeyEvent *event)
-{
-    const bool capture = m_captureKeyboard && !editingText();
-
-    if (m_delegate && !isRepeat(event)) {
-
-        rememberEvent(event);
-
-        if (event->key() == Qt::Key_CapsLock) {
-
-            m_delegate->capsLock(false);
-            return true;
-        }
-
-        optional<uint> newQKey = { };
-        optional<uint> newPKey = { };
-        auto newMods = m_mods;
-
-        if ((event->modifiers() & Qt::ShiftModifier) == 0)
-            newMods.leftShift = newMods.rightShift = false;
-        if ((event->modifiers() & Qt::ControlModifier) == 0)
-            newMods.leftCtrl = newMods.rightCtrl = false;
-        if ((event->modifiers() & Qt::AltModifier) == 0)
-            newMods.leftAlt = newMods.rightAlt = false;
-        if ((event->modifiers() & Qt::MetaModifier) == 0)
-            newMods.leftMeta = newMods.rightMeta = false;
-
-        m_qKey = newQKey;
-        m_pKey = newPKey;
-        m_sKey = "";
-        m_mods = newMods;
-        emit keyChanged();
-
-        // printf("Key up event filter: %x %x %x\n", m_qKey, m_pKey, m_mods.bits());
-
-        if (m_ctrlAltL || m_ctrlAltR || m_ctrlMetaL || m_ctrlMetaR) {
-
-            if (m_ctrlAltL && !m_mods.ctrl() && !m_mods.leftAlt) {
-                m_delegate->keyCombo(KeyCombo::CtrlAltL, (m_ctrlAltL = 0));
-            } else if (m_ctrlAltR && !m_mods.ctrl() && !m_mods.rightAlt) {
-                m_delegate->keyCombo(KeyCombo::CtrlAltR, (m_ctrlAltR = 0));
-            } else if (m_ctrlMetaL && !m_mods.ctrl() && !m_mods.leftMeta) {
-                m_delegate->keyCombo(KeyCombo::CtrlMetaL, (m_ctrlMetaL = 0));
-            } else if (m_ctrlMetaR && !m_mods.ctrl() && !m_mods.rightMeta) {
-                m_delegate->keyCombo(KeyCombo::CtrlMetaR, (m_ctrlMetaR = 0));
-            }
-
-        } else {
-
-            /* Deliberately NOT gated on m_captureKeyboard, unlike the matching
-             * block in keyDownEventFilter.
-             *
-             * Capture can be withdrawn between a press and its release -- open
-             * RetroShell with a key held down and that is exactly what happens.
-             * Swallowing the release would leave that key stuck down in the
-             * virtual machine with nothing to ever lift it. Releasing a key the
-             * machine never saw pressed is harmless by comparison, so the
-             * asymmetry falls on the safe side.
-             */
-
-            // Check if the pressed key is an emulation key
-            bool isEmuKey = emulationKeyFilter(0, event, false) || emulationKeyFilter(1, event, false);
-
-            if (!isEmuKey || !preferences().getDisconnectEmulationKeys()) {
-
-                m_delegate->keyUp(event, m_mods);
-            }
-        }
-    }
-
-    /* Consumed on the same terms as the press, so that a key typed into a
-     * text field reaches it. The delegate above still hears the release
-     * either way -- that is the point of the block above.
-     */
-    return capture || QObject::eventFilter(obj, event);
-}
-
-bool
-InputManager::isRepeat(QKeyEvent *event) const
-{
-    return event->type() == m_latestType && m_latestKey == physicalKeyCode(event);
-}
-
-void
-InputManager::rememberEvent(QKeyEvent *event)
-{
-    m_latestType = event->type();
-    m_latestKey = physicalKeyCode(event);
-}
-
-bool
-InputManager::emulationKeyFilter(int port, QKeyEvent *event, bool down)
-{
-    if (auto *device = port == 0 ? getPort0Device() : getPort1Device()) {
-
-        auto qKey = event->key();
-        auto pKey = physicalKeyCode(event);
-        auto time = event->timestamp();
-
-        if (auto nr = device->isEmulationKey(qKey, pKey)) {
-
-            switch (device->type) {
-
-                case GamepadType::Mouse:
-
-                    // printf("MOUSE EMULATION KEY %d hit\n", *nr);
-
-                    if (*nr < 3) {
-                        recordMouseButtonEvent(port, time, *nr, down);
-                    }
-                    break;
-
-                case GamepadType::Joystick:
-
-                    // printf("JOYSTICK EMULATION KEY %d hit\n", *nr);
-
-                    assert(*nr <= 4);
-                    device->state[*nr] = down;
-                    recordJoystickEvent(port, time, device->state);
-                    break;
-
-                default:
-                    break;
-            }
-
-            return true;
-        }
-    }
-    return false;
 }
 
 void
@@ -948,103 +612,439 @@ InputManager::getDeviceInfo(int deviceIndex)
     return info;
 }
 
-QVariantList
-InputManager::deviceList() const
+bool
+InputManager::eventFilter(QObject *object, QEvent *event)
 {
-    QVariantList list;
+    switch (event->type()) {
 
-    auto icon = [](GamepadType type) {
-        switch (type) {
-            case GamepadType::None:
-                return "block";
-            case GamepadType::Mouse:
-                return "mouse";
-            case GamepadType::Joystick:
-                return "joystick";
-            case GamepadType::Paddle:
-                return "handheld_controller";
-            default:
-                return "stadia_controller";
+        case QEvent::MouseMove:
+
+            return mouseEventFilter(object, static_cast<QMouseEvent *>(event));
+
+        case QEvent::MouseButtonPress:
+        case QEvent::MouseButtonRelease:
+
+            return mouseButtonEventFilter(object, static_cast<QMouseEvent *>(event));
+
+        case QEvent::KeyPress:
+
+            return keyDownEventFilter(object, static_cast<QKeyEvent *>(event));
+
+        case QEvent::KeyRelease:
+
+            return keyUpEventFilter(object, static_cast<QKeyEvent *>(event));
+
+        default:
+            break;
+    }
+
+    return QObject::eventFilter(object, event);
+}
+
+bool
+InputManager::mouseEventFilter(QObject *object, QMouseEvent *event)
+{
+    static QPointF lastPos = event->globalPosition();
+
+    if (m_delegate) {
+
+#ifdef __APPLE__
+        // While captured, the motion is polled (see poll())
+        if (m_captureMouse) return true;
+#endif
+
+        auto current = event->globalPosition();
+        auto x       = static_cast<float>(current.x());
+        auto y       = static_cast<float>(current.y());
+        auto dx      = x - static_cast<float>(lastPos.x());
+        auto dy      = y - static_cast<float>(lastPos.y());
+
+        lastPos = current;
+
+        recordMouseMotion(event->timestamp(), x, y, dx, dy);
+
+#ifndef __APPLE__
+        if (m_captureMouse) {
+
+            m_delegate->warpToCenter();
+            return true;
         }
-    };
-
-    for (const auto &pad : m_devices) {
-
-        QVariantMap map;
-        map["name"] = pad.name;
-        map["type"] = int(pad.type);
-        map["icon"] = icon(pad.type);
-        list.append(map);
+#endif
     }
-    return list;
+
+    return QObject::eventFilter(object, event);
+}
+
+bool
+InputManager::mouseButtonEventFilter(QObject *obj, QMouseEvent *event)
+{
+    if (m_delegate) {
+
+        bool down = event->type() == QEvent::MouseButtonPress;
+
+        auto mappedButton = [](Qt::MouseButton btn) -> int {
+            if (btn == Qt::LeftButton) return 0;
+            if (btn == Qt::MiddleButton) return 1;
+            if (btn == Qt::RightButton) return 2;
+            return -1;
+        };
+
+        if (auto button = mappedButton(event->button()); button != -1) {
+
+            if (auto *device = getPort0Device(); device->type == GamepadType::Mouse) {
+                recordMouseButtonEvent(0, event->timestamp(), button, down);
+            }
+            if (auto *device = getPort1Device(); device->type == GamepadType::Mouse) {
+                recordMouseButtonEvent(1, event->timestamp(), button, down);
+            }
+
+            if (m_captureMouse) return true;
+        }
+    }
+
+    return QObject::eventFilter(obj, event);
+}
+
+bool
+InputManager::keyDownEventFilter(QObject *obj, QKeyEvent *event)
+{
+    // Who the key belongs to, asked once and used for both decisions below
+    // (feeding the machine, and swallowing the event).
+    const bool capture = m_captureKeyboard && !editingText();
+
+    if (m_delegate && !isRepeat(event)) {
+
+        rememberEvent(event);
+
+        if (event->key() == Qt::Key_CapsLock) {
+
+            m_delegate->capsLock(true);
+            return true;
+        }
+
+        optional<uint> newQKey = event->key();
+        optional<uint> newPKey = physicalKeyCode(event);
+        auto newMods = m_mods;
+
+        newMods.leftShift |= leftShift(event);
+        newMods.rightShift |= rightShift(event);
+        newMods.leftCtrl |= leftCtrl(event);
+        newMods.rightCtrl |= rightCtrl(event);
+        newMods.leftAlt |= leftAlt(event);
+        newMods.rightAlt |= rightAlt(event);
+        newMods.leftMeta |= leftMeta(event);
+        newMods.rightMeta |= rightMeta(event);
+
+        m_qKey = newQKey;
+        m_pKey = newPKey;
+        m_sKey = event->text();
+        m_mods = newMods;
+        emit keyChanged();
+
+        // printf("Key down event filter: %x %x %x\n", m_qKey, m_pKey, m_mods.bits());
+
+        if (auto combo = keyCombo(event)) {
+
+            switch (*combo) {
+
+                case KeyCombo::CtrlAltL:
+
+                    m_delegate->keyCombo(KeyCombo::CtrlAltL, ++m_ctrlAltL);
+                    break;
+
+                case KeyCombo::CtrlAltR:
+
+                    m_delegate->keyCombo(KeyCombo::CtrlAltR, ++m_ctrlAltR);
+                    break;
+
+                case KeyCombo::CtrlMetaL:
+
+                    m_delegate->keyCombo(KeyCombo::CtrlMetaL, ++m_ctrlMetaL);
+                    break;
+
+                case KeyCombo::CtrlMetaR:
+
+                    m_delegate->keyCombo(KeyCombo::CtrlMetaR, ++m_ctrlMetaR);
+                    break;
+
+                default:
+                    break;
+            }
+
+        } else if (capture) {
+
+            /* Only while the emulator owns the keyboard.
+             *
+             * m_captureKeyboard decides who a keystroke belongs to, and it has
+             * to gate this as well as the consumption below -- the two are the
+             * same question asked twice. Gating only the consumption would let
+             * a keystroke reach the app *and* the virtual machine: typing a
+             * RetroShell command would type it into the running C64 too, and
+             * WASD in any text field would nudge the joystick.
+             */
+
+            // Check if the pressed key is an emulation key
+            bool isEmuKey = emulationKeyFilter(0, event, true) || emulationKeyFilter(1, event, true);
+
+            if (!isEmuKey || !preferences().getDisconnectEmulationKeys()) {
+
+                m_delegate->keyDown(event, m_mods);
+            }
+        }
+    }
+
+    return capture || QObject::eventFilter(obj, event);
+}
+
+bool
+InputManager::keyUpEventFilter(QObject *obj, QKeyEvent *event)
+{
+    const bool capture = m_captureKeyboard && !editingText();
+
+    if (m_delegate && !isRepeat(event)) {
+
+        rememberEvent(event);
+
+        if (event->key() == Qt::Key_CapsLock) {
+
+            m_delegate->capsLock(false);
+            return true;
+        }
+
+        optional<uint> newQKey = { };
+        optional<uint> newPKey = { };
+        auto newMods = m_mods;
+
+        if ((event->modifiers() & Qt::ShiftModifier) == 0)
+            newMods.leftShift = newMods.rightShift = false;
+        if ((event->modifiers() & Qt::ControlModifier) == 0)
+            newMods.leftCtrl = newMods.rightCtrl = false;
+        if ((event->modifiers() & Qt::AltModifier) == 0)
+            newMods.leftAlt = newMods.rightAlt = false;
+        if ((event->modifiers() & Qt::MetaModifier) == 0)
+            newMods.leftMeta = newMods.rightMeta = false;
+
+        m_qKey = newQKey;
+        m_pKey = newPKey;
+        m_sKey = "";
+        m_mods = newMods;
+        emit keyChanged();
+
+        // printf("Key up event filter: %x %x %x\n", m_qKey, m_pKey, m_mods.bits());
+
+        if (m_ctrlAltL || m_ctrlAltR || m_ctrlMetaL || m_ctrlMetaR) {
+
+            if (m_ctrlAltL && !m_mods.ctrl() && !m_mods.leftAlt) {
+                m_delegate->keyCombo(KeyCombo::CtrlAltL, (m_ctrlAltL = 0));
+            } else if (m_ctrlAltR && !m_mods.ctrl() && !m_mods.rightAlt) {
+                m_delegate->keyCombo(KeyCombo::CtrlAltR, (m_ctrlAltR = 0));
+            } else if (m_ctrlMetaL && !m_mods.ctrl() && !m_mods.leftMeta) {
+                m_delegate->keyCombo(KeyCombo::CtrlMetaL, (m_ctrlMetaL = 0));
+            } else if (m_ctrlMetaR && !m_mods.ctrl() && !m_mods.rightMeta) {
+                m_delegate->keyCombo(KeyCombo::CtrlMetaR, (m_ctrlMetaR = 0));
+            }
+
+        } else {
+
+            /* Deliberately NOT gated on m_captureKeyboard, unlike the matching
+             * block in keyDownEventFilter.
+             *
+             * Capture can be withdrawn between a press and its release -- open
+             * RetroShell with a key held down and that is exactly what happens.
+             * Swallowing the release would leave that key stuck down in the
+             * virtual machine with nothing to ever lift it. Releasing a key the
+             * machine never saw pressed is harmless by comparison, so the
+             * asymmetry falls on the safe side.
+             */
+
+            // Check if the pressed key is an emulation key
+            bool isEmuKey = emulationKeyFilter(0, event, false) || emulationKeyFilter(1, event, false);
+
+            if (!isEmuKey || !preferences().getDisconnectEmulationKeys()) {
+
+                m_delegate->keyUp(event, m_mods);
+            }
+        }
+    }
+
+    /* Consumed on the same terms as the press, so that a key typed into a
+     * text field reaches it. The delegate above still hears the release
+     * either way -- that is the point of the block above.
+     */
+    return capture || QObject::eventFilter(obj, event);
+}
+
+bool
+InputManager::emulationKeyFilter(int port, QKeyEvent *event, bool down)
+{
+    if (auto *device = port == 0 ? getPort0Device() : getPort1Device()) {
+
+        auto qKey = event->key();
+        auto pKey = physicalKeyCode(event);
+        auto time = event->timestamp();
+
+        if (auto nr = device->isEmulationKey(qKey, pKey)) {
+
+            switch (device->type) {
+
+                case GamepadType::Mouse:
+
+                    // printf("MOUSE EMULATION KEY %d hit\n", *nr);
+
+                    if (*nr < 3) {
+                        recordMouseButtonEvent(port, time, *nr, down);
+                    }
+                    break;
+
+                case GamepadType::Joystick:
+
+                    // printf("JOYSTICK EMULATION KEY %d hit\n", *nr);
+
+                    assert(*nr <= 4);
+                    device->state[*nr] = down;
+                    recordJoystickEvent(port, time, device->state);
+                    break;
+
+                default:
+                    break;
+            }
+
+            return true;
+        }
+    }
+    return false;
+}
+
+optional<KeyCombo>
+InputManager::keyCombo(QKeyEvent *event) const
+{
+    if (event->modifiers() & Qt::ControlModifier) {
+
+        if (leftAlt(event)) return KeyCombo::CtrlAltL;
+        if (rightAlt(event)) return KeyCombo::CtrlAltR;
+        if (leftMeta(event)) return KeyCombo::CtrlMetaL;
+        if (rightMeta(event)) return KeyCombo::CtrlMetaR;
+    }
+
+    return { };
+}
+
+bool
+InputManager::isRepeat(QKeyEvent *event) const
+{
+    return event->type() == m_latestType && m_latestKey == physicalKeyCode(event);
 }
 
 void
-InputManager::start()
+InputManager::rememberEvent(QKeyEvent *event)
 {
-    if (!m_running) {
-
-        LogTask subtask("Starting InputManager...");
-
-        // Install event filter
-        QGuiApplication::instance()->installEventFilter(this);
-
-        /* Hand the mouse back when the app is sent to the background.
-         *
-         * Capturing the mouse is an arrangement with the window system, and
-         * the window system ends it on its own when the app deactivates: on
-         * macOS the CGDisplayHideCursor() hide count only takes effect while
-         * the app is frontmost, so Cmd+Tab puts the pointer back on screen
-         * no matter what we think. Without this, m_captureMouse stays true
-         * behind the app's back: the pointer is visible and owned by whatever
-         * the user switched to, while the event filter still warps it to the
-         * window center and swallows the clicks meant for that other app.
-         *
-         * Releasing here also rebalances the hide count (setCaptureMouse()
-         * calls CGDisplayShowCursor()), so the cursor does not vanish again
-         * the moment the user comes back.
-         */
-        connect(qGuiApp, &QGuiApplication::applicationStateChanged,
-                this, [this](Qt::ApplicationState state) {
-
-            if (state != Qt::ApplicationActive) setCaptureMouse(false);
-        });
-
-        // Initial population
-        updateDevices();
-
-        // Rebuild the device list when SDL reports a device change
-        connect(&m_sdl, &SDLManager::countChanged, this, &InputManager::updateDevices);
-
-        // Rebuild the device list when the device preferences change
-        connect(&preferences(), &Preferences::devicesPrefsChanged, this, &InputManager::updateDevices);
-
-        // Register as delegate
-        m_sdl.setDelegate(this);
-        m_sdl.start();
-
-        // Start in auto mode
-        m_pollTimer.start();
-
-        m_running = true;
-    }
+    m_latestType = event->type();
+    m_latestKey = physicalKeyCode(event);
 }
 
 void
-InputManager::stop()
+InputManager::recordMouseMotion(u64 timestamp, float x, float y, float dx, float dy)
 {
-    if (m_running) {
-
-        LogTask task("Stopping InputManager...");
-
-        // Gives the cursor back (see setCaptureMouse())
-        setCaptureMouse(false);
-
-        m_pollTimer.stop();
-        m_sdl.stop();
-
-        m_running = false;
+    if (m_delegate && m_delegate->detectShakeDxDy(dx, dy)) {
+        m_delegate->shakeDetected();
     }
+
+    /* Apply the sensitivity to the relative motion only.
+     *
+     * mouseXY() gets the unscaled position: it is an absolute screen
+     * coordinate, and scaling it would displace the pointer rather than
+     * speed it up. Shake detection above stays on the raw deltas too, so
+     * the setting cannot make "shake to release the mouse" easier or
+     * harder to trigger than it is with the pointer itself.
+     */
+    auto sens = preferences().getMouseSensitivity();
+    auto sdx  = sens * dx;
+    auto sdy  = sens * dy;
+
+    for (int port = 0; port < 2; port++) {
+
+        auto *device = port == 0 ? getPort0Device() : getPort1Device();
+        if (device->type != GamepadType::Mouse) continue;
+
+        auto &state = m_portState[port];
+        state.x = x;
+        state.y = y;
+        state.dx = sdx;
+        state.dy = sdy;
+        state.moved = true;
+    }
+
+    dispatch(timestamp);
+
+    m_mouseRestTimer.start();
+}
+
+void
+InputManager::recordMouseButtonEvent(int port, u64 timestamp, int button, bool down)
+{
+    if (button < 0 || button >= 3) return;
+
+    m_portState[port].mb[button] = down;
+    dispatch(timestamp);
+}
+
+void
+InputManager::recordJoystickEvent(int port, u64 timestamp, const bool state[5])
+{
+    std::copy(state, state + 5, m_portState[port].joy);
+    dispatch(timestamp);
+}
+
+void
+InputManager::dispatch(u64 timestamp)
+{
+    bool mouseChanged = false;
+    bool joystickChanged = false;
+
+    for (int port = 0; port < 2; port++) {
+
+        auto &state = m_portState[port];
+        auto &prev = m_prevPortState[port];
+
+        // Mouse movement
+        if (state.moved) {
+
+            mouseChanged = true;
+
+            if (m_delegate) {
+                m_delegate->mouseXY(port, timestamp, state.x, state.y);
+                m_delegate->mouseDxDy(port, timestamp, state.dx, state.dy);
+            }
+        }
+
+        // Mouse buttons
+        for (int button = 0; button < 3; button++) {
+
+            if (state.mb[button] == prev.mb[button]) continue;
+
+            mouseChanged = true;
+            prev.mb[button] = state.mb[button];
+
+            if (m_delegate) m_delegate->mouseButton(port, timestamp, button, state.mb[button]);
+        }
+
+        // Joystick
+        if (!std::equal(state.joy, state.joy + 5, prev.joy)) {
+
+            joystickChanged = true;
+
+            bool before[5];
+            std::copy(prev.joy, prev.joy + 5, before);
+            std::copy(state.joy, state.joy + 5, prev.joy);
+
+            if (m_delegate) m_delegate->joystickMotion(port, timestamp, state.joy, before);
+        }
+
+        state.moved = false;
+    }
+
+    if (mouseChanged) emit mouseStateChanged();
+    if (joystickChanged) emit joystickStateChanged();
 }
 
 void
