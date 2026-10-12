@@ -67,14 +67,14 @@ VMWindow {
         onClicked: {
 
             if (Preferences.retainMouseByClicking && !canvasOverlay.visible) {
-                root.amiga.captureMouse()
+                if (root.amiga.isRunning) { root.amiga.captureMouse() }
             }
         }
 
         onDoubleClicked: {
 
             if (Preferences.retainMouseByDoubleClicking && !canvasOverlay.visible) {
-                root.amiga.captureMouse()
+                if (root.amiga.isRunning) { root.amiga.captureMouse() }
             }
         }
 
