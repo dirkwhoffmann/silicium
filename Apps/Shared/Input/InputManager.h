@@ -41,6 +41,9 @@ struct PortState {
 
     // Current joystick state (up, down, left, right, fire)
     bool joy[5] = {};
+
+    // The mouse has moved since the state was last dispatched
+    bool moved = false;
 };
 
 struct KeyModifier {
@@ -119,8 +122,9 @@ class InputManager : public QObject, SiObject, SDLManagerDelegate {
     // List of managed devices
     QList<Gamepad> m_devices;
 
-    // Current port state
+    // Current port state, and the state the delegate was last told about
     PortState m_portState[2];
+    PortState m_prevPortState[2];
 
     // Port mapping (gameport -> device number)
     int m_port0 = 0;
@@ -256,7 +260,28 @@ private:
 
 
     //
-    // Capturing
+    // Polling
+    //
+
+public:
+
+    // Starts polling the input devices at a fixed interval
+    void poll(utl::Time interval);
+
+    // Polls the input devices once and stops fixed-interval polling
+    void poll();
+
+private:
+
+    // Polls SDL managed devices
+    void pollGamepads();
+
+    // Polls the current mouse motion and button states
+    void pollMouse();
+
+
+    //
+    // Capturing the mouse and keyboard
     //
 
 public:
@@ -291,25 +316,38 @@ private:
 
     QVariantMap getDeviceInfo(int deviceIndex);
 
+
+    //
+    // Filtering events
+    //
+
+private:
+
     bool eventFilter(QObject *obj, QEvent *event) override;
     bool mouseEventFilter(QObject *obj, QMouseEvent *event);
 
-    // Forwards relative mouse motion to the delegate
-    void dispatchMouseMotion(u64 timestamp, float x, float y, float dx, float dy);
-
-    // Record the new port state and tell the delegate
-    void sendMouseButton(int port, u64 timestamp, int button, bool down);
-    void sendJoystickState(int port, u64 timestamp, const bool state[5]);
     bool mouseButtonEventFilter(QObject *obj, QMouseEvent *event);
     bool keyDownEventFilter(QObject *obj, QKeyEvent *event);
     bool keyUpEventFilter(QObject *obj, QKeyEvent *event);
-
-    optional<KeyCombo> keyCombo(QKeyEvent *event) const;
-
     bool emulationKeyFilter(int port, QKeyEvent *event, bool down);
 
+    optional<KeyCombo> keyCombo(QKeyEvent *event) const;
     bool isRepeat(QKeyEvent *event) const;
     void rememberEvent(QKeyEvent *event);
+
+
+    //
+    // Recording and dispatching
+    //
+
+private:
+
+    void recordMouseMotion(u64 timestamp, float x, float y, float dx, float dy);
+    void recordMouseButtonEvent(int port, u64 timestamp, int button, bool down);
+    void recordJoystickEvent(int port, u64 timestamp, const bool state[5]);
+
+    // Tells the delegate what has changed since the last call
+    void dispatch(u64 timestamp);
 
 
     //
@@ -321,27 +359,6 @@ private:
     void sdlAxisEvent(int id, u64 timestamp, int axis, int value, float normalize) override;
     void sdlMotionEvent(int id, u64 timestamp, char state[5]) override;
     void sdlButtonEvent(int id, u64 timestamp, int button, bool down) override;
-
-
-    //
-    // Polling
-    //
-
-public:
-
-    // Starts polling the input devices at a fixed interval
-    void poll(utl::Time interval);
-
-    // Polls the input devices once and stops fixed-interval polling
-    void poll();
-
-private:
-
-    // Polls SDL managed devices
-    void pollGamepads();
-
-    // Polls the current mouse motion and button states
-    void pollMouse();
 
 
     //

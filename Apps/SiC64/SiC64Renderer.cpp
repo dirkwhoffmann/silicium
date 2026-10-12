@@ -94,7 +94,7 @@ SiC64Renderer::stop()
         m_frameConnection = QMetaObject::Connection();
 
         // Back to polling by timer
-        AppServices::inputManager.poll(utl::Time::milliseconds(InputManager::AUTO_POLL_MSEC));
+        AppServices::inputManager.poll(utl::Time::milliseconds(25));
     }
 
     // Optional: stop rendering

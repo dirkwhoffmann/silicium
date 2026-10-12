@@ -305,11 +305,9 @@ InputManager::eventFilter(QObject *object, QEvent *event)
 }
 
 void
-InputManager::dispatchMouseMotion(u64 timestamp, float x, float y, float dx, float dy)
+InputManager::recordMouseMotion(u64 timestamp, float x, float y, float dx, float dy)
 {
-    if (!m_delegate) return;
-
-    if (m_delegate->detectShakeDxDy(dx, dy)) {
+    if (m_delegate && m_delegate->detectShakeDxDy(dx, dy)) {
         m_delegate->shakeDetected();
     }
 
@@ -325,29 +323,90 @@ InputManager::dispatchMouseMotion(u64 timestamp, float x, float y, float dx, flo
     auto sdx  = sens * dx;
     auto sdy  = sens * dy;
 
-    if (auto *device = getPort0Device(); device->type == GamepadType::Mouse) {
+    for (int port = 0; port < 2; port++) {
 
-        m_delegate->mouseXY(0, timestamp, x, y);
-        m_portState[0].x = x;
-        m_portState[0].y = y;
-        m_portState[0].dx = sdx;
-        m_portState[0].dy = sdy;
-        emit mouseStateChanged();
-        m_delegate->mouseDxDy(0, timestamp, sdx, sdy);
+        auto *device = port == 0 ? getPort0Device() : getPort1Device();
+        if (device->type != GamepadType::Mouse) continue;
+
+        auto &state = m_portState[port];
+        state.x = x;
+        state.y = y;
+        state.dx = sdx;
+        state.dy = sdy;
+        state.moved = true;
     }
 
-    if (auto *device = getPort1Device(); device->type == GamepadType::Mouse) {
-
-        m_delegate->mouseXY(1, timestamp, x, y);
-        m_portState[1].x = x;
-        m_portState[1].y = y;
-        m_portState[1].dx = sdx;
-        m_portState[1].dy = sdy;
-        emit mouseStateChanged();
-        m_delegate->mouseDxDy(1, timestamp, sdx, sdy);
-    }
+    dispatch(timestamp);
 
     m_mouseRestTimer.start();
+}
+
+void
+InputManager::recordMouseButtonEvent(int port, u64 timestamp, int button, bool down)
+{
+    if (button < 0 || button >= 3) return;
+
+    m_portState[port].mb[button] = down;
+    dispatch(timestamp);
+}
+
+void
+InputManager::recordJoystickEvent(int port, u64 timestamp, const bool state[5])
+{
+    std::copy(state, state + 5, m_portState[port].joy);
+    dispatch(timestamp);
+}
+
+void
+InputManager::dispatch(u64 timestamp)
+{
+    bool mouseChanged = false;
+    bool joystickChanged = false;
+
+    for (int port = 0; port < 2; port++) {
+
+        auto &state = m_portState[port];
+        auto &prev = m_prevPortState[port];
+
+        // Mouse movement
+        if (state.moved) {
+
+            mouseChanged = true;
+
+            if (m_delegate) {
+                m_delegate->mouseXY(port, timestamp, state.x, state.y);
+                m_delegate->mouseDxDy(port, timestamp, state.dx, state.dy);
+            }
+        }
+
+        // Mouse buttons
+        for (int button = 0; button < 3; button++) {
+
+            if (state.mb[button] == prev.mb[button]) continue;
+
+            mouseChanged = true;
+            prev.mb[button] = state.mb[button];
+
+            if (m_delegate) m_delegate->mouseButton(port, timestamp, button, state.mb[button]);
+        }
+
+        // Joystick
+        if (!std::equal(state.joy, state.joy + 5, prev.joy)) {
+
+            joystickChanged = true;
+
+            bool before[5];
+            std::copy(prev.joy, prev.joy + 5, before);
+            std::copy(state.joy, state.joy + 5, prev.joy);
+
+            if (m_delegate) m_delegate->joystickMotion(port, timestamp, state.joy, before);
+        }
+
+        state.moved = false;
+    }
+
+    if (mouseChanged) emit mouseStateChanged();
+    if (joystickChanged) emit joystickStateChanged();
 }
 
 void
@@ -388,42 +447,10 @@ InputManager::pollMouse()
     if (m_delegate && (dx != 0 || dy != 0)) {
 
         auto pos = QCursor::pos();
-        dispatchMouseMotion(QDateTime::currentMSecsSinceEpoch(),
-                            pos.x(), pos.y(), dx, dy);
+        recordMouseMotion(QDateTime::currentMSecsSinceEpoch(),
+                        pos.x(), pos.y(), dx, dy);
     }
 #endif
-}
-
-void
-InputManager::sendMouseButton(int port, u64 timestamp, int button, bool down)
-{
-    if (button >= 0 && button < 3) {
-
-        m_portState[port].mb[button] = down;
-        emit mouseStateChanged();
-    }
-
-    if (m_delegate) m_delegate->mouseButton(port, timestamp, button, down);
-}
-
-void
-InputManager::sendJoystickState(int port, u64 timestamp, const bool state[5])
-{
-    auto &joy = m_portState[port].joy;
-
-    // Key auto-repeat and the like report the same state again and again.
-    // Acting on those could do harm (a second "press" toggles autofire).
-    if (std::equal(state, state + 5, joy)) return;
-
-    bool prev[5];
-    bool next[5];
-    std::copy(joy, joy + 5, prev);
-    std::copy(state, state + 5, next);
-    std::copy(state, state + 5, joy);
-
-    emit joystickStateChanged();
-
-    if (m_delegate) m_delegate->joystickMotion(port, timestamp, next, prev);
 }
 
 QVariantList
@@ -476,7 +503,7 @@ InputManager::mouseEventFilter(QObject *object, QMouseEvent *event)
 
         lastPos = current;
 
-        dispatchMouseMotion(event->timestamp(), x, y, dx, dy);
+        recordMouseMotion(event->timestamp(), x, y, dx, dy);
 
 #ifndef __APPLE__
         if (m_captureMouse) {
@@ -507,10 +534,10 @@ InputManager::mouseButtonEventFilter(QObject *obj, QMouseEvent *event)
         if (auto button = mappedButton(event->button()); button != -1) {
 
             if (auto *device = getPort0Device(); device->type == GamepadType::Mouse) {
-                sendMouseButton(0, event->timestamp(), button, down);
+                recordMouseButtonEvent(0, event->timestamp(), button, down);
             }
             if (auto *device = getPort1Device(); device->type == GamepadType::Mouse) {
-                sendMouseButton(1, event->timestamp(), button, down);
+                recordMouseButtonEvent(1, event->timestamp(), button, down);
             }
 
             if (m_captureMouse) return true;
@@ -734,7 +761,7 @@ InputManager::emulationKeyFilter(int port, QKeyEvent *event, bool down)
                     // printf("MOUSE EMULATION KEY %d hit\n", *nr);
 
                     if (*nr < 3) {
-                        sendMouseButton(port, time, *nr, down);
+                        recordMouseButtonEvent(port, time, *nr, down);
                     }
                     break;
 
@@ -744,7 +771,7 @@ InputManager::emulationKeyFilter(int port, QKeyEvent *event, bool down)
 
                     assert(*nr <= 4);
                     device->state[*nr] = down;
-                    sendJoystickState(port, time, device->state);
+                    recordJoystickEvent(port, time, device->state);
                     break;
 
                 default:
@@ -1060,10 +1087,10 @@ InputManager::sdlAxisEvent(int sdlid, u64 timestamp, int axis, int value, float 
         }
 
         if (auto *device = getPort0Device(); device->sdlid == sdlid)
-            sendJoystickState(0, timestamp, dev->state);
+            recordJoystickEvent(0, timestamp, dev->state);
 
         if (auto *device = getPort1Device(); device->sdlid == sdlid)
-            sendJoystickState(1, timestamp, dev->state);
+            recordJoystickEvent(1, timestamp, dev->state);
     }
 }
 
@@ -1082,9 +1109,9 @@ InputManager::sdlButtonEvent(int sdlid, u64 timestamp, int button, bool down)
         dev->state[4] = down;
 
         if (auto *device = getPort0Device(); device->sdlid == sdlid)
-            sendJoystickState(0, timestamp, dev->state);
+            recordJoystickEvent(0, timestamp, dev->state);
 
         if (auto *device = getPort1Device(); device->sdlid == sdlid)
-            sendJoystickState(1, timestamp, dev->state);
+            recordJoystickEvent(1, timestamp, dev->state);
     }
 }
