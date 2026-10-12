@@ -148,7 +148,6 @@ Pane {
                 KeyValueRow { keyLabel: "Created:"; valueLabel: vInfo.created ?? "" }
                 KeyValueRow { keyLabel: "Modified:"; valueLabel: vInfo.modified ?? "" }
                 KeyValueRow { keyLabel: "Preinstalled:"; valueLabel: vInfo.preinstalled ?? "" }
-                KeyValueRow { keyLabel: "Compatible:"; valueLabel: vInfo.compatible ?? "" }
                 KeyValueRow { keyLabel: "Startup Script:"; valueLabel: vInfo.startup ?? "" }
 
                 Repeater {
@@ -186,7 +185,6 @@ Pane {
                 KeyValueRow { keyLabel: "Modified:"; valueLabel: sInfo.modified ?? "" }
                 KeyValueRow { keyLabel: "Screenshot:"; valueLabel: sInfo.screenshot ?? "" }
                 KeyValueRow { keyLabel: "Binary:"; valueLabel: sInfo.binary ?? "" }
-                KeyValueRow { keyLabel: "Compatible:"; valueLabel: sInfo.compatible ?? "" }
 
                 VSpacer { size: Style.largeSpacing }
             }

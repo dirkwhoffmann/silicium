@@ -43,7 +43,6 @@ struct SidebarItem {
     QString svm() const;
     QString title() const;
     bool readOnly() const;
-    bool compatible() const;
 };
 
 class HubSidebarModel : public QAbstractListModel, SiObject {
@@ -70,8 +69,7 @@ public:
         StateSrcRole,
         TitleRole,
         StateRole,
-        ReadOnlyRole,
-        CompatibleRole
+        ReadOnlyRole
     };
 
 private:

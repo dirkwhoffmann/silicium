@@ -40,7 +40,6 @@ Pane {
     readonly property string vScreenshot: vInfo.screenshotUrl ?? ""
     readonly property string vCreated: vInfo.created ?? ""
     readonly property bool vReadOnly: vInfo.readonly ?? true
-    readonly property bool vCompatible: vInfo.compatible ?? true
 
     // Snapshot properties
     readonly property string sUUID: sInfo.uuid ?? ""
@@ -49,7 +48,6 @@ Pane {
     readonly property string sName: sInfo.name ?? ""
     readonly property string sScreenshot: sInfo.screenshotUrl ?? ""
     readonly property string sCreated:sInfo.created ?? ""
-    readonly property bool sCompatible: sInfo.compatible ?? false
 
     // Prev/Next item
     readonly property string prev: sSelected ? sUUIDprev : vUUIDprev
@@ -118,53 +116,11 @@ Pane {
 
         id: bgImage
         anchors.fill: parent
-        visible: (vSelected && vScreenshot) || (sSelected && sCompatible)
+        visible: (vSelected && vScreenshot) || sSelected
         source: vSelected ? vScreenshot : sScreenshot
         title: vName
         author: vAuthor
         description: vDescription
-    }
-
-    SiOverlayRect {
-
-        anchors.centerIn: parent
-        width: parent.width * 0.85
-        height: Math.max(220, warningText.contentHeight + 2 * Style.mediumSpacing)
-        visible: sSelected && !sCompatible
-        color: "#D0800000"
-
-        RowLayout {
-
-            id: theRow
-            anchors.fill: parent
-            spacing: 0
-
-            SuOverlayButton {
-
-                id: warningButton
-                Layout.alignment: Qt.AlignVCenter
-                background: Rectangle { color: "transparent" }
-                size: 220
-                enabled: false
-                symbol: "do_not_touch"
-            }
-
-            SuText {
-                id: warningText
-                anchors.margins: 10
-                Layout.fillWidth: true
-                lineHeight: Style.large * 1.3
-                lineHeightMode: Text.FixedHeight
-                text: "This snapshot is incompatible because it was created with a different release. However, you may still choose to boot the machine from its power-on state."
-                // "\n\nNote that incompatible snapshots will be deleted automatically the next time the machine is hibernated."
-                color: "white"
-                font.bold: true
-                font.pixelSize: Style.large
-                wrapMode: Text.WordWrap
-                // horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
-        }
     }
 
     //

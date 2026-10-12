@@ -29,7 +29,6 @@ ItemDelegate {
     required property int type
     required property int level
     required property bool readOnly
-    required property bool isCompatible
     required property bool isExpandable
     required property bool isExpanded
 
@@ -257,7 +256,6 @@ ItemDelegate {
 
             visible: !editing
             text: title
-            font.strikeout: !isCompatible
 
             DebugRect {}
 
@@ -268,9 +266,7 @@ ItemDelegate {
                     ? Palette.secondary
                     : isSelected
                         ? Palette.accentText
-                        : isCompatible
-                            ? Palette.primary
-                            : Palette.statusWarning
+                        : Palette.primary
 
             verticalAlignment: Text.AlignVCenter
             Layout.alignment: Qt.AlignVCenter

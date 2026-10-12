@@ -94,37 +94,6 @@ SidebarItem::readOnly() const
     return false;
 }
 
-bool
-SidebarItem::compatible() const
-{
-    auto &library = Silicium::instance().getLibrary();
-
-    switch (type) {
-
-        case ItemType::VM:
-
-            if (auto *vm = library.lookupVirtualMachine(uuid)) {
-                return vm->getManifest().isCompatible();
-            }
-            break;
-
-        case ItemType::Snapshot:
-
-            if (auto *vm = library.lookupVirtualMachine(parent)) {
-                if (auto *info = vm->lookupSnapshot(uuid)) {
-                    return info->isCompatible();
-                }
-            }
-            break;
-
-        default:
-            break;
-    }
-
-    return true;
-}
-
-
 //
 // Sidebar Model
 //
@@ -155,7 +124,6 @@ HubSidebarModel::roleNames() const
     roles[TitleRole]      = "title";
     roles[StateRole]      = "state";
     roles[ReadOnlyRole]   = "readOnly";
-    roles[CompatibleRole] = "isCompatible";
 
     return roles;
 }
@@ -181,7 +149,6 @@ HubSidebarModel::data(const QModelIndex &index, int role) const
         case StateSrcRole:   return item.stateIcon();
         case TitleRole:      return item.title();
         case ReadOnlyRole:   return item.readOnly();
-        case CompatibleRole: return item.compatible();
         default:             return {};
     }
 }

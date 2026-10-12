@@ -262,7 +262,6 @@ HubController::select(UUID uuid)
         m_vInfo["engine"]        = Assets::getIconUrl(engine);
         m_vInfo["created"]       = QDateTime::fromSecsSinceEpoch(m.created).toString(dateString);
         m_vInfo["modified"]      = QDateTime::fromSecsSinceEpoch(m.modified).toString(dateString);
-        m_vInfo["compatible"]    = m.isCompatible();
         m_vInfo["preinstalled"]  = m.isPreinstalled();
         m_vInfo["readonly"]      = vm->isReadOnly();
         m_vInfo["startup"]       = QString::fromStdString(m.startup.string());
@@ -333,7 +332,6 @@ HubController::select(UUID uuid)
             }
 
             m_sInfo["binary"]        = QString::fromStdString(snap->binary.string());
-            m_sInfo["compatible"]    = snap->isCompatible();
         }
     }
 
