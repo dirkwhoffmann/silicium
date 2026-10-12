@@ -60,7 +60,8 @@ SettingsPage {
 
         heading: "Audio Settings"
         menuContent: [
-            MenuItem {
+
+            SuMenuItem {
                 text: "Restore factory defaults..."
                 onTriggered: config.restoreAudioDefaults()
             }

@@ -63,7 +63,8 @@ SettingsPage {
         heading: "Peripherals Settings"
 
         menuContent: [
-            MenuItem {
+
+            SuMenuItem {
                 text: "Restore factory defaults..."
                 onTriggered: config.restoreDevicesDefaults()
             }

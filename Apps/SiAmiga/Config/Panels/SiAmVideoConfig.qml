@@ -50,7 +50,8 @@ SettingsPage {
         heading: "Video Settings"
 
         menuContent: [
-            MenuItem {
+
+            SuMenuItem {
                 text: "Restore factory defaults..."
                 onTriggered: config.restoreVideoDefaults()
             }

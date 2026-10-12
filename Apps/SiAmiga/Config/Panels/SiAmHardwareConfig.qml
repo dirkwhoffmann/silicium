@@ -18,10 +18,9 @@ import Sulfur
 // ConfigGrid/ConfigSection cards, one per hardware component, matching
 // SiC64HardwareConfig's layout.
 //
-// The chip-model preset combos (Amiga 500/1000/2000/500+/1200 --
-// HardwareSettingsViewController.preset(tag:)) aren't ported: they'd need a
-// second combo box this panel doesn't have room for without a screenshot to
-// match, and every option they set is already reachable individually here.
+// The toolbar menu lists the Amiga models (Amiga 500/1000/2000/500+/1200) and
+// sets the machine up accordingly, as HardwareSettingsViewController.preset(tag:)
+// does (see applyModel()).
 SettingsPage {
 
     id: root
@@ -93,14 +92,72 @@ SettingsPage {
         }
     }
 
+    // The Amiga models: the chipset, the memory and the RTC they came with.
+    // The values are the raw values of the core's enums (CPURevision,
+    // AgnusRevision, DeniseRevision, BankMap, RTCRevision).
+    readonly property var models: [
+
+        { name: "Amiga 500",  cpu: 0, overclocking: 0, agnus: 2, denise: 0,
+          busWidth: 16, chipRam:  512, bankMap: 0, rtc: 0 },
+        { name: "Amiga 1000", cpu: 0, overclocking: 0, agnus: 0, denise: 0,
+          busWidth: 16, chipRam:  512, bankMap: 1, rtc: 0 },
+        { name: "Amiga 2000", cpu: 0, overclocking: 0, agnus: 3, denise: 0,
+          busWidth: 16, chipRam:  512, bankMap: 3, rtc: 1 },
+        { name: "Amiga 500+", cpu: 0, overclocking: 0, agnus: 3, denise: 1,
+          busWidth: 16, chipRam: 1024, bankMap: 0, rtc: 1 },
+        { name: "Amiga 1200", cpu: 2, overclocking: 2, agnus: 4, denise: 2,
+          busWidth: 32, chipRam: 2048, bankMap: 4, rtc: 1 }
+    ]
+
+    // Sets the machine up as the given model. Like vAmiga's own preset, this
+    // first reverts the chipset to the standard settings and then changes the
+    // options that make up the model.
+    function applyModel(model) {
+
+        config.restoreChipsetDefaults()
+
+        config.CPU_REVISION = model.cpu
+        config.CPU_OVERCLOCKING = model.overclocking
+        config.AGNUS_REVISION = model.agnus
+        config.DENISE_REVISION = model.denise
+        config.MEM_BUS_WIDTH = model.busWidth
+        config.MEM_CHIP_RAM = model.chipRam
+        config.MEM_BANKMAP = model.bankMap
+        config.RTC_MODEL = model.rtc
+    }
+
     toolbar: ConfigToolbar {
 
         heading: "Hardware Settings"
 
+        // Some of these options can only be changed while the machine is off
+        // (see 'locked'), so the models are not on offer while it is on.
         menuContent: [
-            MenuItem {
-                text: "Restore factory defaults..."
-                onTriggered: config.restoreHardwareDefaults()
+
+            SuMenuItem {
+                text: root.models[0].name
+                enabled: !root.locked
+                onTriggered: root.applyModel(root.models[0])
+            },
+            SuMenuItem {
+                text: root.models[1].name
+                enabled: !root.locked
+                onTriggered: root.applyModel(root.models[1])
+            },
+            SuMenuItem {
+                text: root.models[2].name
+                enabled: !root.locked
+                onTriggered: root.applyModel(root.models[2])
+            },
+            SuMenuItem {
+                text: root.models[3].name
+                enabled: !root.locked
+                onTriggered: root.applyModel(root.models[3])
+            },
+            SuMenuItem {
+                text: root.models[4].name
+                enabled: !root.locked
+                onTriggered: root.applyModel(root.models[4])
             }
         ]
 

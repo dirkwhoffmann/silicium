@@ -116,6 +116,7 @@ Item {
                 // -- see their own comments for why not every version
                 // VACore's RomFileTypes.h knows about is offered here.
                 menuContent: [
+
                     SuMenu {
                         title: qsTr("Install AROS")
                         enabled: !root.locked

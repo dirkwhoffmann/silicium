@@ -32,7 +32,8 @@ SettingsPage {
         heading: "Performance Settings"
 
         menuContent: [
-            MenuItem {
+
+            SuMenuItem {
                 text: "Restore factory defaults..."
                 onTriggered: config.restorePerformanceDefaults()
             }

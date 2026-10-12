@@ -39,7 +39,8 @@ SettingsPage {
         heading: "Compatibility Settings"
 
         menuContent: [
-            MenuItem {
+
+            SuMenuItem {
                 text: "Restore factory defaults..."
                 onTriggered: config.restoreCompatibilityDefaults()
             }

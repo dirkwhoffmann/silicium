@@ -245,6 +245,11 @@ class SiAmConfigController : public Controller {
     // SiC64ConfigController's VICII cutout options.
     Q_INVOKABLE void restoreHardwareDefaults();
 
+    // Restores the factory settings of the chipset only: the video format, the
+    // CPU, Agnus, Denise, the CIAs and the RTC. This is what a model preset
+    // starts from (see SiAmHardwareConfig.qml).
+    Q_INVOKABLE void restoreChipsetDefaults();
+
     int videoFormat() const { return (int)get(vamiga::Opt::AMIGA_VIDEO_FORMAT); }
     void setVideoFormat(int value) { set(vamiga::Opt::AMIGA_VIDEO_FORMAT, (i64)value); }
     int agnusRevision() const { return (int)get(vamiga::Opt::AGNUS_REVISION); }

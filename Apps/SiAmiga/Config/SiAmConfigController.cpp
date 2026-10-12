@@ -299,6 +299,20 @@ SiAmConfigController::restoreHardwareDefaults()
 }
 
 void
+SiAmConfigController::restoreChipsetDefaults()
+{
+    restoreDefaults(Opt::AMIGA_VIDEO_FORMAT);
+    restoreDefaults(Opt::CPU_REVISION);
+    restoreDefaults(Opt::CPU_OVERCLOCKING);
+    restoreDefaults(Opt::AGNUS_REVISION);
+    restoreDefaults(Opt::DENISE_REVISION);
+    restoreDefaults(Opt::CIA_REVISION, { CiaA, CiaB });
+    restoreDefaults(Opt::RTC_MODEL);
+
+    emit configChanged();
+}
+
+void
 SiAmConfigController::restoreDevicesDefaults()
 {
     static const std::vector<isize> drives = { 0, 1, 2, 3 };

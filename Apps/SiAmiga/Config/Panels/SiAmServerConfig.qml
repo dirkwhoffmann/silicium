@@ -47,7 +47,8 @@ SettingsPage {
 
         heading: "Server Settings"
         menuContent: [
-            MenuItem {
+
+            SuMenuItem {
                 text: "Restore factory defaults..."
                 onTriggered: config.restoreServerDefaults()
             }
