@@ -390,7 +390,7 @@ public:
     void shakeDetected() override;
 
     void warpToCenter() override;
-    void joystickMotionEvent(int port, u64 timestamp, bool state[5], bool prev[5]) override;
+    void joystickMotion(int port, u64 timestamp, bool state[5], bool prev[5]) override;
 
 
     //

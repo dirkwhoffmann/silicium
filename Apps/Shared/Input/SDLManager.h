@@ -35,9 +35,6 @@ class SDLManager : public QObject {
 
     bool running = false;
 
-    //
-    // std::vector<SDL_Gamepad *> controllers;
-
     // Currently available SDL game pads
     QMap<int, Gamepad> m_gamePads;
 

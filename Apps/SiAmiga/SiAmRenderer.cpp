@@ -63,9 +63,6 @@ SiAmRenderer::start()
         tick();
         update();
     });
-
-    // This renderer polls the input devices once per frame (see tick())
-    AppServices::inputManager.setAutoPoll(false);
 }
 
 void
@@ -79,7 +76,7 @@ SiAmRenderer::stop()
         m_frameConnection = QMetaObject::Connection();
 
         // Back to polling by timer
-        AppServices::inputManager.setAutoPoll(true);
+        AppServices::inputManager.poll(utl::Time::milliseconds(25));
     }
 
     setFlag(ItemHasContents, false);

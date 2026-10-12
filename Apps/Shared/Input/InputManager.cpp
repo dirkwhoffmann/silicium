@@ -15,9 +15,7 @@
 #include <algorithm>
 #include <QDateTime>
 #include <QGuiApplication>
-#include <QInputMethod>
 #include <QQuickWindow>
-#include <QTextStream>
 #include <QTimer>
 #include <SDL3/SDL.h>
 
@@ -121,15 +119,13 @@ InputManager::InputManager() : QObject()
         emit mouseStateChanged();
     });
 
-    m_sincePoll.start();
     m_pollTimer.setTimerType(Qt::PreciseTimer);
-    m_pollTimer.setInterval(AUTO_POLL_MSEC);
+    m_pollTimer.setInterval(25);
     connect(&m_pollTimer, &QTimer::timeout, this, [this]() {
 
-        // In manual mode this is only a watchdog: step in if nobody polled
-        if (m_autoPoll || m_sincePoll.elapsed() >= WATCHDOG_MSEC - 10) poll();
+        pollGamepads();
+        pollMouse();
     });
-
 }
 
 void
@@ -158,7 +154,7 @@ InputManager::setPort0(int index)
 {
     if (m_port0 != index) {
 
-        // Avoid double-mapings
+        // Avoid double-mappings
         if (index != 0 && m_port1 == index) {
             printf("Double mapping detected on port 0\n");
             setPort1(0);
@@ -175,7 +171,7 @@ InputManager::setPort1(int index)
 {
     if (m_port1 != index) {
 
-        // Avoid double-mapings
+        // Avoid double-mappings
         if (index != 0 && m_port0 == index) {
             printf("Double mapping detected on port 0\n");
             setPort0(0);
@@ -355,19 +351,29 @@ InputManager::dispatchMouseMotion(u64 timestamp, float x, float y, float dx, flo
 }
 
 void
+InputManager::poll(utl::Time interval)
+{
+    m_pollInterval = interval;
+    m_pollTimer.setInterval(int(interval.asMilliseconds()));
+
+    // Only a running manager has anything to poll
+    if (m_running) m_pollTimer.start();
+}
+
+void
 InputManager::poll()
 {
-    m_sincePoll.restart();
+    // The caller takes over
+    m_pollTimer.stop();
 
-    m_sdl.poll();
+    pollGamepads();
     pollMouse();
 }
 
 void
-InputManager::setAutoPoll(bool value)
+InputManager::pollGamepads()
 {
-    m_autoPoll = value;
-    m_pollTimer.setInterval(value ? AUTO_POLL_MSEC : WATCHDOG_MSEC);
+    m_sdl.poll();
 }
 
 void
@@ -417,7 +423,7 @@ InputManager::sendJoystickState(int port, u64 timestamp, const bool state[5])
 
     emit joystickStateChanged();
 
-    if (m_delegate) m_delegate->joystickMotionEvent(port, timestamp, next, prev);
+    if (m_delegate) m_delegate->joystickMotion(port, timestamp, next, prev);
 }
 
 QVariantList
@@ -990,7 +996,7 @@ InputManager::start()
         m_sdl.setDelegate(this);
         m_sdl.start();
 
-        m_sincePoll.restart();
+        // Start in auto mode
         m_pollTimer.start();
 
         m_running = true;
@@ -1052,14 +1058,6 @@ InputManager::sdlAxisEvent(int sdlid, u64 timestamp, int axis, int value, float 
                 dev->state[2] = dev->state[3] = false;
             }
         }
-
-        /*
-        printf("%p: ", dev);
-        for (isize i = 0; i < 5; ++i) {
-            printf("%d ", dev->state[i]);
-        }
-        printf("\n");
-        */
 
         if (auto *device = getPort0Device(); device->sdlid == sdlid)
             sendJoystickState(0, timestamp, dev->state);

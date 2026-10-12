@@ -1066,7 +1066,7 @@ SiAmController::mouseButton(int port, u64 timestamp, int button, bool down)
 }
 
 void
-SiAmController::joystickMotionEvent(int port, u64 timestamp, bool state[5], bool prev[5])
+SiAmController::joystickMotion(int port, u64 timestamp, bool state[5], bool prev[5])
 {
     if (port != 0 && port != 1) return;
 

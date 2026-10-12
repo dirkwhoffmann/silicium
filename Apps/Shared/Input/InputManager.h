@@ -11,7 +11,7 @@
 
 #include "SDLManager.h"
 #include "SiObject.h"
-#include <QElapsedTimer>
+#include "utl/chrono.h"
 #include <QList>
 #include <QMouseEvent>
 #include <QObject>
@@ -87,7 +87,7 @@ class InputManagerDelegate {
     virtual void capsLock(bool down) { }
 
     // Gamepad events
-    virtual void joystickMotionEvent(int port, u64 timestamp, bool state[5], bool prev[5]) { }
+    virtual void joystickMotion(int port, u64 timestamp, bool state[5], bool prev[5]) { }
 
     // Mouse events
     virtual void mouseXY(int port, u64 timestamp, float x, float y) { }
@@ -146,28 +146,9 @@ class InputManager : public QObject, SiObject, SDLManagerDelegate {
     bool m_captureMouse = false;
     bool m_captureKeyboard = false;
 
-    /* Polling
-     *
-     * Some input sources can't tell us when something happens and have to be
-     * asked: the SDL game pads, and the mouse while it is captured (macOS: the
-     * cursor is detached from the mouse then, which makes Qt stop delivering
-     * move events, so the hardware deltas are read instead). poll() does that.
-     *
-     * Who calls it is configurable. By default a timer does, which is what an
-     * application without an emulator window needs. A window that draws
-     * frames can drive it itself (see setAutoPoll()), right before it lets the
-     * emulator compute the next frame, which gives the shortest possible delay
-     * between an input and the core seeing it.
-     */
-    static constexpr int AUTO_POLL_MSEC = 10;
-    static constexpr int WATCHDOG_MSEC  = 50;
-
+    // Polling
     QTimer m_pollTimer;
-    QElapsedTimer m_sincePoll;
-    bool m_autoPoll = true;
-
-    // Reads the relative mouse motion while the mouse is captured
-    void pollMouse();
+    utl::Time m_pollInterval;
 
     /* Returns the motion to rest.
      *
@@ -306,7 +287,7 @@ public:
     // Drops a customized mapping, putting the device back on its own
     void resetMapping(int nr);
 
-  private:
+private:
 
     QVariantMap getDeviceInfo(int deviceIndex);
 
@@ -346,25 +327,28 @@ private:
     // Polling
     //
 
-  public:
+public:
 
-    /* Polls the input devices that can't report events by themselves.
-     *
-     * In auto mode (the default) a timer calls this. When a frame-driven
-     * client takes over (setAutoPoll(false)), it must call this once per
-     * frame. A slow watchdog timer keeps polling for as long as nobody does,
-     * e.g., while the window is hidden, so game pads still show up and the
-     * preferences keep working.
-     */
+    // Starts polling the input devices at a fixed interval
+    void poll(utl::Time interval);
+
+    // Polls the input devices once and stops fixed-interval polling
     void poll();
-    void setAutoPoll(bool value);
+
+private:
+
+    // Polls SDL managed devices
+    void pollGamepads();
+
+    // Polls the current mouse motion and button states
+    void pollMouse();
 
 
     //
     // Signals
     //
 
-  signals:
+signals:
 
     void devicesChanged();
     void port0Changed();

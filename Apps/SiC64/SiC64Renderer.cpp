@@ -57,9 +57,6 @@ SiC64Renderer::start()
         tick();
         update();
     });
-
-    // This renderer polls the input devices once per frame (see tick())
-    AppServices::inputManager.setAutoPoll(false);
 }
 
 void
@@ -97,7 +94,7 @@ SiC64Renderer::stop()
         m_frameConnection = QMetaObject::Connection();
 
         // Back to polling by timer
-        AppServices::inputManager.setAutoPoll(true);
+        AppServices::inputManager.poll(utl::Time::milliseconds(InputManager::AUTO_POLL_MSEC));
     }
 
     // Optional: stop rendering
