@@ -151,7 +151,7 @@ ApplicationWindow {
             icon.source: Assets.iconUrl(Assets.GitHub)
             icon.width: 20
             icon.height: 20
-            icon.color: hovered ? "#ffffff" : "#d0ffffff"
+            icon.color: hovered ? Palette.secondary : Palette.primary  //  "#ffffff" : "#d0ffffff"
 
             background: Rectangle { color: "transparent" }
             SuToolTip { text: gitHubButton.repository }

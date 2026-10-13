@@ -38,6 +38,7 @@ VMWindow {
     chromeRef: chrome
     controllerRef: c64
     actionsRef: siActions
+    canvasRef: wrapper
 
     title: ""
 

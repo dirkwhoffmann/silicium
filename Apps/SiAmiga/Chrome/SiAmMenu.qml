@@ -115,6 +115,12 @@ SuMenuBar {
         SuMenuItem {
             action: window.actions.toggleStatusBar
         }
+        SuMenuSeparator { }
+        SuMenuItem {
+            text: qsTr("Adjust window size")
+            enabled: window.visibility === Window.Windowed
+            onTriggered: window.adjustWindowSize()
+        }
     }
 
     //

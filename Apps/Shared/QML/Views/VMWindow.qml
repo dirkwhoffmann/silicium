@@ -77,6 +77,38 @@ ApplicationWindow {
     }
 
     //
+    // Window size
+    //
+
+    // The item the emulator texture is drawn on (a CanvasWrapper)
+    property var canvasRef: null
+
+    /* Resizes the window such that a line of the emulator texture is a fixed
+     * number of lines on the screen, i.e. a fixed number of physical pixels.
+     */
+    function adjustWindowSize() {
+
+        if (!canvasRef || !controllerRef || !controllerRef.renderer) return
+        if (visibility !== Window.Windowed) return
+
+        const lines = 4 * controllerRef.renderer.visibleLines()
+        const pixelRatio = screen ? screen.devicePixelRatio : 1
+
+        const canvasHeight = lines / pixelRatio
+        const canvasWidth = canvasHeight * canvasRef.aspectRatio
+
+        const extraWidth = width - canvasRef.width
+        const extraHeight = height - canvasRef.height
+
+        // Stay on the screen
+        const maxWidth = screen ? screen.desktopAvailableWidth : width
+        const maxHeight = screen ? screen.desktopAvailableHeight : height
+
+        width = Math.min(Math.round(canvasWidth + extraWidth), maxWidth)
+        height = Math.min(Math.round(canvasHeight + extraHeight), maxHeight)
+    }
+
+    //
     // Hints
     //
 

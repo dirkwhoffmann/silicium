@@ -38,6 +38,7 @@ VMWindow {
     chromeRef: chrome
     controllerRef: amiga
     actionsRef: siActions
+    canvasRef: wrapper
 
     title: ""
 

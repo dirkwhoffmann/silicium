@@ -64,4 +64,7 @@ class Renderer : public QQuickItem {
     // Returns the visible texture area based on the zoom and center parameters
     virtual TexRect visible() const = 0;
     virtual TexRect visibleNormalized() const = 0;
+
+    // Returns the number of texture lines that are drawn
+    Q_INVOKABLE qreal visibleLines() const { return visible().h; }
 };
