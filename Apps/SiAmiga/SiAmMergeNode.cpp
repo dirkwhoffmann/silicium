@@ -74,10 +74,7 @@ class SiAmMergeShader : public QSGMaterialShader {
 
         if (!t) { *texture = nullptr; return; }
 
-        // Nearest sampling matches merge1X4Y, whose read() is an unfiltered
-        // texel fetch -- and the field selection above only makes sense on
-        // whole source lines anyway.
-        t->setFiltering(QSGTexture::Nearest);
+        t->setFiltering(QSGTexture::Linear);
         t->setMipmapFiltering(QSGTexture::None);
         t->setHorizontalWrapMode(QSGTexture::ClampToEdge);
         t->setVerticalWrapMode(QSGTexture::ClampToEdge);
