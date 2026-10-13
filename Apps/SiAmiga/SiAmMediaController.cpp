@@ -158,6 +158,25 @@ SiAmMediaController::hdHasDisk(int nr) const
     return SiAmController::core().hd[nr]->getInfo().hasDisk;
 }
 
+bool
+SiAmMediaController::hdSnapshot(int nr) const
+{
+    return SiAmController::core().get(Opt::HDR_SNAPSHOT, nr);
+}
+
+void
+SiAmMediaController::setHdSnapshot(int nr, bool value)
+{
+    try {
+
+        SiAmController::core().set(Opt::HDR_SNAPSHOT, value, nr);
+
+    } catch (const std::exception &e) {
+
+        showError("Failed to change the snapshot setting.", e.what());
+    }
+}
+
 QString
 SiAmMediaController::hdExistingImage(int nr) const
 {

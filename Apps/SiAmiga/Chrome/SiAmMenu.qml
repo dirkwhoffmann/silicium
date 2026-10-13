@@ -229,6 +229,10 @@ SuMenuBar {
         }
         readonly property bool hasDisk: amiga.media.hdHasDisk(driveNr)
 
+        // Refreshed whenever the menu opens (the core may reject a change)
+        property bool snapshot: amiga.media.hdSnapshot(driveNr)
+        onAboutToShow: snapshot = amiga.media.hdSnapshot(driveNr)
+
         SuMenuItem {
             text: connected ? qsTr("Detach") : qsTr("Connect")
             onTriggered: connected ? amiga.media.detachHd(driveNr) : config.setHdConnected(driveNr, true)
@@ -252,6 +256,17 @@ SuMenuBar {
             visible: connected
             enabled: hasDisk
             onTriggered: window.actions.exportHdAction(driveNr)
+        }
+        SuMenuSeparator { visible: connected }
+        SuMenuItem {
+            text: qsTr("Include in snapshots")
+            checkable: true
+            visible: connected
+            checked: snapshot
+            onTriggered: {
+                amiga.media.setHdSnapshot(driveNr, checked)
+                hdMenu.snapshot = amiga.media.hdSnapshot(driveNr)
+            }
         }
     }
 

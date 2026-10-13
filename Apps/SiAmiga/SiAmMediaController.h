@@ -59,6 +59,10 @@ public:
 
     Q_INVOKABLE bool hdHasDisk(int nr) const;
 
+    // Controls whether the disk is included in snapshots
+    Q_INVOKABLE bool hdSnapshot(int nr) const;
+    Q_INVOKABLE void setHdSnapshot(int nr, bool value);
+
     // Checks whether the SVM contains an existing hard-drive image
     Q_INVOKABLE QString hdExistingImage(int nr) const;
 
