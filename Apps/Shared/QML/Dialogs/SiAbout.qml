@@ -21,6 +21,10 @@ import Sulfur
  *
  * What differs between the apps is handed in: the name, the icon, the line
  * below the icon, and the error message.
+ *
+ * The title bar is transparent and the window has no title, so it looks like
+ * a splash window. It can still be dragged by its background and closed with
+ * the button or the Escape key.
  */
 ApplicationWindow {
 
@@ -39,20 +43,24 @@ ApplicationWindow {
     property string errorMessage: ""
 
     readonly property bool hasError: errorMessage !== ""
+    readonly property string author: qsTr("Dirk W. Hoffmann, 2026")
     readonly property string version: qsTr("Version %1").arg(AppController.version)
     readonly property string build: qsTr("Build %1").arg(AppController.buildNr)
 
-    title: hasError ? qsTr("%1 - Error").arg(appName) : qsTr("About %1").arg(appName)
+    title: ""
+    flags: Qt.Window | Qt.ExpandedClientAreaHint | Qt.NoTitleBarBackgroundHint
     visible: true
+
+    topPadding: 0
     width: 420
-    height: 340
+    height: 380 // 340
     minimumWidth: width
     maximumWidth: width
     minimumHeight: height
     maximumHeight: height
 
-    Palette.appearance: Preferences.appearance
-    Palette.theme: Preferences.colorTheme
+    Palette.appearance: Palette.Appearance.Dark
+    Palette.theme: Palette.Thema.AppDefault
 
     Image {
 
@@ -61,36 +69,59 @@ ApplicationWindow {
         fillMode: Image.PreserveAspectCrop
     }
 
+    MouseArea {
+
+        anchors.fill: parent
+        onPressed: Window.window.startSystemMove()
+    }
+
+    Shortcut {
+
+        sequence: "Escape"
+        onActivated: root.hasError ? Qt.quit() : root.close()
+    }
+
     ColumnLayout {
 
         anchors.fill: parent
         anchors.margins: Style.largeSpacing
-        spacing: Style.mediumSpacing
+        anchors.topMargin: root.contentItem.SafeArea.margins.top // + Style.largeSpacing
+        spacing: Style.tinySpacing
 
         Image {
 
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: Style.largeSpacing
-            Layout.preferredWidth: 128
-            Layout.preferredHeight: 128
+            Layout.preferredWidth: 92
+            Layout.preferredHeight: 92
             source: root.iconSource
             fillMode: Image.PreserveAspectFit
             smooth: true
         }
 
+        VSpacer {}
+
         SuText {
 
             Layout.alignment: Qt.AlignHCenter
-            text: root.tagline
-            color: "white"
+            Layout.topMargin: Style.largeSpacing
+            text: "Silicium Retro Emulator"
             font.pixelSize: Style.regular
         }
 
         SuText {
 
             Layout.alignment: Qt.AlignHCenter
+            text: root.tagline
+            color: Palette.secondary
+            font.pixelSize: Style.small
+        }
+
+        SuText {
+
+            Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: Style.largeSpacing
             text: hoverArea.containsMouse ? build : version
-            color: "white"
             font.pixelSize: Style.regular
 
             MouseArea {
@@ -101,6 +132,14 @@ ApplicationWindow {
             }
         }
 
+        SuText {
+
+            Layout.alignment: Qt.AlignHCenter
+            text: root.author
+            color: Palette.secondary
+            font.pixelSize: Style.small
+        }
+
         RoundButton {
 
             readonly property url repository: "https://github.com/dirkwhoffmann/silicium"
@@ -108,6 +147,7 @@ ApplicationWindow {
             id: gitHubButton
             visible: !root.hasError
             Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: Style.largeSpacing
             icon.source: Assets.iconUrl(Assets.GitHub)
             icon.width: 20
             icon.height: 20
@@ -121,11 +161,11 @@ ApplicationWindow {
         SuText {
 
             visible: root.hasError
-            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: Style.largeSpacing
             text: "Error: " + root.errorMessage
             color: "lightcoral"
             wrapMode: Text.WordWrap
-            horizontalAlignment: Text.AlignHCenter
         }
 
         VSpacer {}
