@@ -1179,11 +1179,10 @@ SiAmController::didHdrAttach(i64 nr)
 
     if (info.hasDisk && !info.snapshotable) {
 
-        const auto limit = (int)core.get(Opt::HDR_SNAPSHOT_LIMIT, nr);
         showNotification(tr("Large hard drive"),
         tr("HD%1 is too large to be saved in snapshots because it exceeds "
             "the %2 MB limit. It is kept in the virtual machine folder only.")
-            .arg(nr).arg(limit));
+            .arg(nr).arg(hdrSnapshotLimit));
     }
 }
 

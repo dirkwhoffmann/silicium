@@ -209,11 +209,10 @@ SiAmMediaController::checkForLargeDrive(int nr)
 
     if (info.hasDisk && !info.snapshotable) {
 
-        const auto limit = (int)SiAmController::core().get(Opt::HDR_SNAPSHOT_LIMIT, nr);
         showNotification(tr("Large hard drive attached"),
                          tr("hd%1 exceeds the %2 MB limits a snapshot stores. "
                              "It is kept in the virtual machine folder only.")
-                         .arg(nr).arg(limit));
+                         .arg(nr).arg(hdrSnapshotLimit));
     }
 }
 */
