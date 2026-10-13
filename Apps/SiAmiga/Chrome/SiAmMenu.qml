@@ -231,7 +231,13 @@ SuMenuBar {
 
         // Refreshed whenever the menu opens (the core may reject a change)
         property bool snapshot: amiga.media.hdSnapshot(driveNr)
-        onAboutToShow: snapshot = amiga.media.hdSnapshot(driveNr)
+        property bool writeThrough: amiga.media.hdWriteThrough(driveNr)
+        property bool writeProtected: amiga.media.hdWriteProtected(driveNr)
+        onAboutToShow: {
+            snapshot = amiga.media.hdSnapshot(driveNr)
+            writeThrough = amiga.media.hdWriteThrough(driveNr)
+            writeProtected = amiga.media.hdWriteProtected(driveNr)
+        }
 
         SuMenuItem {
             text: connected ? qsTr("Detach") : qsTr("Connect")
@@ -266,6 +272,27 @@ SuMenuBar {
             onTriggered: {
                 amiga.media.setHdSnapshot(driveNr, checked)
                 hdMenu.snapshot = amiga.media.hdSnapshot(driveNr)
+            }
+        }
+        SuMenuItem {
+            text: qsTr("Write through")
+            checkable: true
+            visible: connected
+            checked: writeThrough
+            onTriggered: {
+                amiga.media.setHdWriteThrough(driveNr, checked)
+                hdMenu.writeThrough = amiga.media.hdWriteThrough(driveNr)
+            }
+        }
+        SuMenuItem {
+            text: qsTr("Write protect")
+            checkable: true
+            visible: connected
+            enabled: hasDisk
+            checked: writeProtected
+            onTriggered: {
+                amiga.media.setHdWriteProtected(driveNr, checked)
+                hdMenu.writeProtected = amiga.media.hdWriteProtected(driveNr)
             }
         }
     }

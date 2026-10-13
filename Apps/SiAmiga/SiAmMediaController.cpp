@@ -177,6 +177,45 @@ SiAmMediaController::setHdSnapshot(int nr, bool value)
     }
 }
 
+bool
+SiAmMediaController::hdWriteThrough(int nr) const
+{
+    return SiAmController::core().get(Opt::HDR_WRITE_THROUGH, nr) != (i64)WriteThroughMode::NEVER;
+}
+
+void
+SiAmMediaController::setHdWriteThrough(int nr, bool value)
+{
+    try {
+
+        SiAmController::core().set(Opt::HDR_WRITE_THROUGH,
+                                   (i64)(value ? WriteThroughMode::ON_IDLE : WriteThroughMode::NEVER), nr);
+
+    } catch (const std::exception &e) {
+
+        showError("Failed to change the write-through setting.", e.what());
+    }
+}
+
+bool
+SiAmMediaController::hdWriteProtected(int nr) const
+{
+    return SiAmController::core().hd[nr]->getInfo().hasProtectedDisk;
+}
+
+void
+SiAmMediaController::setHdWriteProtected(int nr, bool value)
+{
+    try {
+
+        SiAmController::core().hd[nr]->setFlag(DiskFlags::PROTECTED, value);
+
+    } catch (const std::exception &e) {
+
+        showError("Failed to change write protection.", e.what());
+    }
+}
+
 QString
 SiAmMediaController::hdExistingImage(int nr) const
 {

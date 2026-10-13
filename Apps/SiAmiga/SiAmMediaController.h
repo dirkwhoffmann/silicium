@@ -63,6 +63,14 @@ public:
     Q_INVOKABLE bool hdSnapshot(int nr) const;
     Q_INVOKABLE void setHdSnapshot(int nr, bool value);
 
+    // Controls whether changes are written back to the image file
+    Q_INVOKABLE bool hdWriteThrough(int nr) const;
+    Q_INVOKABLE void setHdWriteThrough(int nr, bool value);
+
+    // Controls whether the disk rejects write accesses
+    Q_INVOKABLE bool hdWriteProtected(int nr) const;
+    Q_INVOKABLE void setHdWriteProtected(int nr, bool value);
+
     // Checks whether the SVM contains an existing hard-drive image
     Q_INVOKABLE QString hdExistingImage(int nr) const;
 
