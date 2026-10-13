@@ -43,6 +43,51 @@ SuMenuBar {
 
         SuMenuSeparator { }
 
+        // Same entries as the Inspector toolbar button
+        SuMenu {
+            title: qsTr("Inspector")
+
+            SuMenuItem {
+                action: window.actions.openCPUInspector
+            }
+            SuMenuItem {
+                action: window.actions.openCIAInspector
+            }
+            SuMenuItem {
+                action: window.actions.openMemoryInspector
+            }
+            SuMenuItem {
+                action: window.actions.openAgnusInspector
+            }
+            SuMenuItem {
+                action: window.actions.openCopperInspector
+            }
+            SuMenuItem {
+                action: window.actions.openBlitterInspector
+            }
+            SuMenuItem {
+                action: window.actions.openPaulaInspector
+            }
+            SuMenuItem {
+                action: window.actions.openDeniseInspector
+            }
+            SuMenuItem {
+                action: window.actions.openPortInspector
+            }
+            SuMenuItem {
+                action: window.actions.openEventsInspector
+            }
+            SuMenuSeparator { }
+            SuMenuItem {
+                action: window.actions.openLogicAnalyzer
+            }
+            SuMenuItem {
+                action: window.actions.openXRayScanner
+            }
+        }
+
+        SuMenuSeparator { }
+
         Action {
             text: qsTr("&Quit");
             shortcut: window.actions.quitShortcut
