@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include "Assets.h"
+
 /* Tells Sulfur, the UI toolkit, what the user has set up.
  *
  * Sulfur knows nothing about Silicium's preferences. This bridge copies the
@@ -19,6 +21,7 @@ class SulfurBridge {
 
 public:
 
-    // Call once, before the first QML window is created
-    static void install();
+    // Call once, before the first QML window is created. The icon is the one of
+    // the app; the message dialogs show it.
+    static void install(Assets::Icon appIcon);
 };

@@ -57,7 +57,7 @@ main(int argc, char *argv[])
     // Configure app appearance
     QQuickStyle::setStyle("Fusion");
     QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar, true);
-    app.setWindowIcon(QIcon(":/assets/images/app-icon.png"));
+    app.setWindowIcon(QIcon(":/assets/images/amiga-icon.png"));
 
     // Register types
     qmlRegisterType<SiAmRenderer>("Silicium.Controllers", 1, 0, "SiAmRenderer");
@@ -69,7 +69,7 @@ main(int argc, char *argv[])
     qmlRegisterType<SiAmDmaView>("Silicium.Components", 1, 0, "SiAmDmaView");
 
     // Tell the UI toolkit what the user has set up
-    SulfurBridge::install();
+    SulfurBridge::install(Assets::Icon::AmigaIcon);
 
     // Register singletons
     qmlRegisterSingletonInstance("Silicium.Assets", 1, 0, "Assets", Assets::instance());
@@ -114,7 +114,7 @@ main(int argc, char *argv[])
     // Load the main window, or an alert window if the SVM file couldn't be opened
     const QUrl url(ok
         ? QStringLiteral("qrc:/qt/qml/siamigaUI/SiAmiga/SiAmWindow.qml")
-        : QStringLiteral("qrc:/qt/qml/siamigaUI/SiAmiga/Dialogs/SiAmAbout.qml"));
+        : QStringLiteral("qrc:/qt/qml/siamigaUI/Shared/QML/Dialogs/SiAbout.qml"));
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreated,
@@ -134,6 +134,16 @@ main(int argc, char *argv[])
                 SiAmController::instance().attachWindow(window);
             }
         });
+
+    // The About window doubles as the error window: tell it what went wrong
+    if (!ok) {
+        engine.setInitialProperties({
+            { "appName", "SiAmiga" },
+            { "iconSource", Assets::instance()->iconUrl(Assets::Icon::AmigaIcon) },
+            { "tagline", QObject::tr("Amiga Virtual Machine") },
+            { "errorMessage", SiAmController::instance().getErrorMessage() }
+        });
+    }
     engine.load(url);
 
     // Run the app

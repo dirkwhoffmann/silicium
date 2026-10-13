@@ -15,19 +15,37 @@ import Silicium.Controllers
 import Silicium.Preferences
 import Sulfur
 
+/* The About window of an emulator app. It doubles as the error window: an app
+ * that could not open the virtual machine it was asked for shows this window
+ * with an error message, instead of a machine window (see main.cpp).
+ *
+ * What differs between the apps is handed in: the name, the icon, the line
+ * below the icon, and the error message.
+ */
 ApplicationWindow {
 
     id: root
 
-    property string errorMessage: SiAmController.errorMessage
+    // The name of the app (SiC64, SiAmiga, ...)
+    property string appName: ""
+
+    // The icon of the app
+    property url iconSource
+
+    // What the machine is, e.g. "C64 Virtual Machine"
+    property string tagline: ""
+
+    // Why the app could not do what it was asked to (empty if it could)
+    property string errorMessage: ""
+
     readonly property bool hasError: errorMessage !== ""
     readonly property string version: qsTr("Version %1").arg(AppController.version)
     readonly property string build: qsTr("Build %1").arg(AppController.buildNr)
 
-    title: hasError ? qsTr("SiAmiga - Error") : qsTr("About SiAmiga")
+    title: hasError ? qsTr("%1 - Error").arg(appName) : qsTr("About %1").arg(appName)
     visible: true
     width: 420
-    height: 320
+    height: 340
     minimumWidth: width
     maximumWidth: width
     minimumHeight: height
@@ -53,16 +71,17 @@ ApplicationWindow {
 
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: Style.largeSpacing
-            Layout.preferredWidth: 260
-            Layout.preferredHeight: 110
-            source: Assets.iconUrl(Assets.AmigaLogo)
+            Layout.preferredWidth: 128
+            Layout.preferredHeight: 128
+            source: root.iconSource
             fillMode: Image.PreserveAspectFit
+            smooth: true
         }
 
         SuText {
 
             Layout.alignment: Qt.AlignHCenter
-            text: qsTr("Amiga Virtual Machine")
+            text: root.tagline
             color: "white"
             font.pixelSize: Style.regular
         }

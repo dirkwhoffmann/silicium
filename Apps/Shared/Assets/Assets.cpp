@@ -48,13 +48,14 @@ Assets::getIconUrl(Icon icon)
 
         case Icon::AmigaBg:             return QUrl("qrc:/images/amiga-bg.png");
         case Icon::AmigaCore:           return QUrl("qrc:/images/amiga-core.png");
+        case Icon::AmigaIcon:           return QUrl("qrc:/images/amiga-icon.png");
         case Icon::AmigaLogo:           return QUrl("qrc:/images/amiga-logo.png");
         case Icon::AmigaMonitor:        return QUrl("qrc:/images/amiga-monitor.png");
-        case Icon::AppIcon:             return QUrl("qrc:/images/app-icon.png");
         case Icon::Biohazard:           return QUrl("qrc:/images/biohazard.png");
         case Icon::Bomb:                return QUrl("qrc:/images/bomb.png");
         case Icon::C64Bg:               return QUrl("qrc:/images/c64-bg.png");
         case Icon::C64Core:             return QUrl("qrc:/images/c64-core.png");
+        case Icon::C64Icon:             return QUrl("qrc:/images/c64-icon.png");
         case Icon::C64Logo:             return QUrl("qrc:/images/c64-logo.png");
         case Icon::C64Monitor:          return QUrl("qrc:/images/c64-monitor.png");
         case Icon::CommodoreLogo:       return QUrl("qrc:/images/commodore-logo.png");
@@ -104,6 +105,7 @@ Assets::getIconUrl(Icon icon)
         case Icon::RomDemo:             return QUrl("qrc:/images/rom-demo.png");
         case Icon::RomDiag:             return QUrl("qrc:/images/rom-diag.png");
         case Icon::RomEmutos:           return QUrl("qrc:/images/rom-emutos.png");
+        case Icon::SiIcon:              return QUrl("qrc:/images/si-icon.png");
         case Icon::Snapshot:            return QUrl("qrc:/images/snapshot.png");
         case Icon::State0:              return QUrl("qrc:/images/state0.png");
         case Icon::State1:              return QUrl("qrc:/images/state1.png");

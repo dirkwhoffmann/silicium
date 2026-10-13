@@ -7,6 +7,8 @@
 // See https://www.gnu.org for license information
 // -----------------------------------------------------------------------------
 
+#pragma once
+
 #include <utl/io.h>
 
 #include <QtQml>
@@ -65,13 +67,14 @@ public:
         // Images
         AmigaBg,
         AmigaCore,
+        AmigaIcon,
         AmigaLogo,
         AmigaMonitor,
-        AppIcon,
         Biohazard,
         Bomb,
         C64Bg,
         C64Core,
+        C64Icon,
         C64Logo,
         C64Monitor,
         CommodoreLogo,
@@ -119,6 +122,7 @@ public:
         RomDemo,
         RomDiag,
         RomEmutos,
+        SiIcon,
         Snapshot,
         State0,
         State1,

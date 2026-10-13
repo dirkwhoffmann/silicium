@@ -238,10 +238,13 @@ VMWindow {
     // Auxiliary windows
     //
 
-    SiC64About {
+    SiAbout {
 
         id: aboutWindow
         visible: false
+        appName: "SiC64"
+        iconSource: Assets.iconUrl(Assets.C64Icon)
+        tagline: qsTr("C64 Virtual Machine")
     }
 
     SiC64DiskCreator {

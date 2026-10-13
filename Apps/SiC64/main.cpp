@@ -63,7 +63,7 @@ main(int argc, char *argv[])
     // Configure app appearance
     QQuickStyle::setStyle("Fusion");
     QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar, true);
-    app.setWindowIcon(QIcon(":/assets/images/app-icon.png"));
+    app.setWindowIcon(QIcon(":/assets/images/c64-icon.png"));
 
     // Register types
     qmlRegisterType<SiC64ConfigController>("Silicium.Controllers", 1, 0, "SiC64ConfigController");
@@ -77,7 +77,7 @@ main(int argc, char *argv[])
     qmlRegisterType<SiC64Waveform>("Silicium.Components", 1, 0, "SiC64Waveform");
 
     // Tell the UI toolkit what the user has set up
-    SulfurBridge::install();
+    SulfurBridge::install(Assets::Icon::C64Icon);
 
     // Register singletons
     qmlRegisterSingletonInstance("Silicium.Assets", 1, 0, "Assets", Assets::instance());
@@ -122,7 +122,7 @@ main(int argc, char *argv[])
     // Load the main window, or an alert window if the SVM file couldn't be opened
     const QUrl url(ok
         ? QStringLiteral("qrc:/qt/qml/sic64UI/SiC64/SiC64Window.qml")
-        : QStringLiteral("qrc:/qt/qml/sic64UI/SiC64/Dialogs/SiC64About.qml"));
+        : QStringLiteral("qrc:/qt/qml/sic64UI/Shared/QML/Dialogs/SiAbout.qml"));
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreated,
@@ -142,6 +142,16 @@ main(int argc, char *argv[])
                 C64Controller::instance().attachWindow(window);
             }
         });
+
+    // The About window doubles as the error window: tell it what went wrong
+    if (!ok) {
+        engine.setInitialProperties({
+            { "appName", "SiC64" },
+            { "iconSource", Assets::instance()->iconUrl(Assets::Icon::C64Icon) },
+            { "tagline", QObject::tr("C64 Virtual Machine") },
+            { "errorMessage", C64Controller::instance().getErrorMessage() }
+        });
+    }
     engine.load(url);
 
     // Run the app

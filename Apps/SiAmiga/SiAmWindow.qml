@@ -241,10 +241,13 @@ VMWindow {
     // Auxiliary windows
     //
 
-    SiAmAbout {
+    SiAbout {
 
         id: aboutWindow
         visible: false
+        appName: "SiAmiga"
+        iconSource: Assets.iconUrl(Assets.AmigaIcon)
+        tagline: qsTr("Amiga Virtual Machine")
     }
 
     SiAmDiskCreator {

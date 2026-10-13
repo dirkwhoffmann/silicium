@@ -155,7 +155,7 @@ main(int argc, char *argv[])
     // Configure app appearance
     QQuickStyle::setStyle("Fusion");
     QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar, true);
-    app.setWindowIcon(QIcon(":/assets/images/app-icon.png"));
+    app.setWindowIcon(QIcon(":/assets/images/si-icon.png"));
 
     // Register types (Controllers)
     qmlRegisterType<AudioController>("Silicium.Controllers", 1, 0, "AudioController");
@@ -168,7 +168,7 @@ main(int argc, char *argv[])
     qRegisterMetaType<EmulationKey>("EmulationKey");
 
     // Tell the UI toolkit what the user has set up
-    SulfurBridge::install();
+    SulfurBridge::install(Assets::Icon::SiIcon);
 
     // Register singletons
     qmlRegisterSingletonInstance("Silicium.Assets", 1, 0, "Assets", Assets::instance());

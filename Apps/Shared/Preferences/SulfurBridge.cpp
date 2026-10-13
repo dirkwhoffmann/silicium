@@ -13,7 +13,7 @@
 #include "SulfurSettings.h"
 
 void
-SulfurBridge::install()
+SulfurBridge::install(Assets::Icon appIcon)
 {
     auto &prefs = Preferences::instance();
     auto &sulfur = SulfurSettings::instance();
@@ -35,7 +35,7 @@ SulfurBridge::install()
 
     // The pictures of the message dialogs never change
     auto *assets = Assets::instance();
-    sulfur.setDialogIcon(assets->iconUrl(Assets::Icon::AppIcon));
+    sulfur.setDialogIcon(assets->iconUrl(appIcon));
     sulfur.setDialogBadge(assets->iconUrl(Assets::Icon::Biohazard));
 
     QObject::connect(&prefs, &Preferences::appearancePrefsChanged, &sulfur, sync);

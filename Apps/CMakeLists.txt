@@ -71,22 +71,6 @@ set(SI_BUNDLE_PREFIX "de.dirkwhoffmann")
 
 set(SI_COPYRIGHT "Copyright (C) Dirk W. Hoffmann. www.dirkwhoffmann.de")
 
-set(ICON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/Shared/Assets/icons/AppIcon.icns")
-set(ICON_FILE_C64 "${CMAKE_CURRENT_SOURCE_DIR}/Shared/Assets/icons/AppIconC64.icns")
-
-set_source_files_properties(${ICON_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-set_source_files_properties(${ICON_FILE_C64} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-
-# The flat icons are only for platforms without Icon Composer icons (see
-# si_app_icon() below).
-if(APPLE)
-    set(SI_FLAT_ICON "")
-    set(SI_FLAT_ICON_C64 "")
-else()
-    set(SI_FLAT_ICON ${ICON_FILE})
-    set(SI_FLAT_ICON_C64 ${ICON_FILE_C64})
-endif()
-
 # Gives a bundle the Icon Composer icon Shared/Assets/icons/<icon>.icon.
 #
 # macOS Tahoe puts every icon that is not one of those into a gray container,
@@ -149,15 +133,13 @@ endfunction()
 
 qt_add_executable(silicium
         MACOSX_BUNDLE
-        "Silicium/main.cpp"
-        ${SI_FLAT_ICON})
+        "Silicium/main.cpp")
 
 # Silicium carries a plist of its own because it is the app that declares the
 # .svm/.svmz document types; SiC64 and SiAmiga stay on Qt's stock template.
 set_target_properties(silicium PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Apps/bin"
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Silicium/Info.plist.in"
-        MACOSX_BUNDLE_ICON_FILE AppIcon.icns
         MACOSX_BUNDLE_BUNDLE_NAME "Silicium"
         MACOSX_BUNDLE_GUI_IDENTIFIER "${SI_BUNDLE_PREFIX}.silicium"
         MACOSX_BUNDLE_SHORT_VERSION_STRING "${SI_VERSION}"
@@ -269,15 +251,13 @@ qt_add_qml_module(silicium
 
 qt_add_executable(SiC64
         MACOSX_BUNDLE
-        "SiC64/main.cpp"
-        ${SI_FLAT_ICON_C64})
+        "SiC64/main.cpp")
 
 # The target name matches this source subdirectory's name, which would
 # otherwise collide with the build-tree mirror CMake creates for it. Give
 # the binary its own output directory to avoid that clash.
 set_target_properties(SiC64 PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Apps/bin"
-        MACOSX_BUNDLE_ICON_FILE AppIconC64.icns
         MACOSX_BUNDLE_BUNDLE_NAME "SiC64"
         MACOSX_BUNDLE_GUI_IDENTIFIER "${SI_BUNDLE_PREFIX}.SiC64"
         MACOSX_BUNDLE_SHORT_VERSION_STRING "${SI_VERSION}"
@@ -342,15 +322,13 @@ qt_add_qml_module(SiC64
 # is built out in a later step, once the Amiga UI work begins in earnest.
 qt_add_executable(SiAmiga
         MACOSX_BUNDLE
-        "SiAmiga/main.cpp"
-        ${SI_FLAT_ICON})
+        "SiAmiga/main.cpp")
 
 # The target name matches this source subdirectory's name, which would
 # otherwise collide with the build-tree mirror CMake creates for it. Give
 # the binary its own output directory to avoid that clash.
 set_target_properties(SiAmiga PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Apps/bin"
-        MACOSX_BUNDLE_ICON_FILE AppIcon.icns
         MACOSX_BUNDLE_BUNDLE_NAME "SiAmiga"
         MACOSX_BUNDLE_GUI_IDENTIFIER "${SI_BUNDLE_PREFIX}.SiAmiga"
         MACOSX_BUNDLE_SHORT_VERSION_STRING "${SI_VERSION}"
