@@ -99,7 +99,7 @@ Item {
                                       : root.unified    ? 0
                                                         : root.titleBarInset
     readonly property real canvasEnd: !root.overlayed && root.showStatusBar
-                                      ? root.height - statusBarSlot.height
+                                      ? root.height - statusBar.height
                                       : root.height
 
     /* The area between the command bar and the status bar, in the coordinates
@@ -108,7 +108,7 @@ Item {
      */
     readonly property real overlayStart: root.chromeHeight
     readonly property real overlayEnd: root.showStatusBar
-                                       ? root.height - statusBarSlot.height
+                                       ? root.height - statusBar.height
                                        : root.height
 
     // Colors
@@ -233,7 +233,7 @@ Item {
 
             visible: root.showMenu || root.showToolbar
             Layout.fillWidth: true
-            Layout.preferredHeight: barRows.implicitHeight + 2 * margin
+            Layout.preferredHeight: barRows.implicitHeight + margin
 
             readonly property real margin: root.overlayed ? Style.mediumSpacing : 0
 
@@ -375,18 +375,52 @@ Item {
     // Status bar
     //
 
-    Rectangle {
+    Item {
 
-        id: statusBarSlot
+        id: statusBar
 
         visible: root.showStatusBar
-        color: Qt.alpha(root.statusBarBg, root.statusBarAlpha)
         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+        height: statusBarSlot.height + margin
 
-        onChildrenChanged: {
+        // If the chrome is overlayed, the bar floats in a translucent rounded
+        // rectangle that keeps its distance to the window borders and turns
+        // more opaque while the mouse is over it (see the command bar).
+        readonly property real margin: root.overlayed ? Style.mediumSpacing : 0
 
-            height = Qt.binding(() =>
-                Math.max(0, ...Array.from(children, c => c.implicitHeight)))
+        HoverHandler {
+
+            id: statusBarHover
+        }
+
+        SiOverlayRect {
+
+            visible: root.overlayed
+            anchors.fill: parent
+            anchors.leftMargin: statusBar.margin
+            anchors.rightMargin: statusBar.margin
+            anchors.topMargin: statusBar.margin / 2
+            anchors.bottomMargin: statusBar.margin / 2
+
+            hovered: statusBarHover.hovered
+            color: Qt.alpha(root.statusBarBg, hovered ? 0.95 : 0.5)
+        }
+
+        Rectangle {
+
+            id: statusBarSlot
+
+            color: root.overlayed ? "transparent" : Qt.alpha(root.statusBarBg, root.statusBarAlpha)
+            anchors { left: parent.left; right: parent.right; top: parent.top }
+            anchors.leftMargin: statusBar.margin
+            anchors.rightMargin: statusBar.margin
+            anchors.topMargin: statusBar.margin / 2
+
+            onChildrenChanged: {
+
+                height = Qt.binding(() =>
+                    Math.max(0, ...Array.from(children, c => c.implicitHeight)))
+            }
         }
     }
 }
