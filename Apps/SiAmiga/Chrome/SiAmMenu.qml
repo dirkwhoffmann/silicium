@@ -197,37 +197,10 @@ SuMenuBar {
 
         id: driveMenu
 
-        required property int driveNr   // 0..3
-
-        // driveConnected(nr) is a Q_INVOKABLE, not a Q_PROPERTY -- reading
-        // it here wouldn't register as a binding dependency, so it would
-        // never notice a later change and 'connected' would go stale (see
-        // SiAmConfigController.h's DF0_CONNECTED.._CONNECTED comment).
-        // driveNr is fixed for this component's lifetime, so picking the
-        // matching named property keeps this reactive.
-        readonly property bool connected: {
-            switch (driveNr) {
-                case 0: return config.DF0_CONNECTED
-                case 1: return config.DF1_CONNECTED
-                case 2: return config.DF2_CONNECTED
-                case 3: return config.DF3_CONNECTED
-            }
-            return false
-        }
+        required property int driveNr
+        required property bool connected
         readonly property bool hasDisk: amiga.media.driveHasDisk(driveNr)
         readonly property bool writeProtected: amiga.media.driveWriteProtected(driveNr)
-
-        // While disconnected, there's nothing to insert/eject/export for
-        // hardware that isn't part of the current setup, so every other item
-        // is hidden and only the toggle remains -- mirrors DriveMenu in
-        // SiC64Menu.qml. df0 (see updatePeripheralMenus below) is the one
-        // drive that stays in the bar regardless of this toggle.
-        SuMenuItem {
-            text: connected ? qsTr("Disconnect") : qsTr("Connect")
-            onTriggered: config.setDriveConnected(driveNr, !connected)
-        }
-
-        SuMenuSeparator { visible: connected }
 
         SuMenuItem {
             text: qsTr("New...")
@@ -266,33 +239,13 @@ SuMenuBar {
     //
     // Hard Drive Menu (reusable inline component, instantiated for hd0..hd3)
     //
-    // Mirrors the Hd0..Hd3 menus in vAmiga's own MainMenu.xib: New..., Attach...,
-    // Attach Recent, Detach, Export..., Export To, Properties..., Bootable,
-    // Write Protected. "Properties..." (a geometry/format dialog) and
-    // "Bootable" (no public getter/setter on HardDriveAPI, only on the core's
-    // internal HardDrive class) have no controller-side support yet, so
-    // they're left out rather than wired to nothing; "Attach Recent" and
-    // "Export To" need a recent-files list this stub doesn't have either
-    // (see SiC64Menu's insertRecentComponent for what that eventually looks
-    // like).
-    //
 
     component HardDriveMenu: SuMenu {
 
         id: hdMenu
 
-        required property int driveNr   // 0..3
-
-        // Same staleness reason as DriveMenu.connected above.
-        readonly property bool connected: {
-            switch (driveNr) {
-                case 0: return config.HD0_CONNECTED
-                case 1: return config.HD1_CONNECTED
-                case 2: return config.HD2_CONNECTED
-                case 3: return config.HD3_CONNECTED
-            }
-            return false
-        }
+        required property int driveNr
+        required property bool connected
         readonly property bool hasDisk: amiga.media.hdHasDisk(driveNr)
 
         // Refreshed whenever the menu opens (the core may reject a change)
@@ -370,14 +323,14 @@ SuMenuBar {
     // not something a user unplugs -- while df1..df3 and hd0..hd3 come and
     // go with their DRIVE_CONNECT/HDC_CONNECT config state.
 
-    Component { id: df0Component; DriveMenu { title: qsTr("Df&0"); driveNr: 0 } }
-    Component { id: df1Component; DriveMenu { title: qsTr("Df&1"); driveNr: 1 } }
-    Component { id: df2Component; DriveMenu { title: qsTr("Df&2"); driveNr: 2 } }
-    Component { id: df3Component; DriveMenu { title: qsTr("Df&3"); driveNr: 3 } }
-    Component { id: hd0Component; HardDriveMenu { title: qsTr("Hd&0"); driveNr: 0 } }
-    Component { id: hd1Component; HardDriveMenu { title: qsTr("Hd&1"); driveNr: 1 } }
-    Component { id: hd2Component; HardDriveMenu { title: qsTr("Hd&2"); driveNr: 2 } }
-    Component { id: hd3Component; HardDriveMenu { title: qsTr("Hd&3"); driveNr: 3 } }
+    Component { id: df0Component; DriveMenu { title: qsTr("Df&0"); driveNr: 0; connected: config.DF0_CONNECTED } }
+    Component { id: df1Component; DriveMenu { title: qsTr("Df&1"); driveNr: 1; connected: config.DF1_CONNECTED } }
+    Component { id: df2Component; DriveMenu { title: qsTr("Df&2"); driveNr: 2; connected: config.DF2_CONNECTED } }
+    Component { id: df3Component; DriveMenu { title: qsTr("Df&3"); driveNr: 3; connected: config.DF3_CONNECTED } }
+    Component { id: hd0Component; HardDriveMenu { title: qsTr("Hd&0"); driveNr: 0; connected: config.HD0_CONNECTED } }
+    Component { id: hd1Component; HardDriveMenu { title: qsTr("Hd&1"); driveNr: 1; connected: config.HD1_CONNECTED } }
+    Component { id: hd2Component; HardDriveMenu { title: qsTr("Hd&2"); driveNr: 2; connected: config.HD2_CONNECTED } }
+    Component { id: hd3Component; HardDriveMenu { title: qsTr("Hd&3"); driveNr: 3; connected: config.HD3_CONNECTED } }
 
     property Menu df0MenuItem: null
     property Menu df1MenuItem: null
@@ -448,11 +401,6 @@ SuMenuBar {
 
     //
     // Keyboard Menu
-    //
-    // Trimmed to what vAmiga's own MainMenu.xib offers -- there's no
-    // C64-style "type this BASIC command" section, since AmigaOS isn't a
-    // line-oriented BASIC the emulator can type into the way the C64's
-    // KERNAL is.
     //
 
     SuMenu {
