@@ -233,9 +233,10 @@ Item {
 
             visible: root.showMenu || root.showToolbar
             Layout.fillWidth: true
-            Layout.preferredHeight: barRows.implicitHeight + margin
+            Layout.preferredHeight: barRows.implicitHeight + 2 * vmargin
 
-            readonly property real margin: root.overlayed ? Style.largeSpacing : 0
+            readonly property real hmargin: root.overlayed ? Style.mediumSpacing : 0
+            readonly property real vmargin: root.overlayed ? Style.mediumSpacing : 0
 
             HoverHandler {
 
@@ -246,13 +247,14 @@ Item {
 
                 visible: root.overlayed
                 anchors.fill: parent
-                anchors.leftMargin: commandBar.margin
-                anchors.rightMargin: commandBar.margin
-                anchors.topMargin: commandBar.margin / 2
-                anchors.bottomMargin: commandBar.margin / 2
+                anchors.leftMargin: commandBar.hmargin
+                anchors.rightMargin: commandBar.hmargin
+                anchors.topMargin: commandBar.vmargin
+                anchors.bottomMargin: commandBar.vmargin
 
                 hovered: commandBarHover.hovered
-                color: Qt.alpha(root.commandBarBg, hovered ? 0.95 : 0.5)
+                color: Qt.alpha(root.commandBarBg, hovered ? 1.0 : 0.9)
+                border.color: Qt.alpha(root.commandBarBg, hovered ? 1.0 : 0.6)
             }
 
             ColumnLayout {
@@ -260,10 +262,10 @@ Item {
                 id: barRows
 
                 anchors.fill: parent
-                anchors.leftMargin: commandBar.margin
-                anchors.rightMargin: commandBar.margin
-                anchors.topMargin: commandBar.margin / 2
-                anchors.bottomMargin: commandBar.margin / 2
+                anchors.leftMargin: commandBar.hmargin
+                anchors.rightMargin: commandBar.hmargin
+                anchors.topMargin: commandBar.vmargin
+                anchors.bottomMargin: commandBar.vmargin
                 spacing: 0
 
                 Rectangle {
@@ -381,12 +383,10 @@ Item {
 
         visible: root.showStatusBar
         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-        height: statusBarSlot.height + margin
+        height: statusBarSlot.height + 2 * vmargin
 
-        // If the chrome is overlayed, the bar floats in a translucent rounded
-        // rectangle that keeps its distance to the window borders and turns
-        // more opaque while the mouse is over it (see the command bar).
-        readonly property real margin: root.overlayed ? Style.mediumSpacing : 0
+        readonly property real hmargin: root.overlayed ? Style.mediumSpacing : 0
+        readonly property real vmargin: root.overlayed ? Style.mediumSpacing : 0
 
         HoverHandler {
 
@@ -397,13 +397,14 @@ Item {
 
             visible: root.overlayed
             anchors.fill: parent
-            anchors.leftMargin: statusBar.margin
-            anchors.rightMargin: statusBar.margin
-            anchors.topMargin: statusBar.margin / 2
-            anchors.bottomMargin: statusBar.margin / 2
+            anchors.leftMargin: statusBar.hmargin
+            anchors.rightMargin: statusBar.hmargin
+            anchors.topMargin: statusBar.vmargin
+            anchors.bottomMargin: statusBar.vmargin
 
             hovered: statusBarHover.hovered
-            color: Qt.alpha(root.statusBarBg, hovered ? 0.95 : 0.5)
+            color: Qt.alpha(root.statusBarBg, hovered ? 1.0 : 0.9)
+            border.color: Qt.alpha(root.statusBarBg, hovered ? 1.0 : 0.6)
         }
 
         Rectangle {
@@ -412,9 +413,10 @@ Item {
 
             color: root.overlayed ? "transparent" : Qt.alpha(root.statusBarBg, root.statusBarAlpha)
             anchors { left: parent.left; right: parent.right; top: parent.top }
-            anchors.leftMargin: statusBar.margin
-            anchors.rightMargin: statusBar.margin
-            anchors.topMargin: statusBar.margin / 2
+            anchors.leftMargin: statusBar.hmargin
+            anchors.rightMargin: statusBar.hmargin
+            anchors.topMargin: statusBar.vmargin
+            anchors.bottomMargin: statusBar.vmargin
 
             onChildrenChanged: {
 
