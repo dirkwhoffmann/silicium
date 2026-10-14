@@ -42,7 +42,6 @@ Item {
     required property VMWindow window
 
     // Content
-    property alias titleBarContent: titleBarSlot.data
     property alias menuContent: menuSlot.data
     property alias toolbarContent: toolbarSlot.data
     property alias statusBarContent: statusBarSlot.data
@@ -117,7 +116,7 @@ Item {
     readonly property real statusBarAlpha: statusBarOverlayed ? 0.9 : 1.0
     readonly property color commandBarBg: Palette.toolbar
     readonly property color statusBarBg: Palette.toolbar
-    readonly property color titleBarBg: root.unified ? Palette.toolbar : systemPalette.window
+    readonly property color titleBarBg: root.unified ? Palette.toolbar : Palette.background // systemPalette.window
 
     // The standard title bar color of the operating system. Follows the
     // color scheme, which the app sets from the appearance preferences.
@@ -193,6 +192,28 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
 
                 spacing: Style.smallSpacing
+
+                SuSymbolButton {
+
+                    symbol: "page_header"
+                    color: root.showTitleBar ? Palette.secondary : "white"
+                    background: Rectangle {
+                        visible: root.titleBarOverlayed
+                        color: root.commandBarBg;
+                        radius: height / 2
+                    }
+
+                    onClicked: root.window.actionsRef.toggleCommandBar.trigger()
+                }
+
+                SuSymbolButton {
+
+                    symbol: "page_footer"
+                    color: Palette.secondary
+                    background: Rectangle { color: root.commandBarBg; radius: height / 2 }
+
+                    onClicked: root.window.actionsRef.toggleStatusBar.trigger()
+                }
             }
 
             Rectangle {

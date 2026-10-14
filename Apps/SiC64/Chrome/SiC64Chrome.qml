@@ -39,31 +39,6 @@ SiChrome {
     titleText: c64.name + (Preferences.developerMode ? " - " + c64.uuid : "")
     paused: c64.isPaused
 
-    titleBarContent: [
-
-        SuSymbolButton {
-
-            id: chromeToggle
-
-            symbol: "page_header"
-            color: Palette.secondary
-            background: Rectangle { color: Qt.alpha(Palette.background, 0.5); radius: height / 2 }
-
-            onClicked: root.window.actions.toggleCommandBar.trigger()
-        },
-
-        SuSymbolButton {
-
-            id: statusBarToggle
-
-            symbol: "page_footer"
-            color: Palette.secondary
-            background: Rectangle { color: Qt.alpha(Palette.background, 0.5); radius: height / 2 }
-
-            onClicked: root.window.actions.toggleStatusBar.trigger()
-        }
-    ]
-
     // The menu bar is part of the chrome only if it is not native
     menuContent: Loader {
 
