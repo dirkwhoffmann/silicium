@@ -19,6 +19,7 @@
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QCursor>
+#include <QDesktopServices>
 #include <QDir>
 #include <QFile>
 #include <QJsonDocument>
@@ -787,6 +788,24 @@ SiAmController::revertSnapshot()
         return;
     }
     loadSnapshot(info->uuid);
+}
+
+void
+SiAmController::browseSnapshots()
+{
+    try {
+
+        const auto folder = svm->root() / SVMFile::snapshotDir;
+        fs::create_directories(folder);
+
+        if (!QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdWString(folder.wstring())))) {
+            showError("Failed to open the snapshot folder.", QString::fromStdString(folder.string()));
+        }
+
+    } catch (const std::exception &e) {
+
+        showError("Failed to open the snapshot folder.", e.what());
+    }
 }
 
 void

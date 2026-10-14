@@ -306,6 +306,9 @@ public:
 
     Q_INVOKABLE void revertSnapshot();
 
+    // Shows the snapshot folder of this virtual machine in the file browser
+    Q_INVOKABLE void browseSnapshots();
+
     Q_PROPERTY(SiAmActivityController *activityController READ getActivityController CONSTANT)
     Q_PROPERTY(SiAmConfigController *configController READ getConfigController CONSTANT)
     Q_PROPERTY(SiAmKeyboardController *keyboardController READ getKeyboardController CONSTANT)

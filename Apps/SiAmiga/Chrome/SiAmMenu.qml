@@ -24,27 +24,29 @@ SuMenuBar {
     readonly property SiAmConfigController config: amiga.configController
 
     //
-    // Amiga menu
+    // Machine menu
     //
 
     SuMenu {
+
         title: qsTr("Machine")
 
         SuMenuItem {
             action: window.actions.showAbout
         }
 
-        SuMenuSeparator { }
+        SuMenuSeparator {
+        }
 
         SuMenuItem {
             action: window.actions.config
         }
 
-        SuMenuSeparator { }
+        SuMenuSeparator {
+        }
 
-        // Same entries as the Inspector toolbar button
         SuMenu {
-            title: qsTr("Inspector")
+            title: qsTr("Open Inspector")
 
             SuMenuItem {
                 action: window.actions.openCPUInspector
@@ -76,7 +78,10 @@ SuMenuBar {
             SuMenuItem {
                 action: window.actions.openEventsInspector
             }
-            SuMenuSeparator { }
+
+            SuMenuSeparator {
+            }
+
             SuMenuItem {
                 action: window.actions.openLogicAnalyzer
             }
@@ -96,10 +101,21 @@ SuMenuBar {
 
         SuMenuSeparator { }
 
-        Action {
-            text: qsTr("&Quit");
-            shortcut: window.actions.quitShortcut
-            onTriggered: Qt.quit()
+        SuMenuItem {
+            action: window.actions.quit
+        }
+
+        SuMenuSeparator {
+        }
+
+        SuMenuItem {
+            action: window.actions.saveSnapshot
+        }
+        SuMenuItem {
+            action: window.actions.loadSnapshot
+        }
+        SuMenuItem {
+            action: window.actions.browseSnapshots
         }
     }
 

@@ -83,6 +83,7 @@ Item {
     property alias saveWorkspace: saveWorkspaceAction
     property alias saveSnapshot: saveSnapshotAction
     property alias loadSnapshot: loadSnapshotAction
+    property alias browseSnapshots: browseSnapshotsAction
     property alias pause: pauseAction
     property alias reset: resetAction
     property alias power: powerAction
@@ -99,6 +100,7 @@ Item {
     property alias toggleCommandBar: toggleCommandBarAction
     property alias toggleStatusBar: toggleStatusBarAction
     property alias showAbout: showAboutAction
+    property alias quit: quitAction
     property alias formatHex: formatHexAction
     property alias formatHexPadded: formatHexPaddedAction
     property alias formatDecimal: formatDecimalAction
@@ -458,15 +460,22 @@ Item {
     Action {
 
         id: saveSnapshotAction
-        text: qsTr("Save Snapshot")
+        text: qsTr("Take Snapshot")
         onTriggered: amiga.saveSnapshotAsync()
     }
 
     Action {
 
         id: loadSnapshotAction
-        text: qsTr("Load Snapshot")
+        text: qsTr("Restore Latest Snapshot")
         onTriggered: amiga.revertSnapshot()
+    }
+
+    Action {
+
+        id: browseSnapshotsAction
+        text: qsTr("Browse Snapshots")
+        onTriggered: amiga.browseSnapshots()
     }
 
     Action {
@@ -595,6 +604,14 @@ Item {
         id: showAboutAction
         text: qsTr("About")
         onTriggered: aboutWindowRef.show()
+    }
+
+    Action {
+
+        id: quitAction
+        text: qsTr("&Quit")
+        shortcut: root.quitShortcut
+        onTriggered: Qt.quit()
     }
 
     // Inspector number format (SiAmInspectorToolbar's format menu). Unlike
