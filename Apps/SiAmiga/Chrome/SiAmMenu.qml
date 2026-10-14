@@ -28,7 +28,7 @@ SuMenuBar {
     //
 
     SuMenu {
-        title: qsTr("Amiga")
+        title: qsTr("Machine")
 
         SuMenuItem {
             action: window.actions.showAbout
@@ -38,7 +38,6 @@ SuMenuBar {
 
         SuMenuItem {
             action: window.actions.config
-            text: qsTr("Settings...")
         }
 
         SuMenuSeparator { }
@@ -84,6 +83,15 @@ SuMenuBar {
             SuMenuItem {
                 action: window.actions.openXRayScanner
             }
+        }
+
+        SuMenuSeparator { }
+
+        SuMenuItem {
+            action: window.actions.retroShell
+        }
+        SuMenuItem {
+            action: window.actions.logger
         }
 
         SuMenuSeparator { }
@@ -462,62 +470,9 @@ SuMenuBar {
     //
     // Debug Menu
     //
-    // Groups what SiC64Menu.qml splits across its C64 menu (Inspector/
-    // RetroShell/Logger) and toolbar (Debug Panel).
-    //
 
     SuMenu {
         title: qsTr("&Debug")
-
-        SuMenu {
-            title: qsTr("Inspector")
-
-            SuMenuItem {
-                action: window.actions.openCPUInspector
-            }
-            SuMenuItem {
-                action: window.actions.openLogicAnalyzer
-            }
-            SuMenuItem {
-                action: window.actions.openXRayScanner
-            }
-            SuMenuItem {
-                action: window.actions.openCIAInspector
-            }
-            SuMenuItem {
-                action: window.actions.openMemoryInspector
-            }
-            SuMenuItem {
-                action: window.actions.openAgnusInspector
-            }
-            SuMenuItem {
-                action: window.actions.openCopperInspector
-            }
-            SuMenuItem {
-                action: window.actions.openBlitterInspector
-            }
-            SuMenuItem {
-                action: window.actions.openPaulaInspector
-            }
-            SuMenuItem {
-                action: window.actions.openDeniseInspector
-            }
-            SuMenuItem {
-                action: window.actions.openPortInspector
-            }
-            SuMenuItem {
-                action: window.actions.openEventsInspector
-            }
-        }
-
-        SuMenuSeparator { }
-
-        SuMenuItem {
-            action: window.actions.retroShell
-        }
-        SuMenuItem {
-            action: window.actions.logger
-        }
 
         SuMenuSeparator { }
 

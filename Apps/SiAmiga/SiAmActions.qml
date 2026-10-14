@@ -228,7 +228,7 @@ Item {
     Action {
 
         id: configAction
-        text: qsTr("Open Configurator")
+        text: qsTr("Settings...")
         shortcut: root.configShortcut
         onTriggered: configWindowRef.showPage(configWindowRef.currentIndex)
     }
