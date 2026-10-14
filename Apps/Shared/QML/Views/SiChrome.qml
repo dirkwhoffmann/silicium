@@ -51,6 +51,9 @@ Item {
     required property bool unified
     required property bool compact
 
+    // If false, the menu is native and the chrome has no menu row
+    property bool customMenu: true
+
     // Shows or hides the command bar and the status bar. The chrome owns this
     // state; the window actions change it.
     property bool showCommandBar: true
@@ -75,8 +78,8 @@ Item {
     readonly property bool statusBarOverlayed: root.overlayed
 
     readonly property bool showTitleBar: root.showCommandBar || !root.unified
-    readonly property bool showMenu: root.showCommandBar && (!root.compact || menuSwitch === 0)
-    readonly property bool showToolbar: root.showCommandBar && (!root.compact || menuSwitch === 1)
+    readonly property bool showMenu: root.customMenu && root.showCommandBar && (!root.compact || menuSwitch === 0)
+    readonly property bool showToolbar: root.showCommandBar && (!root.customMenu || !root.compact || menuSwitch === 1)
 
     // The height of the title bar and the command bar together
     readonly property real chromeHeight: content.height
@@ -273,7 +276,7 @@ Item {
 
                 SuBarButton {
 
-                    visible: root.compact
+                    visible: root.compact && root.customMenu
                     phosphor: "list"
                     text: qsTr("Show Menu")
                     onClicked: root.menuSwitch = 0
@@ -281,7 +284,7 @@ Item {
 
                 SuBarDivider {
 
-                    visible: root.compact
+                    visible: root.compact && root.customMenu
                 }
 
                 Item {

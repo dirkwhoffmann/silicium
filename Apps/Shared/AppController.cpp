@@ -109,6 +109,15 @@ AppController::locateExecutable(Platform platform)
     throw ImageError(ImageError::EXECUTABLE_NOT_FOUND, name);
 }
 
+void
+AppController::setCustomMenu(bool value)
+{
+    if (m_customMenu == value) return;
+
+    m_customMenu = value;
+    emit customMenuChanged();
+}
+
 QString
 AppController::getVersion() const
 {

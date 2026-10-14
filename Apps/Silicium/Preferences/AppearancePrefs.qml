@@ -10,6 +10,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Silicium.Controllers
 import Silicium.Preferences
 import Sulfur
 
@@ -281,6 +282,9 @@ PrefPage {
         }
 
         HelpWrapper {
+
+            // Native menus leave nothing to choose (the chrome is compact)
+            visible: AppController.customMenu
 
             SuLabeledComboBox {
 

@@ -10,6 +10,7 @@
 #include "SiAmController.h"
 #include "SiAmRenderer.h"
 #include "Logger.h"
+#include "AppController.h"
 #include "Preferences.h"
 #include "SleepGuard.h"
 #include "Images/ImageError.h"
@@ -189,13 +190,21 @@ SiAmController::parseArguments(const QCoreApplication &app)
             "Executes a command after startup. May be given multiple times.",
             "command");
 
+    QCommandLineOption customMenuOption(
+            "custom-menu",
+            "Uses the app's own menu bar instead of the native one (macOS only).");
+
     QCommandLineParser parser;
     parser.setApplicationDescription("SiAmiga - Amiga emulator");
     parser.addHelpOption();
     parser.addPositionalArgument("svm", "The SVM file to load.");
     parser.addOption(execOption);
+    parser.addOption(customMenuOption);
 
     parser.process(app);
+
+    // Only macOS has native menus
+    AppController::instance().setCustomMenu(!OS_MACOS || parser.isSet(customMenuOption));
 
     const QStringList positionalArgs = parser.positionalArguments();
     const QString svmPath = positionalArgs.isEmpty() ? QString() : positionalArgs.first();

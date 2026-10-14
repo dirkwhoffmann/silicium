@@ -54,6 +54,9 @@ class AppController : public Controller {
     Q_PROPERTY(bool beta READ getBeta CONSTANT)
     Q_PROPERTY(QString qtVersion READ getQtVersion CONSTANT)
 
+    // Indicates whether the app draws its own menu bar (otherwise it is native)
+    Q_PROPERTY(bool customMenu READ getCustomMenu WRITE setCustomMenu NOTIFY customMenuChanged)
+
     static AppController &instance();
     static AppController *create(QQmlEngine *qmlEngine, QJSEngine *jsEngine);
 
@@ -69,7 +72,16 @@ class AppController : public Controller {
     // Locates the emulator built for the given platform
     static QString locateExecutable(Platform platform);
 
+    bool getCustomMenu() const { return m_customMenu; }
+    void setCustomMenu(bool value);
+
+signals:
+
+    void customMenuChanged();
+
 private:
+
+    bool m_customMenu = true;
 
     InputManager *getInputManager() { return &inputManager; }
     QString getVersion() const;

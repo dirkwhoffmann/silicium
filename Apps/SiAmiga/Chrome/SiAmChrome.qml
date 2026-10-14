@@ -21,7 +21,9 @@ SiChrome {
     // Visual style, from the appearance preferences
     overlayed: Preferences.chromePlacement === 1
     unified: Preferences.chromeTitleBar === 1
-    compact: Preferences.chromeLayout === 1
+    // Native menus live outside the window, which leaves the toolbar alone
+    customMenu: AppController.customMenu
+    compact: !AppController.customMenu || Preferences.chromeLayout === 1
 
     // The height of the title bar row, as the window reports it
     titleBarInset: window.contentItem.SafeArea.margins.top
@@ -54,11 +56,16 @@ SiChrome {
         }
     ]
 
-    menuContent: SiAmMenu {
+    // The menu bar is part of the chrome only if it is not native
+    menuContent: Loader {
 
         anchors.fill: parent
+        active: AppController.customMenu
 
-        window: root.window
+        sourceComponent: SiAmMenu {
+
+            window: root.window
+        }
     }
 
     toolbarContent: SiAmToolbar {
