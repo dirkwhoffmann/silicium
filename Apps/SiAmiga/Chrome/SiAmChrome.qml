@@ -71,15 +71,11 @@ SiChrome {
     toolbarContent: SiAmToolbar {
 
         anchors.fill: parent
-
         window: root.window
     }
 
     statusBarContent: SiAmStatusbar {
 
         anchors.fill: parent
-
-        // The background is drawn by the chrome
-        color: "transparent"
     }
 }

@@ -235,7 +235,7 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: barRows.implicitHeight + margin
 
-            readonly property real margin: root.overlayed ? Style.mediumSpacing : 0
+            readonly property real margin: root.overlayed ? Style.largeSpacing : 0
 
             HoverHandler {
 
