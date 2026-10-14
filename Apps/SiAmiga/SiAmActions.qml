@@ -574,6 +574,7 @@ Item {
 
         id: toggleWarpAction
         text: qsTr("Toggle Warp Mode")
+        enabled: !amiga.isPaused
         shortcut: root.toggleWarpShortcut
         onTriggered: amiga.toggleWarp()
     }

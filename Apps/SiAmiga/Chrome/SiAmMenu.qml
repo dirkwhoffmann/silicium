@@ -144,9 +144,6 @@ SuMenuBar {
         SuMenuItem {
             action: window.actions.power
         }
-        SuMenuItem {
-            action: window.actions.brk
-        }
 
         SuMenuSeparator { }
 

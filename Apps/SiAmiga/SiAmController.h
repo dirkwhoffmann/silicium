@@ -248,7 +248,6 @@ public:
 
     Q_INVOKABLE void reset();
     Q_INVOKABLE void softReset();
-    Q_INVOKABLE void brk();
     Q_INVOKABLE void stepOver();
     Q_INVOKABLE void stepInto();
     Q_INVOKABLE void finishLine();

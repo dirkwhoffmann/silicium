@@ -957,14 +957,6 @@ SiAmController::softReset()
 }
 
 void
-SiAmController::brk()
-{
-    // vAmiga has no direct equivalent of vc64's Cmd::CPU_BRK (an immediate
-    // software breakpoint); pausing is the closest available action.
-    pause();
-}
-
-void
 SiAmController::stepOver()
 {
     core().stepOver();
