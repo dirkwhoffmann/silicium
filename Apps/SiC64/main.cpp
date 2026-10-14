@@ -62,7 +62,6 @@ main(int argc, char *argv[])
 
     // Configure app appearance
     QQuickStyle::setStyle("Fusion");
-    QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar, true);
     app.setWindowIcon(QIcon(":/assets/images/c64-icon.png"));
 
     // Register types
@@ -88,6 +87,9 @@ main(int argc, char *argv[])
 
     // Parse the command line and open the SVM file it names
     bool ok = C64Controller::instance().parseArguments(app);
+
+    // Choose between the native and the custom menu bar (see parseArguments)
+    QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar, AppController::instance().getCustomMenu());
 
     // Launch the emulator core
     C64Controller::instance().initialize();

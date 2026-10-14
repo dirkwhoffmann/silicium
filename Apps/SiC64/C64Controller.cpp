@@ -11,6 +11,7 @@
 #include "SiC64Renderer.h"
 #include "Logger.h"
 #include "OpenRoms.h"
+#include "AppController.h"
 #include "Preferences.h"
 #include "SleepGuard.h"
 #include "Images/ImageError.h"
@@ -19,6 +20,7 @@
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QCursor>
+#include <QDesktopServices>
 #include <QDir>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -201,13 +203,21 @@ C64Controller::parseArguments(const QCoreApplication &app)
             "Executes a command after startup. May be given multiple times.",
             "command");
 
+    QCommandLineOption customMenuOption(
+            "custom-menu",
+            "Uses the app's own menu bar instead of the native one (macOS only).");
+
     QCommandLineParser parser;
     parser.setApplicationDescription("SiC64 - Commodore 64 emulator");
     parser.addHelpOption();
     parser.addPositionalArgument("svm", "The SVM file to load.");
     parser.addOption(execOption);
+    parser.addOption(customMenuOption);
 
     parser.process(app);
+
+    // Only macOS has native menus
+    AppController::instance().setCustomMenu(!OS_MACOS || parser.isSet(customMenuOption));
 
     const QStringList positionalArgs = parser.positionalArguments();
     const QString svmPath = positionalArgs.isEmpty() ? QString() : positionalArgs.first();
@@ -880,6 +890,24 @@ C64Controller::snapshotDidSave(std::exception_ptr exception)
         notifyPersist();
         emit snapshotSaved(uuid);
         notifySvmChanged("snapshot", uuid);
+    }
+}
+
+void
+C64Controller::browseSnapshots()
+{
+    try {
+
+        const auto folder = svm->root() / SVMFile::snapshotDir;
+        fs::create_directories(folder);
+
+        if (!QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdWString(folder.wstring())))) {
+            showError("Failed to open the snapshot folder.", QString::fromStdString(folder.string()));
+        }
+
+    } catch (const std::exception &e) {
+
+        showError("Failed to open the snapshot folder.", e.what());
     }
 }
 

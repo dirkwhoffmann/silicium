@@ -383,6 +383,9 @@ public:
 
     Q_INVOKABLE void revertSnapshot();
 
+    // Shows the snapshot folder of this virtual machine in the file browser
+    Q_INVOKABLE void browseSnapshots();
+
 
     //
     // Processing messages

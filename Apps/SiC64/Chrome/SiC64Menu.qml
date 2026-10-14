@@ -80,10 +80,8 @@ SuMenuBar {
 
         SuMenuSeparator { }
 
-        Action {
-            text: qsTr("&Quit");
-            shortcut: StandardKey.Quit
-            onTriggered: Qt.quit()
+        SuMenuItem {
+            action: window.actions.quit
         }
     }
 
@@ -136,6 +134,18 @@ SuMenuBar {
         SuMenuItem {
             action: window.actions.toggleWarp
         }
+
+        SuMenuSeparator { }
+
+        SuMenuItem {
+            action: window.actions.saveSnapshot
+        }
+        SuMenuItem {
+            action: window.actions.loadSnapshot
+        }
+        SuMenuItem {
+            action: window.actions.browseSnapshots
+        }
     }
 
     //
@@ -170,7 +180,8 @@ SuMenuBar {
 
         required property int driveNr   // 8 or 9
 
-        readonly property bool connected: driveNr === 8 ? config.DRIVE8_CONNECTED : config.DRIVE9_CONNECTED
+        // Passed in as a binding (e.g., config.DRIVE8_CONNECTED)
+        required property bool connected
         readonly property bool hasDisk: driveNr === 8 ? c64.media.drive8HasDisk : c64.media.drive9HasDisk
         readonly property bool writeProtected: driveNr === 8 ? c64.media.drive8WriteProtected : c64.media.drive9WriteProtected
         readonly property bool modified: driveNr === 8 ? c64.media.drive8Modified : c64.media.drive9Modified
@@ -327,8 +338,8 @@ SuMenuBar {
     // they are always present; in "When connected" mode they appear only while
     // the peripheral is connected.
 
-    Component { id: drive8Component; DriveMenu { title: qsTr("Drive &8"); driveNr: 8 } }
-    Component { id: drive9Component; DriveMenu { title: qsTr("Drive &9"); driveNr: 9 } }
+    Component { id: drive8Component; DriveMenu { title: qsTr("Drive &8"); driveNr: 8; connected: config.DRIVE8_CONNECTED } }
+    Component { id: drive9Component; DriveMenu { title: qsTr("Drive &9"); driveNr: 9; connected: config.DRIVE9_CONNECTED } }
     Component { id: datasetteComponent; DatasetteMenu { } }
 
     property Menu drive8MenuItem: null

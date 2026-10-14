@@ -42,6 +42,19 @@ VMWindow {
 
     title: ""
 
+    // The native menu bar (see SiC64Chrome for the custom one)
+    Component {
+
+        id: nativeMenuComponent
+
+        SiC64Menu {
+
+            window: root
+        }
+    }
+
+    menuBar: AppController.customMenu ? null : nativeMenuComponent.createObject(root)
+
     //
     // Main area
     //

@@ -46,11 +46,13 @@ Item {
     // Shortcuts of the View menu items
     readonly property string toolbarShortcut: "Ctrl+Alt+T"
     readonly property string statusBarShortcut: "Ctrl+Alt+B"
+    readonly property var quitShortcut: StandardKey.Quit
 
     property alias config: configAction
     property alias toggleCommandBar: toggleCommandBarAction
     property alias toggleStatusBar: toggleStatusBarAction
     property alias showAbout: showAboutAction
+    property alias quit: quitAction
     property alias openEventsInspector: openEventsInspectorAction
     property alias openCIAInspector: openCIAInspectorAction
     property alias openBusInspector: openBusInspectorAction
@@ -65,6 +67,7 @@ Item {
     property alias saveWorkspace: saveWorkspaceAction
     property alias saveSnapshot: saveSnapshotAction
     property alias loadSnapshot: loadSnapshotAction
+    property alias browseSnapshots: browseSnapshotsAction
     property alias pause: pauseAction
     property alias reset: resetAction
     property alias power: powerAction
@@ -255,15 +258,30 @@ Item {
     Action {
 
         id: saveSnapshotAction
-        text: qsTr("Save Snapshot")
+        text: qsTr("Take Snapshot")
         onTriggered: c64.saveSnapshotAsync()
     }
 
     Action {
 
         id: loadSnapshotAction
-        text: qsTr("Load Snapshot")
+        text: qsTr("Restore Latest Snapshot")
         onTriggered: c64.revertSnapshot()
+    }
+
+    Action {
+
+        id: browseSnapshotsAction
+        text: qsTr("Browse Snapshots")
+        onTriggered: c64.browseSnapshots()
+    }
+
+    Action {
+
+        id: quitAction
+        text: qsTr("&Quit")
+        shortcut: root.quitShortcut
+        onTriggered: Qt.quit()
     }
 
     Action {
