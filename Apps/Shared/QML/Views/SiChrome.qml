@@ -8,6 +8,7 @@
 // -----------------------------------------------------------------------------
 
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 import Silicium.Preferences
 import Sulfur
@@ -116,7 +117,15 @@ Item {
     readonly property real statusBarAlpha: statusBarOverlayed ? 0.9 : 1.0
     readonly property color commandBarBg: Palette.toolbar
     readonly property color statusBarBg: Palette.toolbar
-    readonly property color titleBarBg: root.unified ? Palette.toolbar : Palette.background
+    readonly property color titleBarBg: root.unified ? Palette.toolbar : systemPalette.window
+
+    // The standard title bar color of the operating system. Follows the
+    // color scheme, which the app sets from the appearance preferences.
+    SystemPalette {
+
+        id: systemPalette
+        colorGroup: SystemPalette.Active
+    }
 
     //
     // Main
