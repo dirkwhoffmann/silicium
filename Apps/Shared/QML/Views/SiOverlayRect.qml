@@ -6,6 +6,10 @@ import Sulfur
 Rectangle {
 
     id: root
+
+    // Set by the user of the rect
+    property bool hovered: false
+    property bool down: false
     anchors.topMargin: 0
     anchors.bottomMargin: 2
     anchors.leftMargin: 0

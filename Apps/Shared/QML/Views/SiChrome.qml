@@ -213,102 +213,148 @@ Item {
 
         Rectangle {
 
-            visible: root.showCommandBar
+            visible: root.showCommandBar && !root.overlayed
             Layout.fillWidth: true
             Layout.preferredHeight: 1
             color: Qt.alpha(root.commandBarBg.lighter(1.05), root.commandBarAlpha)
         }
 
         //
-        // Menu row
+        // Menu and toolbar rows
+        //
+        // If the chrome is overlayed, the rows float in a translucent rounded
+        // rectangle that keeps its distance to the window borders. The
+        // rectangle turns more opaque while the mouse is over it.
         //
 
-        Rectangle {
+        Item {
 
-            visible: root.showMenu
-            color: Qt.alpha(root.commandBarBg, root.commandBarAlpha)
+            id: commandBar
+
+            visible: root.showMenu || root.showToolbar
             Layout.fillWidth: true
-            implicitHeight: menuRow.implicitHeight
+            Layout.preferredHeight: barRows.implicitHeight + 2 * margin
 
-            RowLayout {
+            readonly property real margin: root.overlayed ? Style.mediumSpacing : 0
 
-                id: menuRow
-                anchors.fill: parent
+            HoverHandler {
 
-                spacing: 0
-
-                SuBarButton {
-
-                    visible: root.compact
-                    phosphor: "list"
-                    text: qsTr("Show Toolbar")
-                    onClicked: root.menuSwitch = 1
-                }
-
-                SuBarDivider {
-
-                    visible: root.compact
-                }
-
-                Item {
-
-                    id: menuSlot
-
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    onChildrenChanged: {
-
-                        implicitHeight = Qt.binding(() =>
-                            Math.max(0, ...Array.from(children, c => c.implicitHeight)))
-                    }
-                }
+                id: commandBarHover
             }
-        }
 
-        //
-        // Toolbar row
-        //
+            SiOverlayRect {
 
-        Rectangle {
-
-            visible: root.showToolbar
-            color: Qt.alpha(root.commandBarBg, root.commandBarAlpha)
-            Layout.fillWidth: true
-            implicitHeight: toolbarRow.implicitHeight
-
-            RowLayout {
-
-                id: toolbarRow
+                visible: root.overlayed
                 anchors.fill: parent
+                anchors.leftMargin: commandBar.margin
+                anchors.rightMargin: commandBar.margin
+                anchors.topMargin: commandBar.margin / 2
+                anchors.bottomMargin: commandBar.margin / 2
+
+                hovered: commandBarHover.hovered
+                color: Qt.alpha(root.commandBarBg, hovered ? 0.95 : 0.5)
+            }
+
+            ColumnLayout {
+
+                id: barRows
+
+                anchors.fill: parent
+                anchors.leftMargin: commandBar.margin
+                anchors.rightMargin: commandBar.margin
+                anchors.topMargin: commandBar.margin / 2
+                anchors.bottomMargin: commandBar.margin / 2
                 spacing: 0
 
-                SuBarButton {
+                Rectangle {
 
-                    visible: root.compact && root.customMenu
-                    phosphor: "list"
-                    text: qsTr("Show Menu")
-                    onClicked: root.menuSwitch = 0
-                }
-
-                SuBarDivider {
-
-                    visible: root.compact && root.customMenu
-                }
-
-                Item {
-
-                    id: toolbarSlot
-
+                    visible: root.showMenu
+                    color: root.overlayed ? "transparent" : Qt.alpha(root.commandBarBg, root.commandBarAlpha)
                     Layout.fillWidth: true
-                    Layout.fillHeight: true
+                    implicitHeight: menuRow.implicitHeight
 
-                    onChildrenChanged: {
+                    RowLayout {
 
-                        implicitHeight = Qt.binding(() =>
-                            Math.max(0, ...Array.from(children, c => c.implicitHeight)))
+                        id: menuRow
+                        anchors.fill: parent
+
+                        spacing: 0
+
+                        SuBarButton {
+
+                            visible: root.compact
+                            phosphor: "list"
+                            text: qsTr("Show Toolbar")
+                            onClicked: root.menuSwitch = 1
+                        }
+
+                        SuBarDivider {
+
+                            visible: root.compact
+                        }
+
+                        Item {
+
+                            id: menuSlot
+
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+
+                            onChildrenChanged: {
+
+                                implicitHeight = Qt.binding(() =>
+                                    Math.max(0, ...Array.from(children, c => c.implicitHeight)))
+                            }
+                        }
                     }
                 }
+
+                //
+                // Toolbar row
+                //
+
+                Rectangle {
+
+                    visible: root.showToolbar
+                    color: root.overlayed ? "transparent" : Qt.alpha(root.commandBarBg, root.commandBarAlpha)
+                    Layout.fillWidth: true
+                    implicitHeight: toolbarRow.implicitHeight
+
+                    RowLayout {
+
+                        id: toolbarRow
+                        anchors.fill: parent
+                        spacing: 0
+
+                        SuBarButton {
+
+                            visible: root.compact && root.customMenu
+                            phosphor: "list"
+                            text: qsTr("Show Menu")
+                            onClicked: root.menuSwitch = 0
+                        }
+
+                        SuBarDivider {
+
+                            visible: root.compact && root.customMenu
+                        }
+
+                        Item {
+
+                            id: toolbarSlot
+
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+
+                            onChildrenChanged: {
+
+                                implicitHeight = Qt.binding(() =>
+                                    Math.max(0, ...Array.from(children, c => c.implicitHeight)))
+                            }
+                        }
+                    }
+                }
+
             }
         }
 
@@ -318,7 +364,7 @@ Item {
 
         Rectangle {
 
-            visible: root.showCommandBar
+            visible: root.showCommandBar && !root.overlayed
             Layout.fillWidth: true
             Layout.preferredHeight: 1
             color: Qt.alpha(root.commandBarBg.darker(1.1), root.commandBarAlpha)
