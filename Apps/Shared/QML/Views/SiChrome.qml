@@ -425,6 +425,7 @@ Item {
         BarBackground {
 
             hovered: statusBarHover.hovered
+            anchors.bottomMargin: 0
         }
 
         Rectangle {
