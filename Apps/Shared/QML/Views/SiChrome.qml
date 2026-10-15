@@ -415,7 +415,9 @@ Item {
 
         visible: root.showStatusBar
         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-        height: statusBarSlot.height
+        height: statusBarSlot.height + separatorHeight
+
+        readonly property real separatorHeight: root.overlayed ? 0 : 1
 
         HoverHandler {
 
@@ -426,6 +428,18 @@ Item {
 
             hovered: statusBarHover.hovered
             anchors.bottomMargin: 0
+
+            // Mirrors the command bar: the shadow falls on the picture
+            shadowOffset: -4
+        }
+
+        // Separator to the picture (mirrors the one below the command bar)
+        Rectangle {
+
+            visible: root.showStatusBar && !root.overlayed
+            anchors { left: parent.left; right: parent.right; top: parent.top }
+            height: 1
+            color: Qt.alpha(Palette.toolbar.darker(1.1), root.statusBarAlpha)
         }
 
         Rectangle {
@@ -434,6 +448,7 @@ Item {
 
             color: root.overlayed ? "transparent" : Qt.alpha(root.statusBarBg, root.statusBarAlpha)
             anchors { left: parent.left; right: parent.right; top: parent.top }
+            anchors.topMargin: statusBar.separatorHeight
             // anchors.leftMargin: statusBar.hmargin
             // anchors.rightMargin: statusBar.hmargin
             // anchors.topMargin: statusBar.vmargin

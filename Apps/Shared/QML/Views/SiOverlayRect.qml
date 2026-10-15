@@ -10,6 +10,9 @@ Rectangle {
     // Set by the user of the rect
     property bool hovered: false
     property bool down: false
+
+    // Vertical offset of the drop shadow (negative: the shadow falls upwards)
+    property real shadowOffset: 4
     anchors.topMargin: 0
     anchors.bottomMargin: 2
     anchors.leftMargin: 0
@@ -24,6 +27,6 @@ Rectangle {
         shadowEnabled: true
         shadowColor: "#80000000"
         shadowBlur: 0.8
-        shadowVerticalOffset: 4
+        shadowVerticalOffset: root.shadowOffset
     }
 }

@@ -525,13 +525,6 @@ Rectangle {
     implicitHeight: 26
     color: Palette.background
 
-    Rectangle {
-        anchors.top: parent.top
-        width: parent.width
-        height: 1
-        color: Palette.background.darker(1.8)
-    }
-
     RowLayout {
 
         anchors.fill: parent
