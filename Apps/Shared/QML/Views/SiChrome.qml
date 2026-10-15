@@ -377,6 +377,7 @@ Item {
 
                 Rectangle {
 
+                    visible: !root.overlayed
                     // visible: root.showCommandBar && !root.overlayed
                     Layout.fillWidth: true
                     Layout.preferredHeight: 1
