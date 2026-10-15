@@ -114,8 +114,8 @@ Item {
     readonly property real titleBarAlpha: titleBarOverlayed ? 0.9 : 1.0
     readonly property real commandBarAlpha: commandBarOverlayed ? 0.9 : 1.0
     readonly property real statusBarAlpha: statusBarOverlayed ? 0.9 : 1.0
-    readonly property color commandBarBg: Palette.toolbar
-    readonly property color statusBarBg: Palette.toolbar
+    // readonly property color commandBarBg: Palette.toolbar
+    // readonly property color statusBarBg: Palette.toolbar
     readonly property color titleBarBg: root.unified ? Palette.toolbar : Palette.background // systemPalette.window
 
     // The standard title bar color of the operating system. Follows the
@@ -124,6 +124,29 @@ Item {
 
         id: systemPalette
         colorGroup: SystemPalette.Active
+    }
+
+    /* The background of the command bar and the status bar in overlay mode:
+     * a rect in the color of the bar that gets more opaque while the mouse
+     * is over the bar. Fills its parent, minus the margins.
+     */
+    component BarBackground: SiOverlayRect {
+
+        property color tint: Palette.toolbar
+
+        visible: root.overlayed
+        anchors.fill: parent
+        // anchors.leftMargin: root.hmargin
+        // anchors.rightMargin: root.hmargin
+        // anchors.topMargin: root.vmargin
+        // anchors.bottomMargin: root.vmargin
+
+        radius: 0
+        color: Qt.alpha(tint, hovered ? 1.0 : 0.9)
+        border.color: Qt.alpha(tint, hovered ? 1.0 : 0.6)
+
+        Behavior on color { ColorAnimation { duration: 200 } }
+        Behavior on border.color { ColorAnimation { duration: 200 } }
     }
 
     //
@@ -199,7 +222,7 @@ Item {
                     color: root.showTitleBar ? Palette.secondary : "white"
                     background: Rectangle {
                         visible: root.titleBarOverlayed
-                        color: root.commandBarBg;
+                        color: Palette.toolbar
                         radius: height / 2
                     }
 
@@ -210,7 +233,7 @@ Item {
 
                     symbol: "page_footer"
                     color: Palette.secondary
-                    background: Rectangle { color: root.commandBarBg; radius: height / 2 }
+                    background: Rectangle { color: Palette.toolbar; radius: height / 2 }
 
                     onClicked: root.window.actionsRef.toggleStatusBar.trigger()
                 }
@@ -237,7 +260,7 @@ Item {
             visible: root.showCommandBar && !root.overlayed
             Layout.fillWidth: true
             Layout.preferredHeight: 1
-            color: Qt.alpha(root.commandBarBg.lighter(1.05), root.commandBarAlpha)
+            color: Qt.alpha(Palette.toolbar.lighter(1.05), root.commandBarAlpha)
         }
 
         //
@@ -254,28 +277,16 @@ Item {
 
             visible: root.showMenu || root.showToolbar
             Layout.fillWidth: true
-            Layout.preferredHeight: barRows.implicitHeight + 2 * vmargin
-
-            readonly property real hmargin: root.overlayed ? Style.mediumSpacing : 0
-            readonly property real vmargin: root.overlayed ? Style.mediumSpacing : 0
+            Layout.preferredHeight: barRows.implicitHeight
 
             HoverHandler {
 
                 id: commandBarHover
             }
 
-            SiOverlayRect {
-
-                visible: root.overlayed
-                anchors.fill: parent
-                anchors.leftMargin: commandBar.hmargin
-                anchors.rightMargin: commandBar.hmargin
-                anchors.topMargin: commandBar.vmargin
-                anchors.bottomMargin: commandBar.vmargin
+            BarBackground {
 
                 hovered: commandBarHover.hovered
-                color: Qt.alpha(root.commandBarBg, hovered ? 1.0 : 0.9)
-                border.color: Qt.alpha(root.commandBarBg, hovered ? 1.0 : 0.6)
             }
 
             ColumnLayout {
@@ -283,16 +294,16 @@ Item {
                 id: barRows
 
                 anchors.fill: parent
-                anchors.leftMargin: commandBar.hmargin
-                anchors.rightMargin: commandBar.hmargin
-                anchors.topMargin: commandBar.vmargin
-                anchors.bottomMargin: commandBar.vmargin
+                // anchors.leftMargin: root.hmargin
+                // anchors.rightMargin: root.hmargin
+                // anchors.topMargin: root.vmargin
+                // anchors.bottomMargin: root.vmargin
                 spacing: 0
 
                 Rectangle {
 
                     visible: root.showMenu
-                    color: root.overlayed ? "transparent" : Qt.alpha(root.commandBarBg, root.commandBarAlpha)
+                    color: root.overlayed ? "transparent" : Qt.alpha(Palette.toolbar, root.commandBarAlpha)
                     Layout.fillWidth: true
                     implicitHeight: menuRow.implicitHeight
 
@@ -339,7 +350,7 @@ Item {
                 Rectangle {
 
                     visible: root.showToolbar
-                    color: root.overlayed ? "transparent" : Qt.alpha(root.commandBarBg, root.commandBarAlpha)
+                    color: root.overlayed ? "transparent" : Qt.alpha(Palette.toolbar, root.commandBarAlpha)
                     Layout.fillWidth: true
                     implicitHeight: toolbarRow.implicitHeight
 
@@ -390,7 +401,7 @@ Item {
             visible: root.showCommandBar && !root.overlayed
             Layout.fillWidth: true
             Layout.preferredHeight: 1
-            color: Qt.alpha(root.commandBarBg.darker(1.1), root.commandBarAlpha)
+            color: Qt.alpha(Palette.toolbar.darker(1.1), root.commandBarAlpha)
         }
     }
 
@@ -404,28 +415,16 @@ Item {
 
         visible: root.showStatusBar
         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-        height: statusBarSlot.height + 2 * vmargin
-
-        readonly property real hmargin: root.overlayed ? Style.mediumSpacing : 0
-        readonly property real vmargin: root.overlayed ? Style.mediumSpacing : 0
+        height: statusBarSlot.height
 
         HoverHandler {
 
             id: statusBarHover
         }
 
-        SiOverlayRect {
-
-            visible: root.overlayed
-            anchors.fill: parent
-            anchors.leftMargin: statusBar.hmargin
-            anchors.rightMargin: statusBar.hmargin
-            anchors.topMargin: statusBar.vmargin
-            anchors.bottomMargin: statusBar.vmargin
+        BarBackground {
 
             hovered: statusBarHover.hovered
-            color: Qt.alpha(root.statusBarBg, hovered ? 1.0 : 0.9)
-            border.color: Qt.alpha(root.statusBarBg, hovered ? 1.0 : 0.6)
         }
 
         Rectangle {
@@ -434,10 +433,10 @@ Item {
 
             color: root.overlayed ? "transparent" : Qt.alpha(root.statusBarBg, root.statusBarAlpha)
             anchors { left: parent.left; right: parent.right; top: parent.top }
-            anchors.leftMargin: statusBar.hmargin
-            anchors.rightMargin: statusBar.hmargin
-            anchors.topMargin: statusBar.vmargin
-            anchors.bottomMargin: statusBar.vmargin
+            // anchors.leftMargin: statusBar.hmargin
+            // anchors.rightMargin: statusBar.hmargin
+            // anchors.topMargin: statusBar.vmargin
+            // anchors.bottomMargin: statusBar.vmargin
 
             onChildrenChanged: {
 
