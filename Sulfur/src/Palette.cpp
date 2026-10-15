@@ -398,6 +398,7 @@ Palette::deriveColor(Color c, bool darkMode) const
             case Color::OverlayBorder:          return darker(Color::Overlay);
             case Color::OverlayBorderElevated:  return lighter(Color::OverlayBorder);
             case Color::ToolbarBorder:          return darker(Color::Toolbar);
+            case Color::Titlebar:               return QColor("#323232"); // macOS, independent of the theme
             case Color::Elevation:              return QColor("#10FFFFFF");
 
             default:
@@ -420,6 +421,7 @@ Palette::deriveColor(Color c, bool darkMode) const
             case Color::OverlayBorder:          return lighter(Color::Overlay);
             case Color::OverlayBorderElevated:  return darker(Color::OverlayBorder);
             case Color::ToolbarBorder:          return lighter(Color::Toolbar);
+            case Color::Titlebar:               return QColor("#e8e8e8"); // macOS, independent of the theme
             case Color::Elevation:              return QColor("#10000000");
 
             default:

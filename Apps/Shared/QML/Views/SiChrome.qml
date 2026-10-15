@@ -115,15 +115,7 @@ Item {
     readonly property real titleBarAlpha: titleBarOverlayed ? 0.9 : 1.0
     readonly property real commandBarAlpha: commandBarOverlayed ? 0.9 : 1.0
     readonly property real statusBarAlpha: statusBarOverlayed ? 0.9 : 1.0
-    readonly property color titleBarBg: root.unified ? Palette.toolbar : Palette.background // systemPalette.window
-
-    // The standard title bar color of the operating system. Follows the
-    // color scheme, which the app sets from the appearance preferences.
-    SystemPalette {
-
-        id: systemPalette
-        colorGroup: SystemPalette.Active
-    }
+    readonly property color titleBarBg: root.unified ? Palette.toolbar : Palette.titlebar
 
     // Draws the background of the command bar and the status bar in overlay mode
     component BarBackground: Rectangle {
@@ -245,12 +237,12 @@ Item {
 
             Rectangle {
 
-                visible: root.showTitleBar
+                visible: root.showTitleBar && !root.unified
                 anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
                 Layout.fillWidth: true
                 height: 1
                 // Layout.preferredHeight: 1
-                color: Qt.alpha(root.titleBarBg.darker(1.1), root.titleBarAlpha)
+                color: "red" // Qt.alpha(root.titleBarBg.darker(1.1), root.titleBarAlpha)
             }
 
         }
@@ -259,17 +251,15 @@ Item {
         // Command bar
         //
 
+        /*
         Rectangle {
 
             visible: root.showCommandBar && !root.overlayed
             Layout.fillWidth: true
             Layout.preferredHeight: 1
-            color: Qt.alpha(Palette.toolbar.lighter(1.05), root.commandBarAlpha)
+            color: Qt.alpha(Palette.toolbar, root.commandBarAlpha)
         }
-
-        //
-        // Menu and toolbar rows
-        //
+        */
 
         Item {
 
@@ -385,19 +375,14 @@ Item {
                     }
                 }
 
+                Rectangle {
+
+                    // visible: root.showCommandBar && !root.overlayed
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 1
+                    color: "red" // Palette.toolbarBorder  // "red" // Qt.alpha(Palette.toolbar.darker(1.1), root.commandBarAlpha)
+                }
             }
-        }
-
-        //
-        // Separator
-        //
-
-        Rectangle {
-
-            visible: root.showCommandBar && !root.overlayed
-            Layout.fillWidth: true
-            Layout.preferredHeight: 1
-            color: Qt.alpha(Palette.toolbar.darker(1.1), root.commandBarAlpha)
         }
     }
 
@@ -434,14 +419,14 @@ Item {
             visible: root.showStatusBar && !root.overlayed
             anchors { left: parent.left; right: parent.right; top: parent.top }
             height: 1
-            color: Qt.alpha(Palette.toolbar.darker(1.1), root.statusBarAlpha)
+            color: "red" // Qt.alpha(Palette.toolbar.darker(1.1), root.statusBarAlpha)
         }
 
         Rectangle {
 
             id: statusBarSlot
 
-            color: root.overlayed ? "transparent" : Qt.alpha(root.statusBarBg, root.statusBarAlpha)
+            color: root.overlayed ? "transparent" : Palette.toolbar
             anchors { left: parent.left; right: parent.right; top: parent.top }
             anchors.topMargin: statusBar.separatorHeight
 

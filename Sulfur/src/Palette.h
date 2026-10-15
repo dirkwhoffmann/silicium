@@ -39,6 +39,7 @@ class Palette : public QQuickAttachedPropertyPropagator {
         Tint,
         Toolbar,
         ToolbarBorder,
+        Titlebar,
 
         // Foreground colors
         AccentText,
@@ -101,6 +102,7 @@ private:
     Q_PROPERTY(QColor tint READ tint NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor toolbar READ toolbar NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor toolbarBorder READ toolbarBorder NOTIFY themeChanged FINAL)
+    Q_PROPERTY(QColor titlebar READ titlebar NOTIFY themeChanged FINAL)
 
     Q_PROPERTY(QColor accentText READ accentText NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor primary READ primary NOTIFY themeChanged FINAL)
@@ -165,6 +167,7 @@ private:
     QColor tint() const { return getColor(Color::Tint); }
     QColor toolbar() const { return getColor(Color::Toolbar); }
     QColor toolbarBorder() const { return getColor(Color::ToolbarBorder); }
+    QColor titlebar() const { return getColor(Color::Titlebar); }
 
     QColor accentText() const { return getColor(Color::AccentText); }
     QColor primary() const { return getColor(Color::Primary); }
