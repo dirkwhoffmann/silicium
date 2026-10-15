@@ -9,6 +9,7 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Effects
 import QtQuick.Layouts
 import Silicium.Preferences
 import Sulfur
@@ -114,8 +115,6 @@ Item {
     readonly property real titleBarAlpha: titleBarOverlayed ? 0.9 : 1.0
     readonly property real commandBarAlpha: commandBarOverlayed ? 0.9 : 1.0
     readonly property real statusBarAlpha: statusBarOverlayed ? 0.9 : 1.0
-    // readonly property color commandBarBg: Palette.toolbar
-    // readonly property color statusBarBg: Palette.toolbar
     readonly property color titleBarBg: root.unified ? Palette.toolbar : Palette.background // systemPalette.window
 
     // The standard title bar color of the operating system. Follows the
@@ -126,27 +125,32 @@ Item {
         colorGroup: SystemPalette.Active
     }
 
-    /* The background of the command bar and the status bar in overlay mode:
-     * a rect in the color of the bar that gets more opaque while the mouse
-     * is over the bar. Fills its parent, minus the margins.
-     */
-    component BarBackground: SiOverlayRect {
+    // Draws the background of the command bar and the status bar in overlay mode
+    component BarBackground: Rectangle {
 
         property color tint: Palette.toolbar
+        property bool hovered: false
+
+        // Vertical offset of the drop shadow (negative: it falls upwards)
+        property real shadowOffset: 4
 
         visible: root.overlayed
         anchors.fill: parent
-        // anchors.leftMargin: root.hmargin
-        // anchors.rightMargin: root.hmargin
-        // anchors.topMargin: root.vmargin
-        // anchors.bottomMargin: root.vmargin
 
-        radius: 0
         color: Qt.alpha(tint, hovered ? 1.0 : 0.9)
         border.color: Qt.alpha(tint, hovered ? 1.0 : 0.6)
 
         Behavior on color { ColorAnimation { duration: 200 } }
         Behavior on border.color { ColorAnimation { duration: 200 } }
+
+        layer.enabled: true
+        layer.effect: MultiEffect {
+
+            shadowEnabled: true
+            shadowColor: "#80000000"
+            shadowBlur: 0.8
+            shadowVerticalOffset: shadowOffset
+        }
     }
 
     //
@@ -266,10 +270,6 @@ Item {
         //
         // Menu and toolbar rows
         //
-        // If the chrome is overlayed, the rows float in a translucent rounded
-        // rectangle that keeps its distance to the window borders. The
-        // rectangle turns more opaque while the mouse is over it.
-        //
 
         Item {
 
@@ -294,10 +294,6 @@ Item {
                 id: barRows
 
                 anchors.fill: parent
-                // anchors.leftMargin: root.hmargin
-                // anchors.rightMargin: root.hmargin
-                // anchors.topMargin: root.vmargin
-                // anchors.bottomMargin: root.vmargin
                 spacing: 0
 
                 Rectangle {
@@ -427,7 +423,6 @@ Item {
         BarBackground {
 
             hovered: statusBarHover.hovered
-            anchors.bottomMargin: 0
 
             // Mirrors the command bar: the shadow falls on the picture
             shadowOffset: -4
@@ -449,10 +444,6 @@ Item {
             color: root.overlayed ? "transparent" : Qt.alpha(root.statusBarBg, root.statusBarAlpha)
             anchors { left: parent.left; right: parent.right; top: parent.top }
             anchors.topMargin: statusBar.separatorHeight
-            // anchors.leftMargin: statusBar.hmargin
-            // anchors.rightMargin: statusBar.hmargin
-            // anchors.topMargin: statusBar.vmargin
-            // anchors.bottomMargin: statusBar.vmargin
 
             onChildrenChanged: {
 
