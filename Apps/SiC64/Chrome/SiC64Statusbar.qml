@@ -137,7 +137,7 @@ Rectangle {
                 icon.source: diskIcon ? diskIcon : ""
             }
 
-            BusyIndicator {
+            SuBusyIndicator {
 
                 implicitHeight: 22
                 implicitWidth: 22
@@ -182,7 +182,7 @@ Rectangle {
                 icon.source: root.icon
             }
 
-            BusyIndicator {
+            SuBusyIndicator {
 
                 implicitHeight: 22
                 implicitWidth: 22
@@ -310,6 +310,7 @@ Rectangle {
                     DebugRect {}
 
                     text: {
+
                         switch (metric) {
                             case 0:
                                 return activity.c64MhzString

@@ -1,8 +1,6 @@
 import QtQuick
-
-// SegmentedMeter.qml
-
-import QtQuick
+import QtQuick.Controls
+import Sulfur
 
 Item {
 
@@ -17,7 +15,7 @@ Item {
     width: segments * 4
     height: 14
 
-    property color inactiveColor: "#60000000"
+    property color inactiveColor: Qt.alpha(Palette.tertiary, 0.1)
 
     property var stops: [
         { pos: 0.00, color: "#990000" },

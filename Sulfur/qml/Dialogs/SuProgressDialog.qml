@@ -19,7 +19,7 @@ SuDialog {
         Layout.fillWidth: true
         spacing: Style.largeSpacing
 
-        BusyIndicator {
+        SuBusyIndicator {
 
             running: root.visible
             implicitWidth: 64

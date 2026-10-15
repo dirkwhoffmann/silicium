@@ -271,7 +271,7 @@ Item {
                 icon.source: diskIcon ? diskIcon : ""
             }
 
-            BusyIndicator {
+            SuBusyIndicator {
 
                 implicitHeight: 22
                 implicitWidth: 22
@@ -281,13 +281,10 @@ Item {
         }
     }
 
-    /* The hard drive counterpart of FloppyObserver.
-     *
-     * Same shape, so a row of drives reads the same whichever kind it is:
-     * the two LEDs, where the head is, what is in the drive, and whether it
-     * is doing anything. No write-protected variant of the icon -- a hard
-     * drive has no such switch to show.
-     */
+    //
+    // HardDriveObserver
+    //
+
     component HardDriveObserver: Control {
 
         id: root
@@ -340,7 +337,7 @@ Item {
                 icon.source: hdIcon ? hdIcon : ""
             }
 
-            BusyIndicator {
+            SuBusyIndicator {
 
                 implicitHeight: 22
                 implicitWidth: 22
@@ -435,6 +432,7 @@ Item {
                     Layout.preferredWidth: 64
                     horizontalAlignment: Text.AlignRight
                     font.pixelSize: Style.tiny
+                    color: Palette.secondary
                     DebugRect {}
 
                     text: {
@@ -455,15 +453,15 @@ Item {
                     }
                 }
 
-                Button {
+                SuSymbolButton {
 
                     id: menuButton
-                    flat: true
+                    // flat: true
                     implicitWidth: 16
                     implicitHeight: 22
                     padding: 0
-                    text: "unfold_more"
-                    font.family: Fonts.symbols
+                    symbol: "unfold_more"
+                    color: Palette.secondary
                     font.bold: true
                     onClicked: contextMenu.open()
                     background: Rectangle { color: "transparent" }

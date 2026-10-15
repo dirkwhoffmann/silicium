@@ -90,7 +90,7 @@ Item {
             shadowVerticalOffset: 4
         }
 
-        BusyIndicator {
+        SuBusyIndicator {
 
             anchors.centerIn: parent
             implicitWidth: root.boxSize * 0.8
