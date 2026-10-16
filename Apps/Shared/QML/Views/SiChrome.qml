@@ -75,8 +75,6 @@ Item {
 
     // Computed properties
     readonly property bool titleBarOverlayed: root.overlayed && root.unified
-    readonly property bool commandBarOverlayed: root.overlayed
-    readonly property bool statusBarOverlayed: root.overlayed
 
     readonly property bool showTitleBar: root.showCommandBar || !root.unified
     readonly property bool showMenu: root.customMenu && root.showCommandBar && (!root.compact || menuSwitch === 0)
@@ -112,53 +110,67 @@ Item {
                                        : root.height
 
     // Colors
-    readonly property real titleBarAlpha: titleBarOverlayed ? 0.9 : 1.0
-    readonly property real commandBarAlpha: commandBarOverlayed ? 0.9 : 1.0
-    readonly property real statusBarAlpha: statusBarOverlayed ? 0.9 : 1.0
     readonly property color titleBarBg: root.unified ? Palette.toolbar : Palette.titlebar
 
-    // Draws the background of the command bar and the status bar in overlay mode
-    component BarBackground: Rectangle {
+    /* The background of the title bar, the command bar and the status bar.
+     * Draws the fill, an optional drop shadow, and optional lines along the
+     * top and bottom edge. The children are the content of the bar.
+     *
+     * If 'translucent' is set, the bar is somewhat see-through and gets more
+     * opaque while the mouse is over it.
+     */
+    component BarRect: Item {
 
-        property color tint: Palette.toolbar
-        property bool hovered: false
+        id: bar
 
-        // Vertical offset of the drop shadow (negative: it falls upwards)
-        property real shadowOffset: 4
+        property color color: Palette.toolbar
+        property color lineColor: Palette.toolbarBorder
+        property bool translucent: false
+        property real shadow: 0             // Vertical offset, 0 = no shadow
+        property bool topLine: false
+        property bool bottomLine: false
 
-        visible: root.overlayed
-        anchors.fill: parent
+        default property alias content: inner.data
 
-        color: Qt.alpha(tint, hovered ? 1.0 : 0.9)
+        readonly property real fillAlpha: translucent && !hover.hovered ? 0.9 : 1.0
+        readonly property real lineAlpha: translucent && !hover.hovered ? 0.6 : 1.0
 
-        // A rectangle can't have a border on some sides only, so the border
-        // is drawn as a line at the top and one at the bottom
-        property color borderColor: Qt.alpha(tint, hovered ? 1.0 : 0.6)
-
-        Behavior on color { ColorAnimation { duration: 200 } }
-        Behavior on borderColor { ColorAnimation { duration: 200 } }
+        HoverHandler { id: hover }
 
         Rectangle {
 
+            anchors.fill: parent
+            color: Qt.alpha(bar.color, bar.fillAlpha)
+            Behavior on color { ColorAnimation { duration: 200 } }
+
+            layer.enabled: bar.shadow !== 0
+            layer.effect: MultiEffect {
+
+                shadowEnabled: true
+                shadowColor: "#80000000"
+                shadowBlur: 0.8
+                shadowVerticalOffset: bar.shadow
+            }
+        }
+
+        Item { id: inner; anchors.fill: parent }
+
+        Rectangle {
+
+            visible: bar.topLine
             anchors { left: parent.left; right: parent.right; top: parent.top }
             height: 1
-            color: parent.borderColor
+            color: Qt.alpha(bar.lineColor, bar.lineAlpha)
+            Behavior on color { ColorAnimation { duration: 200 } }
         }
 
         Rectangle {
 
+            visible: bar.bottomLine
             anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
             height: 1
-            color: parent.borderColor
-        }
-
-        layer.enabled: true
-        layer.effect: MultiEffect {
-
-            shadowEnabled: true
-            shadowColor: "#80000000"
-            shadowBlur: 0.8
-            shadowVerticalOffset: shadowOffset
+            color: Qt.alpha(bar.lineColor, bar.lineAlpha)
+            Behavior on color { ColorAnimation { duration: 200 } }
         }
     }
 
@@ -177,14 +189,16 @@ Item {
         // Title bar
         //
 
-        Rectangle {
+        BarRect {
 
             id: titleRow
 
             Layout.fillWidth: true
             Layout.preferredHeight: root.titleBarInset
 
-            color: showTitleBar ? Qt.alpha(root.titleBarBg, root.titleBarAlpha) : "transparent"
+            color: root.showTitleBar ? Qt.alpha(root.titleBarBg, root.titleBarOverlayed ? 0.9 : 1.0) : "transparent"
+            lineColor: root.titleBarBg.darker(1.1)
+            bottomLine: root.showTitleBar && !root.unified
 
             // Dragging the title bar moves the window. Declared first, so that
             // the items on top of it (the title and the content) get their
@@ -251,34 +265,13 @@ Item {
                     onClicked: root.window.actionsRef.toggleStatusBar.trigger()
                 }
             }
-
-            Rectangle {
-
-                visible: root.showTitleBar && !root.unified
-                anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-                Layout.fillWidth: true
-                height: 1
-                // Layout.preferredHeight: 1
-                color: "red" // Qt.alpha(root.titleBarBg.darker(1.1), root.titleBarAlpha)
-            }
-
         }
 
         //
         // Command bar
         //
 
-        /*
-        Rectangle {
-
-            visible: root.showCommandBar && !root.overlayed
-            Layout.fillWidth: true
-            Layout.preferredHeight: 1
-            color: Qt.alpha(Palette.toolbar, root.commandBarAlpha)
-        }
-        */
-
-        Item {
+        BarRect {
 
             id: commandBar
 
@@ -286,15 +279,10 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: barRows.implicitHeight
 
-            HoverHandler {
-
-                id: commandBarHover
-            }
-
-            BarBackground {
-
-                hovered: commandBarHover.hovered
-            }
+            translucent: root.overlayed
+            shadow: root.overlayed ? 4 : 0
+            topLine: root.overlayed
+            bottomLine: true
 
             ColumnLayout {
 
@@ -303,10 +291,9 @@ Item {
                 anchors.fill: parent
                 spacing: 0
 
-                Rectangle {
+                Item {
 
                     visible: root.showMenu
-                    color: root.overlayed ? "transparent" : Qt.alpha(Palette.toolbar, root.commandBarAlpha)
                     Layout.fillWidth: true
                     implicitHeight: menuRow.implicitHeight
 
@@ -350,10 +337,9 @@ Item {
                 // Toolbar row
                 //
 
-                Rectangle {
+                Item {
 
                     visible: root.showToolbar
-                    color: root.overlayed ? "transparent" : Qt.alpha(Palette.toolbar, root.commandBarAlpha)
                     Layout.fillWidth: true
                     implicitHeight: toolbarRow.implicitHeight
 
@@ -391,15 +377,6 @@ Item {
                         }
                     }
                 }
-
-                Rectangle {
-
-                    visible: !root.overlayed
-                    // visible: root.showCommandBar && !root.overlayed
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 1
-                    color: "red" // Palette.toolbarBorder  // "red" // Qt.alpha(Palette.toolbar.darker(1.1), root.commandBarAlpha)
-                }
             }
         }
     }
@@ -408,45 +385,24 @@ Item {
     // Status bar
     //
 
-    Item {
+    BarRect {
 
         id: statusBar
 
         visible: root.showStatusBar
         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-        height: statusBarSlot.height + separatorHeight
+        height: statusBarSlot.height
 
-        readonly property real separatorHeight: root.overlayed ? 0 : 1
+        translucent: root.overlayed
+        shadow: root.overlayed ? -4 : 0
+        topLine: true
+        bottomLine: root.overlayed
 
-        HoverHandler {
-
-            id: statusBarHover
-        }
-
-        BarBackground {
-
-            hovered: statusBarHover.hovered
-
-            // Mirrors the command bar: the shadow falls on the picture
-            shadowOffset: -4
-        }
-
-        // Separator to the picture (mirrors the one below the command bar)
-        Rectangle {
-
-            visible: root.showStatusBar && !root.overlayed
-            anchors { left: parent.left; right: parent.right; top: parent.top }
-            height: 1
-            color: "red" // Qt.alpha(Palette.toolbar.darker(1.1), root.statusBarAlpha)
-        }
-
-        Rectangle {
+        Item {
 
             id: statusBarSlot
 
-            color: root.overlayed ? "transparent" : Palette.toolbar
             anchors { left: parent.left; right: parent.right; top: parent.top }
-            anchors.topMargin: statusBar.separatorHeight
 
             onChildrenChanged: {
 
