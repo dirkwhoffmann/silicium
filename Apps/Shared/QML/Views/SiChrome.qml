@@ -154,8 +154,7 @@ Item {
                 shadowVerticalOffset: bar.shadow
             }
         }
-
-        // The lines are part of the layout, so the bar grows if they are shown
+        
         ColumnLayout {
 
             id: layout

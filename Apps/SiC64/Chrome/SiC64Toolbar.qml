@@ -140,7 +140,7 @@ Item {
 
         SuBarDivider {}
 
-        DeviceSelectorFlat {
+        SuBarMenu {
 
             id: port0Selector
             port: "Control Port 1"
@@ -151,7 +151,7 @@ Item {
 
         SuBarDivider {}
 
-        DeviceSelectorFlat {
+        SuBarMenu {
 
             id: port1Selector
             port: "Control Port 2"

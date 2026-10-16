@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Sulfur
 
-AbstractButton {
+SuBarItem {
 
     id: control
 
@@ -27,39 +27,15 @@ AbstractButton {
         deviceModel && currentIndex >= 0 && currentIndex < deviceModel.length
             ? deviceModel[currentIndex] : undefined
 
-    readonly property bool active: menu.visible || control.pressed || control.hovered
-
-    Layout.preferredWidth: 32
-    Layout.fillHeight: true
-    padding: 0
-    topPadding: 0
-    bottomPadding: 0
+    symbol: control.currentDevice ? control.currentDevice.icon : ""
+    highlighted: menu.visible
 
     onClicked: menu.open()
 
-    contentItem: SuSymbol {
-
-        symbol: control.currentDevice ? control.currentDevice.icon : ""
-        scale: 0.7
-        opacity: 0.8
-
-        color: !control.enabled ? Palette.disabled
-            : control.active ? Palette.accentText
-                : Palette.primary
-    }
-
-    background: Rectangle {
-
-        anchors.fill: parent
-        anchors.margins: 0
-        radius: 0
-
-        color: control.enabled && control.active ? Palette.accent : "transparent"
-    }
-
     SuToolTip {
 
-        text: (!control.currentDevice || control.currentDevice.type === 0) ? port : control.currentDevice.name
+        text: menu.visible ? "" : port
+        // text: (!control.currentDevice || control.currentDevice.type === 0) ? port : control.currentDevice.name
     }
 
     SuMenu {
