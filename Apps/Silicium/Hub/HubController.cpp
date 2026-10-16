@@ -761,6 +761,7 @@ HubController::buildArguments(const QString &svmPath, const Manifest &manifest, 
     QStringList argv;
 
     argv << svmPath;
+    argv << "--native" << (Preferences::instance().getNativeIntegration() ? "true" : "false");
     argv << "--exec" << "server rpc set TRANSPORT STDIO";
     argv << "--exec" << "server rpc set ENABLE true";
 

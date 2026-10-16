@@ -203,21 +203,46 @@ C64Controller::parseArguments(const QCoreApplication &app)
             "Executes a command after startup. May be given multiple times.",
             "command");
 
-    QCommandLineOption customMenuOption(
-            "custom-menu",
-            "Uses the app's own menu bar instead of the native one (macOS only).");
+    QCommandLineOption nativeOption(
+            QStringList() << "n" << "native",
+            "Enables native OS integration, such as the native menu bar on macOS. Defaults to true.",
+            "true|false", "true");
 
     QCommandLineParser parser;
     parser.setApplicationDescription("SiC64 - Commodore 64 emulator");
-    parser.addHelpOption();
+    const QCommandLineOption helpOption = parser.addHelpOption();
     parser.addPositionalArgument("svm", "The SVM file to load.");
     parser.addOption(execOption);
-    parser.addOption(customMenuOption);
+    parser.addOption(nativeOption);
 
-    parser.process(app);
+    /* Don't use QCommandLineParser::process(): it quits the process on an
+     * error, which tears down the half-initialized emulator and crashes.
+     * Report the error through the error window instead.
+     */
+    if (!parser.parse(app.arguments())) {
+
+        errorMessage = parser.errorText();
+        qCWarning(siLog).noquote() << errorMessage;
+        return false;
+    }
+
+    // Same reason: print the help and leave without running any destructors
+    if (parser.isSet(helpOption)) {
+
+        fputs(qPrintable(parser.helpText()), stdout);
+        fflush(stdout);
+        std::_Exit(0);
+    }
+
+    const QString native = parser.value(nativeOption).toLower();
+    if (native != "true" && native != "false") {
+        errorMessage = "Invalid value for --native: expected true or false";
+        qCWarning(siLog).noquote() << errorMessage;
+        return false;
+    }
 
     // Only macOS has native menus
-    AppController::instance().setCustomMenu(!OS_MACOS || parser.isSet(customMenuOption));
+    AppController::instance().setCustomMenu(!OS_MACOS || native == "false");
 
     const QStringList positionalArgs = parser.positionalArguments();
     const QString svmPath = positionalArgs.isEmpty() ? QString() : positionalArgs.first();

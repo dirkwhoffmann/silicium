@@ -53,6 +53,9 @@ class Preferences : public QObject {
     int statusbar;
     int resizeMode;
 
+    // Switches on OS specific features (e.g., the native menu bar on macOS)
+    bool nativeIntegration;
+
     // Themes
     int appearance;
     int colorTheme;
@@ -277,6 +280,7 @@ class Preferences : public QObject {
     Q_PROPERTY(int chromeTitleBar READ getChromeTitleBar WRITE setChromeTitleBar NOTIFY appearancePrefsChanged)
     Q_PROPERTY(int statusbar READ getStatusbar WRITE setStatusbar NOTIFY appearancePrefsChanged)
     Q_PROPERTY(int resizeMode READ getResizeMode WRITE setResizeMode NOTIFY appearancePrefsChanged)
+    Q_PROPERTY(bool nativeIntegration READ getNativeIntegration WRITE setNativeIntegration NOTIFY appearancePrefsChanged)
 
     Q_PROPERTY(int appearance READ getAppearance WRITE setAppearance NOTIFY appearancePrefsChanged)
     Q_PROPERTY(int colorTheme READ getColorTheme WRITE setColorTheme NOTIFY appearancePrefsChanged)
@@ -294,6 +298,8 @@ class Preferences : public QObject {
     void setStatusbar(int value) { setAppearanceProperty(statusbar, value); }
     int getResizeMode() const { return resizeMode; }
     void setResizeMode(int value) { setAppearanceProperty(resizeMode, value); }
+    bool getNativeIntegration() const { return nativeIntegration; }
+    void setNativeIntegration(bool value) { setAppearanceProperty(nativeIntegration, value); }
 
     int getAppearance() const { return appearance; }
     void setAppearance(int value) { setAppearanceProperty(appearance, value); }

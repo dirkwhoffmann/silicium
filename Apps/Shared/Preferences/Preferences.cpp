@@ -152,6 +152,7 @@ Preferences::loadAppearanceSettings()
     chromeTitleBar = s.value("chromeTitleBar", s.value("titleBar", 0)).toInt();
     statusbar    = s.value("statusbar", 1).toInt();
     resizeMode   = s.value("resizeMode", 0).toInt();
+    nativeIntegration = s.value("nativeIntegration", true).toBool();
 
     s.endGroup();
 }
@@ -432,6 +433,7 @@ Preferences::saveAppearanceSettings()
     s.setValue("chromeTitleBar", chromeTitleBar);
     s.setValue("statusbar", statusbar);
     s.setValue("resizeMode", resizeMode);
+    s.setValue("nativeIntegration", nativeIntegration);
 
     s.endGroup();
 
