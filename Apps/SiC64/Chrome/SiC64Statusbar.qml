@@ -15,7 +15,7 @@ import Silicium.Controllers
 import Silicium.Preferences
 import Sulfur
 
-Rectangle {
+Item {
 
     id: root
 
@@ -524,7 +524,6 @@ Rectangle {
     //
 
     implicitHeight: 26
-    color: Palette.background
 
     RowLayout {
 

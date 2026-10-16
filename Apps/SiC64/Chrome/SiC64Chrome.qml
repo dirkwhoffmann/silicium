@@ -60,7 +60,5 @@ SiChrome {
     statusBarContent: SiC64Statusbar {
 
         anchors.fill: parent
-        // The background is drawn by the chrome
-        color: "transparent"
     }
 }
