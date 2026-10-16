@@ -387,9 +387,8 @@ Item {
 
             filled: root.showCommandBar
             translucent: root.overlayed
-            idleOpacity: 0.7
+            idleOpacity: 0.5
             shadow: root.overlayed ? 4 : 0
-            // topLine: root.overlayed
             bottomLine: true
 
             TitleBar { }
@@ -424,7 +423,7 @@ Item {
                 Layout.fillWidth: true
                 visible: root.showCommandBar
                 translucent: root.overlayed
-                idleOpacity: 0.7
+                idleOpacity: 0.5
                 shadow: root.overlayed ? 4 : 0
                 topLine: root.overlayed
                 bottomLine: true
