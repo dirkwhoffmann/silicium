@@ -55,8 +55,7 @@ Item {
     // If false, the menu is native and the chrome has no menu row
     property bool customMenu: true
 
-    // Shows or hides the command bar and the status bar. The chrome owns this
-    // state; the window actions change it.
+    // Shows or hides the command bar and the status bar
     property bool showCommandBar: true
     property bool showStatusBar: true
 
@@ -75,11 +74,12 @@ Item {
 
     // Computed properties
     readonly property bool titleBarOverlayed: root.overlayed && root.unified
-
-    readonly property bool commandBarVisible: root.showMenu || root.showToolbar
     readonly property bool showTitleBar: root.showCommandBar || !root.unified
-    readonly property bool showMenu: root.customMenu && root.showCommandBar && (!root.compact || menuSwitch === 0)
-    readonly property bool showToolbar: root.showCommandBar && (!root.customMenu || !root.compact || menuSwitch === 1)
+    readonly property bool showMenu: root.customMenu && (!root.compact || menuSwitch === 0)
+    readonly property bool showToolbar: !root.customMenu || !root.compact || menuSwitch === 1
+    // readonly property bool showMenu: root.customMenu && root.showCommandBar && (!root.compact || menuSwitch === 0)
+    // readonly property bool showToolbar: root.showCommandBar && (!root.customMenu || !root.compact || menuSwitch === 1)
+    // readonly property bool showCommandBar: root.showMenu || root.showToolbar
 
     // The height of the title bar and the command bar together
     readonly property real chromeHeight: content.height
@@ -230,32 +230,33 @@ Item {
 
                 symbol: "page_header"
                 color: root.showTitleBar ? Palette.secondary : "white"
-                background: Rectangle {
-                    visible: root.titleBarOverlayed
-                    color: Palette.toolbar
-                    radius: height / 2
-                }
-
+                // background: Rectangle { color: Palette.toolbar; radius: height / 2 }
                 onClicked: root.window.actionsRef.toggleCommandBar.trigger()
             }
 
             SuSymbolButton {
 
                 symbol: "page_footer"
-                color: Palette.secondary
-                background: Rectangle { color: Palette.toolbar; radius: height / 2 }
-
+                color: root.showTitleBar ? Palette.secondary : "white"
+                // background: Rectangle { color: Palette.toolbar; radius: height / 2 }
                 onClicked: root.window.actionsRef.toggleStatusBar.trigger()
             }
         }
     }
 
-    // The command bar: the menu row and the toolbar row
+    //
+    // CommandBar
+    //
+
     component CommandBar: ColumnLayout {
 
         Layout.fillWidth: true
-        visible: root.commandBarVisible
+        visible: root.showCommandBar
         spacing: 0
+
+        //
+        // Menu row
+        //
 
         Item {
 
@@ -364,22 +365,30 @@ Item {
         sourceComponent: root.unified ? unifiedBars : splitBars
     }
 
+    //
+    // Header (unified)
+    //
+
     Component {
 
         id: unifiedBars
 
         BarRect {
 
-            filled: root.commandBarVisible
+            filled: root.showCommandBar
             translucent: root.overlayed
             shadow: root.overlayed ? 4 : 0
-            topLine: root.overlayed
+            // topLine: root.overlayed
             bottomLine: true
 
             TitleBar { }
             CommandBar { }
         }
     }
+
+    //
+    // Header (split)
+    //
 
     Component {
 
@@ -402,7 +411,7 @@ Item {
             BarRect {
 
                 Layout.fillWidth: true
-                visible: root.commandBarVisible
+                visible: root.showCommandBar
                 translucent: root.overlayed
                 shadow: root.overlayed ? 4 : 0
                 topLine: root.overlayed
@@ -428,7 +437,7 @@ Item {
         translucent: root.overlayed
         shadow: root.overlayed ? -4 : 0
         topLine: true
-        bottomLine: root.overlayed
+        // bottomLine: root.overlayed
 
         Item {
 
