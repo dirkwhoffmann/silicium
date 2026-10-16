@@ -11,6 +11,11 @@ MenuItem {
     // has a checkmark to show somewhere; otherwise it's just stray padding.
     readonly property real indicatorMargin: (root.menu && root.menu.hasCheckmark) ? 24 : Style.mediumSpacing
 
+    // The color of the item's content
+    readonly property color color: root.highlighted ? Palette.accentText
+                                 : root.enabled ? Palette.primary
+                                                : Palette.tertiary
+
     implicitWidth: contentItem.implicitWidth + indicatorMargin + Style.mediumSpacing
     implicitHeight: root.visible ? 26 : 0
     rightPadding: 0
@@ -30,9 +35,7 @@ MenuItem {
             width: Style.large
             height: Style.large
 
-            color: root.highlighted ? Palette.accentText
-                : root.enabled ? Palette.primary
-                    : Palette.tertiary
+            color: root.color
         }
 
         SuText {
@@ -46,9 +49,7 @@ MenuItem {
             font.pixelSize: Style.regular
             font.bold: root.font.bold
 
-            color: root.highlighted ? Palette.accentText
-                : root.enabled ? Palette.primary
-                    : Palette.tertiary
+            color: root.color
 
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight
@@ -69,36 +70,27 @@ MenuItem {
         }
     }
 
-    arrow: SuText {
+    arrow: SuSymbol {
 
         x: parent.width - width
         anchors.verticalCenter: parent.verticalCenter
         visible: root.subMenu !== null
-        text: "chevron_right"
-        font.family: Fonts.symbols
-        font.pixelSize: 16
-        color: root.highlighted ? Palette.accentText : Palette.primary
+        symbol: "chevron_right"
+        width: 20
+        height: 20
+        color: root.color
     }
 
-    indicator: Item {
+    indicator: SuSymbol {
 
-        visible: root.checkable && root.checked
-        width: 18
-        height: parent.height
-        anchors.left: parent.left
-        anchors.leftMargin: 2
+        x: 2 + (18 - width) / 2
         anchors.verticalCenter: parent.verticalCenter
-
-        SuText {
-
-            anchors.centerIn: parent
-            visible: root.checkable && root.checked
-            text: "check"
-            font.family: Fonts.symbols
-            font.pixelSize: 16
-            font.bold: true
-            color: root.highlighted ? Palette.accentText : Palette.primary
-        }
+        visible: root.checkable && root.checked
+        symbol: "check"
+        width: 20
+        height: 20
+        font.bold: true
+        color: root.color
     }
 
     background: Rectangle {
