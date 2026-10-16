@@ -77,9 +77,6 @@ Item {
     readonly property bool showTitleBar: root.showCommandBar || !root.unified
     readonly property bool showMenu: root.customMenu && (!root.compact || menuSwitch === 0)
     readonly property bool showToolbar: !root.customMenu || !root.compact || menuSwitch === 1
-    // readonly property bool showMenu: root.customMenu && root.showCommandBar && (!root.compact || menuSwitch === 0)
-    // readonly property bool showToolbar: root.showCommandBar && (!root.customMenu || !root.compact || menuSwitch === 1)
-    // readonly property bool showCommandBar: root.showMenu || root.showToolbar
 
     // The height of the title bar and the command bar together
     readonly property real chromeHeight: content.height
@@ -446,6 +443,7 @@ Item {
         height: implicitHeight
 
         translucent: root.overlayed
+        idleOpacity: 0.7
         shadow: root.overlayed ? -4 : 0
         topLine: true
         // bottomLine: root.overlayed
