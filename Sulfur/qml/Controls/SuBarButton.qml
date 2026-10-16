@@ -13,6 +13,9 @@ AbstractButton {
     property string awesome: ""
     property string phosphor: ""
 
+    // Color of the icon while the button is neither disabled nor highlighted
+    property color color: Palette.primary
+
     Layout.preferredWidth: 32
     Layout.preferredHeight: Style.barItemHeight
     Layout.fillHeight: true
@@ -29,7 +32,7 @@ AbstractButton {
 
         color: !control.enabled ? Palette.disabled
             : control.active ? Palette.accentText
-                : Palette.primary
+                : control.color
     }
 
     background: Rectangle {

@@ -13,6 +13,9 @@ MenuBarItem {
     leftPadding: Style.mediumSpacing
     rightPadding: Style.mediumSpacing
 
+    // Color of the title while the item is not highlighted
+    property color color: Palette.primary
+
     readonly property bool active: root.hovered || root.pressed || (root.menu && root.menu.visible)
 
     contentItem: SuText {
@@ -21,7 +24,7 @@ MenuBarItem {
         // accelerators, so there's nothing useful to render it as.
         text: root.text.replace(/&/g, "")
         font.pixelSize: Style.regular
-        color: root.active ? Palette.accentText : Palette.primary
+        color: root.active ? Palette.accentText : root.color
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
     }
