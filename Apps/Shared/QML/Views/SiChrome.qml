@@ -129,6 +129,9 @@ Item {
         property bool topLine: false
         property bool bottomLine: false
 
+        // Opacity of the content while the bar is translucent and not hovered
+        property real idleOpacity: 1.0
+
         default property alias content: inner.data
 
         implicitHeight: inner.implicitHeight
@@ -155,7 +158,14 @@ Item {
             }
         }
 
-        ColumnLayout { id: inner; anchors.fill: parent; spacing: 0 }
+        ColumnLayout {
+
+            id: inner
+            anchors.fill: parent
+            spacing: 0
+            opacity: bar.translucent && !hover.hovered ? bar.idleOpacity : 1.0
+            Behavior on opacity { NumberAnimation { duration: 200 } }
+        }
 
         Rectangle {
 
@@ -377,6 +387,7 @@ Item {
 
             filled: root.showCommandBar
             translucent: root.overlayed
+            idleOpacity: 0.7
             shadow: root.overlayed ? 4 : 0
             // topLine: root.overlayed
             bottomLine: true
@@ -413,6 +424,7 @@ Item {
                 Layout.fillWidth: true
                 visible: root.showCommandBar
                 translucent: root.overlayed
+                idleOpacity: 0.7
                 shadow: root.overlayed ? 4 : 0
                 topLine: root.overlayed
                 bottomLine: true
