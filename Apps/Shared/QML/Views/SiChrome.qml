@@ -131,7 +131,7 @@ Item {
 
         default property alias content: inner.data
 
-        implicitHeight: inner.implicitHeight
+        implicitHeight: layout.implicitHeight
 
         readonly property real fillAlpha: translucent && !hover.hovered ? 0.9 : 1.0
         readonly property real lineAlpha: translucent && !hover.hovered ? 0.6 : 1.0
@@ -155,31 +155,40 @@ Item {
             }
         }
 
+        // The lines are part of the layout, so the bar grows if they are shown
         ColumnLayout {
 
-            id: inner
+            id: layout
             anchors.fill: parent
             spacing: 0
-            opacity: bar.translucent && !hover.hovered ? bar.idleOpacity : 1.0
-            Behavior on opacity { NumberAnimation { duration: 200 } }
-        }
 
-        Rectangle {
+            Rectangle {
 
-            visible: bar.filled && bar.topLine
-            anchors { left: parent.left; right: parent.right; top: parent.top }
-            height: 1
-            color: Qt.alpha(bar.lineColor, bar.lineAlpha)
-            Behavior on color { ColorAnimation { duration: 200 } }
-        }
+                visible: bar.filled && bar.topLine
+                Layout.fillWidth: true
+                Layout.preferredHeight: 1
+                color: Qt.alpha(bar.lineColor, bar.lineAlpha)
+                Behavior on color { ColorAnimation { duration: 200 } }
+            }
 
-        Rectangle {
+            ColumnLayout {
 
-            visible: bar.filled && bar.bottomLine
-            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-            height: 1
-            color: Qt.alpha(bar.lineColor, bar.lineAlpha)
-            Behavior on color { ColorAnimation { duration: 200 } }
+                id: inner
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                spacing: 0
+                opacity: bar.translucent && !hover.hovered ? bar.idleOpacity : 1.0
+                Behavior on opacity { NumberAnimation { duration: 200 } }
+            }
+
+            Rectangle {
+
+                visible: bar.filled && bar.bottomLine
+                Layout.fillWidth: true
+                Layout.preferredHeight: 1
+                color: Qt.alpha(bar.lineColor, bar.lineAlpha)
+                Behavior on color { ColorAnimation { duration: 200 } }
+            }
         }
     }
 

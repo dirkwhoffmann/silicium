@@ -10,16 +10,5 @@ Rectangle {
     Layout.fillHeight: true
     Layout.topMargin: 5
     Layout.bottomMargin: 5
-    color: Palette.toolbarBorder
-
-    /*
-    Rectangle {
-
-        anchors.left: parent.right
-        width: 1
-        height: parent.height
-        color: Palette.surface.darker()
-    }
-
-     */
+    color: "transparent" // Palette.tertiary // toolbarBorder
 }
