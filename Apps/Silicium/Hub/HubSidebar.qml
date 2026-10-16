@@ -81,7 +81,7 @@ Item {
     Rectangle {
 
         anchors.fill: parent
-        color: Palette.surface
+        // color: Palette.surface
     }
 
     ColumnLayout {

@@ -306,8 +306,8 @@ Palette::computeColor<Palette::Theme::Solaris>(Color c, bool darkMode) const
 
             case Color::Accent:                 return QColor("#A75376");
             case Color::Backdrop:               return QColor("#5C636A");
-            case Color::Background:             return QColor("#494971"); // #586C80"); // #718BA4"); // #AFB2C1").darker(115);
-            case Color::Surface:                return QColor("#9496A4");
+            case Color::Background:             return QColor("#343451");
+            case Color::Surface:                return QColor("#494971");
             case Color::Tint:                   return QColor("#636398");
             case Color::Toolbar:                return lighter(Color::Background);
 
