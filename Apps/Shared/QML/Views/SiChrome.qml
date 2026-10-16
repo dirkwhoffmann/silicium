@@ -43,8 +43,8 @@ Item {
     required property VMWindow window
 
     // Content
-    property alias menuContent: menuSlot.data
-    property alias toolbarContent: toolbarSlot.data
+    property list<QtObject> menuContent
+    property list<QtObject> toolbarContent
     property alias statusBarContent: statusBarSlot.data
 
     // Visual style
@@ -76,6 +76,7 @@ Item {
     // Computed properties
     readonly property bool titleBarOverlayed: root.overlayed && root.unified
 
+    readonly property bool commandBarVisible: root.showMenu || root.showToolbar
     readonly property bool showTitleBar: root.showCommandBar || !root.unified
     readonly property bool showMenu: root.customMenu && root.showCommandBar && (!root.compact || menuSwitch === 0)
     readonly property bool showToolbar: root.showCommandBar && (!root.customMenu || !root.compact || menuSwitch === 1)
@@ -109,9 +110,6 @@ Item {
                                        ? root.height - statusBar.height
                                        : root.height
 
-    // Colors
-    readonly property color titleBarBg: root.unified ? Palette.toolbar : Palette.titlebar
-
     /* The background of the title bar, the command bar and the status bar.
      * Draws the fill, an optional drop shadow, and optional lines along the
      * top and bottom edge. The children are the content of the bar.
@@ -125,12 +123,15 @@ Item {
 
         property color color: Palette.toolbar
         property color lineColor: Palette.toolbarBorder
+        property bool filled: true          // False: draws nothing
         property bool translucent: false
         property real shadow: 0             // Vertical offset, 0 = no shadow
         property bool topLine: false
         property bool bottomLine: false
 
         default property alias content: inner.data
+
+        implicitHeight: inner.implicitHeight
 
         readonly property real fillAlpha: translucent && !hover.hovered ? 0.9 : 1.0
         readonly property real lineAlpha: translucent && !hover.hovered ? 0.6 : 1.0
@@ -139,6 +140,7 @@ Item {
 
         Rectangle {
 
+            visible: bar.filled
             anchors.fill: parent
             color: Qt.alpha(bar.color, bar.fillAlpha)
             Behavior on color { ColorAnimation { duration: 200 } }
@@ -153,11 +155,11 @@ Item {
             }
         }
 
-        Item { id: inner; anchors.fill: parent }
+        ColumnLayout { id: inner; anchors.fill: parent; spacing: 0 }
 
         Rectangle {
 
-            visible: bar.topLine
+            visible: bar.filled && bar.topLine
             anchors { left: parent.left; right: parent.right; top: parent.top }
             height: 1
             color: Qt.alpha(bar.lineColor, bar.lineAlpha)
@@ -166,7 +168,7 @@ Item {
 
         Rectangle {
 
-            visible: bar.bottomLine
+            visible: bar.filled && bar.bottomLine
             anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
             height: 1
             color: Qt.alpha(bar.lineColor, bar.lineAlpha)
@@ -174,209 +176,239 @@ Item {
         }
     }
 
-    //
-    // Main
-    //
+    // The title bar: the window title and the buttons on its right
+    component TitleBar: Item {
 
-    ColumnLayout {
+        Layout.fillWidth: true
+        Layout.preferredHeight: root.titleBarInset
 
-        id: content
 
-        anchors { left: parent.left; right: parent.right; top: parent.top }
-        spacing: 0
+        // Dragging the title bar moves the window. Declared first, so that
+        // the items on top of it (the title and the content) get their
+        // clicks.
+        MouseArea {
 
-        //
-        // Title bar
-        //
+            anchors.fill: parent
+            onPressed: Window.window.startSystemMove()
+        }
 
-        BarRect {
+        SuSymbol {
 
-            id: titleRow
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: titleLabel.left
+            anchors.rightMargin: Style.smallSpacing
+            visible: root.showTitleBar && root.paused
+            phosphor: "pause"
+            size: Size.small
+            color: Palette.secondary
+        }
 
-            Layout.fillWidth: true
-            Layout.preferredHeight: root.titleBarInset
+        Text {
 
-            color: root.showTitleBar ? Qt.alpha(root.titleBarBg, root.titleBarOverlayed ? 0.9 : 1.0) : "transparent"
-            lineColor: root.titleBarBg.darker(1.1)
-            bottomLine: root.showTitleBar && !root.unified
+            id: titleLabel
+            anchors.centerIn: parent
+            visible: root.showTitleBar
+            text: root.titleText
+            color: Palette.secondary
+            font.bold: true
+            elide: Text.ElideRight
+            width: Math.min(implicitWidth, parent.width / 2)
+            horizontalAlignment: Text.AlignHCenter
+        }
 
-            // Dragging the title bar moves the window. Declared first, so that
-            // the items on top of it (the title and the content) get their
-            // clicks.
-            MouseArea {
+        Row {
 
-                anchors.fill: parent
-                onPressed: Window.window.startSystemMove()
-            }
+            id: titleBarSlot
 
-            SuSymbol {
+            anchors.right: parent.right
+            anchors.rightMargin: Style.mediumSpacing
+            anchors.verticalCenter: parent.verticalCenter
 
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.right: titleLabel.left
-                anchors.rightMargin: Style.smallSpacing
-                visible: root.showTitleBar && root.paused
-                phosphor: "pause"
-                size: Size.small
-                color: Palette.secondary
-            }
+            spacing: Style.smallSpacing
 
-            Text {
+            SuSymbolButton {
 
-                id: titleLabel
-                anchors.centerIn: parent
-                visible: root.showTitleBar
-                text: root.titleText
-                color: Palette.secondary
-                font.bold: true
-                elide: Text.ElideRight
-                width: Math.min(implicitWidth, parent.width / 2)
-                horizontalAlignment: Text.AlignHCenter
-            }
-
-            Row {
-
-                id: titleBarSlot
-
-                anchors.right: parent.right
-                anchors.rightMargin: Style.mediumSpacing
-                anchors.verticalCenter: parent.verticalCenter
-
-                spacing: Style.smallSpacing
-
-                SuSymbolButton {
-
-                    symbol: "page_header"
-                    color: root.showTitleBar ? Palette.secondary : "white"
-                    background: Rectangle {
-                        visible: root.titleBarOverlayed
-                        color: Palette.toolbar
-                        radius: height / 2
-                    }
-
-                    onClicked: root.window.actionsRef.toggleCommandBar.trigger()
+                symbol: "page_header"
+                color: root.showTitleBar ? Palette.secondary : "white"
+                background: Rectangle {
+                    visible: root.titleBarOverlayed
+                    color: Palette.toolbar
+                    radius: height / 2
                 }
 
-                SuSymbolButton {
+                onClicked: root.window.actionsRef.toggleCommandBar.trigger()
+            }
 
-                    symbol: "page_footer"
-                    color: Palette.secondary
-                    background: Rectangle { color: Palette.toolbar; radius: height / 2 }
+            SuSymbolButton {
 
-                    onClicked: root.window.actionsRef.toggleStatusBar.trigger()
+                symbol: "page_footer"
+                color: Palette.secondary
+                background: Rectangle { color: Palette.toolbar; radius: height / 2 }
+
+                onClicked: root.window.actionsRef.toggleStatusBar.trigger()
+            }
+        }
+    }
+
+    // The command bar: the menu row and the toolbar row
+    component CommandBar: ColumnLayout {
+
+        Layout.fillWidth: true
+        visible: root.commandBarVisible
+        spacing: 0
+
+        Item {
+
+            visible: root.showMenu
+            Layout.fillWidth: true
+            implicitHeight: menuRow.implicitHeight
+
+            RowLayout {
+
+                id: menuRow
+                anchors.fill: parent
+
+                spacing: 0
+
+                SuBarButton {
+
+                    visible: root.compact
+                    phosphor: "list"
+                    text: qsTr("Show Toolbar")
+                    onClicked: root.menuSwitch = 1
+                }
+
+                SuBarDivider {
+
+                    visible: root.compact
+                }
+
+                Item {
+
+                    id: menuSlot
+
+                    data: root.menuContent
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    onChildrenChanged: {
+
+                        implicitHeight = Qt.binding(() =>
+                            Math.max(0, ...Array.from(children, c => c.implicitHeight)))
+                    }
                 }
             }
         }
 
         //
-        // Command bar
+        // Toolbar row
         //
+
+        Item {
+
+            visible: root.showToolbar
+            Layout.fillWidth: true
+            implicitHeight: toolbarRow.implicitHeight
+
+            RowLayout {
+
+                id: toolbarRow
+                anchors.fill: parent
+                spacing: 0
+
+                SuBarButton {
+
+                    visible: root.compact && root.customMenu
+                    phosphor: "list"
+                    text: qsTr("Show Menu")
+                    onClicked: root.menuSwitch = 0
+                }
+
+                SuBarDivider {
+
+                    visible: root.compact && root.customMenu
+                }
+
+                Item {
+
+                    id: toolbarSlot
+
+                    data: root.toolbarContent
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    onChildrenChanged: {
+
+                        implicitHeight = Qt.binding(() =>
+                            Math.max(0, ...Array.from(children, c => c.implicitHeight)))
+                    }
+                }
+            }
+        }
+    }
+
+    //
+    // Main
+    //
+    // A unified title bar is drawn together with the command bar. Otherwise,
+    // the title bar is a bar of its own.
+    //
+
+    Loader {
+
+        id: content
+
+        anchors { left: parent.left; right: parent.right; top: parent.top }
+        sourceComponent: root.unified ? unifiedBars : splitBars
+    }
+
+    Component {
+
+        id: unifiedBars
 
         BarRect {
 
-            id: commandBar
-
-            visible: root.showMenu || root.showToolbar
-            Layout.fillWidth: true
-            Layout.preferredHeight: barRows.implicitHeight
-
+            filled: root.commandBarVisible
             translucent: root.overlayed
             shadow: root.overlayed ? 4 : 0
             topLine: root.overlayed
             bottomLine: true
 
-            ColumnLayout {
+            TitleBar { }
+            CommandBar { }
+        }
+    }
 
-                id: barRows
+    Component {
 
-                anchors.fill: parent
-                spacing: 0
+        id: splitBars
 
-                Item {
+        ColumnLayout {
 
-                    visible: root.showMenu
-                    Layout.fillWidth: true
-                    implicitHeight: menuRow.implicitHeight
+            spacing: 0
 
-                    RowLayout {
+            BarRect {
 
-                        id: menuRow
-                        anchors.fill: parent
+                Layout.fillWidth: true
+                color: Palette.titlebar
+                lineColor: Palette.titlebar.darker(1.1)
+                bottomLine: true
 
-                        spacing: 0
+                TitleBar { }
+            }
 
-                        SuBarButton {
+            BarRect {
 
-                            visible: root.compact
-                            phosphor: "list"
-                            text: qsTr("Show Toolbar")
-                            onClicked: root.menuSwitch = 1
-                        }
+                Layout.fillWidth: true
+                visible: root.commandBarVisible
+                translucent: root.overlayed
+                shadow: root.overlayed ? 4 : 0
+                topLine: root.overlayed
+                bottomLine: true
 
-                        SuBarDivider {
-
-                            visible: root.compact
-                        }
-
-                        Item {
-
-                            id: menuSlot
-
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-
-                            onChildrenChanged: {
-
-                                implicitHeight = Qt.binding(() =>
-                                    Math.max(0, ...Array.from(children, c => c.implicitHeight)))
-                            }
-                        }
-                    }
-                }
-
-                //
-                // Toolbar row
-                //
-
-                Item {
-
-                    visible: root.showToolbar
-                    Layout.fillWidth: true
-                    implicitHeight: toolbarRow.implicitHeight
-
-                    RowLayout {
-
-                        id: toolbarRow
-                        anchors.fill: parent
-                        spacing: 0
-
-                        SuBarButton {
-
-                            visible: root.compact && root.customMenu
-                            phosphor: "list"
-                            text: qsTr("Show Menu")
-                            onClicked: root.menuSwitch = 0
-                        }
-
-                        SuBarDivider {
-
-                            visible: root.compact && root.customMenu
-                        }
-
-                        Item {
-
-                            id: toolbarSlot
-
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-
-                            onChildrenChanged: {
-
-                                implicitHeight = Qt.binding(() =>
-                                    Math.max(0, ...Array.from(children, c => c.implicitHeight)))
-                            }
-                        }
-                    }
-                }
+                CommandBar { }
             }
         }
     }
@@ -391,7 +423,7 @@ Item {
 
         visible: root.showStatusBar
         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-        height: statusBarSlot.height
+        height: implicitHeight
 
         translucent: root.overlayed
         shadow: root.overlayed ? -4 : 0
@@ -402,11 +434,11 @@ Item {
 
             id: statusBarSlot
 
-            anchors { left: parent.left; right: parent.right; top: parent.top }
+            Layout.fillWidth: true
 
             onChildrenChanged: {
 
-                height = Qt.binding(() =>
+                implicitHeight = Qt.binding(() =>
                     Math.max(0, ...Array.from(children, c => c.implicitHeight)))
             }
         }
