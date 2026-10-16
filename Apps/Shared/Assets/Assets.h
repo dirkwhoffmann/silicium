@@ -40,6 +40,9 @@ public:
         Star,
 
         // Icons (Custom)
+        AppSi,
+        AppVa,
+        AppVc,
         Cartridge,
         Disk35,
         Disk35wp,

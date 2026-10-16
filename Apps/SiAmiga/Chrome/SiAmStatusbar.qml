@@ -32,7 +32,7 @@ Item {
     readonly property string ledGray:  "qrc:/images/led-gray.png"
     readonly property string disk35:   "qrc:/icons/disk-35.png"
     readonly property string disk35wp: "qrc:/icons/disk-35-wp.png"
-    readonly property string hardDisk: "qrc:/icons/drop-hd.png"
+    readonly property string hardDisk: "qrc:/icons/hd.png"
 
     /* Drive state comes from the info controller, which the core tells when
      * something moves (Msg::DRIVE_MOTOR and friends) and which samples the

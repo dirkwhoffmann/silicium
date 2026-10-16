@@ -17,14 +17,7 @@ import Sulfur
 
 /* The About window of an emulator app. It doubles as the error window: an app
  * that could not open the virtual machine it was asked for shows this window
- * with an error message, instead of a machine window (see main.cpp).
- *
- * What differs between the apps is handed in: the name, the icon, the line
- * below the icon, and the error message.
- *
- * The title bar is transparent and the window has no title, so it looks like
- * a splash window. It can still be dragged by its background and closed with
- * the button or the Escape key.
+ * with an error message, instead of a machine window.
  */
 ApplicationWindow {
 
@@ -53,7 +46,7 @@ ApplicationWindow {
 
     topPadding: 0
     width: 420
-    height: 380 // 340
+    height: 380
     minimumWidth: width
     maximumWidth: width
     minimumHeight: height
@@ -85,15 +78,15 @@ ApplicationWindow {
 
         anchors.fill: parent
         anchors.margins: Style.largeSpacing
-        anchors.topMargin: root.contentItem.SafeArea.margins.top // + Style.largeSpacing
+        anchors.topMargin: root.contentItem.SafeArea.margins.top
         spacing: Style.tinySpacing
 
         Image {
 
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: Style.largeSpacing
-            Layout.preferredWidth: 92
-            Layout.preferredHeight: 92
+            Layout.preferredWidth: 96
+            Layout.preferredHeight: 96
             source: root.iconSource
             fillMode: Image.PreserveAspectFit
             smooth: true

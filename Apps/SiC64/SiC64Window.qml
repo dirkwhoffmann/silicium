@@ -257,7 +257,7 @@ VMWindow {
         id: aboutWindow
         visible: false
         appName: "SiC64"
-        iconSource: Assets.iconUrl(Assets.C64Icon)
+        iconSource: Assets.iconUrl(Assets.AppVc)
         tagline: qsTr("C64 Virtual Machine")
     }
 

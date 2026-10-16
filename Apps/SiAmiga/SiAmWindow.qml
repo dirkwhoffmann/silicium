@@ -260,7 +260,7 @@ VMWindow {
         id: aboutWindow
         visible: false
         appName: "SiAmiga"
-        iconSource: Assets.iconUrl(Assets.AmigaIcon)
+        iconSource: Assets.iconUrl(Assets.AppVa)
         tagline: qsTr("Amiga Virtual Machine")
     }
 

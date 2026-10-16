@@ -23,6 +23,9 @@ Assets::getIconUrl(Icon icon)
         case Icon::Lock:                return QUrl("qrc:/images/lock.png");
         case Icon::Star:                return QUrl("qrc:/icons/star.svg");
 
+        case Icon::AppSi:               return QUrl("qrc:/icons/app-si.png");
+        case Icon::AppVa:               return QUrl("qrc:/icons/app-va.png");
+        case Icon::AppVc:               return QUrl("qrc:/icons/app-vc.png");
         case Icon::Cartridge:           return QUrl("qrc:/icons/cartridge.png");
         case Icon::Disk35:              return QUrl("qrc:/icons/disk-35.png");
         case Icon::Disk35wp:            return QUrl("qrc:/icons/disk-35-wp.png");
