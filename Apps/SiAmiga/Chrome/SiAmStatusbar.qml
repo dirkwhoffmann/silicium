@@ -216,6 +216,7 @@ Item {
         icon.width: 24
         icon.height: 20
         background: Rectangle { color: "transparent" }
+        opacity: 0.7
     }
 
     component FloppyObserver: Control {

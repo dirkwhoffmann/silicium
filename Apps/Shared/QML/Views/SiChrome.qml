@@ -130,10 +130,27 @@ Item {
         anchors.fill: parent
 
         color: Qt.alpha(tint, hovered ? 1.0 : 0.9)
-        border.color: Qt.alpha(tint, hovered ? 1.0 : 0.6)
+
+        // A rectangle can't have a border on some sides only, so the border
+        // is drawn as a line at the top and one at the bottom
+        property color borderColor: Qt.alpha(tint, hovered ? 1.0 : 0.6)
 
         Behavior on color { ColorAnimation { duration: 200 } }
-        Behavior on border.color { ColorAnimation { duration: 200 } }
+        Behavior on borderColor { ColorAnimation { duration: 200 } }
+
+        Rectangle {
+
+            anchors { left: parent.left; right: parent.right; top: parent.top }
+            height: 1
+            color: parent.borderColor
+        }
+
+        Rectangle {
+
+            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+            height: 1
+            color: parent.borderColor
+        }
 
         layer.enabled: true
         layer.effect: MultiEffect {
