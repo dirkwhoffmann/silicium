@@ -13,7 +13,7 @@ import QtQuick.Layouts
 import Silicium.Controllers
 import Sulfur
 
-Window {
+SiWindow {
 
     id: root
 
@@ -34,11 +34,10 @@ Window {
     readonly property var cc: controller.configController
     property int currentIndex: 0
 
-    title: "Configurator"
+    titleText: "Configurator"
     visible: false
     width: 860
-    height: 440
-    color: Palette.background
+    height: 440 + titleBarInset
 
     // Brings the window to the front, optionally switching to a specific page
     function showPage(page) {

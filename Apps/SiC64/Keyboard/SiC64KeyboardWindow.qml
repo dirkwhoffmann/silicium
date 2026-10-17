@@ -12,7 +12,7 @@ import QtQuick.Controls
 import Silicium.Controllers
 import Sulfur
 
-Window {
+SiWindow {
 
     id: root
 
@@ -20,9 +20,9 @@ Window {
     readonly property var kc: controller.keyboardController
 
     readonly property int nativeWidth: panel.implicitWidth + 2 * Style.largeSpacing
-    readonly property int nativeHeight: panel.implicitHeight + 2 * Style.largeSpacing
+    readonly property int nativeHeight: panel.implicitHeight + 2 * Style.largeSpacing + titleBarInset
 
-    title: "Keyboard"
+    titleText: "Keyboard"
     visible: false
     width: nativeWidth
     height: nativeHeight
@@ -30,7 +30,6 @@ Window {
     maximumWidth: nativeWidth
     minimumHeight: nativeHeight
     maximumHeight: nativeHeight
-    color: Palette.background
 
     Component.onCompleted: { kc.window = root }
 

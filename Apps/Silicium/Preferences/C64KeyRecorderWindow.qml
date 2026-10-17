@@ -14,17 +14,16 @@ import Silicium.Controllers
 import Silicium.Preferences
 import Sulfur
 
-Window {
+SiWindow {
 
     id: root
 
     required property PrefController controller
 
-    title: "Key Map Recorder"
+    titleText: "Key Map Recorder"
     visible: false
     width: column.implicitWidth + 2 * Style.largeSpacing
-    height: column.implicitHeight + 2 * Style.largeSpacing
-    color: Palette.background
+    height: column.implicitHeight + 2 * Style.largeSpacing + titleBarInset
 
     readonly property real keyUnit: 38
     readonly property real keyGap: 2

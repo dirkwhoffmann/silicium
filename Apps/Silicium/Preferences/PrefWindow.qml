@@ -23,7 +23,7 @@ SiWindow {
     titleText: "Preferences"
     visible: false
     width: 860
-    height: 440
+    height: 440 + titleBarInset
 
     onActiveChanged: {
 
