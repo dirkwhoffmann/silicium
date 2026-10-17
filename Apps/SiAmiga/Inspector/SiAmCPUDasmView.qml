@@ -25,7 +25,7 @@ SiBox {
     required property int numBase
     property alias listView: instrList
 
-    title: qsTr("Program")
+    // title: qsTr("Program")
     spacing: Style.mediumSpacing
 
     readonly property int markerColW: 20

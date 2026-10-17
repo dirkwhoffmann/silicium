@@ -155,6 +155,7 @@ SiAmInspectorWindow {
                         SiAmCPUGuardView {
 
                             title: qsTr("Breakpoints")
+                            // addressTitle: qsTr("Breakpoints")
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             numBase: root.numBase
@@ -168,6 +169,7 @@ SiAmInspectorWindow {
                         SiAmCPUGuardView {
 
                             title: qsTr("Watchpoints")
+                            // addressTitle: qsTr("Watchpoints")
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             numBase: root.numBase

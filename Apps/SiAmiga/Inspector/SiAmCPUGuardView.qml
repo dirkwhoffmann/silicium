@@ -25,6 +25,9 @@ SiBox {
     id: root
 
     property alias model: list.model
+
+    // The caption of the column that holds the addresses
+    property alias addressTitle: addressHeader.text
     required property int numBase
     signal toggle(int row)
     signal remove(int row)
@@ -88,7 +91,7 @@ SiBox {
                 spacing: Style.smallSpacing
                 HeaderLabel { text: ""; Layout.preferredWidth: 20 }
                 Rectangle { Layout.preferredWidth: 1; Layout.preferredHeight: 24; color: Palette.surfaceBorder }
-                HeaderLabel { text: qsTr("Address"); Layout.fillWidth: true }
+                HeaderLabel { id: addressHeader; text: qsTr("Address"); Layout.fillWidth: true }
                 Rectangle { Layout.preferredWidth: 1; Layout.preferredHeight: 24; color: Palette.surfaceBorder }
                 HeaderLabel { text: ""; Layout.preferredWidth: 20 }
             }

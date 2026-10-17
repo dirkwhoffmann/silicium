@@ -22,7 +22,7 @@ SiBox {
     required property var cpu
     property alias listView: traceList
 
-    title: qsTr("Trace")
+    // title: qsTr("Trace")
     spacing: Style.mediumSpacing
 
     readonly property int addrColW: 70
