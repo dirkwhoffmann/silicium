@@ -152,7 +152,6 @@ Preferences::loadAppearanceSettings()
     chromeTitleBar = s.value("chromeTitleBar", s.value("titleBar", 0)).toInt();
     statusbar    = s.value("statusbar", 1).toInt();
     resizeMode   = s.value("resizeMode", 0).toInt();
-    nativeIntegration = s.value("nativeIntegration", true).toBool();
 
     s.endGroup();
 }
@@ -356,6 +355,10 @@ Preferences::loadDeveloperSettings()
     developerMode = s.value("developerMode", false).toBool();
     qtDebug       = s.value("qtDebug", false).toBool();
     logVerbosity  = s.value("logVerbosity", 1).toInt();
+    c64Executable   = s.value("c64Executable", "SiC64").toString();
+    c64Parameters   = s.value("c64Parameters", "--native true").toString();
+    amigaExecutable = s.value("amigaExecutable", "SiAmiga").toString();
+    amigaParameters = s.value("amigaParameters", "--native true").toString();
 
     s.endGroup();
 }
@@ -433,7 +436,6 @@ Preferences::saveAppearanceSettings()
     s.setValue("chromeTitleBar", chromeTitleBar);
     s.setValue("statusbar", statusbar);
     s.setValue("resizeMode", resizeMode);
-    s.setValue("nativeIntegration", nativeIntegration);
 
     s.endGroup();
 
@@ -537,6 +539,10 @@ Preferences::saveDeveloperSettings()
     s.setValue("developerMode", developerMode);
     s.setValue("qtDebug", qtDebug);
     s.setValue("logVerbosity", logVerbosity);
+    s.setValue("c64Executable", c64Executable);
+    s.setValue("c64Parameters", c64Parameters);
+    s.setValue("amigaExecutable", amigaExecutable);
+    s.setValue("amigaParameters", amigaParameters);
 
     s.endGroup();
 

@@ -87,7 +87,7 @@ Window {
                     {name: "Appearance", symbol: "select_window"},
                     {name: "Devices", symbol: "joystick"},
                     {name: "Controls", symbol: "keyboard_command_key"},
-                    {name: "Developer", symbol: "bug_report"},
+                    {name: "Advanced", symbol: "bug_report"},
                     {name: "Playground", symbol: "playground"}
 
                 ] : [
@@ -96,7 +96,7 @@ Window {
                     {name: "Appearance", symbol: "select_window"},
                     {name: "Devices", symbol: "joystick"},
                     {name: "Controls", symbol: "keyboard_command_key"},
-                    {name: "Developer", symbol: "bug_report"},
+                    {name: "Advanced", symbol: "bug_report"},
                 ]
 
                 delegate: ItemDelegate {

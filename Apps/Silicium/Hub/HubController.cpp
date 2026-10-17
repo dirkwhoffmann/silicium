@@ -16,6 +16,8 @@
 // #include <QGuiApplication>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QDir>
+#include <QFileInfo>
 #include <QProcess>
 
 using retro::vault::ImageError;
@@ -755,13 +757,56 @@ HubController::createProcess(UUID vUUID, UUID sUUID)
     return process;
 }
 
+/* The emulator backends can be configured in the Advanced settings. An
+ * executable given by a plain name is looked up next to this app (see
+ * AppController::locateExecutable). An absolute path is used as it is.
+ */
+
+static QString
+emulatorExecutable(Platform platform)
+{
+    auto &prefs = Preferences::instance();
+    auto name = (platform == Platform::AMIGA ? prefs.getAmigaExecutable() : prefs.getC64Executable()).trimmed();
+
+    // Fall back to the built-in backend if nothing is configured
+    if (name.isEmpty()) return AppController::locateExecutable(platform);
+
+    QFileInfo info(name);
+
+    if (info.isAbsolute()) {
+
+        // An app bundle stands for the executable inside of it
+        if (info.isDir() && info.suffix() == "app") {
+            info = QFileInfo(QDir(info.filePath()).filePath("Contents/MacOS/" + info.completeBaseName()));
+        }
+        if (!info.isFile() || !info.isExecutable()) {
+            throw ImageError(ImageError::EXECUTABLE_NOT_FOUND, name.toStdString());
+        }
+        return info.filePath();
+    }
+
+    if (QString path = AppController::locateExecutable(name); !path.isEmpty()) return path;
+
+    throw ImageError(ImageError::EXECUTABLE_NOT_FOUND, name.toStdString());
+}
+
+static QString
+emulatorParameters(Platform platform)
+{
+    auto &prefs = Preferences::instance();
+    return platform == Platform::AMIGA ? prefs.getAmigaParameters() : prefs.getC64Parameters();
+}
+
 QStringList
 HubController::buildArguments(const QString &svmPath, const Manifest &manifest, UUID sUUID)
 {
     QStringList argv;
 
     argv << svmPath;
-    argv << "--native" << (Preferences::instance().getNativeIntegration() ? "true" : "false");
+
+    // Parameters from the preferences (Advanced settings)
+    argv << QProcess::splitCommand(emulatorParameters(manifest.platform));
+
     argv << "--exec" << "server rpc set TRANSPORT STDIO";
     argv << "--exec" << "server rpc set ENABLE true";
 
@@ -802,7 +847,7 @@ HubController::launch(UUID vUUID, UUID sUUID)
 
         // Locate the emulator app
         auto &manifest = vm->getManifest();
-        const QString exePath = AppController::locateExecutable(manifest.platform);
+        const QString exePath = emulatorExecutable(manifest.platform);
 
         const QString svmPath = QString::fromStdString(vm->root().string());
 

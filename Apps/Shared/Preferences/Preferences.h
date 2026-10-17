@@ -53,9 +53,6 @@ class Preferences : public QObject {
     int statusbar;
     int resizeMode;
 
-    // Switches on OS specific features (e.g., the native menu bar on macOS)
-    bool nativeIntegration;
-
     // Themes
     int appearance;
     int colorTheme;
@@ -133,6 +130,12 @@ class Preferences : public QObject {
 
     // Logging
     int logVerbosity;
+
+    // Emulator backends: the app to launch and its additional parameters
+    QString c64Executable;
+    QString c64Parameters;
+    QString amigaExecutable;
+    QString amigaParameters;
 
 
     //
@@ -280,7 +283,6 @@ class Preferences : public QObject {
     Q_PROPERTY(int chromeTitleBar READ getChromeTitleBar WRITE setChromeTitleBar NOTIFY appearancePrefsChanged)
     Q_PROPERTY(int statusbar READ getStatusbar WRITE setStatusbar NOTIFY appearancePrefsChanged)
     Q_PROPERTY(int resizeMode READ getResizeMode WRITE setResizeMode NOTIFY appearancePrefsChanged)
-    Q_PROPERTY(bool nativeIntegration READ getNativeIntegration WRITE setNativeIntegration NOTIFY appearancePrefsChanged)
 
     Q_PROPERTY(int appearance READ getAppearance WRITE setAppearance NOTIFY appearancePrefsChanged)
     Q_PROPERTY(int colorTheme READ getColorTheme WRITE setColorTheme NOTIFY appearancePrefsChanged)
@@ -298,8 +300,6 @@ class Preferences : public QObject {
     void setStatusbar(int value) { setAppearanceProperty(statusbar, value); }
     int getResizeMode() const { return resizeMode; }
     void setResizeMode(int value) { setAppearanceProperty(resizeMode, value); }
-    bool getNativeIntegration() const { return nativeIntegration; }
-    void setNativeIntegration(bool value) { setAppearanceProperty(nativeIntegration, value); }
 
     int getAppearance() const { return appearance; }
     void setAppearance(int value) { setAppearanceProperty(appearance, value); }
@@ -570,9 +570,15 @@ private:
     // Developer
     //
 
+  public:
+
     Q_PROPERTY(bool developerMode READ getDeveloperMode WRITE setDeveloperMode NOTIFY developerPrefsChanged)
     Q_PROPERTY(bool qtDebug READ getQtDebug WRITE setQtDebug NOTIFY developerPrefsChanged)
     Q_PROPERTY(int logVerbosity READ getLogVerbosity WRITE setLogVerbosity NOTIFY developerPrefsChanged)
+    Q_PROPERTY(QString c64Executable READ getC64Executable WRITE setC64Executable NOTIFY developerPrefsChanged)
+    Q_PROPERTY(QString c64Parameters READ getC64Parameters WRITE setC64Parameters NOTIFY developerPrefsChanged)
+    Q_PROPERTY(QString amigaExecutable READ getAmigaExecutable WRITE setAmigaExecutable NOTIFY developerPrefsChanged)
+    Q_PROPERTY(QString amigaParameters READ getAmigaParameters WRITE setAmigaParameters NOTIFY developerPrefsChanged)
 
     bool getDeveloperMode() const { return developerMode; }
     void setDeveloperMode(bool value) { setDeveloperProperty(developerMode, value); }
@@ -580,6 +586,14 @@ private:
     void setQtDebug(bool value) { setDeveloperProperty(qtDebug, value); }
     int getLogVerbosity() const { return logVerbosity; }
     void setLogVerbosity(int value) { setDeveloperProperty(logVerbosity, value); }
+    QString getC64Executable() const { return c64Executable; }
+    void setC64Executable(const QString &value) { setDeveloperProperty(c64Executable, value); }
+    QString getC64Parameters() const { return c64Parameters; }
+    void setC64Parameters(const QString &value) { setDeveloperProperty(c64Parameters, value); }
+    QString getAmigaExecutable() const { return amigaExecutable; }
+    void setAmigaExecutable(const QString &value) { setDeveloperProperty(amigaExecutable, value); }
+    QString getAmigaParameters() const { return amigaParameters; }
+    void setAmigaParameters(const QString &value) { setDeveloperProperty(amigaParameters, value); }
 
   private:
 

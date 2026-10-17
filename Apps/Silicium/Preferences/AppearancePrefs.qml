@@ -10,7 +10,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Silicium.Controllers
 import Silicium.Preferences
 import Sulfur
 
@@ -18,9 +17,6 @@ PrefPage {
 
     id: root
     readonly property int labelWidth: 100
-
-    // Native menus replace the menu row (and with it the "Controls" choice)
-    readonly property bool nativeMenus: Qt.platform.os === "osx" && Preferences.nativeIntegration
     readonly property int comboWidth: 220
 
     component HelpWrapper : ColumnLayout {
@@ -286,9 +282,6 @@ PrefPage {
 
         HelpWrapper {
 
-            // Native menus leave nothing to choose (the chrome is compact)
-            visible: !root.nativeMenus
-
             SuLabeledComboBox {
 
                 id: chromeLayout
@@ -320,34 +313,5 @@ PrefPage {
             }
         }
 
-
-        HelpWrapper {
-
-            SuLabeledCheckBox {
-
-                id: nativeIntegration
-                l: "System:"
-                lwidth: root.labelWidth
-                r: "Use native OS integration"
-
-                SuHelpButton {
-
-                    id: nativeIntegrationHelp
-                    checkable: true
-                    alignment: Qt.AlignLeft
-                }
-
-                HSpacer { }
-
-                checked: Preferences.nativeIntegration
-                onCheckedChanged: Preferences.nativeIntegration = checked
-            }
-
-            HelpBox {
-
-                visibleTarget: nativeIntegrationHelp.checked
-                text: "Switches on compatibility features that are specific to your operating system. On macOS, the emulator windows use the native menu bar at the top of the screen instead of a menu drawn inside the window, and the window layout is set to \"Compact\". The option takes effect the next time a machine is started."
-            }
-        }
     }
 }
