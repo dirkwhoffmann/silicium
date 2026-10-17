@@ -110,6 +110,15 @@ AppController::locateExecutable(Platform platform)
 }
 
 void
+AppController::setNative(bool value)
+{
+    if (m_native == value) return;
+
+    m_native = value;
+    emit nativeChanged();
+}
+
+void
 AppController::setCustomMenu(bool value)
 {
     if (m_customMenu == value) return;

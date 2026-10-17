@@ -241,6 +241,8 @@ C64Controller::parseArguments(const QCoreApplication &app)
         return false;
     }
 
+    AppController::instance().setNative(native == "true");
+
     // Only macOS has native menus
     AppController::instance().setCustomMenu(!OS_MACOS || native == "false");
 

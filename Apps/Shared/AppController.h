@@ -57,6 +57,9 @@ class AppController : public Controller {
     // Indicates whether the app draws its own menu bar (otherwise it is native)
     Q_PROPERTY(bool customMenu READ getCustomMenu WRITE setCustomMenu NOTIFY customMenuChanged)
 
+    // Indicates whether the app fits in with the operating system (--native)
+    Q_PROPERTY(bool native READ getNative WRITE setNative NOTIFY nativeChanged)
+
     static AppController &instance();
     static AppController *create(QQmlEngine *qmlEngine, QJSEngine *jsEngine);
 
@@ -75,13 +78,18 @@ class AppController : public Controller {
     bool getCustomMenu() const { return m_customMenu; }
     void setCustomMenu(bool value);
 
+    bool getNative() const { return m_native; }
+    void setNative(bool value);
+
 signals:
 
     void customMenuChanged();
+    void nativeChanged();
 
 private:
 
     bool m_customMenu = true;
+    bool m_native = true;
 
     InputManager *getInputManager() { return &inputManager; }
     QString getVersion() const;
