@@ -17,7 +17,7 @@ import Silicium.Preferences
 import siliciumUI
 import Sulfur
 
-SiApplicationWindow {
+SiWindow {
 
     id: root
 

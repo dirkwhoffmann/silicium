@@ -15,7 +15,8 @@ import Sulfur
  * theme instead of the look of the operating system. The window buttons are
  * still provided by the OS and are drawn on top of the title bar.
  *
- * The children are placed in the area below the title bar. Set 'titleText'
+ * The children are placed in the area below the title bar. An optional
+ * toolbar can be placed in between by assigning to 'toolbar'. Set 'titleText'
  * instead of 'title': the native title is empty, because its view swallows
  * mouse clicks and so blocks dragging the window.
  */
@@ -24,6 +25,9 @@ Window {
     id: root
 
     default property alias content: contentArea.data
+
+    // An optional item between the title bar and the content
+    property alias toolbar: toolbarSlot.data
 
     // The title that is drawn in the title bar
     property string titleText: ""
@@ -71,8 +75,24 @@ Window {
 
     Item {
 
+        id: toolbarSlot
+
+        anchors { left: parent.left; right: parent.right; top: titleBar.bottom }
+
+        // The toolbar spans the window
+        onChildrenChanged: {
+
+            for (const child of children) child.width = Qt.binding(() => toolbarSlot.width)
+
+            height = Qt.binding(() =>
+                Math.max(0, ...Array.from(children, c => c.implicitHeight)))
+        }
+    }
+
+    Item {
+
         id: contentArea
 
-        anchors { left: parent.left; right: parent.right; top: titleBar.bottom; bottom: parent.bottom }
+        anchors { left: parent.left; right: parent.right; top: toolbarSlot.bottom; bottom: parent.bottom }
     }
 }

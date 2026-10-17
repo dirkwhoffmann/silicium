@@ -25,7 +25,7 @@ import Sulfur
 // declared as a plain child item.
 //
 
-SiApplicationWindow {
+SiWindow {
 
     id: root
 

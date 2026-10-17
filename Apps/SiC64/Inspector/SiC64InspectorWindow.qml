@@ -26,7 +26,7 @@ import Sulfur
 // custom plumbing is needed for that part.
 //
 
-SiApplicationWindow {
+SiWindow {
 
     id: root
 
