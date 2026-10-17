@@ -4,6 +4,8 @@ import Sulfur
 
 TextField {
 
+    id: control
+
     property int size: Size.regular
 
     font.family: Fonts.main

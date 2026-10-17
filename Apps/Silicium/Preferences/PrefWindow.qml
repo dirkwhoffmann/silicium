@@ -14,17 +14,16 @@ import Silicium.Controllers
 import Silicium.Preferences
 import Sulfur
 
-Window {
+SiWindow {
 
     id: root
 
     property int currentIndex: 0
 
-    title: "Preferences"
+    titleText: "Preferences"
     visible: false
     width: 860
     height: 440
-    color: Palette.background
 
     onActiveChanged: {
 
