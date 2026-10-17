@@ -205,8 +205,13 @@ ApplicationWindow {
     NotificationCenter {
 
         id: notifications
+
+        // Starts above the status bar (if it is shown) instead of overlapping it
+        readonly property real statusBarHeight: root.chromeRef ? root.chromeRef.height - root.chromeRef.overlayEnd : 0
+
+        anchors.bottomMargin: Style.largeSpacing + statusBarHeight
         maxWidth: root.width - 2 * Style.largeSpacing
-        maxHeight: root.height - 2 * Style.largeSpacing
+        maxHeight: root.height - 2 * Style.largeSpacing - statusBarHeight
         watchdog: 0
         z: 999
     }
