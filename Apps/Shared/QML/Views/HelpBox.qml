@@ -21,7 +21,7 @@ Pane {
 
     background: Rectangle {
 
-        color: "transparent" // "#30ff0000"
+        color: "transparent"
         radius: Style.radius
 
     }
@@ -29,10 +29,7 @@ Pane {
     clip: true
 
     Behavior on Layout.preferredHeight {
-        NumberAnimation {
-            duration: 300
-            easing.type: Easing.InOutQuad
-        }
+        NumberAnimation { duration: 300; easing.type: Easing.InOutQuad }
     }
 
     Pane {
@@ -43,18 +40,14 @@ Pane {
 
         background: Rectangle {
 
-            color: "#a0ffffff"
+            color: Qt.alpha(Palette.surfaceElevated, 1.0)
             radius: Style.radius
-
             opacity: textContainer.visibleTarget ? 1.0 : 0.0
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: 300
-                }
-            }
+            Behavior on opacity { NumberAnimation { duration: 300 } }
         }
 
         SuText {
+
             id: descriptionText
             width: parent.width
             padding: 0
@@ -62,15 +55,8 @@ Pane {
             font.pixelSize: 13
             color: Palette.secondary
             wrapMode: Text.WordWrap
-
-            // Rectangle { anchors.fill: parent; color: "#300000ff" }
-
             opacity: textContainer.visibleTarget ? 1.0 : 0.0
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: 300
-                }
-            }
+            Behavior on opacity { NumberAnimation { duration: 300 } }
         }
     }
 }

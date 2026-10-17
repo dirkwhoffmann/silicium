@@ -336,11 +336,11 @@ Preferences::loadScreenshotSettings()
 
     s.beginGroup("screenshots");
 
-    screenshotFormat    = s.value("screenshotFormat", 0).toInt();
-    screenshotSource    = s.value("screenshotSource", 0).toInt();
-    screenshotCutout    = s.value("screenshotCutout", 0).toInt();
-    screenshotWidth     = s.value("screenshotWidth", 320).toInt();
-    screenshotHeight    = s.value("screenshotHeight", 200).toInt();
+    screenshotFormat = s.value("screenshotFormat", 0).toInt();
+    screenshotSource = s.value("screenshotSource", 0).toInt();
+    screenshotCutout = s.value("screenshotCutout", 0).toInt();
+    screenshotWidth  = s.value("screenshotWidth", 320).toInt();
+    screenshotHeight = s.value("screenshotHeight", 200).toInt();
 
     s.endGroup();
 }
@@ -352,9 +352,9 @@ Preferences::loadAdvancedSettings()
 
     s.beginGroup("developer");
 
-    developerMode = s.value("developerMode", false).toBool();
-    qtDebug       = s.value("qtDebug", false).toBool();
-    logVerbosity  = s.value("logVerbosity", 1).toInt();
+    developerMode   = s.value("developerMode", false).toBool();
+    qtDebug         = s.value("qtDebug", false).toBool();
+    logVerbosity    = s.value("logVerbosity", 1).toInt();
     c64Executable   = s.value("c64Executable", "SiC64").toString();
     c64Parameters   = s.value("c64Parameters", "--native true").toString();
     amigaExecutable = s.value("amigaExecutable", "SiAmiga").toString();
