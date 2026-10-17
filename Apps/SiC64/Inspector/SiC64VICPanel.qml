@@ -17,7 +17,7 @@ SiC64InspectorWindow {
 
     id: root
 
-    title: qsTr("VICII Inspector")
+    titleText: qsTr("VICII Inspector")
     currentController: controller.vicController
 
     readonly property var vic: controller.vicController

@@ -17,7 +17,7 @@ SiAmInspectorWindow {
 
     id: root
 
-    title: qsTr("Agnus Inspector")
+    titleText: qsTr("Agnus Inspector")
     currentController: controller.agnusController
 
     readonly property var agnus: controller.agnusController

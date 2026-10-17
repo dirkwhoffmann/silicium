@@ -40,7 +40,7 @@ SiAmInspectorWindow {
 
     id: root
 
-    title: qsTr("Memory Inspector")
+    titleText: qsTr("Memory Inspector")
     currentController: controller.memoryController
 
     readonly property var mem: controller.memoryController

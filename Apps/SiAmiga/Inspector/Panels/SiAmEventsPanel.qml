@@ -30,7 +30,7 @@ SiAmInspectorWindow {
 
     id: root
 
-    title: qsTr("Events Inspector")
+    titleText: qsTr("Events Inspector")
     currentController: controller.eventController
 
     readonly property var ec: controller.eventController

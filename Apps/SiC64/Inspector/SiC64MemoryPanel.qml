@@ -27,7 +27,7 @@ SiC64InspectorWindow {
     readonly property int typeCrtHi: 7
     readonly property int typePP: 8
 
-    title: qsTr("Memory Inspector")
+    titleText: qsTr("Memory Inspector")
     currentController: controller.memoryController
 
     readonly property var mem: controller.memoryController

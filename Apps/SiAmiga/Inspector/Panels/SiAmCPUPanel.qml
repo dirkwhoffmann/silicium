@@ -26,7 +26,7 @@ SiAmInspectorWindow {
 
     id: root
 
-    title: qsTr("CPU Inspector")
+    titleText: qsTr("CPU Inspector")
     currentController: controller.cpuController
 
     readonly property var cpu: controller.cpuController

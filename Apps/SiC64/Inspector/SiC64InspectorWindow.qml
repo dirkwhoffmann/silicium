@@ -26,7 +26,7 @@ import Sulfur
 // custom plumbing is needed for that part.
 //
 
-ApplicationWindow {
+SiApplicationWindow {
 
     id: root
 
@@ -47,12 +47,11 @@ ApplicationWindow {
 
     visible: false
     width: 880
-    height: 440
+    height: 440 + titleBarInset
     minimumWidth: 640
-    minimumHeight: 320
-    color: Palette.background
+    minimumHeight: 320 + titleBarInset
 
-    header: SiC64InspectorToolbar {
+    toolbar: SiC64InspectorToolbar {
 
         actions: root.actions
         inspectorController: root.currentController

@@ -20,7 +20,7 @@ SiAmInspectorWindow {
 
     id: root
 
-    title: qsTr("Denise Inspector")
+    titleText: qsTr("Denise Inspector")
     currentController: controller.deniseController
 
     // Every inspector otherwise shares SiAmInspectorWindow.qml's 880x440

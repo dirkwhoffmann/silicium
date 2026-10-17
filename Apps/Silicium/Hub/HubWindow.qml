@@ -17,7 +17,7 @@ import Silicium.Preferences
 import siliciumUI
 import Sulfur
 
-ApplicationWindow {
+SiApplicationWindow {
 
     id: root
 
@@ -25,10 +25,10 @@ ApplicationWindow {
 
     property bool closeApproved: false
 
-    title: Preferences.developerMode ? devTitle : "Silicium Retro Emulator"
+    titleText: Preferences.developerMode ? devTitle : "Silicium Retro Emulator"
     visible: true
     width: 896
-    height: 480
+    height: 480 + titleBarInset
     // flags: Qt.Window | Qt.CustomizeWindowHint | Qt.WindowTitleHint
 
     Palette.appearance: Preferences.appearance

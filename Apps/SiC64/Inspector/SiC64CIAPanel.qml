@@ -17,7 +17,7 @@ SiC64InspectorWindow {
 
     id: root
 
-    title: qsTr("CIA Inspector")
+    titleText: qsTr("CIA Inspector")
     currentController: controller.ciaController
 
     readonly property var cia: controller.ciaController

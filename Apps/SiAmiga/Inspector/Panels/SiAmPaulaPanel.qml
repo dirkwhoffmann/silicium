@@ -30,7 +30,7 @@ SiAmInspectorWindow {
 
     id: root
 
-    title: qsTr("Paula Inspector")
+    titleText: qsTr("Paula Inspector")
     currentController: controller.paulaController
 
     readonly property var paula: controller.paulaController

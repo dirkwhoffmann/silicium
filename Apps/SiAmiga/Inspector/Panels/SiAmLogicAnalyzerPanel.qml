@@ -28,7 +28,7 @@ SiAmInspectorWindow {
 
     id: root
 
-    title: qsTr("Logic Analyzer")
+    titleText: qsTr("Logic Analyzer")
     currentController: controller.logicAnalyzerController
 
     readonly property var logicAnalyzer: controller.logicAnalyzerController

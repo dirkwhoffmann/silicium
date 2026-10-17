@@ -25,7 +25,7 @@ import Sulfur
 // declared as a plain child item.
 //
 
-ApplicationWindow {
+SiApplicationWindow {
 
     id: root
 
@@ -42,12 +42,11 @@ ApplicationWindow {
 
     visible: false
     width: 880
-    height: 440
+    height: 440 + titleBarInset
     minimumWidth: 640
-    minimumHeight: 320
-    color: Palette.background
+    minimumHeight: 320 + titleBarInset
 
-    header: SiAmInspectorToolbar {
+    toolbar: SiAmInspectorToolbar {
 
         actions: root.actions
         inspectorController: root.currentController

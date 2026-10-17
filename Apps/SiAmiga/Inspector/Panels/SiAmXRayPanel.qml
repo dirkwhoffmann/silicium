@@ -26,7 +26,7 @@ SiAmInspectorWindow {
 
     id: root
 
-    title: qsTr("Layers Inspector")
+    titleText: qsTr("Layers Inspector")
     currentController: controller.layersController
 
     readonly property var cc: controller.configController

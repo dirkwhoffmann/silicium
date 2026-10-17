@@ -33,7 +33,7 @@ SiAmInspectorWindow {
 
     id: root
 
-    title: qsTr("Blitter Inspector")
+    titleText: qsTr("Blitter Inspector")
     currentController: controller.blitterController
 
     readonly property var blitter: controller.blitterController

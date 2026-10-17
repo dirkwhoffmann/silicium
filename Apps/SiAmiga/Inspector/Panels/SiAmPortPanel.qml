@@ -22,7 +22,7 @@ SiAmInspectorWindow {
 
     id: root
 
-    title: qsTr("Ports Inspector")
+    titleText: qsTr("Ports Inspector")
     currentController: controller.portController
 
     readonly property var po: controller.portController

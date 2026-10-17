@@ -18,7 +18,7 @@ SiC64InspectorWindow {
 
     id: root
 
-    title: qsTr("SID Inspector")
+    titleText: qsTr("SID Inspector")
     currentController: controller.sidController
 
     readonly property var sid: controller.sidController

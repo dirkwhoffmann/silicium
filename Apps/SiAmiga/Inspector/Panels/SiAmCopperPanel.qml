@@ -32,7 +32,7 @@ SiAmInspectorWindow {
 
     id: root
 
-    title: qsTr("Copper Inspector")
+    titleText: qsTr("Copper Inspector")
     currentController: controller.copperController
 
     readonly property var copper: controller.copperController
