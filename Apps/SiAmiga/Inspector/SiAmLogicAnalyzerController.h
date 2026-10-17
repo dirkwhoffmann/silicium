@@ -57,6 +57,15 @@ class SiAmLogicAnalyzerController : public SiAmInspectorController {
     // (0..3): sets LA_PROBEn and, if the preset carries one, LA_ADDRn.
     Q_INVOKABLE void selectPreset(int channel, int index);
 
+    // The entry of presetModel() that matches the state of probe channel
+    // 'channel': "None", "IPL", the preset whose address the probe has, or
+    // "Memory" for any other address.
+    Q_INVOKABLE int presetIndex(int channel) const;
+
+    // The address probed by channel 'channel' as hex digits, or an empty
+    // string if the channel does not probe memory.
+    Q_INVOKABLE QString probeAddress(int channel) const;
+
     // Applies a user-typed hex address to probe channel 'channel': sets
     // LA_PROBEn to MEMORY and LA_ADDRn to the parsed value. Returns false
     // (and changes nothing) if 'hex' doesn't parse, mirroring

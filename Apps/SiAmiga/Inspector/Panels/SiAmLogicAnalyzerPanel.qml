@@ -70,34 +70,78 @@ SiAmInspectorWindow {
         function onConfigChanged() { root.configVersion++ }
     }
 
-    // One probe selector: a single macOS-style combo box that both shows the
-    // current selection (probeLabel()) and accepts input the two ways
-    // BusPanel.swift's NSComboButton did -- picking a preset from the
-    // dropdown, or typing a custom hex address directly into the field.
-    component ProbeSelector : SuLabeledComboInput {
+    /* One probe selector: a combo box with the preselections ("None",
+     * "Memory", the custom registers and "IPL"), followed by the address that
+     * is probed. The field shows the address of the selected preselection.
+     * Typing an address selects the preselection that has it, or "Memory" if
+     * there is none. Nothing is stored here: both controls show what the
+     * probe says (see presetIndex() and probeAddress()), and what the user
+     * does is an instruction to change the probe.
+     */
+    component ProbeSelector : RowLayout {
 
         id: sel
 
         required property int channel
 
+        // Bumped to put the address field back in step with the probe after
+        // an edit that the probe did not take
+        property int refresh: 0
+
+        readonly property var presets: root.logicAnalyzer.presetModel()
+        readonly property int presetIndex: (root.configVersion, root.logicAnalyzer.presetIndex(channel))
+        readonly property bool hasAddress: presets[presetIndex].hasAddress
+
         Layout.fillWidth: true
         Layout.fillHeight: true
         Layout.alignment: Qt.AlignVCenter
+        spacing: Style.smallSpacing
 
-        model: root.logicAnalyzer.presetModel()
-        textRole: "name"
-        placeholderText: qsTr("Address")
+        SuLabeledComboBox {
 
-        /* The label is the probe's, not the field's: what the user types is
-         * an instruction to change the probe, and the field shows whatever
-         * the probe says afterwards. SuLabeledComboInput puts it back in
-         * step on its own, so an address selectAddress() refuses leaves the
-         * old label on screen with nothing to restore here.
-         */
-        text: (root.configVersion, root.logicAnalyzer.probeLabel(channel))
+            id: presetBox
 
-        onActivated: (index) => root.logicAnalyzer.selectPreset(channel, index)
-        onAccepted: root.logicAnalyzer.selectAddress(channel, editText)
+            Layout.fillWidth: true
+            model: sel.presets
+            textRole: "name"
+            isItemEnabled: (itemText, index) => !sel.presets[index].separator
+
+            onActivated: (index) => root.logicAnalyzer.selectPreset(sel.channel, index)
+
+            // Binding rather than a currentIndex binding: the combo box writes
+            // the user's choice into currentIndex, which would end the latter
+            Binding {
+                target: presetBox
+                property: "currentIndex"
+                value: sel.presetIndex
+                restoreMode: Binding.RestoreNone
+            }
+        }
+
+        SuTextField {
+
+            id: addressField
+
+            // visible: sel.hasAddress
+            opacity: sel.hasAddress ? 1 : 0
+            Layout.preferredWidth: 70
+            Layout.alignment: Qt.AlignVCenter
+            // placeholderText: qsTr("Address")
+            font.capitalization: Font.AllUppercase
+            validator: RegularExpressionValidator { regularExpression: /[0-9A-Fa-f]{0,8}/ }
+
+            onEditingFinished: {
+                root.logicAnalyzer.selectAddress(sel.channel, text)
+                sel.refresh++
+            }
+
+            Binding {
+                target: addressField
+                property: "text"
+                value: (root.configVersion, sel.refresh, root.logicAnalyzer.probeAddress(sel.channel))
+                restoreMode: Binding.RestoreNone
+            }
+        }
     }
 
     /* The two cell kinds of the hover tooltip's grid.

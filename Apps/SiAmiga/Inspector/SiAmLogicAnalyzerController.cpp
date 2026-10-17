@@ -19,6 +19,7 @@ using namespace vamiga;
 const SiAmLogicAnalyzerController::Preset SiAmLogicAnalyzerController::presets[] = {
 
     { "None",     Probe::NONE,   false, 0 },
+    { "Memory",   Probe::MEMORY, false, 0 },
     { nullptr,    Probe::NONE,   false, 0 },
     { "DMACONR",  Probe::MEMORY, true,  0xDFF002 },
     { "VPOSR",    Probe::MEMORY, true,  0xDFF004 },
@@ -61,6 +62,9 @@ SiAmLogicAnalyzerController::presetModel() const
         QVariantMap entry;
         entry["separator"] = presets[i].name == nullptr;
         entry["name"] = presets[i].name ? QString(presets[i].name) : QString();
+
+        // Everything but the IPL signal is probed through an address
+        entry["hasAddress"] = presets[i].probe != Probe::IPL;
         list.append(entry);
     }
     return list;
@@ -82,6 +86,64 @@ SiAmLogicAnalyzerController::selectPreset(int channel, int index)
         if (preset.hasAddr) core.set(addrOpt, (i64)preset.addr);
 
     } catch (...) { }
+}
+
+int
+SiAmLogicAnalyzerController::presetIndex(int channel) const
+{
+    if (channel < 0 || channel > 3) return 0;
+
+    auto &core = SiAmController::core();
+    auto probeOpt = Opt(int(Opt::LA_PROBE0) + channel);
+    auto addrOpt = Opt(int(Opt::LA_ADDR0) + channel);
+
+    Probe probe = Probe::NONE;
+    u32 addr = 0;
+
+    try {
+
+        probe = Probe(core.get(probeOpt));
+        addr = (u32)core.get(addrOpt);
+
+    } catch (...) { }
+
+    int memory = 0;
+
+    for (int i = 0; i < numPresets; i++) {
+
+        const auto &preset = presets[i];
+        if (!preset.name) continue;
+
+        // The preset for an arbitrary memory location is the fallback
+        if (preset.probe == Probe::MEMORY && !preset.hasAddr) memory = i;
+
+        if (probe == Probe::MEMORY) {
+            if (preset.probe == Probe::MEMORY && preset.hasAddr && preset.addr == addr) return i;
+        } else {
+            if (preset.probe == probe) return i;
+        }
+    }
+
+    return probe == Probe::MEMORY ? memory : 0;
+}
+
+QString
+SiAmLogicAnalyzerController::probeAddress(int channel) const
+{
+    if (channel < 0 || channel > 3) return QString();
+
+    auto &core = SiAmController::core();
+    auto probeOpt = Opt(int(Opt::LA_PROBE0) + channel);
+    auto addrOpt = Opt(int(Opt::LA_ADDR0) + channel);
+
+    try {
+
+        if (Probe(core.get(probeOpt)) != Probe::MEMORY) return QString();
+        return QString("%1").arg((unsigned)core.get(addrOpt), 6, 16, QChar('0')).toUpper();
+
+    } catch (...) { }
+
+    return QString();
 }
 
 bool
