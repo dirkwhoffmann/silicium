@@ -80,7 +80,7 @@ SiAmController::SiAmController()
     m_agnusController = make_unique<SiAmAgnusController>(this);
     m_paulaController = make_unique<SiAmPaulaController>(this);
     m_logicAnalyzerController = make_unique<SiAmLogicAnalyzerController>(this);
-    m_layersController = make_unique<SiAmLayersController>(this);
+    m_xrayController = make_unique<SiAmXRayController>(this);
     m_cpuController = make_unique<SiAmCPUController>(this);
     m_deniseController = make_unique<SiAmDeniseController>(this);
     m_portController = make_unique<SiAmPortController>(this);

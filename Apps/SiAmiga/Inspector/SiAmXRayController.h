@@ -12,7 +12,7 @@
 #include "SiAmInspectorController.h"
 
 //
-// Layers inspector controller -- supplies SiAmXRayPanel's inspector-window
+// X-Ray inspector controller -- supplies SiAmXRayPanel's inspector-window
 // chrome (currentController for the toolbar, the shared active flag, tick
 // throttle and beam-position readout from SiAmInspectorController). It owns
 // no properties of its own: the X-Ray debugger's settings are XRAY_*
@@ -24,11 +24,11 @@
 
 class SiAmController;
 
-class SiAmLayersController : public SiAmInspectorController {
+class SiAmXRayController : public SiAmInspectorController {
 
     Q_OBJECT
 
   public:
 
-    explicit SiAmLayersController(SiAmController *parent = nullptr);
+    explicit SiAmXRayController(SiAmController *parent = nullptr);
 };

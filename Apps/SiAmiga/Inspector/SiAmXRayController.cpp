@@ -7,9 +7,9 @@
 // See https://www.gnu.org for license information
 // -----------------------------------------------------------------------------
 
-#include "SiAmLayersController.h"
+#include "SiAmXRayController.h"
 
-SiAmLayersController::SiAmLayersController(SiAmController *parent)
+SiAmXRayController::SiAmXRayController(SiAmController *parent)
     : SiAmInspectorController(parent)
 {
 

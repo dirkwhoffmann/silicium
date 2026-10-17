@@ -23,7 +23,7 @@ target_sources(SiAmiga PRIVATE
         Inspector/SiAmAgnusController.cpp
         Inspector/SiAmPaulaController.cpp
         Inspector/SiAmLogicAnalyzerController.cpp
-        Inspector/SiAmLayersController.cpp
+        Inspector/SiAmXRayController.cpp
         Inspector/SiAmDmaView.cpp
         Inspector/SiAmLogicView.cpp
         Inspector/SiAmInstructionModel.cpp
