@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "SiC64InspectorController.h"
+#include "Inspector/SiC64InspectorController.h"
 #include <QVariantList>
 
 //

@@ -9,10 +9,10 @@
 
 #pragma once
 
-#include "SiAmInspectorController.h"
+#include "Inspector/SiAmInspectorController.h"
 #include "SiAmInstructionModel.h"
 #include "SiAmTraceModel.h"
-#include "SiAmGuardModel.h"
+#include "Inspector/SiAmGuardModel.h"
 #include "VAmiga.h"
 
 //

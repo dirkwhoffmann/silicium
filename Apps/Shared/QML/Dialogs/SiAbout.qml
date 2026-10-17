@@ -53,7 +53,7 @@ ApplicationWindow {
     maximumHeight: height
 
     Palette.appearance: Palette.Appearance.Dark
-    Palette.theme: Palette.Thema.AppDefault
+    Palette.theme: Palette.Theme.AppDefault
 
     Image {
 

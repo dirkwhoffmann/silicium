@@ -11,25 +11,25 @@ target_sources(SiAmiga PRIVATE
         Keyboard/AmigaKeyModel.cpp
         Keyboard/SiAmKeyboardController.cpp
         Inspector/SiAmInspectorController.cpp
-        Inspector/SiAmCIAController.cpp
-        Inspector/SiAmEventController.cpp
-        Inspector/SiAmEventTableModel.cpp
-        Inspector/SiAmMemoryController.cpp
-        Inspector/SiAmMemDumpModel.cpp
-        Inspector/SiAmCopperController.cpp
-        Inspector/SiAmCopperListModel.cpp
+        Inspector/CIA/SiAmCIAController.cpp
+        Inspector/Events/SiAmEventController.cpp
+        Inspector/Events/SiAmEventTableModel.cpp
+        Inspector/Memory/SiAmMemoryController.cpp
+        Inspector/Memory/SiAmMemDumpModel.cpp
+        Inspector/Copper/SiAmCopperController.cpp
+        Inspector/Copper/SiAmCopperListModel.cpp
         Inspector/SiAmGuardModel.cpp
-        Inspector/SiAmBlitterController.cpp
-        Inspector/SiAmAgnusController.cpp
-        Inspector/SiAmPaulaController.cpp
-        Inspector/SiAmLogicAnalyzerController.cpp
-        Inspector/SiAmXRayController.cpp
-        Inspector/SiAmDmaView.cpp
-        Inspector/SiAmLogicView.cpp
-        Inspector/SiAmInstructionModel.cpp
-        Inspector/SiAmTraceModel.cpp
-        Inspector/SiAmCPUController.cpp
-        Inspector/SiAmDeniseController.cpp
-        Inspector/SiAmSpriteView.cpp
-        Inspector/SiAmPortController.cpp
+        Inspector/Blitter/SiAmBlitterController.cpp
+        Inspector/Agnus/SiAmAgnusController.cpp
+        Inspector/Paula/SiAmPaulaController.cpp
+        Inspector/LogicAnalyzer/SiAmLogicAnalyzerController.cpp
+        Inspector/XRay/SiAmXRayController.cpp
+        Inspector/XRay/SiAmDmaView.cpp
+        Inspector/LogicAnalyzer/SiAmLogicView.cpp
+        Inspector/CPU/SiAmInstructionModel.cpp
+        Inspector/CPU/SiAmTraceModel.cpp
+        Inspector/CPU/SiAmCPUController.cpp
+        Inspector/Denise/SiAmDeniseController.cpp
+        Inspector/Denise/SiAmSpriteView.cpp
+        Inspector/Port/SiAmPortController.cpp
         SiAmInfoController.cpp)

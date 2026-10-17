@@ -19,13 +19,13 @@
 #include "C64MediaController.h"
 #include "SiC64Renderer.h"
 #include "Keyboard/SiC64KeyboardController.h"
-#include "Inspector/SiC64EventController.h"
-#include "Inspector/SiC64CIAController.h"
-#include "Inspector/SiC64BusController.h"
-#include "Inspector/SiC64CPUController.h"
-#include "Inspector/SiC64MemoryController.h"
-#include "Inspector/SiC64VICController.h"
-#include "Inspector/SiC64SIDController.h"
+#include "Inspector/Events/SiC64EventController.h"
+#include "Inspector/CIA/SiC64CIAController.h"
+#include "Inspector/Bus/SiC64BusController.h"
+#include "Inspector/CPU/SiC64CPUController.h"
+#include "Inspector/Memory/SiC64MemoryController.h"
+#include "Inspector/VIC/SiC64VICController.h"
+#include "Inspector/SID/SiC64SIDController.h"
 
 class QCoreApplication;
 using vc64::VirtualC64;

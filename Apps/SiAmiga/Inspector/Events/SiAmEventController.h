@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "SiAmInspectorController.h"
+#include "Inspector/SiAmInspectorController.h"
 #include "SiAmEventTableModel.h"
 
 //

@@ -18,7 +18,7 @@ import Sulfur
 // top-level window, so several can be open side by side -- picked from a
 // dropdown on the main toolbar's Inspector button (SiAmToolbar.qml's
 // inspectMenu, mirroring SiC64Toolbar.qml's own). SiAmiga now follows the
-// same shape: each file under Inspector/Panels/ (SiAmCPUPanel.qml, ...) uses
+// same shape: each panel file under Inspector/<Name>/ (SiAmCPUPanel.qml, ...) uses
 // this as its root type and supplies a title, the sub-controller its content
 // samples (currentController, activated/deactivated as the window shows/
 // hides -- exactly like SiC64's per-panel windows), and the content itself,

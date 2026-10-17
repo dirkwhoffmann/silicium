@@ -9,31 +9,48 @@
 
 #pragma once
 
-#include "SiC64InspectorController.h"
+#include "Inspector/SiAmInspectorController.h"
 #include <QStringList>
 
 //
-// CIA inspector controller -- port of the old Swift-based emulator's CIA
-// inspector (Inspector.swift's CIA tab / CIAPanel.swift). Samples CIA1 or
-// CIA2 (see selectedCia) and exposes its ports, timers, ICR/IMR, TOD clock
-// and idle statistics for SiC64CIAPanel.
+// CIA inspector controller -- port of SiC64CIAController. Samples CIA A or
+// CIA B (see selectedCia) and exposes its ports, timers, ICR/IMR, TOD clock
+// and idle statistics for a future SiAmCIAPanel.
 //
-// The shared active flag, tick throttle and beam-position readout live in the
-// SiC64InspectorController base class; this class only adds the CIA-panel
-// specifics and overrides refreshData() to sample them.
+// The shared active flag, tick throttle and beam-position readout live in
+// the SiAmInspectorController base class; this class only adds the
+// CIA-panel specifics and overrides refreshData() to sample them.
+//
+// Two real differences from the C64 version, both hardware-driven rather
+// than stylistic:
+//
+//  - vAmiga's two CIA chips are called CIA A / CIA B (not CIA1/CIA2), and
+//    their port pins wire up to entirely different things than the C64's
+//    joystick/serial-bus CIAs -- CIA A's ports drive the power LED, ROM
+//    overlay bit and floppy status lines (port A) and the parallel port
+//    (port B); CIA B's drive the serial port (port A) and the floppy
+//    control lines -- step/side/motor/select (port B). See
+//    Core/Components/CIA/CIA.cpp's own pin-out comments, which
+//    portALabels/portBLabels below are transcribed from directly.
+//
+//  - The Amiga's CIA TOD is a plain 24-bit cycle counter (TODInfo's
+//    value/latch/alarm), not the C64 CIA's BCD hour:min:sec.tenth clock
+//    (vc64's TODInfo has separate hour/min/sec/tenth fields) -- so
+//    todValue/todLatch/todAlarm are raw counters here instead of four
+//    decoded time components each.
 //
 
-class C64Controller;
+class SiAmController;
 
-class SiC64CIAController : public SiC64InspectorController {
+class SiAmCIAController : public SiAmInspectorController {
 
     Q_OBJECT
 
-    int m_selectedCia = 0; // 0 = CIA1, 1 = CIA2
+    int m_selectedCia = 0; // 0 = CIA A, 1 = CIA B
 
     QString m_title;
 
-    // Port A / B. The register/direction values are raw so the panel's
+    // Port A / B. The register/direction values are raw so a future panel's
     // SuNumberView can format them per the shared display format.
     int m_portAPort = 0;
     int m_portBPort = 0;
@@ -56,10 +73,8 @@ class SiC64CIAController : public SiC64InspectorController {
     bool m_intLineLow = false;
     QString m_intLineLabel;
 
-    // TOD clock / alarm, as raw hour/min/sec/tenth components so the panel
-    // can render each as its own byte view.
-    int m_todHour = 0, m_todMin = 0, m_todSec = 0, m_todTenth = 0;
-    int m_todAlarmHour = 0, m_todAlarmMin = 0, m_todAlarmSec = 0, m_todAlarmTenth = 0;
+    // TOD clock / alarm / latch -- raw 24-bit counters, see the class comment.
+    qint64 m_todValue = 0, m_todLatch = 0, m_todAlarm = 0;
     bool m_todIntEnable = false;
 
     // Serial data / shift registers
@@ -72,7 +87,7 @@ class SiC64CIAController : public SiC64InspectorController {
 
   public:
 
-    explicit SiC64CIAController(C64Controller *parent = nullptr);
+    explicit SiAmCIAController(SiAmController *parent = nullptr);
 
     Q_PROPERTY(int selectedCia READ selectedCia WRITE setSelectedCia NOTIFY ciaChanged)
     Q_PROPERTY(QString title READ title NOTIFY ciaChanged)
@@ -105,14 +120,9 @@ class SiC64CIAController : public SiC64InspectorController {
     Q_PROPERTY(bool intLineLow READ intLineLow NOTIFY ciaChanged)
     Q_PROPERTY(QString intLineLabel READ intLineLabel NOTIFY ciaChanged)
 
-    Q_PROPERTY(int todHour READ todHour NOTIFY ciaChanged)
-    Q_PROPERTY(int todMin READ todMin NOTIFY ciaChanged)
-    Q_PROPERTY(int todSec READ todSec NOTIFY ciaChanged)
-    Q_PROPERTY(int todTenth READ todTenth NOTIFY ciaChanged)
-    Q_PROPERTY(int todAlarmHour READ todAlarmHour NOTIFY ciaChanged)
-    Q_PROPERTY(int todAlarmMin READ todAlarmMin NOTIFY ciaChanged)
-    Q_PROPERTY(int todAlarmSec READ todAlarmSec NOTIFY ciaChanged)
-    Q_PROPERTY(int todAlarmTenth READ todAlarmTenth NOTIFY ciaChanged)
+    Q_PROPERTY(qint64 todValue READ todValue NOTIFY ciaChanged)
+    Q_PROPERTY(qint64 todLatch READ todLatch NOTIFY ciaChanged)
+    Q_PROPERTY(qint64 todAlarm READ todAlarm NOTIFY ciaChanged)
     Q_PROPERTY(bool todIntEnable READ todIntEnable NOTIFY ciaChanged)
 
     Q_PROPERTY(int sdr READ sdr NOTIFY ciaChanged)
@@ -161,14 +171,9 @@ class SiC64CIAController : public SiC64InspectorController {
     bool intLineLow() const { return m_intLineLow; }
     QString intLineLabel() const { return m_intLineLabel; }
 
-    int todHour() const { return m_todHour; }
-    int todMin() const { return m_todMin; }
-    int todSec() const { return m_todSec; }
-    int todTenth() const { return m_todTenth; }
-    int todAlarmHour() const { return m_todAlarmHour; }
-    int todAlarmMin() const { return m_todAlarmMin; }
-    int todAlarmSec() const { return m_todAlarmSec; }
-    int todAlarmTenth() const { return m_todAlarmTenth; }
+    qint64 todValue() const { return m_todValue; }
+    qint64 todLatch() const { return m_todLatch; }
+    qint64 todAlarm() const { return m_todAlarm; }
     bool todIntEnable() const { return m_todIntEnable; }
 
     int sdr() const { return m_sdr; }

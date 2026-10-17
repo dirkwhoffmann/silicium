@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "SiAmInspectorController.h"
+#include "Inspector/SiAmInspectorController.h"
 
 //
 // Blitter inspector controller -- port of vAmiga's own GUI/Inspector/

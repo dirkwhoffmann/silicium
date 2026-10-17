@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "SiAmInspectorController.h"
+#include "Inspector/SiAmInspectorController.h"
 
 //
 // Agnus inspector controller -- port of vAmiga's own GUI/Inspector/

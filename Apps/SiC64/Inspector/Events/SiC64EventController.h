@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "SiC64InspectorController.h"
+#include "Inspector/SiC64InspectorController.h"
 #include "SiC64EventTableModel.h"
 
 class C64Controller;

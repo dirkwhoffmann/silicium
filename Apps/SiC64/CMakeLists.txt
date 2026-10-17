@@ -15,17 +15,17 @@ target_sources(SiC64 PRIVATE
         SiC64ActivityController.cpp
         Keyboard/SiC64KeyboardController.cpp
         Inspector/SiC64InspectorController.cpp
-        Inspector/SiC64EventController.cpp
-        Inspector/SiC64EventTableModel.cpp
-        Inspector/SiC64CIAController.cpp
-        Inspector/SiC64BusController.cpp
-        Inspector/SiC64DmaView.cpp
-        Inspector/SiC64CPUController.cpp
-        Inspector/SiC64InstructionModel.cpp
-        Inspector/SiC64TraceModel.cpp
-        Inspector/SiC64MemoryController.cpp
-        Inspector/SiC64MemDumpModel.cpp
-        Inspector/SiC64Heatmap.cpp
-        Inspector/SiC64VICController.cpp
-        Inspector/SiC64SIDController.cpp
-        Inspector/SiC64Waveform.cpp)
+        Inspector/Events/SiC64EventController.cpp
+        Inspector/Events/SiC64EventTableModel.cpp
+        Inspector/CIA/SiC64CIAController.cpp
+        Inspector/Bus/SiC64BusController.cpp
+        Inspector/Bus/SiC64DmaView.cpp
+        Inspector/CPU/SiC64CPUController.cpp
+        Inspector/CPU/SiC64InstructionModel.cpp
+        Inspector/CPU/SiC64TraceModel.cpp
+        Inspector/Memory/SiC64MemoryController.cpp
+        Inspector/Memory/SiC64MemDumpModel.cpp
+        Inspector/Memory/SiC64Heatmap.cpp
+        Inspector/VIC/SiC64VICController.cpp
+        Inspector/SID/SiC64SIDController.cpp
+        Inspector/SID/SiC64Waveform.cpp)

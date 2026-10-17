@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "SiAmInspectorController.h"
+#include "Inspector/SiAmInspectorController.h"
 
 //
 // X-Ray inspector controller -- supplies SiAmXRayPanel's inspector-window
