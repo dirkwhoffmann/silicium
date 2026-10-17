@@ -31,7 +31,7 @@ Item {
         text: "Open Preferences"
         shortcut: StandardKey.Preferences
         onTriggered: {
-            console.log("HubWindow: preferencesAction")
+
             preferencesWindow.show()
             preferencesWindow.raise()
             preferencesWindow.requestActivate()

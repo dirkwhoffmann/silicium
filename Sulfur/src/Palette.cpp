@@ -225,6 +225,7 @@ Palette::computeColor<Palette::Theme::AppDefault>(Color c, bool darkMode) const
             case Color::Surface:                return QColor("#3c3c3e"); // QColor("#2c2c2e");
             case Color::Tint:                   return QColor("#99ccff");
             case Color::Toolbar:                return darker(Color::Surface, 100); // lighter(Color::Background, 110);
+            case Color::Titlebar:               return QColor("#323232");
 
             case Color::AccentText:             return QColor("#FFFFFF");
             case Color::Primary:                return QColor("#ffffff");
@@ -260,7 +261,8 @@ Palette::computeColor<Palette::Theme::AppDefault>(Color c, bool darkMode) const
             case Color::Background:             return QColor("#ececec");
             case Color::Surface:                return QColor("#e2e2e2");
             case Color::Tint:                   return QColor("#CFDDFF");
-            case Color::Toolbar:                return darker(Color::Surface, 100); // darker(Color::Background, 104);
+            case Color::Toolbar:                return darker(Color::Surface, 100);
+            case Color::Titlebar:               return QColor("#e8e8e8");
 
             case Color::AccentText:             return QColor("#FFFFFF");
             case Color::Primary:                return QColor("#000000");
@@ -310,6 +312,7 @@ Palette::computeColor<Palette::Theme::Solaris>(Color c, bool darkMode) const
             case Color::Surface:                return QColor("#494971");
             case Color::Tint:                   return QColor("#636398");
             case Color::Toolbar:                return lighter(Color::Background);
+            case Color::Titlebar:               return darker(Color::Background);
 
             case Color::AccentText:             return QColor("#FFFFFF");
             case Color::Primary:                return QColor("#FFFFFF");
@@ -347,6 +350,7 @@ Palette::computeColor<Palette::Theme::Solaris>(Color c, bool darkMode) const
             case Color::Surface:                return QColor("#9496A4");
             case Color::Tint:                   return QColor("#636398");
             case Color::Toolbar:                return lighter(Color::Background);
+            case Color::Titlebar:               return QColor("#B9BCCC");
 
             case Color::AccentText:             return QColor("#FFFFFF");
             case Color::Primary:                return QColor("#000000");
@@ -398,7 +402,6 @@ Palette::deriveColor(Color c, bool darkMode) const
             case Color::OverlayBorder:          return darker(Color::Overlay);
             case Color::OverlayBorderElevated:  return lighter(Color::OverlayBorder);
             case Color::ToolbarBorder:          return darker(Color::Toolbar);
-            case Color::Titlebar:               return QColor("#323232"); // macOS, independent of the theme
             case Color::Elevation:              return QColor("#10FFFFFF");
 
             default:
@@ -421,7 +424,6 @@ Palette::deriveColor(Color c, bool darkMode) const
             case Color::OverlayBorder:          return lighter(Color::Overlay);
             case Color::OverlayBorderElevated:  return darker(Color::OverlayBorder);
             case Color::ToolbarBorder:          return lighter(Color::Toolbar);
-            case Color::Titlebar:               return QColor("#e8e8e8"); // macOS, independent of the theme
             case Color::Elevation:              return QColor("#10000000");
 
             default:
