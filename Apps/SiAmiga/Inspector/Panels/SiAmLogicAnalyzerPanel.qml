@@ -226,6 +226,11 @@ SiAmInspectorWindow {
                     Layout.minimumWidth: 0
                     Layout.maximumWidth: 220
                     Layout.fillHeight: true
+
+                    // Same vertical extent as the grid: it lies inside the frame
+                    // of the trace area and leaves room for the scroll bar
+                    Layout.topMargin: 1
+                    Layout.bottomMargin: 1 + hbar.height
                     spacing: 0
 
                     readonly property real rowHeight: height / 7
