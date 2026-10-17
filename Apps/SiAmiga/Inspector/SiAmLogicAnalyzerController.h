@@ -77,9 +77,18 @@ class SiAmLogicAnalyzerController : public SiAmInspectorController {
     // address for MEMORY, or "IPL".
     Q_INVOKABLE QString probeLabel(int channel) const;
 
+  signals:
+
+    // The trace may have changed: the view should read it again
+    void traceChanged();
+
   protected:
 
-    void refreshData() override { }
+    // The trace scrolls by quickly, but not so quickly that it needs more
+    qreal refreshInterval() const override { return 0.1; }
+
+    // Nothing is cached here. The view reads the trace itself when told to.
+    void refreshData() override { emit traceChanged(); }
 
   private:
 

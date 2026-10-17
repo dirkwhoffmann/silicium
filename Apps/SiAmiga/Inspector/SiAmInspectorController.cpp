@@ -61,7 +61,7 @@ SiAmInspectorController::tick()
 
     auto now = utl::Time::now();
 
-    if ((now - lastRefresh).asSeconds() < 0.25) return;
+    if ((now - lastRefresh).asSeconds() < refreshInterval()) return;
 
     lastRefresh = now;
     refresh();

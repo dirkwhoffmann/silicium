@@ -67,7 +67,7 @@ void
 SiAmLogicView::setPadded(bool value) { if (m_padded != value) { m_padded = value; emit optionsChanged(); update(); } }
 
 void
-SiAmLogicView::setSymbolic(bool value) { if (m_symbolic != value) { m_symbolic = value; emit optionsChanged(); update(); } }
+SiAmLogicView::setSymbolic(bool value) { if (m_symbolic != value) { m_symbolic = value; emit optionsChanged(); refresh(); } }
 
 void
 SiAmLogicView::setTextColor(const QColor &value) { if (m_textColor != value) { m_textColor = value; emit optionsChanged(); update(); } }
@@ -118,37 +118,10 @@ void
 SiAmLogicView::setHairlineColor(const QColor &value) { if (m_hairlineColor != value) { m_hairlineColor = value; emit optionsChanged(); update(); } }
 
 void
-SiAmLogicView::itemChange(ItemChange change, const ItemChangeData &value)
+SiAmLogicView::refresh()
 {
-    if (change == ItemSceneChange) {
-
-        disconnectFromWindow();
-        if (value.window) connectToWindow(value.window);
-    }
-
-    QQuickPaintedItem::itemChange(change, value);
-}
-
-void
-SiAmLogicView::connectToWindow(QQuickWindow *win)
-{
-    // Re-sample the trace and repaint once per rendered frame,
-    // exactly like SiC64DmaView's texture grab -- naturally idle while the
-    // Bus inspector window is hidden, since a hidden window emits no frames.
-    m_frameConnection = connect(win, &QQuickWindow::frameSwapped, this, [this]() {
-        cacheData();
-        update();
-    });
-}
-
-void
-SiAmLogicView::disconnectFromWindow()
-{
-    if (m_frameConnection) {
-
-        disconnect(m_frameConnection);
-        m_frameConnection = QMetaObject::Connection();
-    }
+    cacheData();
+    update();
 }
 
 void

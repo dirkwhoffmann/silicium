@@ -59,11 +59,19 @@ SiAmInspectorWindow {
         flick.contentX = position * Math.max(0, flick.contentWidth - flick.width)
     }
 
-    // The newest samples are at the right end: show them when the machine stops
+    /* When the machine stops, no more frames are rendered and the controller
+     * is not ticked anymore. The trace is read one last time, as it is now
+     * final, and the newest samples (at the right end) are shown.
+     */
     Connections {
 
         target: root.controller
-        function onStateChanged() { if (root.controller.isPaused) root.scrollTo(1) }
+        function onStateChanged() {
+
+            if (!root.controller.isPaused) return
+            logicView.refresh()
+            root.scrollTo(1)
+        }
     }
 
     // probeLabel() is a plain Q_INVOKABLE (LA_PROBE/LA_ADDR live on
@@ -75,7 +83,13 @@ SiAmInspectorWindow {
     property int configVersion: 0
     Connections {
         target: controller.configController
-        function onConfigChanged() { root.configVersion++ }
+        function onConfigChanged() { root.configVersion++; logicView.refresh() }
+    }
+
+    // The controller is ticked by the renderer (see SiAmRenderer::tick())
+    Connections {
+        target: root.logicAnalyzer
+        function onTraceChanged() { logicView.refresh() }
     }
 
     /* One probe selector: a combo box with the preselections ("None",

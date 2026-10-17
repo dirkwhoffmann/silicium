@@ -135,8 +135,6 @@ class SiAmLogicView : public QQuickPaintedItem {
     QColor m_textColor = QColor(Qt::black);
     QColor m_hairlineColor = QColor(Qt::gray);
 
-    QMetaObject::Connection m_frameConnection;
-
   public:
 
     explicit SiAmLogicView(QQuickItem *parent = nullptr);
@@ -154,6 +152,10 @@ class SiAmLogicView : public QQuickPaintedItem {
      */
     Q_INVOKABLE QVariantMap sampleAt(qreal x, qreal y) const;
 
+    // Reads the trace again and repaints. Called when the controller says
+    // that the trace may have changed.
+    Q_INVOKABLE void refresh();
+
     bool hex() const { return m_hex; }
     void setHex(bool value);
     bool padded() const { return m_padded; }
@@ -169,12 +171,9 @@ class SiAmLogicView : public QQuickPaintedItem {
 
   protected:
 
-    void itemChange(ItemChange change, const ItemChangeData &value) override;
 
   private:
 
-    void connectToWindow(class QQuickWindow *win);
-    void disconnectFromWindow();
 
     // Re-samples the most recent 'segments' entries of the core's logic
     // analyzer ring buffer -- bus owner, address/data bus and the four probe

@@ -63,8 +63,11 @@ class SiAmInspectorController : public Controller {
     explicit SiAmInspectorController(SiAmController *parent = nullptr);
 
     // Called once per rendered frame (see SiAmRenderer::tick()). No-op
-    // unless active; otherwise refreshes at most 4 times per second.
+    // unless active; otherwise refreshes at most once per refreshInterval().
     void tick();
+
+    // The shortest time between two refreshes, in seconds
+    virtual qreal refreshInterval() const { return 0.25; }
 
     // Refreshes shared state, then the derived controller's own data
     // (refreshData()). Public so a future format-change action can force an
