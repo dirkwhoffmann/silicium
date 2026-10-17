@@ -46,6 +46,8 @@ class SiAmLogicView : public QQuickPaintedItem {
 
     Q_OBJECT
 
+    // The number of samples (columns) the view shows
+    Q_PROPERTY(int segmentCount READ segmentCount CONSTANT)
     Q_PROPERTY(bool hex READ hex WRITE setHex NOTIFY optionsChanged)
     Q_PROPERTY(bool padded READ padded WRITE setPadded NOTIFY optionsChanged)
     Q_PROPERTY(bool symbolic READ symbolic WRITE setSymbolic NOTIFY optionsChanged)
@@ -150,6 +152,8 @@ class SiAmLogicView : public QQuickPaintedItem {
      * hex/padded setting. Rows without a value at this column, and the
      * header row, leave the key out rather than reporting a placeholder.
      */
+    int segmentCount() const { return segments; }
+
     Q_INVOKABLE QVariantMap sampleAt(qreal x, qreal y) const;
 
     // Reads the trace again and repaints. Called when the controller says

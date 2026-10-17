@@ -53,6 +53,20 @@ SiAmInspectorWindow {
 
     function zoomBy(factor) { setZoom(root.zoom * factor) }
 
+    // The most the traces are moved away from the right end while the machine
+    // runs, in samples. Without it, the picture stands still between two
+    // refreshes and the analyzer looks like it is not running.
+    readonly property real jitterSamples: 3
+
+    // Scrolls to the neighborhood of the right end, at a random distance
+    function followTrace() {
+
+        const sampleWidth = flick.contentWidth / logicView.segmentCount
+        const end = Math.max(0, flick.contentWidth - flick.width)
+
+        flick.contentX = Math.max(0, end - Math.random() * root.jitterSamples * sampleWidth)
+    }
+
     // Scrolls the traces to the left end (0) or the right end (1)
     function scrollTo(position) {
 
@@ -95,7 +109,7 @@ SiAmInspectorWindow {
 
             // The newest samples are at the right end. While the machine
             // runs, the traces follow them; a paused machine can be browsed.
-            if (root.controller.isRunning) root.scrollTo(1)
+            if (root.controller.isRunning) root.followTrace()
         }
     }
 
