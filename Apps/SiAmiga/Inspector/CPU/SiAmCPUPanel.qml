@@ -152,7 +152,7 @@ SiAmInspectorWindow {
 
                         spacing: Style.largeSpacing
 
-                        SiAmCPUGuardView {
+                        SiAmGuardView {
 
                             title: qsTr("Breakpoints")
                             // addressTitle: qsTr("Breakpoints")
@@ -166,7 +166,7 @@ SiAmInspectorWindow {
                             onAdd: (addr) => cpu.addBreakpoint(addr)
                         }
 
-                        SiAmCPUGuardView {
+                        SiAmGuardView {
 
                             title: qsTr("Watchpoints")
                             // addressTitle: qsTr("Watchpoints")

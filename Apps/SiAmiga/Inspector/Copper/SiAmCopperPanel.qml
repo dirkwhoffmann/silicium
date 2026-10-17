@@ -328,7 +328,7 @@ SiAmInspectorWindow {
             }
 
             //
-            // Breakpoints -- reuses SiAmCPUGuardView (Apps/SiAmiga/
+            // Breakpoints -- reuses SiAmGuardView (Apps/SiAmiga/
             // Inspector), the same reusable table the CPU panel's own
             // Breakpoints/Watchpoints boxes use, which adds its own
             // trailing "Add address..." row (click to type an address, in
@@ -336,7 +336,7 @@ SiAmInspectorWindow {
             // rather than this panel's previous plain read-only table.
             //
 
-            SiAmCPUGuardView {
+            SiAmGuardView {
 
                 title: qsTr("Breakpoints")
                 // addressTitle: qsTr("Breakpoints")

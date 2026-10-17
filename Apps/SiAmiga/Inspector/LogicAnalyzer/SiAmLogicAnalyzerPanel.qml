@@ -28,7 +28,7 @@ SiAmInspectorWindow {
 
     id: root
 
-    // titleText: qsTr("Logic Analyzer")
+    titleText: qsTr("Logic Analyzer")
     currentController: controller.logicAnalyzerController
 
     readonly property var logicAnalyzer: controller.logicAnalyzerController
@@ -221,7 +221,7 @@ SiAmInspectorWindow {
         anchors.fill: parent
         anchors.margins: Style.mediumSpacing
 
-        title: qsTr("Logic Analyzer")
+        // title: qsTr("Logic Analyzer")
         spacing: Style.smallSpacing
 
         ColumnLayout {

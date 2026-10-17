@@ -103,7 +103,7 @@ class SiAmCopperController : public SiAmInspectorController {
 
     // Enables/disables, removes, or relocates the breakpoint at the given
     // row of the Breakpoints box, or adds a new one at 'addr' -- the
-    // Breakpoints box's own SiAmCPUGuardView trailing "Add address..." row
+    // Breakpoints box's own SiAmGuardView trailing "Add address..." row
     // and per-row address editing drive these the same way the CPU panel's
     // Breakpoints/Watchpoints boxes do.
     Q_INVOKABLE void toggleGuardEnabled(int row);
