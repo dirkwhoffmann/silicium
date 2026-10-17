@@ -89,7 +89,14 @@ SiAmInspectorWindow {
     // The controller is ticked by the renderer (see SiAmRenderer::tick())
     Connections {
         target: root.logicAnalyzer
-        function onTraceChanged() { logicView.refresh() }
+        function onTraceChanged() {
+
+            logicView.refresh()
+
+            // The newest samples are at the right end. While the machine
+            // runs, the traces follow them; a paused machine can be browsed.
+            if (root.controller.isRunning) root.scrollTo(1)
+        }
     }
 
     /* One probe selector: a combo box with the preselections ("None",
