@@ -90,8 +90,17 @@ SiAmInspectorController::refresh()
 QString
 SiAmInspectorController::formatNumber(qint64 value, int digits) const
 {
-    int width = m_padded ? digits : 0;
+    /* The number format is set once, on the shared inspector controller (see
+     * SiAmActions' format actions). The controllers of the individual
+     * inspectors have format flags of their own that nobody changes, so they
+     * go by the shared one.
+     */
+    const auto *shared = parent ? parent->getInspectorController() : nullptr;
+    const bool hex = shared ? shared->m_hex : m_hex;
+    const bool padded = shared ? shared->m_padded : m_padded;
 
-    return m_hex ? QString("%1").arg(value, width, 16, QChar('0')).toUpper()
-                 : QString("%1").arg(value, width, 10, QChar('0'));
+    int width = padded ? digits : 0;
+
+    return hex ? QString("%1").arg(value, width, 16, QChar('0')).toUpper()
+               : QString("%1").arg(value, width, 10, QChar('0'));
 }
