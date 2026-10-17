@@ -37,6 +37,35 @@ SiAmInspectorWindow {
 
     property real zoom: 16
 
+    // The factor by which the + and - buttons change the zoom
+    readonly property real zoomStep: 1.5
+
+    /* Sets the zoom, keeping the middle of what is shown where it is. */
+    function setZoom(value) {
+
+        const zoom = Math.max(1, Math.min(32, value))
+        const middle = (flick.contentX + flick.width / 2) / flick.contentWidth
+
+        root.zoom = zoom
+        flick.contentX = Math.max(0, Math.min(flick.contentWidth - flick.width,
+                                              middle * flick.contentWidth - flick.width / 2))
+    }
+
+    function zoomBy(factor) { setZoom(root.zoom * factor) }
+
+    // Scrolls the traces to the left end (0) or the right end (1)
+    function scrollTo(position) {
+
+        flick.contentX = position * Math.max(0, flick.contentWidth - flick.width)
+    }
+
+    // The newest samples are at the right end: show them when the machine stops
+    Connections {
+
+        target: root.controller
+        function onStateChanged() { if (root.controller.isPaused) root.scrollTo(1) }
+    }
+
     /* Row tints for the timing diagram, in row order: Address Bus, Data
      * Bus, then probe channels 0..3.
      *
@@ -122,11 +151,9 @@ SiAmInspectorWindow {
 
             id: addressField
 
-            // visible: sel.hasAddress
             opacity: sel.hasAddress ? 1 : 0
             Layout.preferredWidth: 70
             Layout.alignment: Qt.AlignVCenter
-            // placeholderText: qsTr("Address")
             font.capitalization: Font.AllUppercase
             validator: RegularExpressionValidator { regularExpression: /[0-9A-Fa-f]{0,8}/ }
 
@@ -188,58 +215,6 @@ SiAmInspectorWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
             spacing: Style.smallSpacing
-
-            //
-            // Control elements
-            //
-
-            RowLayout {
-
-                Layout.fillWidth: true
-                Layout.leftMargin: leftColumn.width + Style.smallSpacing
-                spacing: Style.smallSpacing
-
-                SuLabeledCheckBox {
-
-                    checked: root.cc.LA_CONNECT
-                    onClicked: root.cc.LA_CONNECT = checked
-                    r: qsTr("Connect")
-                }
-
-                HSpacer { size: Style.largeSpacing }
-
-                SuSymbol {
-                    size: Size.small
-                    phosphor: "minus-symbol"
-                    // phosphor: "minus-circle"
-                }
-
-                SuLabeledSlider {
-
-                    // l: qsTr("Zoom")
-                    // l: "-"
-                    // r: "+"
-                    Layout.fillWidth: true
-                    from: 1
-                    to: 32
-                    value: root.zoom
-                    onMoved: (value) => root.zoom = value
-                }
-
-                SuSymbol {
-                    size: Size.small
-                    phosphor: "plus-symbol"
-                    // phosphor: "plus-circle"
-                }
-
-                HSpacer { size: Style.largeSpacing }
-
-                SuLabeledCheckBox {
-
-                    id: symbolicBox
-                    r: qsTr("Symbolic")
-                }
-            }
 
             //
             // Traces section
@@ -427,6 +402,75 @@ SiAmInspectorWindow {
                             }
                         }
                     }
+                }
+            }
+
+            //
+            // Control elements (below the traces)
+            //
+
+            RowLayout {
+
+                Layout.fillWidth: true
+                Layout.leftMargin: leftColumn.width + Style.smallSpacing
+                spacing: Style.smallSpacing
+
+                SuLabeledCheckBox {
+
+                    checked: root.cc.LA_CONNECT
+                    onClicked: root.cc.LA_CONNECT = checked
+                    r: qsTr("Connect")
+                }
+
+                HSpacer { size: Style.largeSpacing }
+
+                SuSymbolButton {
+
+                    size: Size.small
+                    phosphor: "minus-symbol"
+                    enabled: root.zoom > 1
+                    onClicked: root.zoomBy(1 / root.zoomStep)
+                }
+
+                SuLabeledSlider {
+
+                    Layout.fillWidth: true
+                    from: 1
+                    to: 32
+                    value: root.zoom
+                    onMoved: (value) => root.setZoom(value)
+                }
+
+                SuSymbolButton {
+
+                    size: Size.small
+                    phosphor: "plus-symbol"
+                    enabled: root.zoom < 32
+                    onClicked: root.zoomBy(root.zoomStep)
+                }
+
+                HSpacer { size: Style.largeSpacing }
+
+                SuSymbolButton {
+
+                    size: Size.small
+                    phosphor: "arrow-line-left"
+                    onClicked: root.scrollTo(0)
+                }
+
+                SuSymbolButton {
+
+                    size: Size.small
+                    phosphor: "arrow-line-right"
+                    onClicked: root.scrollTo(1)
+                }
+
+                HSpacer { size: Style.largeSpacing }
+
+                SuLabeledCheckBox {
+
+                    id: symbolicBox
+                    r: qsTr("Symbolic")
                 }
             }
         }
