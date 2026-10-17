@@ -572,13 +572,13 @@ private:
 
   public:
 
-    Q_PROPERTY(bool developerMode READ getDeveloperMode WRITE setDeveloperMode NOTIFY developerPrefsChanged)
-    Q_PROPERTY(bool qtDebug READ getQtDebug WRITE setQtDebug NOTIFY developerPrefsChanged)
-    Q_PROPERTY(int logVerbosity READ getLogVerbosity WRITE setLogVerbosity NOTIFY developerPrefsChanged)
-    Q_PROPERTY(QString c64Executable READ getC64Executable WRITE setC64Executable NOTIFY developerPrefsChanged)
-    Q_PROPERTY(QString c64Parameters READ getC64Parameters WRITE setC64Parameters NOTIFY developerPrefsChanged)
-    Q_PROPERTY(QString amigaExecutable READ getAmigaExecutable WRITE setAmigaExecutable NOTIFY developerPrefsChanged)
-    Q_PROPERTY(QString amigaParameters READ getAmigaParameters WRITE setAmigaParameters NOTIFY developerPrefsChanged)
+    Q_PROPERTY(bool developerMode READ getDeveloperMode WRITE setDeveloperMode NOTIFY advancedPrefsChanged)
+    Q_PROPERTY(bool qtDebug READ getQtDebug WRITE setQtDebug NOTIFY advancedPrefsChanged)
+    Q_PROPERTY(int logVerbosity READ getLogVerbosity WRITE setLogVerbosity NOTIFY advancedPrefsChanged)
+    Q_PROPERTY(QString c64Executable READ getC64Executable WRITE setC64Executable NOTIFY advancedPrefsChanged)
+    Q_PROPERTY(QString c64Parameters READ getC64Parameters WRITE setC64Parameters NOTIFY advancedPrefsChanged)
+    Q_PROPERTY(QString amigaExecutable READ getAmigaExecutable WRITE setAmigaExecutable NOTIFY advancedPrefsChanged)
+    Q_PROPERTY(QString amigaParameters READ getAmigaParameters WRITE setAmigaParameters NOTIFY advancedPrefsChanged)
 
     bool getDeveloperMode() const { return developerMode; }
     void setDeveloperMode(bool value) { setDeveloperProperty(developerMode, value); }
@@ -603,7 +603,7 @@ private:
         if (property != newValue) {
             property = newValue;
             saveDeveloperSettings();
-            emit developerPrefsChanged();
+            emit advancedPrefsChanged();
         }
     }
 
@@ -647,7 +647,7 @@ private:
     Q_INVOKABLE void loadControlsSettings();
     Q_INVOKABLE void loadDevicesSettings();
     Q_INVOKABLE void loadScreenshotSettings();
-    Q_INVOKABLE void loadDeveloperSettings();
+    Q_INVOKABLE void loadAdvancedSettings();
     Q_INVOKABLE void loadMiscSettings();
 
     Q_INVOKABLE void saveSettings();
@@ -683,6 +683,6 @@ private:
     void devicesPrefsChanged();
     void controlsPrefsChanged();
     void screenshotPrefsChanged();
-    void developerPrefsChanged();
+    void advancedPrefsChanged();
     void miscPrefsChanged();
 };

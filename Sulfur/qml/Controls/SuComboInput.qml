@@ -26,9 +26,9 @@ ComboBox {
     property color primary: Palette.primary
     property color disabled: Palette.disabled
     property color control: Palette.inset
-    property color controlSelected: Palette.insetFocused
-    property color controlBorder: Palette.insetBorder
-    property color controlBorderSelected: Palette.insetBorderFocused
+    property color insetFocused: Palette.insetFocused
+    property color insetBorder: Palette.insetBorder
+    property color insetBorderFocused: Palette.insetBorderFocused
 
     // Width of the accent-colored pull-down segment, macOS-style.
     property real indicatorWidth: 20
@@ -61,9 +61,9 @@ ComboBox {
         implicitWidth: 100
         implicitHeight: root.implicitHeight
         radius: Style.radius
-        border.color: root.activeFocus ? root.controlBorderSelected : root.controlBorder
+        border.color: root.activeFocus ? root.insetBorderFocused : root.insetBorder
         border.width: 1
-        color: root.activeFocus ? root.controlSelected : root.control
+        color: root.activeFocus ? root.insetFocused : root.control
 
         // Accent-colored pull-down segment, like a macOS combo box. Its
         // bounds line up with the 'indicator' item below, which is what
@@ -193,8 +193,8 @@ ComboBox {
 
         background: Rectangle {
 
-            color: root.controlSelected
-            border.color: root.controlBorderSelected
+            color: root.insetFocused
+            border.color: root.insetBorderFocused
             radius: Style.radius
         }
     }
@@ -230,7 +230,7 @@ ComboBox {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 height: 1
-                color: root.controlBorder
+                color: root.insetBorder
             }
 
             SuText {

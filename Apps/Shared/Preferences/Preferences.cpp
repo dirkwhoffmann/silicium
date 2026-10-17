@@ -64,7 +64,7 @@ Preferences::loadSettings()
     loadControlsSettings();
     loadDevicesSettings();
     loadScreenshotSettings();
-    loadDeveloperSettings();
+    loadAdvancedSettings();
     loadMiscSettings();
 }
 
@@ -90,9 +90,9 @@ Preferences::reloadGroup(const QString &group)
     } else if (group == "screenshots") {
         loadScreenshotSettings();
         emit screenshotPrefsChanged();
-    } else if (group == "developer") {
-        loadDeveloperSettings();
-        emit developerPrefsChanged();
+    } else if (group == "advanced") {
+        loadAdvancedSettings();
+        emit advancedPrefsChanged();
     } else if (group == "misc") {
         loadMiscSettings();
         emit miscPrefsChanged();
@@ -346,7 +346,7 @@ Preferences::loadScreenshotSettings()
 }
 
 void
-Preferences::loadDeveloperSettings()
+Preferences::loadAdvancedSettings()
 {
     auto &s = store();
 

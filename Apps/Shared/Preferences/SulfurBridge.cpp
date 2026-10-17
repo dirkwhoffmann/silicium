@@ -39,5 +39,5 @@ SulfurBridge::install(Assets::Icon appIcon)
     sulfur.setDialogBadge(assets->iconUrl(Assets::Icon::Biohazard));
 
     QObject::connect(&prefs, &Preferences::appearancePrefsChanged, &sulfur, sync);
-    QObject::connect(&prefs, &Preferences::developerPrefsChanged, &sulfur, sync);
+    QObject::connect(&prefs, &Preferences::advancedPrefsChanged, &sulfur, sync);
 }

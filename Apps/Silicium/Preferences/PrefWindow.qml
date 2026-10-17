@@ -176,7 +176,7 @@ Window {
             ControlsPrefs {
                 controller: prefController
             }
-            DeveloperPrefs {
+            AdvancedPrefs {
                 controller: prefController
             }
             PlaygroundPrefs {

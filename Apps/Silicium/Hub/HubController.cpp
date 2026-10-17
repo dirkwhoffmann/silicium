@@ -35,7 +35,7 @@ HubController::HubController() : Controller()
     connect(&prefs, &Preferences::controlsPrefsChanged,   this, [this] { broadcastPrefsChange("controls"); });
     connect(&prefs, &Preferences::devicesPrefsChanged,    this, [this] { broadcastPrefsChange("devices"); });
     connect(&prefs, &Preferences::screenshotPrefsChanged, this, [this] { broadcastPrefsChange("screenshots"); });
-    connect(&prefs, &Preferences::developerPrefsChanged,  this, [this] { broadcastPrefsChange("developer"); });
+    connect(&prefs, &Preferences::advancedPrefsChanged,   this, [this] { broadcastPrefsChange("advanced"); });
     connect(&prefs, &Preferences::miscPrefsChanged,       this, [this] { broadcastPrefsChange("misc"); });
 
     /* Rebuild the sidebar whenever the options that shape it change. The

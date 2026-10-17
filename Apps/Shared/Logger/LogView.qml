@@ -36,7 +36,7 @@ Rectangle {
 
             target: Preferences
 
-            function onDeveloperPrefsChanged() {
+            function onAdvancedPrefsChanged() {
                 Logger.verbosity = Preferences.logVerbosity
             }
         }

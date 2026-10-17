@@ -50,40 +50,6 @@ PrefPage {
 
     PrefSection {
 
-        header: "DEBUGGING"
-
-        SuLabeledCheckBox {
-
-            indent: root.labelWidth
-            r: "Developer Mode"
-            checked: Preferences.developerMode
-            onCheckedChanged: Preferences.developerMode = checked
-        }
-
-        SuLabeledCheckBox {
-
-            indent: root.labelWidth
-            r: "Qt Layout Hints"
-            checked: Preferences.qtDebug
-            onCheckedChanged: Preferences.qtDebug = checked
-        }
-    }
-
-    PrefSection {
-
-        header: "LOGGING"
-
-        SuLabeledCheckBox {
-
-            indent: root.labelWidth
-            r: "Include debug messages"
-            checked: Preferences.logVerbosity === 2
-            onCheckedChanged: Preferences.logVerbosity = checked ? 2 : 1
-        }
-    }
-
-    PrefSection {
-
         header: "EMULATOR BACKENDS"
 
         SuLabeledTextBox {
@@ -138,6 +104,40 @@ PrefPage {
                 text: Preferences.amigaParameters
                 onEditingFinished: Preferences.amigaParameters = text
             }
+        }
+    }
+
+    PrefSection {
+
+        header: "DEBUGGING"
+
+        SuLabeledCheckBox {
+
+            indent: root.labelWidth
+            r: "Developer Mode"
+            checked: Preferences.developerMode
+            onCheckedChanged: Preferences.developerMode = checked
+        }
+
+        SuLabeledCheckBox {
+
+            indent: root.labelWidth
+            r: "Qt Layout Hints"
+            checked: Preferences.qtDebug
+            onCheckedChanged: Preferences.qtDebug = checked
+        }
+    }
+
+    PrefSection {
+
+        header: "LOGGING"
+
+        SuLabeledCheckBox {
+
+            indent: root.labelWidth
+            r: "Include debug messages"
+            checked: Preferences.logVerbosity === 2
+            onCheckedChanged: Preferences.logVerbosity = checked ? 2 : 1
         }
     }
 }
