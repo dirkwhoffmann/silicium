@@ -3,22 +3,9 @@
   "groups" : [
     {
       "layers" : [
-
-      ],
-      "shadow" : {
-        "kind" : "neutral",
-        "opacity" : 0.5
-      },
-      "translucency" : {
-        "enabled" : true,
-        "value" : 0.3
-      }
-    },
-    {
-      "layers" : [
         {
-          "image-name" : "AmIcon.png",
-          "name" : "AmIcon"
+          "image-name" : "va-icon 4.png",
+          "name" : "va-icon 4"
         }
       ],
       "shadow" : {
