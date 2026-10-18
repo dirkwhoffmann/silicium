@@ -307,6 +307,7 @@ Item {
                     Layout.preferredWidth: 64
                     horizontalAlignment: Text.AlignRight
                     font.pixelSize: Style.tiny
+                    color: Palette.secondary
                     DebugRect {}
 
                     text: {
@@ -328,15 +329,14 @@ Item {
                     }
                 }
 
-                Button {
+                SuSymbolButton {
 
                     id: menuButton
-                    flat: true
                     implicitWidth: 16
                     implicitHeight: 22
                     padding: 0
-                    text: "unfold_more"
-                    font.family: Fonts.symbols
+                    symbol: "unfold_more"
+                    color: Palette.secondary
                     font.bold: true
                     onClicked: contextMenu.open()
                     background: Rectangle { color: "transparent" }

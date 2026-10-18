@@ -236,7 +236,7 @@ SiBox {
                                 Layout.preferredWidth: 20
                                 Layout.alignment: Qt.AlignVCenter
                                 enabled: true
-                                size: Size.small
+                                size: Size.tiny
                                 awesome: "circle-pause"
                                 color: modelData.enabled ? Palette.accent : Palette.disabled
                                 onClicked: root.toggle(modelData.nr)

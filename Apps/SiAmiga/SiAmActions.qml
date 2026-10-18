@@ -22,6 +22,7 @@ Item {
 
     readonly property SiAmController amiga: SiAmController
     required property var configWindowRef
+    required property var keyboardSheetRef
     required property var keyboardWindowRef
     required property var cpuInspectorRef
     required property var logicAnalyzerRef
@@ -80,6 +81,7 @@ Item {
     property alias retroShell: retroShellAction
     property alias logger: loggerAction
     property alias keyboard: keyboardAction
+    property alias keyboardWindowAction: kbdWindowAction
     property alias saveWorkspace: saveWorkspaceAction
     property alias saveSnapshot: saveSnapshotAction
     property alias loadSnapshot: loadSnapshotAction
@@ -434,13 +436,24 @@ Item {
         }
     }
 
-    // Opens the virtual keyboard window. Triggered by the Keyboard menu's
-    // "Show..." item and the toolbar's keyboard button -- SiAmiga has no
-    // sheet variant to distinguish this from (see the class comment).
+    // Opens the virtual keyboard as a sheet that slides down from the top of
+    // the window. Triggered by the toolbar's keyboard button.
     Action {
 
         id: keyboardAction
+
+        property bool isOpen: keyboardSheetRef.shown
+
         text: qsTr("Open Keyboard")
+        onTriggered: { keyboardSheetRef.shown = !keyboardSheetRef.shown }
+    }
+
+    // Opens the virtual keyboard as a standalone window. Triggered by the
+    // Keyboard menu's "Show..." item.
+    Action {
+
+        id: kbdWindowAction
+        text: qsTr("Open Keyboard Window")
         shortcut: root.keyboardShortcut
         onTriggered: {
 

@@ -61,6 +61,7 @@ Item {
 
     signal pressedKey()
     signal releasedKey()
+    signal toggledKey()
 
     implicitWidth: 40
     implicitHeight: 40
@@ -135,7 +136,10 @@ Item {
 
         id: mouseArea
         anchors.fill: parent
-        onPressed: root.pressedKey()
-        onReleased: root.releasedKey()
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+        // The right button toggles the key without releasing it
+        onPressed: (mouse) => mouse.button === Qt.RightButton ? root.toggledKey() : root.pressedKey()
+        onReleased: (mouse) => { if (mouse.button === Qt.LeftButton) root.releasedKey() }
     }
 }

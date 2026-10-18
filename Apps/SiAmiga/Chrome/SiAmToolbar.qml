@@ -173,6 +173,8 @@ Item {
         SuBarButton {
             phosphor: "keyboard"
             action: root.window.actions.keyboard
+            checkable: true
+            checked: root.window.actions.keyboard.isOpen
         }
 
         SuBarDivider {}

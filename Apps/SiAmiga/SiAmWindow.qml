@@ -175,6 +175,7 @@ VMWindow {
         id: siActions
         aboutWindowRef: aboutWindow
         configWindowRef: configWindow
+        keyboardSheetRef: keyboardSheet
         keyboardWindowRef: keyboardWindow
         cpuInspectorRef: cpuInspectorWindow
         logicAnalyzerRef: logicAnalyzerWindow
@@ -277,6 +278,14 @@ VMWindow {
     SiAmConfigWindow {
 
         id: configWindow
+    }
+
+    SiAmKeyboardSheet {
+
+        id: keyboardSheet
+        anchors.horizontalCenter: parent.horizontalCenter
+        slideTop: overlayArea.y
+        z: 2
     }
 
     SiAmKeyboardWindow {

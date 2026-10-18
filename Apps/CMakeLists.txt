@@ -35,7 +35,7 @@
 # (see Cores/VCCore/vcconfig.h).
 
 set(SI_VERSION_MAJOR    0)
-set(SI_VERSION_MINOR    1)
+set(SI_VERSION_MINOR    2)
 set(SI_VERSION_SUBMINOR 0)
 set(SI_VERSION_BETA     1)
 
@@ -51,8 +51,8 @@ configure_file(
 # Bundle metadata
 #
 # CFBundleShortVersionString has to be one to three dot-separated integers, so
-# the beta suffix that AppController::version() appends ("0.1b1") cannot go in
-# it -- the numeric part goes there, and the beta rides along in
+# the beta suffix that AppController::version() appends (e.g., "1.0b1") cannot
+# go in it. The numeric part goes there, and the beta rides along in
 # CFBundleVersion, which is free-form.
 
 set(SI_VERSION "${SI_VERSION_MAJOR}.${SI_VERSION_MINOR}.${SI_VERSION_SUBMINOR}")

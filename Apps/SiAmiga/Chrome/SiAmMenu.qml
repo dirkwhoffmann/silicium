@@ -407,7 +407,7 @@ SuMenuBar {
         title: qsTr("&Keyboard")
 
         SuMenuItem {
-            action: window.actions.keyboard
+            action: window.actions.keyboardWindowAction
             text: qsTr("Show...")
         }
 
@@ -425,22 +425,6 @@ SuMenuBar {
         Action {
             text: qsTr("Reset Keyboard Handler")
             onTriggered: amiga.resetKeyboardMatrix()
-        }
-    }
-
-    //
-    // Debug Menu
-    //
-
-    SuMenu {
-        title: qsTr("&Debug")
-
-        SuMenuSeparator { }
-
-        SuMenuItem {
-            action: window.actions.debug
-            checkable: true
-            checked: amiga.debugPanel
         }
     }
 }

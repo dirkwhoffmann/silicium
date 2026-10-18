@@ -45,6 +45,9 @@ ColumnLayout {
 
     spacing: Style.largeSpacing
 
+    // Emitted when a key has been clicked (with the button that was used)
+    signal keyActivated(int button)
+
     //
     // Layout selection
     //
@@ -135,7 +138,16 @@ ColumnLayout {
                 // Return's own MouseArea underneath.
 
                 onPressedKey: kc.press(model.nr)
-                onReleasedKey: kc.release(model.nr)
+                onReleasedKey: {
+
+                    kc.release(model.nr)
+                    root.keyActivated(Qt.LeftButton)
+                }
+                onToggledKey: {
+
+                    kc.toggle(model.nr)
+                    root.keyActivated(Qt.RightButton)
+                }
 
                 Connections {
 
