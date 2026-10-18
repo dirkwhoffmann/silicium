@@ -298,52 +298,28 @@ SiAmLogicView::formatValue(int value, int bits) const
 void
 SiAmLogicView::setupValueFont()
 {
-    /* Monospaced, like LogicView.swift's own `mono`. Not only for looks:
-     * every cell in a row is the same width, so a fixed advance makes the
-     * fitted size a function of the string's length alone -- see
-     * fittedFontSize(), and drawSignal()'s per-row table built on it.
-     */
+    // Monospaced, like LogicView.swift's own `mono`
     m_valueFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     m_valueFont.setStyleHint(QFont::Monospace);
-    m_valueFont.setPointSizeF(refFontSize);
+    m_valueFont.setPointSizeF(fontSize);
 
-    const QFontMetricsF fm(m_valueFont);
-
-    /* The widest glyph we might draw, not a representative one.
-     *
-     * On macOS the request above resolves to Menlo and every character
-     * below has the same advance, so the maximum simply is that advance.
-     * Elsewhere a fixed-pitch request can fall back to a proportional face
-     * -- measured, that makes sizing by length underestimate a string by up
-     * to a third, and the value spills out of its cell. Taking the widest
-     * glyph errs the other way: the text comes out slightly small, which is
-     * the harmless direction to be wrong in.
-     */
-    static const QString alphabet = QStringLiteral("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-");
-
-    m_charAdvance = 0.0;
-    for (const QChar c : alphabet) m_charAdvance = qMax(m_charAdvance, fm.horizontalAdvance(c));
-
-    m_lineHeight = fm.height();
+    m_lineHeight = QFontMetricsF(m_valueFont).height();
 }
 
-qreal
-SiAmLogicView::fittedFontSize(int length, const QRectF &cell) const
+void
+SiAmLogicView::drawElided(QPainter *p, const QRectF &cell, const QString &text) const
 {
-    if (length <= 0 || m_charAdvance <= 0.0 || m_lineHeight <= 0.0) return 0.0;
+    if (text.isEmpty() || cell.height() < m_lineHeight) return;
 
-    const qreal usableWidth = cell.width() - 2 * textPadding;
-    if (usableWidth <= 0.0) return 0.0;
+    const qreal available = cell.width() - 2 * textPadding;
+    if (available <= 0.0) return;
 
-    // Both measurements scale linearly with point size, so the size that
-    // just fits is a ratio against the reference rather than a search
-    const qreal byWidth = refFontSize * usableWidth / (length * m_charAdvance);
-    const qreal byHeight = refFontSize * cell.height() / m_lineHeight;
+    const QString shown = QFontMetricsF(m_valueFont).elidedText(text, Qt::ElideRight, available);
 
-    const qreal size = qMin(qMin(byWidth, byHeight), maxFontSize);
+    // Nothing but the ellipsis is left: the cell is too narrow to say anything
+    if (shown.isEmpty() || shown == QChar(0x2026)) return;
 
-    // Below the floor the cell is left empty rather than shrunk further
-    return size >= minFontSize ? size : 0.0;
+    p->drawText(cell, Qt::AlignCenter, shown);
 }
 
 void
@@ -413,9 +389,8 @@ SiAmLogicView::drawLabels(QPainter *p, qreal w, qreal headerHeight, qreal dx) co
 {
     Q_UNUSED(w)
 
-    QFont font = p->font();
-    p->setFont(font);
-    QFontMetricsF fm(font);
+    p->setFont(m_valueFont);
+    const QFontMetricsF fm(m_valueFont);
 
     for (int i = 0; i < segments; i++) {
 
@@ -443,10 +418,8 @@ SiAmLogicView::drawLabels(QPainter *p, qreal w, qreal headerHeight, qreal dx) co
             p->fillRect(barRect, m_colors[i]);
 
             QRectF labelRect(x, 0.5 * headerHeight, dx, 0.5 * headerHeight);
-            if (fm.horizontalAdvance(m_labels[i]) <= labelRect.width()) {
-                p->setPen(m_textColor);
-                p->drawText(labelRect, Qt::AlignCenter, m_labels[i]);
-            }
+            p->setPen(m_textColor);
+            drawElided(p, labelRect, m_labels[i]);
         }
     }
 }
@@ -462,20 +435,7 @@ SiAmLogicView::drawSignal(QPainter *p, int channel, qreal w, qreal headerHeight,
     const qreal margin = qMax(0.0, (dy - 24.0) / 2.0);
     const QRectF cell(0, 0, dx, dy - 2 * margin);
 
-    /* Every cell in this row is the same size, and a string is sized from
-     * its length alone (see setupValueFont), so there are only as many
-     * answers as there are lengths. They are worked out once here and
-     * looked up per cell, which keeps the inner loop free of both the
-     * arithmetic and any font measurement.
-     *
-     * Index 0 stays 0: an empty string has nothing to draw.
-     */
-    std::array<qreal, maxLabelLength + 1> sizeFor {};
-    for (int n = 1; n <= maxLabelLength; n++) sizeFor[n] = fittedFontSize(n, cell);
-
-    // Only reapplied when it actually changes -- in hex every value in a row
-    // is the same length, so this is usually set once for the whole row
-    qreal appliedSize = 0.0;
+    p->setFont(m_valueFont);
 
     for (int i = 0; i < segments; i++) {
 
@@ -499,22 +459,8 @@ SiAmLogicView::drawSignal(QPainter *p, int channel, qreal w, qreal headerHeight,
         const bool named = channel == 0 && m_symbolic && !m_symbols[i].isEmpty();
         const QString label = named ? m_symbols[i] : formatValue(curr, bits);
 
-        const int length = int(qMin<qsizetype>(label.size(), maxLabelLength));
-        const qreal size = sizeFor[length];
-
-        // Too small to read at any size we are willing to use: leave it empty
-        if (size <= 0.0) continue;
-
-        if (size != appliedSize) {
-
-            QFont font = m_valueFont;
-            font.setPointSizeF(size);
-            p->setFont(font);
-            appliedSize = size;
-        }
-
         p->setPen(ink);
-        p->drawText(r, Qt::AlignCenter, label);
+        drawElided(p, r, label);
     }
 }
 
