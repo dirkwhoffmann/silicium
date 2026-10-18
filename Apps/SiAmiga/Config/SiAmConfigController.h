@@ -53,6 +53,9 @@ class SiAmConfigController : public Controller {
     // Owning virtual machine controller
     SiAmController *parent = nullptr;
 
+    // The X-Ray overlay switch (see dmaDebugOverlay())
+    bool m_xrayOverlay = false;
+
     // Cached ROM properties
     vamiga::RomTraits kickRom {};
     vamiga::RomTraits extRom {};
@@ -822,8 +825,12 @@ class SiAmConfigController : public Controller {
 
     int xrayMode() const { return (int)get(vamiga::Opt::XRAY_MODE); }
     void setXrayMode(int value) { set(vamiga::Opt::XRAY_MODE, (i64)value); }
-    bool dmaDebugOverlay() const { return (bool)get(vamiga::Opt::XRAY_OVERLAY); }
-    void setDmaDebugOverlay(bool value) { set(vamiga::Opt::XRAY_OVERLAY, (i64)value); }
+    /* Whether the xray texture is blended into the picture. The flag is kept
+     * here, not in the core: the GPU does the blending (see merge.frag), and
+     * the core's own Opt::XRAY_OVERLAY, with which the CPU does it, stays off.
+     */
+    bool dmaDebugOverlay() const { return m_xrayOverlay; }
+    void setDmaDebugOverlay(bool value) { if (m_xrayOverlay != value) { m_xrayOverlay = value; emit configChanged(); } }
     int dmaDebugMode() const { return (int)get(vamiga::Opt::XRAY_OVERLAY_STYLE); }
     void setDmaDebugMode(int value) { set(vamiga::Opt::XRAY_OVERLAY_STYLE, (i64)value); }
     int dmaDebugOpacity() const { return (int)get(vamiga::Opt::XRAY_OVERLAY_OPACITY); }

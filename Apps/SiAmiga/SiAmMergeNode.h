@@ -44,6 +44,15 @@ class SiAmMergeMaterial : public QSGMaterial {
     QSGTexture *longFrame = nullptr;
     QSGTexture *shortFrame = nullptr;
 
+    // The xray textures of both fields (same dimensions as the field textures)
+    QSGTexture *longXray = nullptr;
+    QSGTexture *shortXray = nullptr;
+
+    // Blends the xray texture into the picture if set (see merge.frag)
+    float xrayOverlay = 0.0f;
+    float xrayFgWeight = 0.0f;
+    float xrayBgWeight = 0.0f;
+
     // Per-field brightness, used to emulate interlace flicker
     float longFrameScale = 1.0f;
     float shortFrameScale = 1.0f;
@@ -63,6 +72,8 @@ class SiAmMergeNode : public QSGGeometryNode {
 
     QSGTexture *longFrameTexture() const { return m_lfTexture; }
     QSGTexture *shortFrameTexture() const { return m_sfTexture; }
+    QSGTexture *longXrayTexture() const { return m_lxTexture; }
+    QSGTexture *shortXrayTexture() const { return m_sxTexture; }
 
     // Both take ownership and drop whatever texture they replace. Called
     // from updatePaintNode(), i.e. on the render thread, which is also where
@@ -70,6 +81,8 @@ class SiAmMergeNode : public QSGGeometryNode {
     // the thread that owns the graphics resources.
     void setLongFrameTexture(QSGTexture *texture);
     void setShortFrameTexture(QSGTexture *texture);
+    void setLongXrayTexture(QSGTexture *texture);
+    void setShortXrayTexture(QSGTexture *texture);
 
     // 'source' is in normalized texture coordinates
     void updateGeometry(const QRectF &target, const QRectF &source);
@@ -81,4 +94,6 @@ class SiAmMergeNode : public QSGGeometryNode {
 
     QSGTexture *m_lfTexture = nullptr;
     QSGTexture *m_sfTexture = nullptr;
+    QSGTexture *m_lxTexture = nullptr;
+    QSGTexture *m_sxTexture = nullptr;
 };

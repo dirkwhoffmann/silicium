@@ -46,6 +46,7 @@ SiAmRenderer::start()
     LogTask task("Starting renderer...");
 
     updateTextureCutout();
+    keepCoreFromMergingXray();
 
     // Get the refresh rate and pass it to the core
     if (auto screen = window() ? window()->screen() : nullptr) {
@@ -129,6 +130,28 @@ SiAmRenderer::updateTexture()
     bool lof = true;
     bool prevlof = true;
 
+    auto *config = controller->getConfigController();
+
+    // Work out whether and how the xray texture is blended into the picture.
+    // The weights are those of PixelEngine::mergeXray() in the core.
+    xrayOverlay = false;
+    try {
+
+        if (config->dmaDebugOverlay() && core.get(vamiga::Opt::XRAY_MODE) != 0) {
+
+            double opacity = double(core.get(vamiga::Opt::XRAY_OVERLAY_OPACITY)) / 255.0;
+
+            switch (core.get(vamiga::Opt::XRAY_OVERLAY_STYLE)) {
+
+                case 0: xrayBgWeight = 0.0f;           xrayFgWeight = 1.0f - opacity; break; // Foreground layer
+                case 1: xrayBgWeight = 1.0f - opacity; xrayFgWeight = 0.0f;           break; // Background layer
+                default: xrayBgWeight = opacity;       xrayFgWeight = 1.0f - opacity; break; // Mixed layers
+            }
+            xrayOverlay = true;
+        }
+
+    } catch (...) { }
+
     // Prevent the stable texture from changing
     core.videoPort.lockTexture();
 
@@ -159,6 +182,24 @@ SiAmRenderer::updateTexture()
             sfImage = frame.copy();
             sfDirty = true;
         }
+
+        // The xray texture of the same frame
+        if (xrayOverlay) {
+
+            if (auto *xray = core.videoPort.getXrayTexture()) {
+
+                QImage xrayFrame(reinterpret_cast<const uchar *>(xray),
+                                 (int)texWidth, (int)texHeight, QImage::Format_ARGB32);
+
+                if (currLOF) {
+                    lfXray = xrayFrame.copy();
+                    lfXrayDirty = true;
+                } else {
+                    sfXray = xrayFrame.copy();
+                    sfXrayDirty = true;
+                }
+            }
+        }
     }
 
     // Release the texture lock
@@ -169,8 +210,6 @@ SiAmRenderer::updateTexture()
      * dimming every other one would just make the whole screen pulse.
      * Mirrors the merge-uniform half of Canvas.makeCommandBuffer().
      */
-    auto *config = controller->getConfigController();
-
     if (currLOF != prevLOF && !config->flickerFixer()) {
 
         auto weight = 1.0f - float(config->flickerJitter()) / 1000.0f;
@@ -209,8 +248,19 @@ SiAmRenderer::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
         mergeNode->setShortFrameTexture(window()->createTextureFromImage(sfImage));
     }
 
+    if (lfXrayDirty) {
+        lfXrayDirty = false;
+        mergeNode->setLongXrayTexture(window()->createTextureFromImage(lfXray));
+    }
+    if (sfXrayDirty) {
+        sfXrayDirty = false;
+        mergeNode->setShortXrayTexture(window()->createTextureFromImage(sfXray));
+    }
+
     auto *lf = mergeNode->longFrameTexture();
     auto *sf = mergeNode->shortFrameTexture();
+    auto *lx = mergeNode->longXrayTexture();
+    auto *sx = mergeNode->shortXrayTexture();
 
     // Until both fields have been seen once, the one that has stands in for
     // the other. Same substitution non-interlace mode makes below, so the
@@ -218,6 +268,13 @@ SiAmRenderer::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
     if (!lf) lf = sf;
     if (!sf) sf = lf;
     if (!lf) return mergeNode;
+
+    // The same for the xray textures. Without any, nothing is blended.
+    if (!lx) lx = sx;
+    if (!sx) sx = lx;
+    const bool blend = xrayOverlay && lx;
+    if (!lx) lx = lf;
+    if (!sx) sx = sf;
 
     auto *material = mergeNode->mergeMaterial();
     material->texHeight = float(texHeight);
@@ -227,8 +284,11 @@ SiAmRenderer::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
         // Non-interlace mode: a single field carries the whole picture.
         // Feeding it to both slots collapses the merge to scale1X4Y's copy.
         auto *field = currLOF ? lf : sf;
+        auto *xray = currLOF ? lx : sx;
         material->longFrame = field;
         material->shortFrame = field;
+        material->longXray = xray;
+        material->shortXray = xray;
         material->longFrameScale = 1.0f;
         material->shortFrameScale = 1.0f;
 
@@ -238,9 +298,15 @@ SiAmRenderer::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
         // other way round -- the shader weaves them line by line.
         material->longFrame = lf;
         material->shortFrame = sf;
+        material->longXray = lx;
+        material->shortXray = sx;
         material->longFrameScale = longFrameScale;
         material->shortFrameScale = shortFrameScale;
     }
+
+    material->xrayOverlay = blend ? 1.0f : 0.0f;
+    material->xrayFgWeight = xrayFgWeight;
+    material->xrayBgWeight = xrayBgWeight;
 
     mergeNode->updateGeometry(boundingRect(),
                               QRectF(x.current / texWidth, y.current / texHeight,
@@ -362,9 +428,21 @@ SiAmRenderer::updateTextureRect(int hstrt, int vstrt, int hstop, int vstop)
 }
 
 void
+SiAmRenderer::keepCoreFromMergingXray()
+{
+    auto &core = controller->core();
+
+    try { if (core.get(vamiga::Opt::XRAY_OVERLAY)) core.set(vamiga::Opt::XRAY_OVERLAY, false); }
+    catch (...) { }
+}
+
+void
 SiAmRenderer::updateTextureCutout()
 {
     if (!controller) return;
+
+    // A configuration change may have switched the core's own overlay on
+    keepCoreFromMergingXray();
 
     auto rect = visible();
     x = rect.x;
