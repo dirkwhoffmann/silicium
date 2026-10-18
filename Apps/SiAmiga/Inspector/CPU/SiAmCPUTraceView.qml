@@ -120,7 +120,7 @@ SiBox {
 
                     width: ListView.view.width
                     implicitHeight: traceRow.implicitHeight
-                    color: index % 2 === 0 ? Palette.inset.lighter(1.025) : Palette.inset.darker(1.025)
+                    color: index % 2 === 0 ? Palette.insetEven : Palette.insetOdd
 
                     RowLayout {
 

@@ -356,7 +356,7 @@ SiAmInspectorWindow {
                             implicitHeight: bankRow.implicitHeight
                             color: index === mem.displayedBank
                                 ? Palette.accent
-                                : index % 2 === 0 ? Palette.inset.lighter(1.025) : Palette.inset.darker(1.025)
+                                : index % 2 === 0 ? Palette.insetEven : Palette.insetOdd
                             radius: Style.radius
 
                             RowLayout {
@@ -452,7 +452,7 @@ SiAmInspectorWindow {
 
                             width: ListView.view.width
                             implicitHeight: dumpRow.implicitHeight
-                            color: index % 2 === 0 ? Palette.inset.lighter(1.025) : Palette.inset.darker(1.025)
+                            color: index % 2 === 0 ? Palette.insetEven : Palette.insetOdd
 
                             RowLayout {
 

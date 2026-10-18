@@ -116,7 +116,7 @@ SiBox {
                     width: ListView.view.width
                     implicitHeight: instrRow.implicitHeight
                     color: isPC ? Palette.accent
-                        : index % 2 === 0 ? Palette.inset.lighter(1.025) : Palette.inset.darker(1.025)
+                        : index % 2 === 0 ? Palette.insetEven : Palette.insetOdd
                     radius: isPC ? Style.radius : 0
 
                     RowLayout {

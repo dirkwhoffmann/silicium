@@ -61,6 +61,8 @@ class Palette : public QQuickAttachedPropertyPropagator {
         InsetFocused,
         InsetBorder,
         InsetBorderFocused,
+        InsetEven,
+        InsetOdd,
 
         // Transparent overlays
         Overlay,
@@ -121,6 +123,8 @@ private:
     Q_PROPERTY(QColor insetFocused READ insetFocused NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor insetBorder READ insetBorder NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor insetBorderFocused READ insetBorderFocused NOTIFY themeChanged FINAL)
+    Q_PROPERTY(QColor insetEven READ insetEven NOTIFY themeChanged FINAL)
+    Q_PROPERTY(QColor insetOdd READ insetOdd NOTIFY themeChanged FINAL)
 
     Q_PROPERTY(QColor overlay READ overlay NOTIFY themeChanged FINAL)
     Q_PROPERTY(QColor overlayElevated READ overlayElevated NOTIFY themeChanged FINAL)
@@ -186,6 +190,8 @@ private:
     QColor insetFocused() const { return getColor(Color::InsetFocused); }
     QColor insetBorder() const { return getColor(Color::InsetBorder); }
     QColor insetBorderFocused() const { return getColor(Color::InsetBorderFocused); }
+    QColor insetEven() const { return getColor(Color::InsetEven); }
+    QColor insetOdd() const { return getColor(Color::InsetOdd); }
 
     QColor overlay() const { return getColor(Color::Overlay); }
     QColor overlayElevated() const { return getColor(Color::OverlayElevated); }

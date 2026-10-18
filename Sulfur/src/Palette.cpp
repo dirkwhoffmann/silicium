@@ -398,6 +398,8 @@ Palette::deriveColor(Color c, bool darkMode) const
             case Color::WidgetElevated:         return lighter(Color::Widget);
             case Color::WidgetBorder:           return darker(Color::Widget);
             case Color::InsetBorder:            return darker(Color::Inset);
+            case Color::InsetEven:              return lighter(Color::Inset, 102);
+            case Color::InsetOdd:               return darker(Color::Inset, 102);
             case Color::OverlayElevated:        return lighter(Color::Overlay);
             case Color::OverlayBorder:          return darker(Color::Overlay);
             case Color::OverlayBorderElevated:  return lighter(Color::OverlayBorder);
@@ -420,6 +422,8 @@ Palette::deriveColor(Color c, bool darkMode) const
             case Color::WidgetElevated:         return darker(Color::Widget);
             case Color::WidgetBorder:           return darker(Color::Widget);
             case Color::InsetBorder:            return darker(Color::Inset);
+            case Color::InsetEven:              return lighter(Color::Inset, 102);
+            case Color::InsetOdd:               return darker(Color::Inset, 102);
             case Color::OverlayElevated:        return darker(Color::Overlay);
             case Color::OverlayBorder:          return lighter(Color::Overlay);
             case Color::OverlayBorderElevated:  return darker(Color::OverlayBorder);

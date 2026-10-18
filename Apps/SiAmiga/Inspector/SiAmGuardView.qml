@@ -12,14 +12,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Sulfur
 
-// Port of vAmiga's own GuardTableView (its BreakTableView/WatchTableView
-// specializations) -- one reusable breakpoint/watchpoint table, parameterized
-// by 'model' (a SiAmGuardModel) and driven entirely through row-index
-// signals, matching SiAmCopperController's own toggleGuardEnabled(index)/
-// removeGuard(index) convention (SiAmGuardModel exposes 'addr'/'enabled'
-// roles only, no per-row "nr" -- row position already doubles as the guard's
-// index in vAmiga's GuardsAPI, since guardNr()/moveTo() are addressed the
-// same way).
 SiBox {
 
     id: root
@@ -135,7 +127,7 @@ SiBox {
                             id: newRow
                             width: parent.width
                             height: list.rowH
-                            color: list.count % 2 === 0 ? Palette.inset.lighter(1.025) : Palette.inset.darker(1.025)
+                            color: list.count % 2 === 0 ? Palette.insetEven : Palette.insetOdd
 
                             RowLayout {
 
@@ -191,7 +183,7 @@ SiBox {
                                 y: newRow.height + index * list.rowH
                                 width: parent.width
                                 height: list.rowH
-                                color: absoluteIndex % 2 === 0 ? Palette.inset.lighter(1.025) : Palette.inset.darker(1.025)
+                                color: absoluteIndex % 2 === 0 ? Palette.insetEven : Palette.insetOdd
                             }
                         }
                     }
@@ -212,7 +204,7 @@ SiBox {
 
                         width: ListView.view.width
                         height: list.rowH
-                        color: index % 2 === 0 ? Palette.inset.lighter(1.025) : Palette.inset.darker(1.025)
+                        color: index % 2 === 0 ? Palette.insetEven : Palette.insetOdd
 
                         RowLayout {
 
@@ -236,7 +228,7 @@ SiBox {
                                 Layout.fillWidth: true
                                 visible: list.editingRow !== guardDelegate.index
                                 text: guardDelegate.addr
-                                color: guardDelegate.guardEnabled ? Palette.primary : Palette.disabled
+                                color: Palette.primary // guardDelegate.guardEnabled ? Palette.primary : Palette.disabled
                                 TapHandler { onTapped: list.editingRow = guardDelegate.index }
                             }
 

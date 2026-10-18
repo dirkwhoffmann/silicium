@@ -166,7 +166,7 @@ SiAmInspectorWindow {
                             width: ListView.view.width
                             implicitHeight: rowLayout.implicitHeight
                             color: model.current ? Qt.alpha(Palette.tint, 0.75)
-                                : index % 2 === 0 ? Palette.inset.lighter(1.025) : Palette.inset.darker(1.025)
+                                : index % 2 === 0 ? Palette.insetEven : Palette.insetOdd
 
                             RowLayout {
 
