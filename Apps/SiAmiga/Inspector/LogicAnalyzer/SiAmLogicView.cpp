@@ -133,6 +133,14 @@ SiAmLogicView::cacheData()
     for (auto &row : m_data) row.fill(NoValue);
     m_positions.fill(NoValue);
 
+    // A probe channel without a selected signal draws nothing
+    static constexpr Opt probeOpts[] = { Opt::LA_PROBE0, Opt::LA_PROBE1, Opt::LA_PROBE2, Opt::LA_PROBE3 };
+    m_active.fill(true);
+    for (int c = 2; c < numSignals; c++) {
+
+        try { m_active[c] = Probe(core.get(probeOpts[c - 2])) != Probe::NONE; } catch (...) { }
+    }
+
     isize count = 0;
     try { count = core.agnus.logicAnalyzer.getTraceCount(); } catch (...) { return; }
     if (count > segments) count = segments;
@@ -428,6 +436,8 @@ void
 SiAmLogicView::drawSignal(QPainter *p, int channel, qreal w, qreal headerHeight, qreal dx, qreal dy) const
 {
     Q_UNUSED(w)
+
+    if (!m_active[channel]) return;
 
     const int bits = bitWidth[channel];
     const QColor ink = inkFor(channel);

@@ -111,6 +111,10 @@ class SiAmLogicView : public QQuickPaintedItem {
     static constexpr qreal fontSize = 9.0;
     static constexpr qreal textPadding = 2.0;
 
+    // Indicates for each row whether it has a signal to show. The address
+    // and data bus always do; a probe channel only if one is selected.
+    std::array<bool, numSignals> m_active {};
+
     QFont m_valueFont;
     qreal m_lineHeight = 0.0;
     QColor m_textColor = QColor(Qt::black);
