@@ -37,7 +37,7 @@ private:
     // The main emulator instance
     Amiga main = Amiga(*this, 0);
 
-    // The run-ahead instance (only created if RUN_AHEAD_FRAMES > 0)
+    // The run-ahead instance (created if RUN_AHEAD_FRAMES > 0)
     std::unique_ptr<Amiga> ahead;
 
     // Counts the number of created clones
