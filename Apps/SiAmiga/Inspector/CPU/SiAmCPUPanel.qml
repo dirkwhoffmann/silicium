@@ -13,15 +13,6 @@ import QtQuick.Layouts
 import Silicium.Controllers
 import Sulfur
 
-// Port of vAmiga's own GUI/Inspector/CPUPanel.swift. Its own top-level
-// window (see SiAmInspectorWindow.qml), mirroring SiC64CPUPanel.qml, so it
-// can stay open alongside any of the other panels.
-//
-// Unlike SiC64CPUPanel.qml's two-way Program/Debug segmented control
-// (Program showing disassembly and trace side by side), this uses a
-// three-way Program/Trace/Debug tab bar -- the 68000's variable-length
-// instructions make each disassembly/trace column wider than the 6510's, so
-// there isn't room to show two of the three side by side the way SiC64 does.
 SiAmInspectorWindow {
 
     id: root
@@ -38,17 +29,15 @@ SiAmInspectorWindow {
     // Which page the stack shows: 0 = Program, 1 = Trace, 2 = Debug.
     property int page: 0
 
-    // CPU revision gates (mirrors CPUPanel.swift's below10/below20): the
-    // 68000 has no VBR/SFC/DFC (added in the 68010) and no MSP/CACR/CAAR or
-    // second trace bit T0/M (added in the 68020).
+    // CPU revision gates
     readonly property int cpuRev: cc.CPU_REVISION
     readonly property bool below10: cpuRev === 0
     readonly property bool below20: cpuRev === 0 || cpuRev === 1
 
-    // SuLabeledWord32View/SuLabeledWordView (Apps/Shared/QML/Compounds) hold
-    // the structural bits (size/weight/bits/default width) shared with every
-    // other panel; this panel only adds the hex/decimal toggle binding local
-    // wrappers like this let every usage below stay untouched.
+    //
+    // Components
+    //
+
     component SiHex32: SuLabeledWord32View {
 
         base: root.numBase
@@ -62,11 +51,6 @@ SiAmInspectorWindow {
         padded: root.numPadded
     }
 
-    // One status-register bit's checkbox (row 0/2 of the Flags grid below).
-    // Some SR bits don't exist on every 68k model (T0/M were added in the
-    // 68020) and four more are permanently unused padding on every model --
-    // 'unused' hides the checkbox but keeps the cell (and its width) so the
-    // grid stays aligned column by column.
     component FlagBit: Item {
 
         property bool on: false
@@ -87,9 +71,6 @@ SiAmInspectorWindow {
         DebugRect {}
     }
 
-    // The label underneath a FlagBit (or a group of them). Every cell --
-    // checkbox or label -- shares the same Layout.preferredWidth, so all 16
-    // grid columns come out equally wide regardless of what's in them.
     component FlagLabel: SuText {
 
         property string label: ""
@@ -103,6 +84,10 @@ SiAmInspectorWindow {
         color: unused ? Palette.disabled : Palette.primary
         DebugRect{}
     }
+
+    //
+    // Main
+    //
 
     RowLayout {
 

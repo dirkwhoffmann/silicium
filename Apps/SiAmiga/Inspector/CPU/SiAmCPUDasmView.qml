@@ -12,10 +12,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Sulfur
 
-// Port of vAmiga's own InstrTableView.swift -- the 256-entry disassembly
-// window (see SiAmCPUController::disassembleWindow()), plus the Search
-// field and the Syntax/CPU-revision disassembler pickers CPUPanel.swift
-// keeps right beside it (cpuGotoAction/cpuSyntaxAction/cpuDasmRevAction).
 SiBox {
 
     id: root
@@ -25,7 +21,7 @@ SiBox {
     required property int numBase
     property alias listView: instrList
 
-    // title: qsTr("Program")
+    title: ""
     spacing: Style.mediumSpacing
 
     readonly property int markerColW: 20
@@ -173,12 +169,10 @@ SiBox {
                             enabled: true
                             size: Size.tiny
                             awesome: instrDelegate.breakpoint === 1 ? "circle-pause"
-                                : instrDelegate.breakpoint === 2 ? "circle-pause"
+                                : instrDelegate.breakpoint === 2 ? "circle"
                                 : instrDelegate.isPC ? "caret-right" : ""
-                            color: instrDelegate.isPC ? Palette.accentText
-                                : instrDelegate.breakpoint === 1 ? Palette.accent
-                                : instrDelegate.breakpoint === 2 ? Palette.disabled : Palette.primary
-
+                            color: instrDelegate.breakpoint === 1 ? Palette.primary
+                                    : instrDelegate.breakpoint === 2 ? Qt.alpha(Palette.primary, 0.5) : Palette.primary
                             onClicked: cpu.cycleBreakpoint(instrDelegate.addrValue)
                         }
 
