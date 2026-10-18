@@ -29,6 +29,10 @@ SiC64InspectorWindow {
     readonly property int xrayNone: 0
     readonly property int xrayDma: 1
 
+    // Mirrors vc64::XRayCompositor
+    readonly property int xrayCompositorCpu: 0
+    readonly property int xrayCompositorGpu: 1
+
     component ChannelRow: RowLayout {
 
         id: chRow
@@ -174,6 +178,16 @@ SiC64InspectorWindow {
                     value: cc.XRAY_OVERLAY_OPACITY
                     onMoved: (value) => cc.XRAY_OVERLAY_OPACITY = value
 
+                }
+
+                // Who merges the xray texture into the picture
+                SuLabeledCheckBox {
+
+                    indent: tabtab
+                    enabled: cc.XRAY_MODE !== xrayNone && cc.XRAY_OVERLAY
+                    checked: cc.XRAY_COMPOSITOR === xrayCompositorGpu
+                    onClicked: cc.XRAY_COMPOSITOR = checked ? xrayCompositorGpu : xrayCompositorCpu
+                    r: qsTr("GPU compositing")
                 }
 
                 VSpacer { }

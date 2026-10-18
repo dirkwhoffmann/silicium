@@ -53,6 +53,7 @@ DmaDebugger::getOption(Opt option) const
         case Opt::XRAY_COLOR3:          return (i64)config.dmaColor[3];
         case Opt::XRAY_COLOR4:          return (i64)config.dmaColor[4];
         case Opt::XRAY_COLOR5:          return (i64)config.dmaColor[5];
+        case Opt::XRAY_COMPOSITOR:      return (i64)config.compositor;
 
         default:
             fatalError;
@@ -72,6 +73,12 @@ DmaDebugger::checkOption(Opt opt, i64 value)
 
         case Opt::XRAY_OVERLAY:
 
+            return;
+
+        case Opt::XRAY_COMPOSITOR:
+            if (!XRayCompositorEnum::isValid(value)) {
+                throw CoreError(CoreError::OPT_INV_ARG, XRayCompositorEnum::keyList());
+            }
             return;
 
         case Opt::XRAY_OVERLAY_STYLE: 
@@ -129,6 +136,7 @@ DmaDebugger::setOption(Opt opt, i64 value)
             config.dmaDisplayMode = (DmaDisplayMode)value;
             return;
 
+        case Opt::XRAY_COMPOSITOR:      config.compositor = (XRayCompositor)value; return;
         case Opt::XRAY_OVERLAY_OPACITY: config.dmaOpacity = (u8)value; return;
         case Opt::VICII_CUT_LAYERS:      config.cutLayers = (u16)value; return;
         case Opt::VICII_CUT_OPACITY:     config.cutOpacity = (u8)value; return;

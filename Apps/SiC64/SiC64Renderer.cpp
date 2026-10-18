@@ -14,7 +14,7 @@
 #include "VirtualC64.h"
 
 #include <QQuickWindow>
-#include <QSGSimpleTextureNode>
+#include "SiC64MergeNode.h"
 
 void
 SiC64Renderer::setController(C64Controller *ptr)
@@ -48,6 +48,9 @@ SiC64Renderer::start()
 
     // Set the texture format
     controller->getConfigController()->setHostTexFormat((int)vc64::TexFormat::ARGB);
+
+    // The GPU blends the xray texture into the picture (see merge.frag)
+    controller->core().set(vc64::Opt::XRAY_COMPOSITOR, (i64)vc64::XRayCompositor::GPU);
 
     // Only proceed if no connection exists yet
     if (m_frameConnection) return;
@@ -122,9 +125,31 @@ SiC64Renderer::tick()
     controller->getVICController()->tick();
     controller->getSIDController()->tick();
 
+    /* Find out whether the xray texture is blended into the picture by the
+     * GPU. The weights are those of DmaDebugger::computeOverlay() in the core,
+     * which does the same if the compositor is the CPU.
+     */
+    bool blend = false;
+    try {
+
+        blend = core.get(vc64::Opt::XRAY_OVERLAY)
+            && core.get(vc64::Opt::XRAY_MODE) == (i64)vc64::XRayMode::XRAY_DMA
+            && core.get(vc64::Opt::XRAY_COMPOSITOR) == (i64)vc64::XRayCompositor::GPU;
+
+        xrayStyle = float(core.get(vc64::Opt::XRAY_OVERLAY_STYLE));
+        xrayWeight = float(core.get(vc64::Opt::XRAY_OVERLAY_OPACITY)) / 255.0f;
+
+    } catch (...) { }
+
     // Update texture
     core.videoPort.lockTexture();
     tex = const_cast<u32 *>(core.videoPort.getTexture(&nr, &width, &height));
+    xrayTex = nullptr;
+    if (blend) {
+        isize xrayNr, xrayWidth, xrayHeight;
+        auto *xray = core.videoPort.getXrayTexture(&xrayNr, &xrayWidth, &xrayHeight);
+        if (xrayWidth == width && xrayHeight == height) xrayTex = const_cast<u32 *>(xray);
+    }
     core.videoPort.unlockTexture();
 
     // Sample the input devices as late as possible, so that the emulator
@@ -143,28 +168,37 @@ SiC64Renderer::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
         return nullptr;
     }
 
-    auto *textureNode = static_cast<QSGSimpleTextureNode *>(node);
-    if (!textureNode) {
-        textureNode = new QSGSimpleTextureNode();
-        // Tells the node to delete the QSGTexture object when it's replaced or destroyed
-        textureNode->setOwnsTexture(true);
+    auto *mergeNode = static_cast<SiC64MergeNode *>(node);
+    if (!mergeNode) mergeNode = new SiC64MergeNode();
+
+    // Wrap the raw u32 buffers into QImages (which don't copy the data) and
+    // create GPU textures from them
+    QImage img(reinterpret_cast<uchar *>(tex), width, height, QImage::Format_ARGB32);
+    mergeNode->setPictureTexture(window()->createTextureFromImage(img));
+
+    if (xrayTex) {
+
+        QImage xrayImg(reinterpret_cast<uchar *>(xrayTex), width, height, QImage::Format_ARGB32);
+        mergeNode->setXrayTexture(window()->createTextureFromImage(xrayImg));
     }
 
-    // 1. Wrap your raw u32 buffer into a QImage
-    // Note: QImage doesn't copy the data here, it just points to it.
-    QImage img(reinterpret_cast<uchar *>(tex), width, height, QImage::Format_ARGB32);
+    auto *material = mergeNode->mergeMaterial();
+    material->picture = mergeNode->pictureTexture();
+    material->xrayOverlay = xrayTex ? 1.0f : 0.0f;
+    material->xrayStyle = xrayStyle;
+    material->xrayWeight = xrayWeight;
 
-    // 2. Create a GPU texture from the QImage
-    QSGTexture *qsgTex = window()->createTextureFromImage(img);
-
-    // 3. Update the node
-    textureNode->setTexture(qsgTex);
-    textureNode->setRect(boundingRect());
+    // Without an xray texture, the shader gets the picture in its place
+    if (!xrayTex) mergeNode->setXrayTexture(nullptr);
+    material->xray = mergeNode->xrayTexture() ? mergeNode->xrayTexture() : material->picture;
 
     // Set the texture cutout
-    textureNode->setSourceRect(x.current, y.current, w.current, h.current);
+    mergeNode->updateGeometry(boundingRect(),
+                              QRectF(x.current / width, y.current / height,
+                                     w.current / width, h.current / height));
+    mergeNode->markDirty(QSGNode::DirtyMaterial);
 
-    return textureNode;
+    return mergeNode;
 }
 
 void

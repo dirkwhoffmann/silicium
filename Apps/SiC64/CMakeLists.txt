@@ -10,6 +10,7 @@ target_sources(SiC64 PRIVATE
         C64Controller.cpp
         C64MediaController.cpp
         SiC64Renderer.cpp
+        SiC64MergeNode.cpp
         Config/SiC64ConfigController.cpp
         SiC64InfoController.cpp
         SiC64ActivityController.cpp

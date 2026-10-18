@@ -590,6 +590,7 @@ class SiC64ConfigController : public Controller {
     Q_PROPERTY(bool XRAY_OVERLAY READ dmaDebugOverlay WRITE setDmaDebugOverlay NOTIFY configChanged)
     Q_PROPERTY(int XRAY_OVERLAY_STYLE READ dmaDebugMode WRITE setDmaDebugMode NOTIFY configChanged)
     Q_PROPERTY(int XRAY_OVERLAY_OPACITY READ dmaDebugOpacity WRITE setDmaDebugOpacity NOTIFY configChanged)
+    Q_PROPERTY(int XRAY_COMPOSITOR READ xrayCompositor WRITE setXrayCompositor NOTIFY configChanged)
     Q_PROPERTY(bool XRAY_DMA_CHANNEL0 READ dmaDebugChannel0 WRITE setDmaDebugChannel0 NOTIFY configChanged)
     Q_PROPERTY(bool XRAY_DMA_CHANNEL1 READ dmaDebugChannel1 WRITE setDmaDebugChannel1 NOTIFY configChanged)
     Q_PROPERTY(bool XRAY_DMA_CHANNEL2 READ dmaDebugChannel2 WRITE setDmaDebugChannel2 NOTIFY configChanged)
@@ -611,6 +612,8 @@ class SiC64ConfigController : public Controller {
     void setDmaDebugMode(int value) { set(vc64::Opt::XRAY_OVERLAY_STYLE, (i64)value); }
     int dmaDebugOpacity() const { return (int)get(vc64::Opt::XRAY_OVERLAY_OPACITY); }
     void setDmaDebugOpacity(int value) { set(vc64::Opt::XRAY_OVERLAY_OPACITY, (i64)value); }
+    int xrayCompositor() const { return (int)get(vc64::Opt::XRAY_COMPOSITOR); }
+    void setXrayCompositor(int value) { set(vc64::Opt::XRAY_COMPOSITOR, (i64)value); }
     bool dmaDebugChannel0() const { return (bool)get(vc64::Opt::XRAY_DMA_CHANNEL0); }
     void setDmaDebugChannel0(bool value) { set(vc64::Opt::XRAY_DMA_CHANNEL0, (i64)value); }
     bool dmaDebugChannel1() const { return (bool)get(vc64::Opt::XRAY_DMA_CHANNEL1); }

@@ -373,6 +373,15 @@ qt_add_shaders(SiAmiga "siamiga_shaders"
         "SiAmiga/Shaders/merge.vert"
         "SiAmiga/Shaders/merge.frag")
 
+# The merge shader of SiC64 (see the comment above SiAmiga's shaders)
+qt_add_shaders(SiC64 "sic64_shaders"
+        BATCHABLE
+        PREFIX "/shaders"
+        BASE "${CMAKE_CURRENT_SOURCE_DIR}/SiC64/Shaders"
+        FILES
+        "SiC64/Shaders/sic64merge.vert"
+        "SiC64/Shaders/sic64merge.frag")
+
 # SiAmiga embeds the same Shared/Assets tree as the other two apps.
 qt_add_resources(SiAmiga "assets_files"
         PREFIX "/"

@@ -25,6 +25,12 @@ class SiC64Renderer : public Renderer {
     class C64Controller *controller = nullptr;
     u32 *tex                        = nullptr;
 
+    // The xray texture of the same frame, and how it is blended into the
+    // picture by the GPU (see sic64merge.frag). Null if the GPU is not asked to.
+    u32 *xrayTex                    = nullptr;
+    float xrayStyle                 = 0.0f;
+    float xrayWeight                = 0.0f;
+
     // Frame counter
     isize frame = 0;
 

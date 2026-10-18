@@ -175,7 +175,7 @@ SiAmInspectorWindow {
                     enabled: cc.XRAY_OVERLAY
                     checked: cc.XRAY_COMPOSITOR === xrayCompositorGpu
                     onClicked: cc.XRAY_COMPOSITOR = checked ? xrayCompositorGpu : xrayCompositorCpu
-                    r: qsTr("GPU acceleration")
+                    r: qsTr("GPU compositing")
                 }
             }
 
