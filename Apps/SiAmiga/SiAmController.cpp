@@ -1282,8 +1282,19 @@ SiAmController::process(const Message &msg, const string &attachment, std::excep
             m_infoIsDirty = true;
             break;
 
-        case Msg::INFO:
+        case Msg::STEP:
+        case Msg::STOP:
+        case Msg::EOL_REACHED:
+        case Msg::EOF_REACHED:
+        case Msg::BREAKPOINT_REACHED:
+        case Msg::WATCHPOINT_REACHED:
+        case Msg::CATCHPOINT_REACHED:
+        case Msg::SWTRAP_REACHED:
+        case Msg::BEAMTRAP_REACHED:
+        case Msg::COPPERBP_REACHED:
+        case Msg::COPPERWP_REACHED:
 
+            // The core says why it is about to pause
             setInfoMessage(QString::fromStdString(attachment));
             break;
 

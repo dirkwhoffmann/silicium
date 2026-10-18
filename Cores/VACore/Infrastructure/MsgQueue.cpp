@@ -121,15 +121,15 @@ MsgQueue::put(Msg type, std::exception_ptr exception)
 }
 
 void
-MsgQueue::put(Msg type, CpuMsg payload)
+MsgQueue::put(Msg type, CpuMsg payload, const string &str)
 {
-    put( Message { .type = type, .cpu = payload } );
+    put( Message { .type = type, .cpu = payload }, str);
 }
 
 void
-MsgQueue::put(Msg type, BeamMsg payload)
+MsgQueue::put(Msg type, BeamMsg payload, const string &str)
 {
-    put( Message { .type = type, .beam = payload } );
+    put( Message { .type = type, .beam = payload }, str);
 }
 
 void

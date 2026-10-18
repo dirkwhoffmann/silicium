@@ -28,6 +28,7 @@ enum class Msg : long
     RUN,
     PAUSE,
     STEP,
+    STOP,               ///< A remote debugger requested a stop
     RESET,
     SHUTDOWN,
     ABORT,
@@ -38,7 +39,6 @@ enum class Msg : long
     POWER_LED_ON,
     POWER_LED_DIM,
     POWER_LED_OFF,
-    INFO,               ///< Informs about an event (the string describes it)
     
     // Retro shell
     RSH_CLOSE,          ///< RetroShell has been closed
@@ -165,6 +165,7 @@ struct MsgEnum : Reflectable<MsgEnum, Msg>
             case Msg::RUN:                   return "RUN";
             case Msg::PAUSE:                 return "PAUSE";
             case Msg::STEP:                  return "STEP";
+            case Msg::STOP:                  return "STOP";
             case Msg::RESET:                 return "RESET";
             case Msg::SHUTDOWN:              return "SHUTDOWN";
             case Msg::ABORT:                 return "ABORT";
@@ -175,7 +176,6 @@ struct MsgEnum : Reflectable<MsgEnum, Msg>
             case Msg::POWER_LED_ON:          return "POWER_LED_ON";
             case Msg::POWER_LED_DIM:         return "POWER_LED_DIM";
             case Msg::POWER_LED_OFF:         return "POWER_LED_OFF";
-            case Msg::INFO:                  return "INFO";
                 
             case Msg::RSH_CLOSE:             return "RSH_CLOSE";
             case Msg::RSH_UPDATE:            return "RSH_UPDATE";
