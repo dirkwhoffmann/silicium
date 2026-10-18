@@ -46,7 +46,9 @@ SiAmRenderer::start()
     LogTask task("Starting renderer...");
 
     updateTextureCutout();
-    keepCoreFromMergingXray();
+
+    // The GPU blends the xray texture into the picture (see merge.frag)
+    controller->core().set(vamiga::Opt::XRAY_COMPOSITOR, (i64)vamiga::XRayCompositor::GPU);
 
     // Get the refresh rate and pass it to the core
     if (auto screen = window() ? window()->screen() : nullptr) {
@@ -133,11 +135,14 @@ SiAmRenderer::updateTexture()
     auto *config = controller->getConfigController();
 
     // Work out whether and how the xray texture is blended into the picture.
-    // The weights are those of PixelEngine::mergeXray() in the core.
+    // The weights are those of PixelEngine::mergeXray() in the core, which
+    // does the same if the compositor is the CPU.
     xrayOverlay = false;
     try {
 
-        if (config->dmaDebugOverlay() && core.get(vamiga::Opt::XRAY_MODE) != 0) {
+        if (core.get(vamiga::Opt::XRAY_OVERLAY)
+            && core.get(vamiga::Opt::XRAY_MODE) != 0
+            && core.get(vamiga::Opt::XRAY_COMPOSITOR) == (i64)vamiga::XRayCompositor::GPU) {
 
             double opacity = double(core.get(vamiga::Opt::XRAY_OVERLAY_OPACITY)) / 255.0;
 
@@ -428,21 +433,9 @@ SiAmRenderer::updateTextureRect(int hstrt, int vstrt, int hstop, int vstop)
 }
 
 void
-SiAmRenderer::keepCoreFromMergingXray()
-{
-    auto &core = controller->core();
-
-    try { if (core.get(vamiga::Opt::XRAY_OVERLAY)) core.set(vamiga::Opt::XRAY_OVERLAY, false); }
-    catch (...) { }
-}
-
-void
 SiAmRenderer::updateTextureCutout()
 {
     if (!controller) return;
-
-    // A configuration change may have switched the core's own overlay on
-    keepCoreFromMergingXray();
 
     auto rect = visible();
     x = rect.x;

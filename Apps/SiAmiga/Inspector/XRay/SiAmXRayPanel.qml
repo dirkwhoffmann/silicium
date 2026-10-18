@@ -38,6 +38,10 @@ SiAmInspectorWindow {
     readonly property int xrayDma: 1
     readonly property int xrayLayers: 2
 
+    // Mirrors vamiga::XRayCompositor
+    readonly property int xrayCompositorCpu: 0
+    readonly property int xrayCompositorGpu: 1
+
     component ChannelRow: RowLayout {
 
         id: chRow
@@ -135,7 +139,6 @@ SiAmInspectorWindow {
 
                 SuLabeledCheckBox {
 
-                    // indent: tab
                     visible: cc.XRAY_MODE !== xrayNone
                     checked: cc.XRAY_OVERLAY
                     onClicked: cc.XRAY_OVERLAY = checked
@@ -144,9 +147,9 @@ SiAmInspectorWindow {
 
                 SuLabeledComboBox {
 
+                    visible: cc.XRAY_MODE !== xrayNone
                     indent: tab
                     Layout.fillWidth: true
-                    visible: cc.XRAY_MODE !== xrayNone
                     enabled: cc.XRAY_OVERLAY
                     model: [qsTr("Foreground layer"), qsTr("Background layer"), qsTr("Mixed layers")]
                     currentIndex: cc.XRAY_OVERLAY_STYLE
@@ -158,11 +161,21 @@ SiAmInspectorWindow {
                     visible: cc.XRAY_MODE !== xrayNone
                     indent: tab
                     Layout.fillWidth: true
-                    // l: qsTr("Opacity")
+                    enabled: cc.XRAY_OVERLAY
                     from: 0
                     to: 255
                     value: cc.XRAY_OVERLAY_OPACITY
                     onMoved: (value) => cc.XRAY_OVERLAY_OPACITY = value
+                }
+
+                SuLabeledCheckBox {
+
+                    visible: cc.XRAY_MODE !== xrayNone
+                    indent: tab
+                    enabled: cc.XRAY_OVERLAY
+                    checked: cc.XRAY_COMPOSITOR === xrayCompositorGpu
+                    onClicked: cc.XRAY_COMPOSITOR = checked ? xrayCompositorGpu : xrayCompositorCpu
+                    r: qsTr("GPU acceleration")
                 }
             }
 

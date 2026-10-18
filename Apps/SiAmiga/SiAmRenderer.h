@@ -42,9 +42,8 @@ class SiAmRenderer : public Renderer {
     bool sfDirty = false;
 
     /* The xray textures that belong to the long and the short frame. They are
-     * blended into the picture by the merge shader, which is why the core is
-     * kept from doing so (see keepCoreFromMergingXray()). Only grabbed while
-     * the overlay is on.
+     * blended into the picture by the merge shader if the compositor is the
+     * GPU (Opt::XRAY_COMPOSITOR). Only grabbed while that is the case.
      */
     QImage lfXray;
     QImage sfXray;
@@ -107,13 +106,6 @@ class SiAmRenderer : public Renderer {
     // works out this frame's flicker weights. Mirrors Canvas.updateTexture()
     // plus the merge-uniform half of Canvas.makeCommandBuffer() in vAmiga.
     void updateTexture();
-
-    /* The overlay is done by the GPU (see merge.frag). The core's own flag,
-     * with which a host without a GPU path lets the CPU blend the xray
-     * texture into the picture, therefore has to stay off. The app's flag
-     * lives in the config controller (XRAY_OVERLAY).
-     */
-    void keepCoreFromMergingXray();
 
     //
     // Texture cutout

@@ -53,9 +53,6 @@ class SiAmConfigController : public Controller {
     // Owning virtual machine controller
     SiAmController *parent = nullptr;
 
-    // The X-Ray overlay switch (see dmaDebugOverlay())
-    bool m_xrayOverlay = false;
-
     // Cached ROM properties
     vamiga::RomTraits kickRom {};
     vamiga::RomTraits extRom {};
@@ -804,6 +801,7 @@ class SiAmConfigController : public Controller {
     Q_PROPERTY(bool XRAY_OVERLAY READ dmaDebugOverlay WRITE setDmaDebugOverlay NOTIFY configChanged)
     Q_PROPERTY(int XRAY_OVERLAY_STYLE READ dmaDebugMode WRITE setDmaDebugMode NOTIFY configChanged)
     Q_PROPERTY(int XRAY_OVERLAY_OPACITY READ dmaDebugOpacity WRITE setDmaDebugOpacity NOTIFY configChanged)
+    Q_PROPERTY(int XRAY_COMPOSITOR READ xrayCompositor WRITE setXrayCompositor NOTIFY configChanged)
     Q_PROPERTY(bool XRAY_DMA_CHANNEL0 READ dmaDebugChannel0 WRITE setDmaDebugChannel0 NOTIFY configChanged)
     Q_PROPERTY(bool XRAY_DMA_CHANNEL1 READ dmaDebugChannel1 WRITE setDmaDebugChannel1 NOTIFY configChanged)
     Q_PROPERTY(bool XRAY_DMA_CHANNEL2 READ dmaDebugChannel2 WRITE setDmaDebugChannel2 NOTIFY configChanged)
@@ -825,16 +823,14 @@ class SiAmConfigController : public Controller {
 
     int xrayMode() const { return (int)get(vamiga::Opt::XRAY_MODE); }
     void setXrayMode(int value) { set(vamiga::Opt::XRAY_MODE, (i64)value); }
-    /* Whether the xray texture is blended into the picture. The flag is kept
-     * here, not in the core: the GPU does the blending (see merge.frag), and
-     * the core's own Opt::XRAY_OVERLAY, with which the CPU does it, stays off.
-     */
-    bool dmaDebugOverlay() const { return m_xrayOverlay; }
-    void setDmaDebugOverlay(bool value) { if (m_xrayOverlay != value) { m_xrayOverlay = value; emit configChanged(); } }
+    bool dmaDebugOverlay() const { return (bool)get(vamiga::Opt::XRAY_OVERLAY); }
+    void setDmaDebugOverlay(bool value) { set(vamiga::Opt::XRAY_OVERLAY, (i64)value); }
     int dmaDebugMode() const { return (int)get(vamiga::Opt::XRAY_OVERLAY_STYLE); }
     void setDmaDebugMode(int value) { set(vamiga::Opt::XRAY_OVERLAY_STYLE, (i64)value); }
     int dmaDebugOpacity() const { return (int)get(vamiga::Opt::XRAY_OVERLAY_OPACITY); }
     void setDmaDebugOpacity(int value) { set(vamiga::Opt::XRAY_OVERLAY_OPACITY, (i64)value); }
+    int xrayCompositor() const { return (int)get(vamiga::Opt::XRAY_COMPOSITOR); }
+    void setXrayCompositor(int value) { set(vamiga::Opt::XRAY_COMPOSITOR, (i64)value); }
     bool dmaDebugChannel0() const { return (bool)get(vamiga::Opt::XRAY_DMA_CHANNEL0); }
     void setDmaDebugChannel0(bool value) { set(vamiga::Opt::XRAY_DMA_CHANNEL0, (i64)value); }
     bool dmaDebugChannel1() const { return (bool)get(vamiga::Opt::XRAY_DMA_CHANNEL1); }
