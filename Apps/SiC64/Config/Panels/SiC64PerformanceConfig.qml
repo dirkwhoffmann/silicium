@@ -193,8 +193,10 @@ SettingsPage {
                 r: `${value} frames`
                 lwidth: root.labelWidth
                 rwidth: 60
-                from: -7
-                to: 7
+                from: -config.maxRunBehind
+                to: config.maxRunAhead
+                stepSize: 1
+                snapMode: Slider.SnapAlways
 
                 value: config.C64_RUN_AHEAD
                 onMoved: (value) => config.C64_RUN_AHEAD = value

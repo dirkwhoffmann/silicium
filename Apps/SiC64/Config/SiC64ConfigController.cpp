@@ -8,6 +8,7 @@
 // -----------------------------------------------------------------------------
 
 #include "SiC64ConfigController.h"
+#include "vcconfig.h"
 #include "Assets.h"
 #include "C64Controller.h"
 #include "Preferences.h"
@@ -16,6 +17,18 @@
 #include <QFileInfo>
 
 using namespace vc64;
+
+int
+SiC64ConfigController::maxRunAhead() const
+{
+    return RUN_AHEAD_FRAMES;
+}
+
+int
+SiC64ConfigController::maxRunBehind() const
+{
+    return RUN_BEHIND_FRAMES;
+}
 
 /* What to call a ROM in a message.
  *

@@ -8,6 +8,7 @@
 // -----------------------------------------------------------------------------
 
 #include "SiAmConfigController.h"
+#include "vaconfig.h"
 #include "Assets.h"
 #include "SiAmController.h"
 #include "RomFile.h"
@@ -20,6 +21,18 @@ SiAmConfigController::SiAmConfigController(SiAmController *parent)
     : Controller(parent), parent(parent)
 {
 
+}
+
+int
+SiAmConfigController::maxRunAhead() const
+{
+    return RUN_AHEAD_FRAMES;
+}
+
+int
+SiAmConfigController::maxRunBehind() const
+{
+    return RUN_BEHIND_FRAMES;
 }
 
 SiAmConfigController::~SiAmConfigController()

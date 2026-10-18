@@ -143,8 +143,10 @@ SettingsPage {
                 lwidth: root.labelWidth
                 Layout.fillWidth: true
                 r: "%1 frames".arg(Math.abs(config.AMIGA_RUN_AHEAD))
-                from: -7
-                to: 7
+                from: -config.maxRunBehind
+                to: config.maxRunAhead
+                stepSize: 1
+                snapMode: Slider.SnapAlways
                 value: config.AMIGA_RUN_AHEAD
                 onMoved: (value) => config.AMIGA_RUN_AHEAD = value
             }

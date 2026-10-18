@@ -403,6 +403,8 @@ class SiC64ConfigController : public Controller {
     Q_PROPERTY(int C64_WARP_BOOT READ warpBoot WRITE setWarpBoot NOTIFY configChanged)
     Q_PROPERTY(bool C64_VSYNC READ vsync WRITE setVsync NOTIFY configChanged)
     Q_PROPERTY(int C64_SPEED_BOOST READ speedBoost WRITE setSpeedBoost NOTIFY configChanged)
+    Q_PROPERTY(int maxRunAhead READ maxRunAhead CONSTANT)
+    Q_PROPERTY(int maxRunBehind READ maxRunBehind CONSTANT)
     Q_PROPERTY(int C64_RUN_AHEAD READ runAhead WRITE setRunAhead NOTIFY configChanged)
 
     bool drive8PowerSave() const { return (bool)get(vc64::Opt::DRV_POWER_SAVE, Drive8); }
@@ -425,6 +427,8 @@ class SiC64ConfigController : public Controller {
     void setVsync(bool value) { set(vc64::Opt::C64_VSYNC, (i64)value); }
     int speedBoost() const { return (int)get(vc64::Opt::C64_SPEED_BOOST); }
     void setSpeedBoost(int value) { set(vc64::Opt::C64_SPEED_BOOST, (i64)value); }
+    int maxRunAhead() const;
+    int maxRunBehind() const;
     int runAhead() const { return (int)get(vc64::Opt::C64_RUN_AHEAD); }
     void setRunAhead(int value) { set(vc64::Opt::C64_RUN_AHEAD, (i64)value); }
 

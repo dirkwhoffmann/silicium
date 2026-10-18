@@ -495,6 +495,8 @@ class SiAmConfigController : public Controller {
     Q_PROPERTY(int AMIGA_WARP_BOOT READ warpBoot WRITE setWarpBoot NOTIFY configChanged)
     Q_PROPERTY(bool AMIGA_VSYNC READ vsync WRITE setVsync NOTIFY configChanged)
     Q_PROPERTY(int AMIGA_SPEED_BOOST READ speedBoost WRITE setSpeedBoost NOTIFY configChanged)
+    Q_PROPERTY(int maxRunAhead READ maxRunAhead CONSTANT)
+    Q_PROPERTY(int maxRunBehind READ maxRunBehind CONSTANT)
     Q_PROPERTY(int AMIGA_RUN_AHEAD READ runAhead WRITE setRunAhead NOTIFY configChanged)
     Q_PROPERTY(bool CIA_A_IDLE_SLEEP READ ciaAIdleSleep WRITE setCiaAIdleSleep NOTIFY configChanged)
     Q_PROPERTY(bool CIA_B_IDLE_SLEEP READ ciaBIdleSleep WRITE setCiaBIdleSleep NOTIFY configChanged)
@@ -526,6 +528,8 @@ class SiAmConfigController : public Controller {
     void setVsync(bool value) { set(vamiga::Opt::AMIGA_VSYNC, (i64)value); }
     int speedBoost() const { return (int)get(vamiga::Opt::AMIGA_SPEED_BOOST); }
     void setSpeedBoost(int value) { set(vamiga::Opt::AMIGA_SPEED_BOOST, (i64)value); }
+    int maxRunAhead() const;
+    int maxRunBehind() const;
     int runAhead() const { return (int)get(vamiga::Opt::AMIGA_RUN_AHEAD); }
     void setRunAhead(int value) { set(vamiga::Opt::AMIGA_RUN_AHEAD, (i64)value); }
     bool ciaAIdleSleep() const { return (bool)get(vamiga::Opt::CIA_IDLE_SLEEP, CiaA); }
