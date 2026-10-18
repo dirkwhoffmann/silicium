@@ -378,27 +378,19 @@ OnboardingController::createAmigaConfigScript(SVMFile &svm, const fs::path &scri
     os << std::endl;
 
     //
-    // ROM
+    // ROMs
     //
 
-    // Names the files createAmigaWorkspace() has just put next to this script.
-    // They resolve against the workspace folder, which Amiga::loadWorkspace()
-    // installs as the search path before running us.
     os << "mem load rom rom.bin" << std::endl;
     if (m_romAmiga == "aros") os << "mem load ext ext.bin" << std::endl;
     os << std::endl;
 
-    /* Chip revisions and memory.
-     *
-     * The values come from the core's own model presets (see
-     * Amiga::set(ConfigScheme) -- A1000_OCS_1MB, A500_OCS_1MB, A500_PLUS_1MB,
-     * A1200_2MB), which is the one place in the tree that says what a given
-     * machine is made of. The A2000 has no preset of its own; it is an A500
-     * with ECS Agnus and a Fast RAM board, which is what the entry below
-     * spells out.
-     */
+    //
+    // Chip revisions and memory
+    //
 
     if (m_modelAmiga == "a500") {
+
         os << "cpu set REVISION 68000" << std::endl;
         os << "cpu set OVERCLOCKING 0" << std::endl;
         os << "agnus set REVISION OCS" << std::endl;
@@ -410,7 +402,7 @@ OnboardingController::createAmigaConfigScript(SVMFile &svm, const fs::path &scri
     }
 
     if (m_modelAmiga == "a1000") {
-        // OCS_OLD is the MOS 8367 the A1000 shipped with, not a typo for OCS.
+
         os << "cpu set REVISION 68000" << std::endl;
         os << "cpu set OVERCLOCKING 0" << std::endl;
         os << "agnus set REVISION OCS_OLD" << std::endl;
@@ -422,6 +414,7 @@ OnboardingController::createAmigaConfigScript(SVMFile &svm, const fs::path &scri
     }
 
     if (m_modelAmiga == "a2000") {
+
         os << "cpu set REVISION 68000" << std::endl;
         os << "cpu set OVERCLOCKING 0" << std::endl;
         os << "agnus set REVISION ECS_1MB" << std::endl;
@@ -433,6 +426,7 @@ OnboardingController::createAmigaConfigScript(SVMFile &svm, const fs::path &scri
     }
 
     if (m_modelAmiga == "a500+") {
+
         os << "cpu set REVISION 68000" << std::endl;
         os << "cpu set OVERCLOCKING 0" << std::endl;
         os << "agnus set REVISION ECS_2MB" << std::endl;
@@ -444,6 +438,7 @@ OnboardingController::createAmigaConfigScript(SVMFile &svm, const fs::path &scri
     }
 
     if (m_modelAmiga == "a1200") {
+
         // 68EC020 is the fastest CPU the core models; there is no plain 68020.
         os << "cpu set REVISION 68EC020" << std::endl;
         os << "cpu set OVERCLOCKING 2" << std::endl;
@@ -454,6 +449,14 @@ OnboardingController::createAmigaConfigScript(SVMFile &svm, const fs::path &scri
         os << "mem set FAST_RAM 0" << std::endl;
         os << "mem set BUS_WIDTH 32" << std::endl;
     }
+
+    //
+    // CIAs
+    //
+
+    const char *todBug = m_modelAmiga == "a1200" ? "true" : "false";
+    os << "ciaa set TODBUG " << todBug << std::endl;
+    os << "ciab set TODBUG " << todBug << std::endl;
 
     //
     // Video format

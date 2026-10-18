@@ -38,6 +38,7 @@ enum class Msg : long
     POWER_LED_ON,
     POWER_LED_DIM,
     POWER_LED_OFF,
+    INFO,               ///< Informs about an event (the string describes it)
     
     // Retro shell
     RSH_CLOSE,          ///< RetroShell has been closed
@@ -174,6 +175,7 @@ struct MsgEnum : Reflectable<MsgEnum, Msg>
             case Msg::POWER_LED_ON:          return "POWER_LED_ON";
             case Msg::POWER_LED_DIM:         return "POWER_LED_DIM";
             case Msg::POWER_LED_OFF:         return "POWER_LED_OFF";
+            case Msg::INFO:                  return "INFO";
                 
             case Msg::RSH_CLOSE:             return "RSH_CLOSE";
             case Msg::RSH_UPDATE:            return "RSH_UPDATE";
@@ -276,6 +278,7 @@ struct MsgEnum : Reflectable<MsgEnum, Msg>
 //
 
 typedef struct { u32 pc; u8 vector; } CpuMsg;
+typedef struct { i16 v; i16 h; } BeamMsg;
 typedef struct { i16 nr; i16 value; i16 volume; i16 pan; } DriveMsg;
 typedef struct { i16 nr; HdcState state; } HdcMsg;
 typedef struct { isize line; i16 delay; } ScriptMsg;
@@ -291,6 +294,7 @@ typedef struct
     union {
         struct { i64 value; i64 value2; };
         CpuMsg cpu;
+        BeamMsg beam;
         DriveMsg drive;
         HdcMsg hdc;
         ScriptMsg script;

@@ -1198,6 +1198,7 @@ Amiga::computeFrame()
             if (flags & RL::SOFTSTOP_REACHED) {
 
                 msgQueue.put(Msg::STEP);
+                msgQueue.put(Msg::INFO, "Step completed");
                 action = pause;
             }
 
@@ -1205,6 +1206,7 @@ Amiga::computeFrame()
             if (flags & RL::EOL_REACHED) {
 
                 msgQueue.put(Msg::EOL_REACHED);
+                msgQueue.put(Msg::INFO, "End of line reached");
                 action = pause;
             }
   
@@ -1212,6 +1214,7 @@ Amiga::computeFrame()
             if (flags & RL::EOF_REACHED) {
 
                 msgQueue.put(Msg::EOF_REACHED);
+                msgQueue.put(Msg::INFO, "End of frame reached");
                 action = pause;
             }
 
@@ -1220,6 +1223,7 @@ Amiga::computeFrame()
 
                 auto addr = cpu.debugger.breakpoints.hit->addr;
                 msgQueue.put(Msg::BREAKPOINT_REACHED, CpuMsg { addr, 0 });
+                msgQueue.put(Msg::INFO, std::format("Breakpoint reached at ${:06X}", addr));
                 action = pause;
             }
 
@@ -1228,6 +1232,7 @@ Amiga::computeFrame()
 
                 auto addr = cpu.debugger.watchpoints.hit->addr;
                 msgQueue.put(Msg::WATCHPOINT_REACHED, CpuMsg { addr, 0 });
+                msgQueue.put(Msg::INFO, std::format("Watchpoint reached at ${:06X}", addr));
                 action = pause;
             }
 
@@ -1235,43 +1240,53 @@ Amiga::computeFrame()
             if (flags & RL::CATCHPOINT_REACHED) {
 
                 auto vector = u8(cpu.debugger.catchpoints.hit->addr);
-                msgQueue.put(Msg::CATCHPOINT_REACHED, CpuMsg { cpu.getPC0(), vector });
+                auto pc = cpu.getPC0();
+                msgQueue.put(Msg::CATCHPOINT_REACHED, CpuMsg { pc, vector });
+                msgQueue.put(Msg::INFO, std::format("Exception vector {} caught at ${:06X}", int(vector), pc));
                 action = pause;
             }
 
             // Did we reach a software trap?
             if (flags & RL::SWTRAP_REACHED) {
 
-                msgQueue.put(Msg::SWTRAP_REACHED, CpuMsg { cpu.getPC0(), 0 });
+                auto pc = cpu.getPC0();
+                msgQueue.put(Msg::SWTRAP_REACHED, CpuMsg { pc, 0 });
+                msgQueue.put(Msg::INFO, std::format("Software trap reached at ${:06X}", pc));
                 action = pause;
             }
 
             // Did we reach a beam trap?
             if (flags & RL::BEAMTRAP_REACHED) {
 
-                msgQueue.put(Msg::BEAMTRAP_REACHED, CpuMsg { 0, 0 });
+                auto v = agnus.dmaDebugger.beamtraps.hitV;
+                auto h = agnus.dmaDebugger.beamtraps.hitH;
+                msgQueue.put(Msg::BEAMTRAP_REACHED, BeamMsg { v, h });
+                msgQueue.put(Msg::INFO, std::format("Beam trap reached at ({},{})", v, h));
                 action = pause;
             }
 
             // Did we reach a Copper breakpoint?
             if (flags & RL::COPPERBP_REACHED) {
 
-                auto addr = u8(agnus.copper.debugger.breakpoints.hit()->addr);
+                auto addr = agnus.copper.debugger.breakpoints.hit()->addr;
                 msgQueue.put(Msg::COPPERBP_REACHED, CpuMsg { addr, 0 });
+                msgQueue.put(Msg::INFO, std::format("Copper breakpoint reached at ${:06X}", addr));
                 action = pause;
             }
 
             // Did we reach a Copper watchpoint?
             if (flags & RL::COPPERWP_REACHED) {
 
-                auto addr = u8(agnus.copper.debugger.watchpoints.hit()->addr);
+                auto addr = agnus.copper.debugger.watchpoints.hit()->addr;
                 msgQueue.put(Msg::COPPERWP_REACHED, CpuMsg { addr, 0 });
+                msgQueue.put(Msg::INFO, std::format("Copper watchpoint reached at ${:06X}", addr));
                 action = pause;
             }
 
             // Are we requested to pause the emulator?
             if (flags & RL::STOP) {
 
+                msgQueue.put(Msg::INFO, "Stopped by the debugger");
                 action = pause;
             }
             

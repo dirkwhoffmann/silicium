@@ -157,7 +157,6 @@ HdController::setOption(Opt option, i64 value)
 
         case Opt::HDC_MB_LIMIT:
 
-            checkOption(option, value);
             config.mbLimit = isize(value);
             return;
 

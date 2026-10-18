@@ -127,6 +127,12 @@ MsgQueue::put(Msg type, CpuMsg payload)
 }
 
 void
+MsgQueue::put(Msg type, BeamMsg payload)
+{
+    put( Message { .type = type, .beam = payload } );
+}
+
+void
 MsgQueue::put(Msg type, DriveMsg payload)
 {
     put( Message { .type = type, .drive = payload } );

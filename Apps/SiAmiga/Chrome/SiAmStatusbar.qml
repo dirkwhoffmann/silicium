@@ -757,6 +757,14 @@ Item {
             visible: !root.amiga.isPaused
         }
 
+        // Tells what happened (in place of the speedometer)
+        SuLabel {
+
+            visible: root.amiga.isPaused && root.amiga.infoMessage !== ""
+            size: Size.small
+            text: root.amiga.infoMessage
+        }
+
         //
         // Server status
         //

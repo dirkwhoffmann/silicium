@@ -85,6 +85,7 @@ public:
     // Sends a message that reports a failure
     void put(Msg type, std::exception_ptr exception);
     void put(Msg type, CpuMsg payload);
+    void put(Msg type, BeamMsg payload);
     void put(Msg type, DriveMsg payload);
     void put(Msg type, HdcMsg payload);
     void put(Msg type, ScriptMsg payload);

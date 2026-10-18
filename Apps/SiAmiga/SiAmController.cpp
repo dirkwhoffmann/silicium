@@ -1193,13 +1193,24 @@ SiAmController::didPowerOn()
 void
 SiAmController::didPowerOff()
 {
+    setInfoMessage("");
     SleepGuard::allowSleep();
     reportState(VMState::OFF);
 }
 
 void
+SiAmController::setInfoMessage(const QString &message)
+{
+    if (m_infoMessage == message) return;
+
+    m_infoMessage = message;
+    emit infoMessageChanged();
+}
+
+void
 SiAmController::didRun()
 {
+    setInfoMessage("");
     if (preferences().getPreventSleepWhileRunning()) SleepGuard::preventSleep();
     reportState(VMState::RUNNING);
 }
@@ -1269,6 +1280,11 @@ SiAmController::process(const Message &msg, const string &attachment, std::excep
 
             didRun();
             m_infoIsDirty = true;
+            break;
+
+        case Msg::INFO:
+
+            setInfoMessage(QString::fromStdString(attachment));
             break;
 
         case Msg::PAUSE:

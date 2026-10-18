@@ -215,6 +215,7 @@ public:
     Q_PROPERTY(bool isPoweredOn READ isPoweredOn NOTIFY stateChanged)
     Q_PROPERTY(bool isRunning READ isRunning NOTIFY stateChanged)
     Q_PROPERTY(bool isPaused READ isPaused NOTIFY stateChanged)
+    Q_PROPERTY(QString infoMessage READ infoMessage NOTIFY infoMessageChanged)
     Q_PROPERTY(bool readOnly READ getReadOnly CONSTANT)
 
     Q_PROPERTY(QString uuid READ getUUID CONSTANT)
@@ -223,6 +224,9 @@ public:
     bool isPoweredOn() const { return m_state == VMState::PAUSED || m_state == VMState::RUNNING; }
     bool isRunning() { return m_state == VMState::RUNNING; }
     bool isPaused() { return m_state == VMState::PAUSED; }
+
+    // Describes the latest event reported by the core (e.g., why it paused)
+    QString infoMessage() const { return m_infoMessage; }
     bool getReadOnly() const;
     QString getUUID() const;
     QString getName() const;
@@ -488,6 +492,8 @@ private:
     void didPowerOff();
     void didRun();
     void didPause();
+    void setInfoMessage(const QString &message);
+    QString m_infoMessage;
     void didShutdown();
     void didHdrAttach(i64 nr);
 
@@ -519,6 +525,7 @@ public:
 signals:
 
     void stateChanged();
+    void infoMessageChanged();
     void rendererChanged();
     void shutdown();
     void hibernated();
