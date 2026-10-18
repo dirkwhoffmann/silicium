@@ -120,6 +120,8 @@ ColumnLayout {
                 height: model.height * root.scale
 
                 label: model.label
+                image: model.label === "Amiga" ? "qrc:/images/amiga-logo.png" : ""
+                vertical: model.label === "Enter"
 
                 // Zero for every ordinary key, so KeyCap draws a plain
                 // rectangle; non-zero only for Return, which is where its

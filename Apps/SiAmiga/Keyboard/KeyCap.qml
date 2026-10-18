@@ -24,9 +24,34 @@ Item {
     id: root
 
     property string label: ""
+
+    // A picture drawn instead of the label (e.g., the logo on the Amiga keys)
+    property url image: ""
+
+    // Draws the label vertically (rotated by 90 degrees), as it is printed on
+    // the keypad's Enter key
+    property bool vertical: false
+
     property bool down: false
     readonly property bool pressed: mouseArea.pressed || down
-    property real fontPixelSize: label.indexOf("\n") !== -1 ? Style.tiny : Style.regular
+
+    // The label is drawn in the largest of a few fixed sizes that lets it
+    // fit on a single line (the text is never wrapped or squeezed). Labels
+    // with an explicit line break (e.g., "Caps\nLock") use the smallest.
+    readonly property real textSpace: (vertical ? height : width) - 2 * Style.tinySpacing - 2
+    readonly property real fontPixelSize: {
+
+        if (label.indexOf("\n") !== -1) return Style.tiny
+
+        const perPixel = textMetrics.boundingRect.width / textMetrics.font.pixelSize
+        const sizes = [Style.regular, Style.small, Style.tiny]
+        for (const size of sizes) {
+            if (perPixel * size <= textSpace) return size
+        }
+
+        // Even the smallest size does not fit: shrink it to the space
+        return Math.max(textSpace / perPixel, 0.5 * Style.tiny)
+    }
 
     property real radius: Style.radius
     property real borderWidth: 1
@@ -151,18 +176,41 @@ Item {
         color: "#80ffffff"
     }
 
+    // Measures the label at a reference size (see fontPixelSize)
+    TextMetrics {
+
+        id: textMetrics
+
+        font.family: Fonts.main
+        font.pixelSize: 100
+        text: root.label
+    }
+
     SuText {
 
+        visible: root.image == ""
         anchors.centerIn: parent
         anchors.verticalCenterOffset: root.labelVerticalOffset
-        width: parent.width - 2 * Style.tinySpacing
+        width: root.textSpace
+        rotation: root.vertical ? -90 : 0
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        wrapMode: Text.Wrap
-        elide: Text.ElideRight
+        wrapMode: Text.NoWrap
         text: root.label
         font.pixelSize: root.fontPixelSize
         color: root.pressed ? Palette.accentText : Palette.primary
+    }
+
+    Image {
+
+        visible: root.image != ""
+        anchors.centerIn: parent
+        width: parent.width - 2 * Style.smallSpacing
+        height: parent.height * 0.7
+        source: root.image
+        fillMode: Image.PreserveAspectFit
+        smooth: true
+        mipmap: true
     }
 
     MouseArea {
