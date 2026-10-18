@@ -195,12 +195,7 @@ SiBox {
                         required property int index
                         required property string addr
 
-                        // SiAmGuardModel's role is named 'enabled', which
-                        // collides with Item's own 'enabled' property -- so
-                        // it's read via the delegate's implicit 'model'
-                        // context property (model.enabled) below instead of
-                        // a same-named required property.
-                        readonly property bool guardEnabled: model.enabled
+                        required property bool guardEnabled
 
                         width: ListView.view.width
                         height: list.rowH
@@ -216,9 +211,9 @@ SiBox {
                                 Layout.preferredWidth: 20
                                 Layout.alignment: Qt.AlignVCenter
                                 enabled: true
-                                size: Size.small
-                                awesome: "circle-pause"
-                                color: guardDelegate.guardEnabled ? Palette.accent : Palette.disabled
+                                size: Size.tiny
+                                awesome: guardDelegate.guardEnabled ? "circle-pause" : "circle"
+                                color: guardDelegate.guardEnabled ? Palette.primary : Qt.alpha(Palette.primary, 0.5)
                                 onClicked: root.toggle(guardDelegate.index)
                             }
                             Rectangle { Layout.preferredWidth: 1; Layout.fillHeight: true; color: Palette.surfaceBorder }

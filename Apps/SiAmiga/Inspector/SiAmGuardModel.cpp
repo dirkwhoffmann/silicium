@@ -41,7 +41,7 @@ SiAmGuardModel::roleNames() const
 {
     return {
         { AddrRole, "addr" },
-        { EnabledRole, "enabled" }
+        { EnabledRole, "guardEnabled" }
     };
 }
 
