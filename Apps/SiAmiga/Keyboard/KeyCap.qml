@@ -1,39 +1,23 @@
-// -----------------------------------------------------------------------------
-// This file is part of Silicium UI
-//
-// Copyright (C) Dirk W. Hoffmann. www.dirkwhoffmann.de
-// Licensed under the GNU General Public License v3
-//
-// See https://www.gnu.org for license information
-// -----------------------------------------------------------------------------
-
 import QtQuick
+import QtQuick.Effects
+import QtQuick.Shapes
 import Sulfur
 
-// A single Amiga keyboard key cap: solid background, solid border, label,
-// and press/release input. Every key on the virtual keyboard
+// A single Amiga keyboard key cap. Every key on the virtual keyboard
 // (SiAmKeyboardPanel.qml) is one of these -- plain rectangular keys and the
-// notched Return key alike -- so there is exactly one place that draws a
-// key rather than a special-cased branch for Return.
+// notched Return key alike.
 //
-// The shape is the bounding box minus an optional notch cut out of its
+// The look matches the C64 keyboard, whose keys are SuButtons: a vertical
+// gradient fill, a one pixel border, a soft drop shadow and a thin highlight
+// along the top edge. A pressed key turns accent colored.
+//
+// An ordinary key is a gradient Rectangle, exactly like a SuButton. The
+// Return key is not a rectangle: its bounding box has a notch cut out of the
 // top-left corner (notchWidth/notchHeight, both zero for an ordinary key),
-// drawn as the union of two rounded rectangles: a vertical one covering
-// everything right of the notch, and a horizontal one covering everything
-// below it. That union is where Return's upside-down-L comes from. Every
-// corner of it that is a real corner of the key is one of the two
-// rectangles' own rounded corners; the two corners that land inside the
-// union (the vertical slab's bottom-left, the horizontal slab's top-right)
-// are covered by the other rectangle, and the notch's inner corner, where
-// the two outlines cross, stays a sharp right angle -- matching real
-// ISO-Enter keycaps.
-//
-// The border is a second pair of rectangles rather than Rectangle.border:
-// the shape is drawn once in the border color, then again one border width
-// smaller in the fill color, leaving a uniform border showing underneath
-// that follows the true outline, notch included. Rectangle.border alone
-// only ever traces one rectangle's own four edges, so it cannot draw the
-// notch's two inner edges at all.
+// which leaves an upside-down L. It is drawn as a Shape that follows the
+// true outline, with the same gradient, border, shadow and highlight. Every
+// real corner of the outline is rounded; the notch's inner corner stays a
+// sharp right angle, as on real ISO-Enter keycaps.
 
 Item {
 
@@ -56,9 +40,6 @@ Item {
     // not at the bounding box's own centre.
     property real labelVerticalOffset: notchHeight / 2
 
-    readonly property color fillColor: pressed ? Palette.accentElevated : Palette.widget
-    readonly property color borderColor: Qt.darker(pressed ? Palette.accent : Palette.widgetBorder, 1.4)
-
     signal pressedKey()
     signal releasedKey()
     signal toggledKey()
@@ -66,56 +47,108 @@ Item {
     implicitWidth: 40
     implicitHeight: 40
 
-    // The key's whole shape in one flat color, optionally shrunk inward on
-    // every edge -- drawn twice below, once for the border and once, one
-    // border width smaller, for the fill.
-    component Slab: Item {
+    // Colors as in SuButton (accentedDown)
+    readonly property color bgColor: pressed ? Palette.accentElevated : Palette.widget
+    readonly property color edgeColor: pressed ? Palette.accent : Palette.widgetBorder
+    readonly property bool notched: notchWidth > 0 && notchHeight > 0
 
-        id: slab
+    // Gradient, border, drop shadow and highlight, shared by both shapes
+    readonly property color gradientTop: bgColor.lighter(1.4)
+    readonly property color gradientBottom: bgColor.darker(1.05)
 
-        property color slabColor
-        property real slabRadius: 0
-        property real slabInset: 0
+    component Shadow: MultiEffect {
 
+        shadowEnabled: true
+        shadowColor: "#40000000"
+        shadowBlur: 0.1
+        shadowVerticalOffset: 1
+        shadowHorizontalOffset: 1
+    }
+
+    // Ordinary keys
+    Rectangle {
+
+        visible: !root.notched
         anchors.fill: parent
+        radius: root.radius
+        border.color: root.edgeColor
+        border.width: root.borderWidth
 
-        // Everything to the right of the notch, full height.
-        Rectangle {
+        gradient: Gradient {
 
-            x: root.notchWidth + slab.slabInset
-            y: slab.slabInset
-            width: slab.width - root.notchWidth - 2 * slab.slabInset
-            height: slab.height - 2 * slab.slabInset
-            radius: slab.slabRadius
-            color: slab.slabColor
+            GradientStop { position: 0.0; color: root.gradientTop }
+            GradientStop { position: 1.0; color: root.gradientBottom }
         }
 
-        // Everything below the notch, full width -- only needed when there
-        // is a notch at all, since without one this is the same rectangle
-        // over again.
-        Rectangle {
+        layer.enabled: !root.notched
+        layer.effect: Shadow { }
+    }
 
-            visible: root.notchWidth > 0 && root.notchHeight > 0
-            x: slab.slabInset
-            y: root.notchHeight + slab.slabInset
-            width: slab.width - 2 * slab.slabInset
-            height: slab.height - root.notchHeight - 2 * slab.slabInset
-            radius: slab.slabRadius
-            color: slab.slabColor
+    // The notched Return key
+    Shape {
+
+        id: notchedShape
+
+        visible: root.notched
+        anchors.fill: parent
+        preferredRendererType: Shape.CurveRenderer
+
+        layer.enabled: root.notched
+        layer.effect: Shadow { }
+
+        // The outline is inset by half the stroke width so that the border
+        // lies inside the bounding box, like Rectangle.border does
+        readonly property real inset: root.borderWidth / 2
+        readonly property real r: root.radius
+        readonly property real x0: inset
+        readonly property real y0: inset
+        readonly property real x1: width - inset
+        readonly property real y1: height - inset
+        readonly property real nx: root.notchWidth
+        readonly property real ny: root.notchHeight
+
+        ShapePath {
+
+            strokeColor: root.edgeColor
+            strokeWidth: root.borderWidth
+
+            fillGradient: LinearGradient {
+
+                x1: 0; y1: 0
+                x2: 0; y2: notchedShape.height
+
+                GradientStop { position: 0.0; color: root.gradientTop }
+                GradientStop { position: 1.0; color: root.gradientBottom }
+            }
+
+            // Clockwise, starting at the top edge to the right of the notch
+            startX: notchedShape.nx + notchedShape.r
+            startY: notchedShape.y0
+
+            PathLine { x: notchedShape.x1 - notchedShape.r; y: notchedShape.y0 }
+            PathArc { x: notchedShape.x1; y: notchedShape.y0 + notchedShape.r; radiusX: notchedShape.r; radiusY: notchedShape.r }
+            PathLine { x: notchedShape.x1; y: notchedShape.y1 - notchedShape.r }
+            PathArc { x: notchedShape.x1 - notchedShape.r; y: notchedShape.y1; radiusX: notchedShape.r; radiusY: notchedShape.r }
+            PathLine { x: notchedShape.x0 + notchedShape.r; y: notchedShape.y1 }
+            PathArc { x: notchedShape.x0; y: notchedShape.y1 - notchedShape.r; radiusX: notchedShape.r; radiusY: notchedShape.r }
+            PathLine { x: notchedShape.x0; y: notchedShape.ny + notchedShape.r }
+            PathArc { x: notchedShape.x0 + notchedShape.r; y: notchedShape.ny; radiusX: notchedShape.r; radiusY: notchedShape.r }
+
+            // The notch's inner corner is a sharp right angle
+            PathLine { x: notchedShape.nx; y: notchedShape.ny }
+            PathLine { x: notchedShape.nx; y: notchedShape.y0 + notchedShape.r }
+            PathArc { x: notchedShape.nx + notchedShape.r; y: notchedShape.y0; radiusX: notchedShape.r; radiusY: notchedShape.r }
         }
     }
 
-    Slab {
+    // Highlight along the top edge (of the part that is not notched away)
+    Rectangle {
 
-        slabColor: root.borderColor
-        slabRadius: root.radius
-    }
-
-    Slab {
-
-        slabColor: root.fillColor
-        slabRadius: Math.max(0, root.radius - root.borderWidth)
-        slabInset: root.borderWidth
+        x: root.notchWidth + 4
+        y: 1
+        width: root.width - root.notchWidth - 8
+        height: 1
+        color: "#80ffffff"
     }
 
     SuText {
