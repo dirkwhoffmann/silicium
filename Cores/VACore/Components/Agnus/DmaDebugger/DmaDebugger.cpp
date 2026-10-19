@@ -412,10 +412,6 @@ DmaDebugger::hsyncHandler(isize vpos)
 void
 DmaDebugger::computeOverlay(Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val)
 {
-    // Dispatched once per call (not per pixel) -- see the class comment in
-    // DmaDebugger.h. Each branch below calls a separate instantiation of
-    // the templated overload, so the format is a compile-time constant for
-    // the whole per-pixel loop inside it.
     switch (static_cast<TexelFormat>(host.getConfig().texFormat)) {
 
         case TexelFormat::ABGR: computeOverlay<TexelFormat::ABGR>(dmaPtr, first, last, own, val); return;
@@ -437,8 +433,6 @@ DmaDebugger::computeOverlay(Texel *dmaPtr, isize first, isize last, BusOwner *ow
         // Handle the easy case first: No foreground pixels
         if (!visualize[owner]) {
 
-            // Nothing to show here -- see PixelEngine::mergeXray for how
-            // (and whether) that ends up dimming the real picture.
             dmaPtr[0] = dmaPtr[1] = dmaPtr[2] = dmaPtr[3] = Texture::black;
             continue;
         }
@@ -449,9 +443,7 @@ DmaDebugger::computeOverlay(Texel *dmaPtr, isize first, isize last, BusOwner *ow
         GpuColor<F> col2 = debugColor[owner][(val[i] & 0x00C0) >> 6];
         GpuColor<F> col3 = debugColor[owner][(val[i] & 0x000C) >> 2];
 
-        // Paint the raw channel color into the xray texture alone -- see
-        // PixelEngine::mergeXray for how (and whether) it ends up blended
-        // into the real picture.
+        // Paint the raw channel color into the xray texture
         dmaPtr[0] = PixelEngine::toTexel<F>(col0);
         dmaPtr[1] = PixelEngine::toTexel<F>(col1);
         dmaPtr[2] = PixelEngine::toTexel<F>(col2);
