@@ -1,0 +1,2 @@
+mem set CHIP_RAM 1024
+mem load rom diagrom-13.bin

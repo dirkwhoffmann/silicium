@@ -11,6 +11,7 @@
 #include "Emulator.h"
 #include "Amiga.h"
 #include "CmdQueue.h"
+#include "Option.h"
 #include "utl/io.h"
 #include <algorithm>
 
@@ -177,19 +178,25 @@ Emulator::check(Opt opt, i64 value, const std::vector<isize> objids)
 void
 Emulator::set(Opt opt, i64 value, const std::vector<isize> objids)
 {
-    return main.set(opt, value, objids);
+    /* The public API (VAmiga::set) checks the value before it posts a
+     * command. Callers inside the core, such as RetroShell, come in here
+     * directly, so the check has to happen here as well. Otherwise, an
+     * invalid value reaches the component's setOption(), which trusts it.
+     */
+    main.check(opt, value, objids);
+    main.set(opt, value, objids);
 }
 
 void
 Emulator::set(Opt opt, const string &value, const std::vector<isize> objids)
 {
-    return main.set(opt, value, objids);
+    set(opt, OptionParser::parse(opt, value), objids);
 }
 
 void
 Emulator::set(const string &opt, const string &value, const std::vector<isize> objids)
 {
-    return main.set(opt, value, objids);
+    set(Opt(utl::parseEnum<OptEnum>(opt)), value, objids);
 }
 
 void
