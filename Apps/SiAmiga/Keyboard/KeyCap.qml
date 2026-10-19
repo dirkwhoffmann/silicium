@@ -64,9 +64,12 @@ Item {
     property real notchWidth: 0
     property real notchHeight: 0
 
-    // A notched key's visual centre of mass sits in its wider lower half,
-    // not at the bounding box's own centre.
-    property real labelVerticalOffset: notchHeight / 2
+    // The notch is cut from the bottom-left corner instead (ISO Return)
+    property bool notchAtBottom: false
+
+    // A notched key's visual centre of mass sits in its wider half, not at
+    // the bounding box's own centre.
+    property real labelVerticalOffset: notchAtBottom ? -notchHeight / 2 : notchHeight / 2
 
     signal pressedKey()
     signal releasedKey()
@@ -112,14 +115,14 @@ Item {
         layer.effect: Shadow { }
     }
 
-    // The notched Return key
-    Shape {
+    // The notched Return key: an L-shaped outline with the notch in the
+    // top-left corner (A500 ANSI, A1000) or the bottom-left one (A500 ISO)
+    Item {
 
-        id: notchedShape
+        id: notchedKey
 
         visible: root.notched
         anchors.fill: parent
-        preferredRendererType: Shape.CurveRenderer
 
         layer.enabled: root.notched
         layer.effect: Shadow { }
@@ -135,46 +138,89 @@ Item {
         readonly property real nx: root.notchWidth
         readonly property real ny: root.notchHeight
 
-        ShapePath {
+        component Gradient2: LinearGradient {
 
-            strokeColor: root.edgeColor
-            strokeWidth: root.borderWidth
+            x1: 0; y1: 0
+            x2: 0; y2: notchedKey.height
 
-            fillGradient: LinearGradient {
+            GradientStop { position: 0.0; color: root.gradientTop }
+            GradientStop { position: 1.0; color: root.gradientBottom }
+        }
 
-                x1: 0; y1: 0
-                x2: 0; y2: notchedShape.height
+        // Notch in the top-left corner. Clockwise, starting at the top edge
+        // to the right of the notch.
+        Shape {
 
-                GradientStop { position: 0.0; color: root.gradientTop }
-                GradientStop { position: 1.0; color: root.gradientBottom }
+            visible: !root.notchAtBottom
+            anchors.fill: parent
+            preferredRendererType: Shape.CurveRenderer
+
+            ShapePath {
+
+                strokeColor: root.edgeColor
+                strokeWidth: root.borderWidth
+                fillGradient: Gradient2 { }
+
+                startX: notchedKey.nx + notchedKey.r
+                startY: notchedKey.y0
+
+                PathLine { x: notchedKey.x1 - notchedKey.r; y: notchedKey.y0 }
+                PathArc { x: notchedKey.x1; y: notchedKey.y0 + notchedKey.r; radiusX: notchedKey.r; radiusY: notchedKey.r }
+                PathLine { x: notchedKey.x1; y: notchedKey.y1 - notchedKey.r }
+                PathArc { x: notchedKey.x1 - notchedKey.r; y: notchedKey.y1; radiusX: notchedKey.r; radiusY: notchedKey.r }
+                PathLine { x: notchedKey.x0 + notchedKey.r; y: notchedKey.y1 }
+                PathArc { x: notchedKey.x0; y: notchedKey.y1 - notchedKey.r; radiusX: notchedKey.r; radiusY: notchedKey.r }
+                PathLine { x: notchedKey.x0; y: notchedKey.ny + notchedKey.r }
+                PathArc { x: notchedKey.x0 + notchedKey.r; y: notchedKey.ny; radiusX: notchedKey.r; radiusY: notchedKey.r }
+
+                // The notch's inner corner is a sharp right angle
+                PathLine { x: notchedKey.nx; y: notchedKey.ny }
+                PathLine { x: notchedKey.nx; y: notchedKey.y0 + notchedKey.r }
+                PathArc { x: notchedKey.nx + notchedKey.r; y: notchedKey.y0; radiusX: notchedKey.r; radiusY: notchedKey.r }
             }
+        }
 
-            // Clockwise, starting at the top edge to the right of the notch
-            startX: notchedShape.nx + notchedShape.r
-            startY: notchedShape.y0
+        // Notch in the bottom-left corner. Clockwise, starting at the top
+        // edge, which spans the full width.
+        Shape {
 
-            PathLine { x: notchedShape.x1 - notchedShape.r; y: notchedShape.y0 }
-            PathArc { x: notchedShape.x1; y: notchedShape.y0 + notchedShape.r; radiusX: notchedShape.r; radiusY: notchedShape.r }
-            PathLine { x: notchedShape.x1; y: notchedShape.y1 - notchedShape.r }
-            PathArc { x: notchedShape.x1 - notchedShape.r; y: notchedShape.y1; radiusX: notchedShape.r; radiusY: notchedShape.r }
-            PathLine { x: notchedShape.x0 + notchedShape.r; y: notchedShape.y1 }
-            PathArc { x: notchedShape.x0; y: notchedShape.y1 - notchedShape.r; radiusX: notchedShape.r; radiusY: notchedShape.r }
-            PathLine { x: notchedShape.x0; y: notchedShape.ny + notchedShape.r }
-            PathArc { x: notchedShape.x0 + notchedShape.r; y: notchedShape.ny; radiusX: notchedShape.r; radiusY: notchedShape.r }
+            visible: root.notchAtBottom
+            anchors.fill: parent
+            preferredRendererType: Shape.CurveRenderer
 
-            // The notch's inner corner is a sharp right angle
-            PathLine { x: notchedShape.nx; y: notchedShape.ny }
-            PathLine { x: notchedShape.nx; y: notchedShape.y0 + notchedShape.r }
-            PathArc { x: notchedShape.nx + notchedShape.r; y: notchedShape.y0; radiusX: notchedShape.r; radiusY: notchedShape.r }
+            ShapePath {
+
+                strokeColor: root.edgeColor
+                strokeWidth: root.borderWidth
+                fillGradient: Gradient2 { }
+
+                startX: notchedKey.x0 + notchedKey.r
+                startY: notchedKey.y0
+
+                PathLine { x: notchedKey.x1 - notchedKey.r; y: notchedKey.y0 }
+                PathArc { x: notchedKey.x1; y: notchedKey.y0 + notchedKey.r; radiusX: notchedKey.r; radiusY: notchedKey.r }
+                PathLine { x: notchedKey.x1; y: notchedKey.y1 - notchedKey.r }
+                PathArc { x: notchedKey.x1 - notchedKey.r; y: notchedKey.y1; radiusX: notchedKey.r; radiusY: notchedKey.r }
+                PathLine { x: notchedKey.nx + notchedKey.r; y: notchedKey.y1 }
+                PathArc { x: notchedKey.nx; y: notchedKey.y1 - notchedKey.r; radiusX: notchedKey.r; radiusY: notchedKey.r }
+
+                // The notch's inner corner is a sharp right angle
+                PathLine { x: notchedKey.nx; y: notchedKey.y1 - notchedKey.ny }
+                PathLine { x: notchedKey.x0 + notchedKey.r; y: notchedKey.y1 - notchedKey.ny }
+                PathArc { x: notchedKey.x0; y: notchedKey.y1 - notchedKey.ny - notchedKey.r; radiusX: notchedKey.r; radiusY: notchedKey.r }
+
+                PathLine { x: notchedKey.x0; y: notchedKey.y0 + notchedKey.r }
+                PathArc { x: notchedKey.x0 + notchedKey.r; y: notchedKey.y0; radiusX: notchedKey.r; radiusY: notchedKey.r }
+            }
         }
     }
 
     // Highlight along the top edge (of the part that is not notched away)
     Rectangle {
 
-        x: root.notchWidth + 4
+        x: (root.notchAtBottom ? 0 : root.notchWidth) + 4
         y: 1
-        width: root.width - root.notchWidth - 8
+        width: root.width - (root.notchAtBottom ? 0 : root.notchWidth) - 8
         height: 1
         color: "#80ffffff"
     }

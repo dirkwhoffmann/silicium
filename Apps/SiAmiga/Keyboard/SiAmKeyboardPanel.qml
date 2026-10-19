@@ -40,11 +40,8 @@ ColumnLayout {
     // Scale factor for resizing the keyboard
     readonly property real scale: 0.85
 
-    // Free space between neighboring key caps, in pixels. The layout itself
-    // keeps the absolute coordinates of the original keyboard. Each key cap
-    // is shrunk by this amount within its cell (half of it on every side),
-    // which leaves the overall size of the keyboard unchanged.
-    property real keyGap: 3
+    // Free space between neighboring key caps, in pixels
+    property real keyGap: 2
 
     spacing: Style.largeSpacing
 
@@ -136,6 +133,7 @@ ColumnLayout {
                 // upside-down-L comes from (see AmigaKeyModel.h).
                 notchWidth: model.notchWidth * root.scale
                 notchHeight: model.notchHeight * root.scale
+                notchAtBottom: model.notchAtBottom
 
                 // Return's own click target is still its whole bounding
                 // rectangle, notch included -- but that's harmless, because

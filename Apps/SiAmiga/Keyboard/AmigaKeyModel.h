@@ -31,8 +31,8 @@
  * directly from the two XIBs' raw frames and bakes it into notchWidth/
  * notchHeight instead: 27x36 for the A500 ANSI and both A1000 layouts
  * (their "]" key overlaps Return's top-left corner by exactly that much),
- * and zero for A500 ISO, where Return's own frame is already narrower and
- * a separate "#" key -- not an overlap -- fills the corner. This model
+ * and 9x36 for A500 ISO, where the "#" key overlaps the bottom-left corner
+ * instead (see notchAtBottom). This model
  * keeps the same one-row-per-key shape as SiC64's C64KeyModel, but adds
  * those two fields, zero for every ordinary key, describing how much of a
  * key's bounding box's top-left corner to cut away. The QML side
@@ -57,6 +57,11 @@ struct AmigaKeyInfo {
     // notched -- see the struct comment above.
     qreal notchWidth = 0;
     qreal notchHeight = 0;
+
+    // The notch is cut from the bottom-left corner instead of the top-left
+    // one. That is the shape of the ISO Return key, which is wider in its
+    // upper part: the "#" key overlaps the bottom-left corner of its frame.
+    bool notchAtBottom = false;
 };
 
 // List model exposing all keys of the virtual Amiga keyboard to QML. The
@@ -82,7 +87,8 @@ public:
         WidthRole,
         HeightRole,
         NotchWidthRole,
-        NotchHeightRole
+        NotchHeightRole,
+        NotchAtBottomRole
     };
 
 private:

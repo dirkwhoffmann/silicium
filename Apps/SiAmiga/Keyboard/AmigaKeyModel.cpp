@@ -19,9 +19,9 @@ namespace {
 // KeyboardAPI::press/release on the real app) -- these are the raw Amiga
 // hardware scancodes, not something invented for this port.
 void add(QVector<AmigaKeyInfo> &keys, int nr, const char *label, qreal x, qreal y, qreal w, qreal h,
-          qreal notchW = 0, qreal notchH = 0)
+          qreal notchW = 0, qreal notchH = 0, bool notchAtBottom = false)
 {
-    keys.append({ nr, QString::fromUtf8(label), x, y, w, h, notchW, notchH });
+    keys.append({ nr, QString::fromUtf8(label), x, y, w, h, notchW, notchH, notchAtBottom });
 }
 
 }
@@ -51,6 +51,7 @@ AmigaKeyModel::roleNames() const
     roles[HeightRole]      = "height";
     roles[NotchWidthRole]  = "notchWidth";
     roles[NotchHeightRole] = "notchHeight";
+    roles[NotchAtBottomRole] = "notchAtBottom";
 
     return roles;
 }
@@ -72,6 +73,7 @@ AmigaKeyModel::data(const QModelIndex &index, int role) const
         case HeightRole:      return key.height;
         case NotchWidthRole:  return key.notchWidth;
         case NotchHeightRole: return key.notchHeight;
+        case NotchAtBottomRole: return key.notchAtBottom;
         default:              return {};
     }
 }
@@ -229,15 +231,16 @@ AmigaKeyModel::buildA500Ansi()
 // Layout: A500, ISO (international) -- vAmiga's A500ISO.xib, content view
 // 883x270. The "<" key next to left Shift occupies a slot the ANSI layout
 // gives to a wider neighbor. Return's own frame here is already narrower
-// than the ANSI one (54 vs 81 -- the "#" key takes up the rest of that
-// row), but it keeps the same notch as every other layout's Return so it
-// still reads as the same shaped key, just narrower.
+// than the ANSI one (54 vs 81). The "#" key overlaps the bottom-left corner
+// of its frame by 9x36, which makes Return wider in its upper part than in
+// its lower one -- the shape of an ISO Enter key. Unlike on the other
+// layouts, the notch is therefore cut from the bottom-left corner.
 void
 AmigaKeyModel::buildA500Iso()
 {
     // Return first -- see buildA500Ansi() for why (so overlapping neighbors
     // stack on top for both painting and mouse hit-testing).
-    add(keys, 68, "Return", 524, 106, 54, 72, /* notchWidth */ 27, /* notchHeight */ 36);
+    add(keys, 68, "Return", 524, 106, 54, 72, /* notchWidth */ 9, /* notchHeight */ 36, /* notchAtBottom */ true);
 
     add(keys, 69, "Esc", 20, 20, 36, 36);
     add(keys, 80, "F1", 74, 20, 45, 36);
