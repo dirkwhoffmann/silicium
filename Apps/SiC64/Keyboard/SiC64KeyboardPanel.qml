@@ -10,6 +10,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Effects
 import Silicium.Controllers
 import Sulfur
 
@@ -127,16 +128,34 @@ ColumnLayout {
                     root.keyActivated(Qt.LeftButton)
                 }
 
-                Image {
+                // Tinted with the key's text color, so the logo follows the
+                // theme and turns light when the key is pressed
+                Item {
 
                     visible: control.commodoreKey
                     anchors.centerIn: parent
                     width: parent.width - 2 * Style.smallSpacing
                     height: parent.height * 0.55
-                    source: "qrc:/icons/chicken-lips.svg"
-                    sourceSize.height: height * 2
-                    fillMode: Image.PreserveAspectFit
-                    smooth: true
+
+                    Image {
+
+                        id: logo
+                        anchors.fill: parent
+                        visible: false
+                        source: "qrc:/icons/chicken-lips.svg"
+                        sourceSize.height: height * 2
+                        fillMode: Image.PreserveAspectFit
+                        smooth: true
+                    }
+
+                    MultiEffect {
+
+                        anchors.fill: logo
+                        source: logo
+                        colorization: 1.0
+                        brightness: 1.0
+                        colorizationColor: control.fgColor
+                    }
                 }
 
                 MouseArea {
