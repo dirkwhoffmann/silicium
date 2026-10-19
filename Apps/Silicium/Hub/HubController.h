@@ -195,8 +195,9 @@ class HubController : public Controller {
 
     // Removes a virtual machine or a snapshot
     Q_INVOKABLE bool remove(const QString &quuid);
-    // bool removeVM(UUID uuid);
-    // bool removeSnapshot(UUID uuid);
+
+    // Removes all custom virtual machines of a sidebar section
+    Q_INVOKABLE bool resetLibrary(const QString &quuid);
 
     /* Opens a virtual machine based on the current selection.
      *

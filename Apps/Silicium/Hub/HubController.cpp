@@ -445,19 +445,44 @@ HubController::remove(const QString &quuid)
     }
 }
 
-/*
 bool
-HubController::removeVM(UUID uuid)
+HubController::resetLibrary(const QString &quuid)
 {
+    try {
 
+        auto section = UUID::fromString(quuid.toStdString());
+
+        // Pick the custom machines that belong to the section
+        auto custom = library.collect([&](const VirtualMachine &vm) {
+
+            if (vm.isPreinstalled()) return false;
+            if (section == HubSidebarModel::UUID_C64) return !vm.getManifest().isAmiga();
+            if (section == HubSidebarModel::UUID_AMIGA) return vm.getManifest().isAmiga();
+            return true;
+        });
+
+        isize open = 0;
+
+        for (auto uuid : custom) {
+
+            if (isOpen(uuid)) { open++; continue; }
+            library.removeVirtualMachine(uuid);
+        }
+
+        m_sidebarController.validate();
+        validateSelection();
+
+        if (open) {
+            throw ImageError(ImageError::VM_RUNNING);
+        }
+        return true;
+
+    } catch (std::exception &e) {
+
+        emit showError("Failed to remove all virtual machines.", e.what());
+        return false;
+    }
 }
-
-bool
-HubController::removeSnapshot(UUID uuid)
-{
-
-}
-*/
 
 int
 HubController::vCount() const

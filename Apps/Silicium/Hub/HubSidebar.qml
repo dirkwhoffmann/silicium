@@ -78,12 +78,6 @@ Item {
     // Main
     //
 
-    Rectangle {
-
-        anchors.fill: parent
-        // color: Palette.surface
-    }
-
     ColumnLayout {
 
         anchors.fill: parent

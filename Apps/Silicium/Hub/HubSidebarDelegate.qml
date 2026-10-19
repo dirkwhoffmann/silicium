@@ -90,6 +90,15 @@ ItemDelegate {
 
     Action {
 
+        id: resetAction
+        icon.name: "ink_eraser"
+        text: "Reset library"
+
+        onTriggered: HubController.resetLibrary(uuid)
+    }
+
+    Action {
+
         id: deleteAction
         icon.name: "delete"
         text: "Delete"
@@ -153,6 +162,11 @@ ItemDelegate {
         SuMenuItem {
             visible: isSnapshot
             action: deleteAction
+        }
+
+        SuMenuItem {
+            visible: isPlatform
+            action: resetAction
         }
     }
 
