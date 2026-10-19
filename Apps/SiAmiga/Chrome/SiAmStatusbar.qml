@@ -512,11 +512,7 @@ Item {
 
             PictogramIcon {
 
-                // In AUTO mode the hourglass reflects whether the emulator is
-                // currently warping; otherwise the warp on/off icon mirrors the
-                // fixed NEVER / ALWAYS setting. Clicking cycles the warp mode
-                // (AUTO -> NEVER -> ALWAYS -> AUTO).
-                icon.source: config.AMIGA_WARP_MODE === 0 // 0 = Warp.AUTO
+                icon.source: config.AMIGA_WARP_MODE === 0
                     ? (amiga.warping ? "qrc:/icons/hourglass-90.png" : "qrc:/icons/hourglass.png")
                     : (amiga.warping ? "qrc:/icons/warp-on.png" : "qrc:/icons/warp-off.png")
                 onClicked: amiga.toggleWarp()

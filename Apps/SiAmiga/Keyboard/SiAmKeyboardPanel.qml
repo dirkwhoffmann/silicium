@@ -37,10 +37,7 @@ ColumnLayout {
     readonly property SiAmController controller: SiAmController
     readonly property var kc: controller.keyboardController
 
-    // AmigaKeyModel's positions/sizes are already in pixels (lifted
-    // straight from vAmiga's A500ANSI.xib), so unlike SiC64KeyboardPanel
-    // there's no separate keyUnit/keyGap grid multiplication -- just an
-    // overall scale factor for resizing the whole keyboard.
+    // Scale factor for resizing the keyboard
     readonly property real scale: 0.85
 
     spacing: Style.largeSpacing
@@ -51,11 +48,7 @@ ColumnLayout {
     //
     // Layout selection
     //
-    // Key cap labels and positions follow the icon bar's A500/A1000 and
-    // ANSI/ISO toggles, which together pick one of AmigaKeyModel's four
-    // built-in key tables -- see AmigaKeyModel::build().
-    //
-
+    
     Binding { target: kc.keyModel; property: "a1000"; value: iconBar.a1000 }
     Binding { target: kc.keyModel; property: "iso"; value: iconBar.iso }
 
@@ -121,6 +114,15 @@ ColumnLayout {
 
                 label: model.label
                 image: model.label === "Amiga" ? "qrc:/images/amiga-logo.png" : ""
+                phosphor: ({
+                    "Backspace": "arrow-left",
+                    "Up": "arrow-up",
+                    "Down": "arrow-down",
+                    "Left": "arrow-left",
+                    "Right": "arrow-right",
+                    "Shift": "arrow-fat-up",
+                    "Tab": "arrow-line-right"
+                })[model.label] ?? ""
                 vertical: model.label === "Enter"
 
                 // Zero for every ordinary key, so KeyCap draws a plain

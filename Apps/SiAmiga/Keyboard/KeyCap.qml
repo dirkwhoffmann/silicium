@@ -25,6 +25,9 @@ Item {
 
     property string label: ""
 
+    // A Phosphor icon drawn instead of the label (e.g., the cursor keys)
+    property string phosphor: ""
+
     // A picture drawn instead of the label (e.g., the logo on the Amiga keys)
     property url image: ""
 
@@ -188,7 +191,7 @@ Item {
 
     SuText {
 
-        visible: root.image == ""
+        visible: root.image == "" && root.phosphor == ""
         anchors.centerIn: parent
         anchors.verticalCenterOffset: root.labelVerticalOffset
         width: root.textSpace
@@ -198,6 +201,18 @@ Item {
         wrapMode: Text.NoWrap
         text: root.label
         font.pixelSize: root.fontPixelSize
+        color: root.pressed ? Palette.accentText : Palette.primary
+    }
+
+    SuText {
+
+        visible: root.phosphor != ""
+        anchors.centerIn: parent
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        text: Fonts.iconText("", root.phosphor, "")
+        font.family: Fonts.iconFamily("", root.phosphor, "")
+        font.pixelSize: Math.round(Math.min(root.width, root.height) * 0.5)
         color: root.pressed ? Palette.accentText : Palette.primary
     }
 

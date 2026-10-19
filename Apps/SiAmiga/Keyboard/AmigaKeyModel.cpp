@@ -66,8 +66,8 @@ AmigaKeyModel::data(const QModelIndex &index, int role) const
 
         case NrRole:          return key.nr;
         case LabelRole:       return key.label;
-        case XRole:            return key.x;
-        case YRole:            return key.y;
+        case XRole:           return key.x;
+        case YRole:           return key.y;
         case WidthRole:       return key.width;
         case HeightRole:      return key.height;
         case NotchWidthRole:  return key.notchWidth;

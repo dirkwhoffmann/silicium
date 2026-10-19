@@ -201,8 +201,7 @@ C64KeyModel::resolveLabel(const C64KeyInfo &key) const
     // Search for a perfect match for the active modifier combination
     if (auto it = key.labels.constFind(m_modifiers); it != key.labels.constEnd()) return it.value();
 
-    // Otherwise fall back to the most specific single modifier that applies,
-    // in the same priority order used by the original VirtualC64 keycap lookup
+    // Otherwise fall back to the most specific single modifier that applies
     if (m_modifiers & Commodore) {
         if (auto it = key.labels.constFind(Commodore); it != key.labels.constEnd()) return it.value();
     }
