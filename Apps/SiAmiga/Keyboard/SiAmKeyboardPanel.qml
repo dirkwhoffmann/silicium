@@ -40,6 +40,12 @@ ColumnLayout {
     // Scale factor for resizing the keyboard
     readonly property real scale: 0.85
 
+    // Free space between neighboring key caps, in pixels. The layout itself
+    // keeps the absolute coordinates of the original keyboard. Each key cap
+    // is shrunk by this amount within its cell (half of it on every side),
+    // which leaves the overall size of the keyboard unchanged.
+    property real keyGap: 3
+
     spacing: Style.largeSpacing
 
     // Emitted when a key has been clicked (with the button that was used)
@@ -96,8 +102,8 @@ ColumnLayout {
 
     Item {
 
-        implicitWidth: childrenRect.width
-        implicitHeight: childrenRect.height
+        implicitWidth: childrenRect.width + root.keyGap
+        implicitHeight: childrenRect.height + root.keyGap
 
         Repeater {
 
@@ -107,10 +113,10 @@ ColumnLayout {
 
                 id: keyItem
 
-                x: model.x * root.scale
-                y: model.y * root.scale
-                width: model.width * root.scale
-                height: model.height * root.scale
+                x: model.x * root.scale + root.keyGap / 2
+                y: model.y * root.scale + root.keyGap / 2
+                width: model.width * root.scale - root.keyGap
+                height: model.height * root.scale - root.keyGap
 
                 label: model.label
                 image: model.label === "Amiga" ? "qrc:/images/amiga-logo.png" : ""
