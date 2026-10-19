@@ -60,7 +60,7 @@ Gamepad::hasEmulationKeys() const
 optional<int>
 Gamepad::isEmulationKey(int qKey, int pKey) const
 {
-    for (int i = 0; i < keys.size(); ++i) {
+    for (int i = 0; i < int(keys.size()); ++i) {
 
         if (keys[i]) {
             if (keys[i]->pKey != -1) {
