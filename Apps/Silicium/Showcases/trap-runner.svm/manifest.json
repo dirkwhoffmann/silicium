@@ -8,6 +8,7 @@
     },
     "platform": "AMIGA",
     "screenshot": "screenshot.png",
+    "startup": "startup.retrosh",
     "version": "0.1b1",
     "created": 1767398400,
     "modified": 1767398400

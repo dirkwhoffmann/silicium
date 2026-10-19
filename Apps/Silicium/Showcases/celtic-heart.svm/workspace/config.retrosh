@@ -1,0 +1,3 @@
+mem set CHIP_RAM 512
+mem set SLOW_RAM 512
+mem set FAST_RAM 8196

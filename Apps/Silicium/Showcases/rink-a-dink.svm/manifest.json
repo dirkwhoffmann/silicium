@@ -9,6 +9,7 @@
     "platform": "AMIGA",
     "readOnly": true,
     "screenshot": "screenshot.png",
+    "startup": "startup.retrosh",
     "uuid": "54a67257-50d8-4ca0-b516-2b9f777f68e0",
     "version": "0.1b1"
 }

@@ -47,9 +47,6 @@ SiAmRenderer::start()
 
     updateTextureCutout();
 
-    // The GPU blends the xray texture into the picture (see merge.frag)
-    controller->core().set(vamiga::Opt::XRAY_COMPOSITOR, (i64)vamiga::XRayCompositor::GPU);
-
     // Get the refresh rate and pass it to the core
     if (auto screen = window() ? window()->screen() : nullptr) {
         controller->core().set(vamiga::Opt::HOST_REFRESH_RATE, (i64)screen->refreshRate());
