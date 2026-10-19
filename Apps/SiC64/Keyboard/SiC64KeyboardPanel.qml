@@ -106,6 +106,9 @@ ColumnLayout {
                 id: control
 
                 readonly property bool shiftLock: model.nr == 34
+
+                // The Commodore key shows the company logo instead of a label
+                readonly property bool commodoreKey: model.nr == 49
                 readonly property bool stacked: model.label.indexOf("\n") !== -1
 
                 accentedDown: true
@@ -113,7 +116,7 @@ ColumnLayout {
                 y: model.y * (root.keyUnit + root.keyGap)
                 width: model.width * root.keyUnit + (model.width - 1) * root.keyGap
                 height: model.height * root.keyUnit + (model.height - 1) * root.keyGap
-                text: model.label
+                text: commodoreKey ? "" : model.label
                 font.family: model.specialFont ? Fonts.c64 : Fonts.main
                 font.pixelSize: stacked ? Style.tiny : Style.regular
 
@@ -122,6 +125,18 @@ ColumnLayout {
 
                     if (!shiftLock) { kc.release(model.nr) }
                     root.keyActivated(Qt.LeftButton)
+                }
+
+                Image {
+
+                    visible: control.commodoreKey
+                    anchors.centerIn: parent
+                    width: parent.width - 2 * Style.smallSpacing
+                    height: parent.height * 0.55
+                    source: "qrc:/icons/chicken-lips.svg"
+                    sourceSize.height: height * 2
+                    fillMode: Image.PreserveAspectFit
+                    smooth: true
                 }
 
                 MouseArea {
