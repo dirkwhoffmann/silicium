@@ -117,6 +117,15 @@ ColumnLayout {
                 width: model.width * root.keyUnit + (model.width - 1) * root.keyGap
                 height: model.height * root.keyUnit + (model.height - 1) * root.keyGap
                 text: commodoreKey ? "" : model.label
+
+                // The arrow keys (←, ↑, and the cursor keys with and without
+                // SHIFT) show the same Phosphor icons as the Amiga keyboard
+                phosphor: ({
+                    "\u2190": "arrow-left",  "\u2191": "arrow-up",
+                    "\u21E7": "arrow-up",    "\u21E9": "arrow-down",
+                    "\u21E6": "arrow-left",  "\u21E8": "arrow-right"
+                })[model.label] ?? ""
+                tooltip: ""
                 font.family: model.specialFont ? Fonts.c64 : Fonts.main
                 font.pixelSize: stacked ? Style.tiny : Style.regular
 
