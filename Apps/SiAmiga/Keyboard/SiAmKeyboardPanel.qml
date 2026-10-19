@@ -116,7 +116,7 @@ ColumnLayout {
                 height: model.height * root.scale - root.keyGap
 
                 label: model.label
-                image: model.label === "Amiga" ? "qrc:/images/amiga-logo.png" : ""
+                image: model.label === "Amiga" ? "qrc:/icons/amiga-a.png" : ""
                 phosphor: ({
                     "Backspace": "arrow-left",
                     "Up": "arrow-up",

@@ -262,16 +262,16 @@ Item {
         color: root.pressed ? Palette.accentText : Palette.primary
     }
 
-    Image {
+    // Tinted with the label color, so it follows the theme and turns light
+    // when the key is pressed
+    SuTemplateImage {
 
         visible: root.image != ""
         anchors.centerIn: parent
         width: parent.width - 2 * Style.smallSpacing
-        height: parent.height * 0.7
+        height: parent.height * 0.45
         source: root.image
-        fillMode: Image.PreserveAspectFit
-        smooth: true
-        mipmap: true
+        color: root.pressed ? Palette.accentText : Palette.primary
     }
 
     MouseArea {
