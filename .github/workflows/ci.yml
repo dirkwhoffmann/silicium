@@ -33,7 +33,8 @@ jobs:
         build: [ Release, Debug ]
 
     env:
-      EXE: ${{ runner.os == 'Windows' && '.exe' || '' }}
+      # The runner context is not available here, so use the matrix
+      EXE: ${{ matrix.os == 'windows-2022' && '.exe' || '' }}
 
     steps:
       - uses: actions/checkout@v4
