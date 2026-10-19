@@ -8,24 +8,32 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(SDL3 REQUIRED CONFIG)
+# The cores (emulators) do not depend on Qt or SDL. Turning this option off
+# builds only them, which is what the CI does for its quick core jobs.
+option(SILICIUM_BUILD_APPS "Build the Qt apps (Hub, SiC64, SiAmiga)" ON)
 
-find_package(Qt6 COMPONENTS
-        Core
-        Concurrent
-        Gui
-        Multimedia
-        Quick
-        QuickControls2
-        QuickDialogs2
-        QuickEffects
-        ShaderTools
-        REQUIRED)
+if(SILICIUM_BUILD_APPS)
 
-qt_standard_project_setup()
-qt_policy(SET QTP0001 NEW)
-qt_policy(SET QTP0004 NEW)
+    find_package(SDL3 REQUIRED CONFIG)
 
-add_subdirectory(Sulfur)
-add_subdirectory(Apps)
+    find_package(Qt6 COMPONENTS
+            Core
+            Concurrent
+            Gui
+            Multimedia
+            Quick
+            QuickControls2
+            QuickDialogs2
+            QuickEffects
+            ShaderTools
+            REQUIRED)
+
+    qt_standard_project_setup()
+    qt_policy(SET QTP0001 NEW)
+    qt_policy(SET QTP0004 NEW)
+
+    add_subdirectory(Sulfur)
+    add_subdirectory(Apps)
+endif()
+
 add_subdirectory(Cores)

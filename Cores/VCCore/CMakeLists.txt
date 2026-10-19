@@ -56,7 +56,9 @@ else()
 endif()
 
 # Add include paths
-target_include_directories(silicium PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+if(TARGET silicium)
+  target_include_directories(silicium PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+endif()
 target_include_directories(VCCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Subdirectories

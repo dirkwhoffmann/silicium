@@ -15,7 +15,6 @@
 #include "Config/SiAmConfigController.h"
 #include <QFile>
 #include <fstream>
-#include <unistd.h>
 
 using namespace vamiga;
 
