@@ -1,0 +1,156 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+# A new push to a branch or pull request makes the previous run obsolete
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  #
+  # The emulator cores (no Qt, no SDL). Quick to build, so they run on every
+  # platform in both configurations.
+  #
+  cores:
+    name: Cores (${{ matrix.os }}, ${{ matrix.build }})
+    runs-on: ${{ matrix.os }}
+
+    # The Windows legs have not been run in this repository yet. Remove this
+    # line once they are green.
+    continue-on-error: ${{ matrix.os == 'windows-2022' }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-24.04, macos-15, windows-2022 ]
+        build: [ Release, Debug ]
+
+    env:
+      EXE: ${{ runner.os == 'Windows' && '.exe' || '' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build zlib1g-dev
+
+      - name: Install tools (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      # Puts the MSVC compiler (cl) and Ninja into the PATH
+      - name: Set up the MSVC environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Cache compiler output
+        if: runner.os != 'Windows'
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: cores-${{ matrix.os }}-${{ matrix.build }}
+
+      - name: Configure
+        shell: bash
+        run: |
+          cmake -S . -B build -G Ninja \
+                -DSILICIUM_BUILD_APPS=OFF \
+                -DCMAKE_BUILD_TYPE=${{ matrix.build }} \
+                ${{ runner.os != 'Windows' && '-DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache' || '' }}
+
+      - name: Build
+        run: cmake --build build --target VAHeadless VC64Headless
+
+      # The headless runners return a non-zero code if a script line fails
+      - name: Smoke test (vAmiga)
+        shell: bash
+        run: build/Cores/VACore/VAHeadless${EXE} --smoke
+
+      - name: Smoke test (VirtualC64)
+        shell: bash
+        run: build/Cores/VCCore/VC64Headless${EXE} --smoke
+
+  #
+  # The Qt apps (Hub, SiC64, SiAmiga). macOS is the reference platform. Linux
+  # and Windows are new and may not build yet, so they are allowed to fail for
+  # now. Once they are green, remove 'experimental' for them.
+  #
+  apps:
+    name: Apps (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: macos-15,     experimental: false }
+          - { os: ubuntu-24.04, experimental: true }
+          - { os: windows-2022, experimental: true }
+
+    env:
+      QT_VERSION: 6.11.*
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build zlib1g-dev \
+              libgl1-mesa-dev libegl1-mesa-dev libvulkan-dev libxkbcommon-dev \
+              libxkbcommon-x11-0 libpulse-dev libasound2-dev \
+              libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
+              libxcb-render-util0 libxcb-shape0 libxcb-xinerama0 libxcb-xkb1
+
+      - name: Install tools (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      - name: Set up the MSVC environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          modules: qtmultimedia qtshadertools
+          cache: true
+
+      - name: Install SDL3
+        id: sdl
+        uses: libsdl-org/setup-sdl@main
+        with:
+          version: 3-latest
+          install-linux-dependencies: true
+
+      - name: Cache compiler output
+        if: runner.os != 'Windows'
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: apps-${{ matrix.os }}
+
+      - name: Configure
+        shell: bash
+        run: |
+          cmake -S . -B build -G Ninja \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_PREFIX_PATH="${QT_ROOT_DIR};${{ steps.sdl.outputs.prefix }}" \
+                ${{ runner.os != 'Windows' && '-DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache' || '' }}
+
+      - name: Build
+        run: cmake --build build
+
+      # Static check of all QML files. Not blocking yet.
+      - name: Lint QML
+        continue-on-error: true
+        run: cmake --build build --target all_qmllint
