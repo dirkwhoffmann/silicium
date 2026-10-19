@@ -59,7 +59,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 BUILD_DIR="$ROOT_DIR/build"
 OUT_DIR="$BUILD_DIR/dist"
-APPS=(silicium SiC64)
+APPS=(silicium SiC64 SiAmiga)
 
 DO_BUILD=0
 DO_SMOKE_TEST=1
@@ -87,6 +87,19 @@ while [ $# -gt 0 ]; do
         *) echo "error: unknown option '$1' (try --help)" >&2; exit 2 ;;
     esac
 done
+
+# The machine apps (SiC64, SiAmiga) are normally started by the Hub with a
+# machine to open, and quit on their own without one. The launch checks
+# therefore give them a showcase; otherwise they would be measuring that
+# rather than the bundle. Sets launch_args.
+set_launch_args()
+{
+    case "$1" in
+        SiC64)   launch_args=("$ROOT_DIR/Apps/Silicium/Showcases/norah.svm") ;;
+        SiAmiga) launch_args=("$ROOT_DIR/Apps/Silicium/Showcases/rink-a-dink.svm") ;;
+        *)       launch_args=() ;;
+    esac
+}
 
 say()  { printf '\n\033[1m==> %s\033[0m\n' "$*"; }
 info() { printf '    %s\n' "$*"; }
@@ -320,11 +333,7 @@ for app in "${APPS[@]}"; do
     #    Homebrew, so this is the one that settles it.
     if [ "$DO_SMOKE_TEST" -eq 1 ]; then
 
-        # SiC64 is normally started by the Hub with a machine to open, and
-        # quits on its own without one -- so it is given a showcase here.
-        # Otherwise the launch check would be measuring that, not the bundle.
-        launch_args=()
-        [ "$app" = "SiC64" ] && launch_args=("$ROOT_DIR/Apps/Silicium/Showcases/rink-a-dink.svm")
+        set_launch_args "$app"
 
         log="$OUT_DIR/$app-smoke.log"
         DYLD_PRINT_LIBRARIES=1 "$bundle/Contents/MacOS/$app" "${launch_args[@]+"${launch_args[@]}"}" > "$log" 2>&1 &
@@ -451,9 +460,9 @@ if [ "$DO_NOTARIZE" -eq 1 ]; then
     #
     # Submit
     #
-    # Both apps ride in one archive. They are a pair -- the Hub cannot start
-    # a machine without the backend -- and one submission means one wait
-    # rather than two sequential ones.
+    # All apps ride in one archive. They belong together -- the Hub cannot
+    # start a machine without SiC64 or SiAmiga -- and one submission means
+    # one wait rather than several sequential ones.
     #
     # ditto, not zip(1): the frameworks are full of symlinks, and zip(1)
     # either follows or flattens them, producing an archive the service
@@ -584,8 +593,7 @@ if [ "$DO_NOTARIZE" -eq 1 ]; then
         # was made earlier, while it still worked.)
         if [ "$DO_SMOKE_TEST" -eq 1 ]; then
 
-            launch_args=()
-            [ "$app" = "SiC64" ] && launch_args=("$ROOT_DIR/Apps/Silicium/Showcases/rink-a-dink.svm")
+            set_launch_args "$app"
 
             log="$OUT_DIR/$app-smoke-hardened.log"
             "$bundle/Contents/MacOS/$app" "${launch_args[@]+"${launch_args[@]}"}" > "$log" 2>&1 &
@@ -617,8 +625,9 @@ du -sh "$OUT_DIR"/*.app | sed 's/^/    /'
 if [ "$DO_NOTARIZE" -eq 1 ]; then
 cat <<EOF
 
-    Copy BOTH bundles to the target machine -- the Hub launches SiC64 as a
-    separate process, so silicium.app alone cannot start a machine.
+    Copy ALL bundles to the target machine -- the Hub launches SiC64 and
+    SiAmiga as separate processes, so silicium.app alone cannot start a
+    machine.
 
     Signed with "$IDENTITY", notarized and stapled. They open by
     double-click on any Mac running macOS $(sed -n 's/^set(CMAKE_OSX_DEPLOYMENT_TARGET "\(.*\)").*/\1/p' "$ROOT_DIR/CMakeLists.txt") or later --
@@ -631,14 +640,16 @@ EOF
 else
 cat <<EOF
 
-    Copy BOTH bundles to the target machine -- the Hub launches SiC64 as a
-    separate process, so silicium.app alone cannot start a machine.
+    Copy ALL bundles to the target machine -- the Hub launches SiC64 and
+    SiAmiga as separate processes, so silicium.app alone cannot start a
+    machine.
 
     They are ad-hoc signed, not notarized. On the target machine, clear the
     quarantine flag once after copying:
 
         xattr -dr com.apple.quarantine /path/to/silicium.app
         xattr -dr com.apple.quarantine /path/to/SiC64.app
+        xattr -dr com.apple.quarantine /path/to/SiAmiga.app
 
     To produce bundles that open by double-click instead, re-run with:
 
