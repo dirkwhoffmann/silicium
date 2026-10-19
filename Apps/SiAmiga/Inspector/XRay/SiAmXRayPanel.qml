@@ -37,6 +37,10 @@ SiAmInspectorWindow {
     readonly property int xrayNone: 0
     readonly property int xrayDma: 1
     readonly property int xrayLayers: 2
+    readonly property int xrayCrosshairs: 3
+
+    // The channel rows only exist in the DMA and layer scans
+    readonly property bool hasChannels: cc.XRAY_MODE === xrayDma || cc.XRAY_MODE === xrayLayers
 
     // Mirrors vamiga::XRayCompositor
     readonly property int xrayCompositorCpu: 0
@@ -122,7 +126,7 @@ SiAmInspectorWindow {
                 SuLabeledComboBox {
 
                     Layout.fillWidth: true
-                    model: [qsTr("Off"), qsTr("DMA scan"), qsTr("Layer scan")]
+                    model: [qsTr("Off"), qsTr("DMA scan"), qsTr("Layer scan"), qsTr("Crosshairs")]
                     currentIndex: cc.XRAY_MODE
                     onCurrentIndexChanged: cc.XRAY_MODE = currentIndex
                 }
@@ -181,7 +185,7 @@ SiAmInspectorWindow {
 
             VSpacer {
 
-                visible: cc.XRAY_MODE === xrayNone
+                visible: !hasChannels
             }
 
             //
@@ -196,7 +200,7 @@ SiAmInspectorWindow {
             SiBox {
 
                 title: qsTr("Channels")
-                visible: cc.XRAY_MODE !== xrayNone
+                visible: hasChannels
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 

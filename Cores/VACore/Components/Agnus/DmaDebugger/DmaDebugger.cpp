@@ -10,6 +10,7 @@
 #include "vaconfig.h"
 #include "DmaDebugger.h"
 #include "Amiga.h"
+#include "Emulator.h"
 #include "utl/io.h"
 
 namespace vamiga {
@@ -452,8 +453,44 @@ DmaDebugger::computeOverlay(Texel *dmaPtr, isize first, isize last, BusOwner *ow
 }
 
 void
+DmaDebugger::_pause()
+{
+    if (config.mode != XRayMode::XRAY_CROSSHAIRS) return;
+
+    // Show the position the emulator has stopped at
+    emulator.lockTexture();
+    computeCrosshairs(pixelEngine.xrayStablePtr());
+    emulator.unlockTexture();
+}
+
+void
+DmaDebugger::computeCrosshairs(Texel *xray)
+{
+    const auto &info = isPaused() ? agnus.info.current() : agnus.info.backed();
+
+    // Fill the texture with black
+    for (isize i = 0; i < PIXELS; i++) xray[i] = Texture::black;
+
+    // Locate the beam (one Texel covers a hires pixel)
+    auto row = std::clamp(info.vpos, isize(0), VPIXELS - 1);
+    auto col = std::clamp(agnus.pos.pixel(info.hpos) / 2, isize(0), HPIXELS - 1);
+
+    // Draw the crosshair
+    auto color = pixelEngine.toTexel(0xFF, 0x40, 0x40);
+    for (isize x = 0; x < HPIXELS; x++) xray[row * HPIXELS + x] = color;
+    for (isize y = 0; y < VPIXELS; y++) xray[y * HPIXELS + col] = color;
+}
+
+void
 DmaDebugger::vSyncHandler()
 {
+    // In crosshairs mode, start the new frame with a fresh texture
+    if (config.mode == XRayMode::XRAY_CROSSHAIRS) {
+
+        computeCrosshairs(pixelEngine.xrayWorkingPtr());
+        return;
+    }
+
     // Only proceed if the debugger is enabled
     if (config.mode != XRayMode::XRAY_DMA) return;
 
