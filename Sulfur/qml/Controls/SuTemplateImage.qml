@@ -7,9 +7,10 @@ Item {
     id: root
 
     property url source
-    property color color
+    property color color: Palette.primary
     property string symbol
     property string awesome
+    property string phosphor
     property alias fillMode: image.fillMode
 
     implicitWidth: image.implicitWidth
@@ -29,8 +30,8 @@ Item {
 
         id: symbolButton
 
-        visible: root.awesome !== "" || root.symbol !== ""
-        font.family: root.symbol ? Fonts.symbols : Fonts.awesome
+        visible: root.awesome !== "" || root.symbol !== "" || root.phosphor !== ""
+        font.family: Fonts.iconFamily(root.symbol, root.phosphor, root.awesome)
 
         implicitWidth: label.implicitWidth
         implicitHeight: label.implicitHeight
@@ -39,14 +40,14 @@ Item {
 
             id: label
 
-            text: root.symbol ? root.symbol : root.awesome
+            text: Fonts.iconText(root.symbol, root.phosphor, root.awesome)
             font: symbolButton.font
 
             color: symbolButton.checked
                 ? Palette.accent
                 : !symbolButton.enabled
                     ? Palette.tertiary
-                    : Palette.primary
+                    : root.color
 
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -61,6 +62,6 @@ Item {
         source: image
         colorization: 1.0
         brightness: 1.0
-        colorizationColor: Palette.primary
+        colorizationColor: root.color
     }
 }
