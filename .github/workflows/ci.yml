@@ -79,7 +79,8 @@ jobs:
         run: build/Cores/VCCore/VC64Headless${EXE} --smoke
 
   #
-  # The Qt apps (Hub, SiC64, SiAmiga). macOS is the reference platform. Linux
+  # The Qt apps (Hub, SiC64, SiAmiga). macOS is the reference platform; it
+  # runs on macOS 26, whose Xcode can compile the Icon Composer app icons. Linux
   # and Windows are new and may not build yet, so they are allowed to fail for
   # now. Once they are green, remove 'experimental' for them.
   #
@@ -92,12 +93,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: macos-15,     experimental: false }
+          - { os: macos-26,     experimental: false }
           - { os: ubuntu-24.04, experimental: true }
           - { os: windows-2022, experimental: true }
 
     env:
-      QT_VERSION: 6.11.*
+      # Pinned to the version the apps are developed with. A wildcard resolves to
+      # the newest release, whose files may not be on the download server yet.
+      QT_VERSION: 6.11.1
 
     steps:
       - uses: actions/checkout@v4
@@ -148,8 +151,10 @@ jobs:
                 -DCMAKE_PREFIX_PATH="${QT_ROOT_DIR};${{ steps.sdl.outputs.prefix }}" \
                 ${{ runner.os != 'Windows' && '-DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache' || '' }}
 
+      # -k 0 keeps going after a failure, so that one run shows every error
+      # (search the log for "FAILED:"), not only the first one.
       - name: Build
-        run: cmake --build build
+        run: cmake --build build -- -k 0
 
       # Static check of all QML files. Not blocking yet.
       - name: Lint QML

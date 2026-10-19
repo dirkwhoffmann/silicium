@@ -94,6 +94,41 @@ function(si_app_icon target icon)
         set(deployment "15.0")
     endif()
 
+    # Only Xcode 26 and newer can compile an Icon Composer icon. With an older
+    # actool (e.g., on a CI runner) the catalog would not be produced and the
+    # build would fail when it copies the missing file into the bundle. So
+    # try it once while configuring, and build without the custom icon if it
+    # does not work.
+    if(NOT DEFINED SI_ACTOOL_COMPILES_ICONS)
+
+        set(probe "${CMAKE_BINARY_DIR}/actool-probe")
+        file(REMOVE_RECURSE "${probe}")
+        file(MAKE_DIRECTORY "${probe}")
+
+        execute_process(
+            COMMAND xcrun actool "${source}"
+                    --compile "${probe}"
+                    --output-format human-readable-text
+                    --output-partial-info-plist "${probe}/partial.plist"
+                    --app-icon ${icon} --include-all-app-icons
+                    --enable-on-demand-resources NO
+                    --development-region en --target-device mac --platform macosx
+                    --minimum-deployment-target "${deployment}"
+            RESULT_VARIABLE probe_result
+            OUTPUT_QUIET ERROR_QUIET)
+
+        if(probe_result EQUAL 0 AND EXISTS "${probe}/Assets.car")
+            set(SI_ACTOOL_COMPILES_ICONS TRUE CACHE INTERNAL "")
+        else()
+            set(SI_ACTOOL_COMPILES_ICONS FALSE CACHE INTERNAL "")
+        endif()
+    endif()
+
+    if(NOT SI_ACTOOL_COMPILES_ICONS)
+        message(WARNING "This actool cannot compile Icon Composer icons (needs Xcode 26 or newer). The apps are built without a custom icon.")
+        return()
+    endif()
+
     file(GLOB_RECURSE icon_files CONFIGURE_DEPENDS "${source}/*")
 
     add_custom_command(
