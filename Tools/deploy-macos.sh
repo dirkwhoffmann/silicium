@@ -40,7 +40,7 @@
 #
 # One-time credential setup for --notarize:
 #
-#     xcrun notarytool store-credentials silicium-notary \
+#     xcrun notarytool store-credentials silicium-notary-api \
 #         --apple-id <your-apple-id> \
 #         --team-id 3NG65ZLYW7 \
 #         --password <app-specific-password>
@@ -68,7 +68,7 @@ DO_NOTARIZE=0
 # Ad-hoc unless told otherwise, so the plain deploy path behaves exactly as
 # it always has.
 IDENTITY="${CODESIGN_IDENTITY:--}"
-NOTARY_PROFILE="${NOTARY_PROFILE:-silicium-notary}"
+NOTARY_PROFILE="${NOTARY_PROFILE:-silicium-notary-api}"
 ENTITLEMENTS=""
 
 while [ $# -gt 0 ]; do
