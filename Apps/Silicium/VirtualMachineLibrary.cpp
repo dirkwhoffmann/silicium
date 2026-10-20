@@ -146,8 +146,9 @@ VirtualMachineLibrary::addVirtualMachine(const fs::path &path)
         if (!Preferences::instance().getResolveUUIDConflicts())
             throw ImageError(ImageError::VM_SAME_UUID, uuid.toString());
 
-        // Assign a new UUID and persist it
-        newVm->getManifest().uuid = utl::UUID::v4();
+        // Assign a new UUID and persist
+        uuid = utl::UUID::v4();
+        newVm->getManifest().uuid = uuid;
         newVm->persist();
     }
 
