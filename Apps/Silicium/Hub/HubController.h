@@ -192,10 +192,10 @@ class HubController : public Controller {
     Q_INVOKABLE QString cloneVM(const QString &quuid, const QUrl &cloneUrl);
 
     // Renames a virtual machine or a snapshot
-    Q_INVOKABLE void rename(const QString &quuid, const QString &name);
+    Q_INVOKABLE void renameVM(const QString &quuid, const QString &name);
 
     // Removes a virtual machine or a snapshot
-    Q_INVOKABLE bool remove(const QString &quuid);
+    Q_INVOKABLE bool removeVM(const QString &quuid);
 
     // Removes all custom virtual machines of a sidebar section
     Q_INVOKABLE bool resetLibrary(const QString &quuid);

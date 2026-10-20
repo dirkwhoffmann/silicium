@@ -141,7 +141,7 @@ Item {
 
         onTriggered: {
             console.log("HubWindow: renameAction")
-            hc.rename(uuid, newName)
+            hc.renameVM(uuid, newName)
         }
     }
 }

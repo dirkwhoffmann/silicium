@@ -23,6 +23,53 @@
 using retro::vault::ImageError;
 using retro::vault::PlatformEnum;
 
+/* The emulator backends can be configured in the Advanced settings. An
+ * executable given by a plain name is looked up next to this app (see
+ * AppController::locateExecutable). An absolute path is used as it is.
+ */
+
+static QString
+emulatorExecutable(Platform platform)
+{
+    auto &prefs = Preferences::instance();
+    auto name = (platform == Platform::AMIGA ? prefs.getAmigaExecutable() : prefs.getC64Executable()).trimmed();
+
+    // Fall back to the built-in backend if nothing is configured
+    if (name.isEmpty()) return AppController::locateExecutable(platform);
+
+    QFileInfo info(name);
+
+    if (info.isAbsolute()) {
+
+        // An app bundle stands for the executable inside of it
+        if (info.isDir() && info.suffix() == "app") {
+            info = QFileInfo(QDir(info.filePath()).filePath("Contents/MacOS/" + info.completeBaseName()));
+        }
+        if (!info.isFile() || !info.isExecutable()) {
+            throw ImageError(ImageError::EXECUTABLE_NOT_FOUND, name.toStdString());
+        }
+        return info.filePath();
+    }
+
+    if (QString path = AppController::locateExecutable(name); !path.isEmpty()) return path;
+
+    throw ImageError(ImageError::EXECUTABLE_NOT_FOUND, name.toStdString());
+}
+
+static QString
+emulatorParameters(Platform platform)
+{
+    auto &prefs = Preferences::instance();
+    return platform == Platform::AMIGA ? prefs.getAmigaParameters() : prefs.getC64Parameters();
+}
+
+HubController &
+HubController::instance()
+{
+    static HubController *inst = new HubController();
+    return *inst;
+}
+
 HubController::HubController() : Controller()
 {
     // Propagate preference changes to running emulator instances. Silicium and
@@ -53,84 +100,6 @@ HubController::HubController() : Controller()
 HubController::~HubController()
 {
 
-}
-
-HubController &
-HubController::instance()
-{
-    static HubController *inst = new HubController();
-    return *inst;
-}
-
-void
-HubController::start() {
-
-    try {
-
-        LogTask task("Starting HubController...");
-
-        // Initialize the VM library
-        setupShowcases();
-        setupUserVMs();
-
-        // Update the sidebar model
-        m_sidebarController.rebuild();
-        commitLibrary();
-
-    } catch (std::exception &e) {
-
-        emit showError("Failed to start the hub controller.", e.what());
-    }
-}
-
-void
-HubController::stop()
-{
-    LogTask task("Stopping HubController...");
-    writeVmList();
-
-    /* Release the machines. It has to happen here rather than being left to
-     * the process exit: instance() hands out a leaked 'new', so this object's
-     * members are never destroyed. Strictly after writeVmList(), which reads
-     * the library.
-     *
-     * Unconditional, unlike when a machine could be ZIP-backed: releasing one
-     * then deleted the temp tree it had been unpacked into, which a running
-     * emulator might still be working on. An SVM is now the folder itself, so
-     * this drops in-memory state and touches nothing on disk.
-     */
-    library.clear();
-}
-
-void
-HubController::setupUserVMs()
-{
-    auto list = readVmList();
-
-    for (const QString &str : list) {
-
-        auto url = QUrl::fromLocalFile(str);
-
-        try {
-
-            auto path = fs::path(url.toLocalFile().toStdString());
-            library.addVirtualMachine(path);
-
-        } catch (std::exception &e) {
-
-            qCWarning(siLog) << "Failed to add VM " << url;
-            qCWarning(siLog) << e.what();
-        }
-    }
-}
-
-Manifest *
-HubController::getManifest()
-{
-    if (auto *vm = library.lookupVirtualMachine(m_vUUID)) {
-        return &vm->getManifest();
-    }
-    return nullptr;
 }
 
 void
@@ -171,6 +140,87 @@ HubController::setupShowcases()
 }
 
 void
+HubController::setupUserVMs()
+{
+    auto list = readVmList();
+
+    for (const QString &str : list) {
+
+        auto url = QUrl::fromLocalFile(str);
+
+        try {
+
+            auto path = fs::path(url.toLocalFile().toStdString());
+            library.addVirtualMachine(path);
+
+        } catch (std::exception &e) {
+
+            qCWarning(siLog) << "Failed to add VM " << url;
+            qCWarning(siLog) << e.what();
+        }
+    }
+}
+
+VMState
+HubController::lookupState(UUID uuid) const
+{
+    if (auto *proc = findProcess(uuid)) return proc->state;
+
+    return VMState::HIBERNATED;
+}
+
+const VMProcess *
+HubController::findProcess(UUID uuid) const
+{
+    for (const auto &proc : m_processes) {
+        if (proc.vUUID == uuid) return &proc;
+    }
+
+    return nullptr;
+}
+
+void
+HubController::start() {
+    LogTask task("Starting HubController...");
+
+    try {
+
+        // Initialize the VM library
+        setupShowcases();
+        setupUserVMs();
+
+        // Update the sidebar model
+        m_sidebarController.rebuild();
+
+        // Persist all change
+        commitLibrary();
+
+    } catch (std::exception &e) {
+
+        emit showError("Failed to start the hub controller.", e.what());
+    }
+}
+
+void
+HubController::stop()
+{
+    LogTask task("Stopping HubController...");
+    writeVmList();
+
+    /* Release the machines. It has to happen here rather than being left to
+     * the process exit: instance() hands out a leaked 'new', so this object's
+     * members are never destroyed. Strictly after writeVmList(), which reads
+     * the library.
+     *
+     * Unconditional, unlike when a machine could be ZIP-backed: releasing one
+     * then deleted the temp tree it had been unpacked into, which a running
+     * emulator might still be working on. An SVM is now the folder itself, so
+     * this drops in-memory state and touches nothing on disk.
+     */
+    library.clear();
+}
+
+void
 HubController::setPanel(const QString &value)
 {
     if (m_panel != value) {
@@ -188,6 +238,27 @@ HubController::setOverlay(const QString &value)
         m_overlay = value;
         emit overlayChanged();
     }
+}
+
+bool
+HubController::vIsSelected(const QString &uuid) const
+{
+    return m_vInfo.value("uuid").toString() == uuid;
+}
+
+bool
+HubController::sIsSelected(const QString &uuid) const
+{
+    return m_sInfo.value("uuid").toString() == uuid;
+}
+
+Manifest *
+HubController::getManifest()
+{
+    if (auto *vm = library.lookupVirtualMachine(m_vUUID)) {
+        return &vm->getManifest();
+    }
+    return nullptr;
 }
 
 void
@@ -345,145 +416,6 @@ HubController::select(UUID uuid)
     }
 }
 
-bool
-HubController::vIsSelected(const QString &uuid) const
-{
-    return m_vInfo.value("uuid").toString() == uuid;
-}
-
-bool
-HubController::sIsSelected(const QString &uuid) const
-{
-    return m_sInfo.value("uuid").toString() == uuid;
-}
-
-/*
-bool
-HubController::isSelected(const QString &uuid) const
-{
-    return vIsSelected(uuid) || sIsSelected(uuid);
-}
-*/
-/*
-void
-HubController::select(const QString &quuid)
-{
-    select(UUID::fromString(quuid.toStdString()));
-}
-
-void
-HubController::select(UUID uuid)
-{
-
-
-    emit vmSelected();
-}
-*/
-
-void
-HubController::rename(const QString &quuid, const QString &qname)
-{
-    try {
-
-        auto uuid = UUID::fromString(quuid.toStdString());
-        auto name = qname.toStdString();
-
-        library.rename(uuid, name);
-        m_sidebarController.refresh(uuid);
-
-        /* 'uuid' may name either the machine or one of its snapshots, and
-         * either way it is the machine's SVM that was rewritten -- so resolve
-         * back to the owner before telling the running instance.
-         */
-        if (auto [vm, snap] = library.resolve(uuid); vm) {
-            notifySvmChanged(vm->getManifest().uuid);
-        }
-
-    } catch (std::exception &e) {
-
-        emit showError("Failed to rename virtual machine.", e.what());
-    }
-}
-
-bool
-HubController::remove(const QString &quuid)
-{
-    try {
-
-        bool success = false;
-        auto uuid = UUID::fromString(quuid.toStdString());
-
-        if (auto [vm, snap] = library.resolve(uuid); vm) {
-
-            if (snap) {
-
-                /* Remove snapshot. Read the owner's UUID before the delete:
-                 * 'snap' dangles once the entry is gone, and 'uuid' is the
-                 * snapshot's, not the machine's.
-                 */
-                auto vUUID = vm->getManifest().uuid;
-
-                success = vm->deleteSnapshot(uuid);
-                if (success) notifySvmChanged(vUUID);
-
-            } else {
-
-                // Remove virtual machine
-                if (isOpen(uuid)) throw ImageError(ImageError::VM_RUNNING);
-                success = library.removeVirtualMachine(uuid);
-            }
-
-            m_sidebarController.validate();
-            validateSelection();
-        }
-        return success;
-
-    } catch (std::exception &e) {
-
-        emit showError("Failed to remove virtual machine.", e.what());
-        return false;
-    }
-}
-
-bool
-HubController::resetLibrary(const QString &quuid)
-{
-    try {
-
-        auto section = UUID::fromString(quuid.toStdString());
-
-        // Pick the custom machines that belong to the section
-        auto custom = library.collect([&](const VirtualMachine &vm) {
-
-            if (vm.isPreinstalled()) return false;
-            if (section == HubSidebarModel::UUID_C64) return !vm.getManifest().isAmiga();
-            if (section == HubSidebarModel::UUID_AMIGA) return vm.getManifest().isAmiga();
-            return true;
-        });
-
-        isize open = 0;
-
-        for (auto uuid : custom) {
-
-            if (isOpen(uuid)) { open++; continue; }
-            library.removeVirtualMachine(uuid);
-        }
-
-        m_sidebarController.validate();
-        validateSelection();
-
-        if (open) {
-            throw ImageError(ImageError::VM_RUNNING);
-        }
-        return true;
-
-    } catch (std::exception &e) {
-
-        emit showError("Failed to remove all virtual machines.", e.what());
-        return false;
-    }
-}
-
 int
 HubController::vCount() const
 {
@@ -509,58 +441,6 @@ HubController::openVMs() const
     }
 
     return result;
-}
-
-const VMProcess *
-HubController::findProcess(UUID uuid) const
-{
-    for (const auto &proc : m_processes) {
-        if (proc.vUUID == uuid) return &proc;
-    }
-
-    return nullptr;
-}
-
-VMState
-HubController::lookupState(UUID uuid) const
-{
-    if (auto *proc = findProcess(uuid)) return proc->state;
-
-    return VMState::HIBERNATED;
-}
-
-void
-HubController::commitLibrary()
-{
-    // Persist all changes
-    writeVmList();
-
-    // Signal the change
-    emit libraryChanged();
-}
-
-QStringList
-HubController::readVmList() const
-{
-    return preferences().readVmList();
-}
-
-void
-HubController::writeVmList()
-{
-    QStringList vmList;
-
-    for (auto *vm : library.getVirtualMachines()) {
-
-        // Skip all preinstalled machines. They ship with the app and are
-        // registered on every launch (see setupShowcases), so recording them
-        // here would only invite duplicates.
-        if (vm->isPreinstalled()) continue;
-
-        vmList.append(QString::fromStdString(vm->getSourcePath().string()));
-    }
-
-    preferences().writeVmList(vmList);
 }
 
 QString
@@ -650,6 +530,119 @@ HubController::cloneVM(const QString &quuid, const QUrl &cloneUrl)
 }
 
 void
+HubController::renameVM(const QString &quuid, const QString &qname)
+{
+    try {
+
+        auto uuid = UUID::fromString(quuid.toStdString());
+        auto name = qname.toStdString();
+
+        if (auto [vm, snap] = library.resolve(uuid); vm) {
+
+            // Rename virtual machine
+            library.rename(uuid, name);
+
+            // Update sidebar
+            m_sidebarController.refresh(uuid);
+
+            // Persist the change
+            commitLibrary();
+
+            // Inform the running emulator
+            notifySvmChanged(vm->getManifest().uuid);
+        }
+
+    } catch (std::exception &e) {
+
+        emit showError("Failed to rename virtual machine.", e.what());
+    }
+}
+
+bool
+HubController::removeVM(const QString &quuid)
+{
+    try {
+
+        bool success = false;
+        auto uuid = UUID::fromString(quuid.toStdString());
+
+        if (auto [vm, snap] = library.resolve(uuid); vm) {
+
+            if (snap) {
+
+                // Remove snapshot
+                auto vUUID = vm->getManifest().uuid;
+                success = vm->deleteSnapshot(uuid);
+                if (success) notifySvmChanged(vUUID);
+
+            } else {
+
+                // Only proceed if the machine is idle
+                if (isOpen(uuid)) throw ImageError(ImageError::VM_RUNNING);
+
+                // Remove virtual machine
+                success = library.removeVirtualMachine(uuid);
+            }
+
+            m_sidebarController.validate();
+            validateSelection();
+
+            // Persist the change (snapshots are not part of the path list)
+            if (!snap) commitLibrary();
+        }
+
+        return success;
+
+    } catch (std::exception &e) {
+
+        emit showError("Failed to remove virtual machine.", e.what());
+        return false;
+    }
+}
+
+bool
+HubController::resetLibrary(const QString &quuid)
+{
+    try {
+
+        auto section = UUID::fromString(quuid.toStdString());
+
+        // Pick the custom machines that belong to the section
+        auto custom = library.collect([&](const VirtualMachine &vm) {
+
+            if (vm.isPreinstalled()) return false;
+            if (section == HubSidebarModel::UUID_C64) return !vm.getManifest().isAmiga();
+            if (section == HubSidebarModel::UUID_AMIGA) return vm.getManifest().isAmiga();
+            return true;
+        });
+
+        isize open = 0;
+
+        for (auto uuid : custom) {
+
+            if (isOpen(uuid)) { open++; continue; }
+            library.removeVirtualMachine(uuid);
+        }
+
+        m_sidebarController.validate();
+        validateSelection();
+
+        // Persist the change
+        commitLibrary();
+
+        // Throw if not all machines could be deleted
+        if (open) throw ImageError(ImageError::VM_RUNNING);
+
+        return true;
+
+    } catch (std::exception &e) {
+
+        emit showError("Failed to remove all virtual machines.", e.what());
+        return false;
+    }
+}
+
+void
 HubController::open()
 {
     open(m_vUUID, m_sUUID);
@@ -660,12 +653,29 @@ HubController::open(const QString &vQUUID, const QString &sQUUID)
 {
     open(UUID::fromString(vQUUID.toStdString()), UUID::fromString(sQUUID.toStdString()));
 }
+
+void
+HubController::closeWindow(const QString &uuid)
+{
+    shutdown(UUID::fromString(uuid.toStdString()));
+}
+
+void
+HubController::closeAll()
+{
+    qDebug() << "Closing all managed windows...";
+
+    for (const auto &uuid : openVMs()) {
+        shutdown(uuid);
+    }
+}
+
 void
 HubController::open(UUID vUUID, UUID sUUID)
 {
-    try {
+    LogTask task("Opening virtual machine...");
 
-        LogTask task("Opening virtual machine...");
+    try {
 
         if (auto *proc = findProcess(vUUID)) {
 
@@ -684,6 +694,37 @@ HubController::open(UUID vUUID, UUID sUUID)
     } catch (const std::exception &e) {
 
         emit showError("Failed to open virtual machine", e.what());
+    }
+}
+
+void
+HubController::launch(UUID vUUID, UUID sUUID)
+{
+    LogTask task("Launching new virtual machine...");
+
+    try {
+
+        // Lookup the virtual machine
+        auto *vm = library.lookupVirtualMachine(vUUID);
+        if (!vm) throw ImageError(ImageError::VM_NOT_FOUND, vUUID.toString());
+
+        // Locate the emulator app
+        auto &manifest = vm->getManifest();
+        const QString exePath = emulatorExecutable(manifest.platform);
+
+        const QString svmPath = QString::fromStdString(vm->root().string());
+
+        // Create a new process
+        auto *process = createProcess(vUUID, sUUID);
+
+        // Assemble arguments and launch the process
+        const QStringList argv = buildArguments(svmPath, manifest, sUUID);
+        qCDebug(siLog) << "Executing" << exePath << argv;
+        process->start(exePath, argv);
+
+    } catch (std::exception &e) {
+
+        emit showError("Failed to open virtual machine.", e.what());
     }
 }
 
@@ -782,46 +823,6 @@ HubController::createProcess(UUID vUUID, UUID sUUID)
     return process;
 }
 
-/* The emulator backends can be configured in the Advanced settings. An
- * executable given by a plain name is looked up next to this app (see
- * AppController::locateExecutable). An absolute path is used as it is.
- */
-
-static QString
-emulatorExecutable(Platform platform)
-{
-    auto &prefs = Preferences::instance();
-    auto name = (platform == Platform::AMIGA ? prefs.getAmigaExecutable() : prefs.getC64Executable()).trimmed();
-
-    // Fall back to the built-in backend if nothing is configured
-    if (name.isEmpty()) return AppController::locateExecutable(platform);
-
-    QFileInfo info(name);
-
-    if (info.isAbsolute()) {
-
-        // An app bundle stands for the executable inside of it
-        if (info.isDir() && info.suffix() == "app") {
-            info = QFileInfo(QDir(info.filePath()).filePath("Contents/MacOS/" + info.completeBaseName()));
-        }
-        if (!info.isFile() || !info.isExecutable()) {
-            throw ImageError(ImageError::EXECUTABLE_NOT_FOUND, name.toStdString());
-        }
-        return info.filePath();
-    }
-
-    if (QString path = AppController::locateExecutable(name); !path.isEmpty()) return path;
-
-    throw ImageError(ImageError::EXECUTABLE_NOT_FOUND, name.toStdString());
-}
-
-static QString
-emulatorParameters(Platform platform)
-{
-    auto &prefs = Preferences::instance();
-    return platform == Platform::AMIGA ? prefs.getAmigaParameters() : prefs.getC64Parameters();
-}
-
 QStringList
 HubController::buildArguments(const QString &svmPath, const Manifest &manifest, UUID sUUID)
 {
@@ -857,37 +858,6 @@ HubController::buildArguments(const QString &svmPath, const Manifest &manifest, 
     }
 
     return argv;
-}
-
-void
-HubController::launch(UUID vUUID, UUID sUUID)
-{
-    LogTask task("Launching new virtual machine...");
-
-    try {
-
-        // Lookup the virtual machine
-        auto *vm = library.lookupVirtualMachine(vUUID);
-        if (!vm) throw ImageError(ImageError::VM_NOT_FOUND, vUUID.toString());
-
-        // Locate the emulator app
-        auto &manifest = vm->getManifest();
-        const QString exePath = emulatorExecutable(manifest.platform);
-
-        const QString svmPath = QString::fromStdString(vm->root().string());
-
-        // Create a new process
-        auto *process = createProcess(vUUID, sUUID);
-
-        // Assemble arguments and launch the process
-        const QStringList argv = buildArguments(svmPath, manifest, sUUID);
-        qCDebug(siLog) << "Executing" << exePath << argv;
-        process->start(exePath, argv);
-
-    } catch (std::exception &e) {
-
-        emit showError("Failed to open virtual machine.", e.what());
-    }
 }
 
 void
@@ -1058,27 +1028,6 @@ HubController::broadcastRpc(const QString &method, const QJsonValue &params)
 }
 
 void
-HubController::notifySvmChanged(UUID vUUID)
-{
-    /* The Hub and a running emulator instance each hold their own SVMFile for the
-     * same file on disk. Whenever the Hub writes -- a rename, a deleted
-     * snapshot -- the instance's copy silently goes stale, and it keeps making
-     * decisions from the manifest it read at startup: counting a snapshot the
-     * user just deleted, and so refusing to save a new one against a capacity
-     * that is no longer full.
-     *
-     * This is the mirror image of the notification the emulator sends the other way
-     * after it writes (see C64Controller::notifySvmChanged), and it carries no
-     * params for the same reason that one carries a kind: there is nothing to
-     * reveal or select here, the receiver simply re-reads.
-     */
-    for (auto &proc : m_processes) {
-
-        if (proc.vUUID == vUUID) sendRpc(proc.process, "svmChanged");
-    }
-}
-
-void
 HubController::sendRpc(QProcess *process, const QString &method, const QJsonValue &params)
 {
     if (!process || process->state() != QProcess::Running) return;
@@ -1099,9 +1048,24 @@ HubController::sendRpc(QProcess *process, const QString &method, const QJsonValu
 }
 
 void
-HubController::closeWindow(const QString &uuid)
+HubController::notifySvmChanged(UUID vUUID)
 {
-    shutdown(UUID::fromString(uuid.toStdString()));
+    /* The Hub and a running emulator instance each hold their own SVMFile for the
+     * same file on disk. Whenever the Hub writes -- a rename, a deleted
+     * snapshot -- the instance's copy silently goes stale, and it keeps making
+     * decisions from the manifest it read at startup: counting a snapshot the
+     * user just deleted, and so refusing to save a new one against a capacity
+     * that is no longer full.
+     *
+     * This is the mirror image of the notification the emulator sends the other way
+     * after it writes (see C64Controller::notifySvmChanged), and it carries no
+     * params for the same reason that one carries a kind: there is nothing to
+     * reveal or select here, the receiver simply re-reads.
+     */
+    for (auto &proc : m_processes) {
+
+        if (proc.vUUID == vUUID) sendRpc(proc.process, "svmChanged");
+    }
 }
 
 void
@@ -1130,11 +1094,32 @@ HubController::shutdown(UUID uuid)
 }
 
 void
-HubController::closeAll()
+HubController::commitLibrary()
 {
-    qDebug() << "Closing all managed windows...";
+    // Persist all changes
+    writeVmList();
 
-    for (const auto &uuid : openVMs()) {
-        shutdown(uuid);
+    // Signal the change
+    emit libraryChanged();
+}
+
+QStringList
+HubController::readVmList() const
+{
+    return preferences().readVmList();
+}
+
+void
+HubController::writeVmList()
+{
+    QStringList vmList;
+
+    for (auto *vm : library.getVirtualMachines()) {
+
+        if (!vm->isPreinstalled()) {
+            vmList.append(QString::fromStdString(vm->getSourcePath().string()));
+        }
     }
+
+    preferences().writeVmList(vmList);
 }

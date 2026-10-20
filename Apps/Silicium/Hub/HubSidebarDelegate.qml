@@ -84,7 +84,7 @@ ItemDelegate {
 
         onTriggered: {
 
-            HubController.remove(uuid)
+            HubController.removeVM(uuid)
         }
     }
 
@@ -104,7 +104,7 @@ ItemDelegate {
         text: "Delete"
         enabled: !readOnly
 
-        onTriggered: HubController.remove(uuid)
+        onTriggered: HubController.removeVM(uuid)
     }
 
     Action {
