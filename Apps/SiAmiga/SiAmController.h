@@ -115,6 +115,9 @@ class SiAmController : public Controller {
     // notification instead of having to poll.
     bool m_warping = false;
 
+    // State of the power LED: 0 = off, 1 = dim, 2 = on (see Msg::POWER_LED_*)
+    int m_powerLed = 0;
+
 
     //
     // Message and signal processing
@@ -237,6 +240,11 @@ public:
     Q_PROPERTY(bool warping READ warping NOTIFY warpingChanged)
 
     bool warping() const { return m_warping; }
+
+    // The power LED is lit by the CIA and dimmed by the Amiga's audio filter
+    Q_PROPERTY(int powerLed READ powerLed NOTIFY powerLedChanged)
+
+    int powerLed() const { return m_powerLed; }
 
     Q_INVOKABLE void powerOn();
     Q_INVOKABLE void powerOff();
@@ -531,6 +539,7 @@ signals:
     void hibernated();
     void captureChanged();
     void warpingChanged();
+    void powerLedChanged();
     void debugPanelChanged();
     void retroShellChanged();
     void retroShellTextChanged();

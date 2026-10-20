@@ -30,6 +30,7 @@ Item {
     readonly property string ledRed:   "qrc:/images/led-red.png"
     readonly property string ledGreen: "qrc:/images/led-green.png"
     readonly property string ledGray:  "qrc:/images/led-gray.png"
+    readonly property string ledBlack: "qrc:/images/led-black.png"
     readonly property string disk35:   "qrc:/icons/disk-35.png"
     readonly property string disk35wp: "qrc:/icons/disk-35-wp.png"
     readonly property string hardDisk: "qrc:/icons/hd.png"
@@ -115,14 +116,13 @@ Item {
         return false
     }
 
-    function redIcon(nr)   { return spinning(nr) ? ledRed : ledGray }
-    function greenIcon(nr) { return writing(nr) ? ledGreen : ledGray }
+    // One LED per drive: red on write, green while the motor runs, else gray
+    function ledIcon(nr)   { return writing(nr) ? ledRed : spinning(nr) ? ledGreen : ledGray }
     function diskIcon(nr)  { return hasDisk(nr) ? (diskProtected(nr) ? disk35wp : disk35) : "" }
 
-    /* The same again for the hard drives. A hard drive has no motor, so what
-     * lights its red LED is the head being busy at all -- reading or writing
-     * (see HardDriveState) -- and the number beside it is the cylinder the
-     * head sits on rather than a track.
+    /* The same again for the hard drives. A hard drive has no motor, and the
+     * number beside its LED is the cylinder the head sits on rather than a
+     * track (see HardDriveState).
      */
     function hdConnected(nr) {
 
@@ -179,9 +179,8 @@ Item {
         return false
     }
 
-    function hdBusy(nr)      { return hdReading(nr) || hdWriting(nr) }
-    function hdRedIcon(nr)   { return hdBusy(nr) ? ledRed : ledGray }
-    function hdGreenIcon(nr) { return hdWriting(nr) ? ledGreen : ledGray }
+    // One LED per drive: red on write, green on read, else gray
+    function hdLedIcon(nr)   { return hdWriting(nr) ? ledRed : hdReading(nr) ? ledGreen : ledGray }
     function hdIcon(nr)      { return hdHasDisk(nr) ? hardDisk : "" }
 
     //
@@ -223,11 +222,9 @@ Item {
 
         id: root
 
-        required property url redIcon
-        required property url greenIcon
+        required property url ledIcon
         required property url diskIcon
         required property int track
-        required property bool spinning
 
         implicitWidth: layout.implicitWidth
         implicitHeight: layout.implicitHeight
@@ -246,13 +243,7 @@ Item {
                 LED {
 
                     padding: 0
-                    icon.source: redIcon ? redIcon : ""
-                }
-
-                LED {
-
-                    padding: 0
-                    icon.source: greenIcon ? greenIcon : ""
+                    icon.source: ledIcon ? ledIcon : ""
                 }
             }
 
@@ -271,14 +262,6 @@ Item {
                 state: diskIcon !== ""
                 icon.source: diskIcon ? diskIcon : ""
             }
-
-            SuBusyIndicator {
-
-                implicitHeight: 22
-                implicitWidth: 22
-                padding: 3
-                running: root.spinning && amiga.isRunning
-            }
         }
     }
 
@@ -290,11 +273,9 @@ Item {
 
         id: root
 
-        required property url redIcon
-        required property url greenIcon
+        required property url ledIcon
         required property url hdIcon
         required property int cylinder
-        required property bool busy
 
         implicitWidth: layout.implicitWidth
         implicitHeight: layout.implicitHeight
@@ -313,13 +294,7 @@ Item {
                 LED {
 
                     padding: 0
-                    icon.source: redIcon ? redIcon : ""
-                }
-
-                LED {
-
-                    padding: 0
-                    icon.source: greenIcon ? greenIcon : ""
+                    icon.source: ledIcon ? ledIcon : ""
                 }
             }
 
@@ -336,14 +311,6 @@ Item {
 
                 state: hdIcon !== ""
                 icon.source: hdIcon ? hdIcon : ""
-            }
-
-            SuBusyIndicator {
-
-                implicitHeight: 22
-                implicitWidth: 22
-                padding: 3
-                running: root.busy && amiga.isRunning
             }
         }
     }
@@ -683,6 +650,16 @@ Item {
             visible: root.amiga.status === ""
 
             //
+            // Power LED
+            //
+
+            LED {
+
+                padding: 0
+                icon.source: amiga.powerLed === 2 ? ledRed : amiga.powerLed === 1 ? ledBlack : ledGray
+            }
+
+            //
             // Floppy drives
             //
 
@@ -698,11 +675,9 @@ Item {
 
                     FloppyObserver {
 
-                        redIcon: root.redIcon(index)
-                        greenIcon: root.greenIcon(index)
+                        ledIcon: root.ledIcon(index)
                         diskIcon: root.diskIcon(index)
                         track: root.track(index)
-                        spinning: root.spinning(index)
                     }
 
                     HSpacer {
@@ -727,11 +702,9 @@ Item {
 
                     HardDriveObserver {
 
-                        redIcon: root.hdRedIcon(index)
-                        greenIcon: root.hdGreenIcon(index)
+                        ledIcon: root.hdLedIcon(index)
                         hdIcon: root.hdIcon(index)
                         cylinder: root.hdCylinder(index)
-                        busy: root.hdBusy(index)
                     }
 
                     HSpacer {

@@ -64,11 +64,9 @@ Assets::getIconUrl(Icon icon)
         case Icon::CommodoreLogo:       return QUrl("qrc:/images/commodore-logo.png");
         case Icon::Help:                return QUrl("qrc:/images/help.png");
         case Icon::LedGray:             return QUrl("qrc:/images/led-gray.png");
-        case Icon::LedGrayDark:         return QUrl("qrc:/images/led-gray-dark.png");
+        case Icon::LedBlack:            return QUrl("qrc:/images/led-black.png");
         case Icon::LedGreen:            return QUrl("qrc:/images/led-green.png");
-        case Icon::LedGreenDark:        return QUrl("qrc:/images/led-green-dark.png");
         case Icon::LedRed:              return QUrl("qrc:/images/led-red.png");
-        case Icon::LedRedDark:          return QUrl("qrc:/images/led-red-dark.png");
         case Icon::LedRoundGray:        return QUrl("qrc:/images/led-round-gray.png");
         case Icon::LedRoundGreen:       return QUrl("qrc:/images/led-round-green.png");
         case Icon::LedRoundYellow:      return QUrl("qrc:/images/led-round-yellow.png");

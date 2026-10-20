@@ -1323,6 +1323,14 @@ SiAmController::process(const Message &msg, const string &attachment, std::excep
             m_infoIsDirty = true;
             break;
 
+        case Msg::POWER_LED_OFF:
+        case Msg::POWER_LED_DIM:
+        case Msg::POWER_LED_ON:
+
+            m_powerLed = msg.type == Msg::POWER_LED_ON ? 2 : msg.type == Msg::POWER_LED_DIM ? 1 : 0;
+            emit powerLedChanged();
+            break;
+
         case Msg::DRIVE_CONNECT:
         case Msg::DRIVE_SELECT:
         case Msg::DRIVE_READ:
