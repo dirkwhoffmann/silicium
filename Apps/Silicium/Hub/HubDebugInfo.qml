@@ -66,7 +66,7 @@ Rectangle {
                 text: "State:"
             }
             ValueLabel {
-                text: HubController.vInfo.state ?? "undefined"
+                text: HubController.vState
                 Layout.fillWidth: true
             }
         }

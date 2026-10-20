@@ -140,6 +140,9 @@ class HubController : public Controller {
     // Returns meta-information about the selected snapshot
     Q_PROPERTY(QVariantMap sInfo READ sInfo NOTIFY selectionChanged)
 
+    // Returns the run state of the selected machine
+    Q_PROPERTY(QString vState READ vState NOTIFY stateChanged)
+
     // Indicates whether the selected machine has an open emulator window
     Q_PROPERTY(bool isOpen READ isOpen NOTIFY openChanged)
 
@@ -168,6 +171,8 @@ class HubController : public Controller {
 
     int sCount() const;
     QVariantMap sInfo() const { return m_sInfo; }
+
+    QString vState() const;
 
     bool isOpen(UUID uuid) const { return findProcess(uuid) != nullptr; }
     bool isOpen() const { return isOpen(m_vUUID); }
@@ -278,6 +283,7 @@ class HubController : public Controller {
     void panelChanged();
     void overlayChanged();
     void selectionChanged();
+    void stateChanged();
     void libraryChanged();
     void openChanged();
     void ambiguousUUID(const QUrl &url);

@@ -161,6 +161,12 @@ HubController::setupUserVMs()
     }
 }
 
+QString
+HubController::vState() const
+{
+    return QString::fromUtf8(VMStateEnum::key(lookupState(m_vUUID)));
+}
+
 VMState
 HubController::lookupState(UUID uuid) const
 {
@@ -369,12 +375,6 @@ HubController::select(UUID uuid)
         }
 
         //
-        // Collect runtime information, if the machine in active
-        //
-
-        m_vInfo["state"] = VMStateEnum::key(lookupState(uuid));
-
-        //
         // Collect information about the selected snapshot
         //
 
@@ -409,6 +409,7 @@ HubController::select(UUID uuid)
     }
 
     emit selectionChanged();
+    emit stateChanged();
 
     } catch (std::exception &e) {
 
@@ -805,10 +806,7 @@ HubController::createProcess(UUID vUUID, UUID sUUID)
         process->deleteLater();
 
         m_sidebarController.refresh(vUUID);
-        if (vUUID == m_vUUID) {
-            m_vInfo["state"] = VMStateEnum::key(VMState::HIBERNATED);
-            emit selectionChanged();
-        }
+        if (vUUID == m_vUUID) emit stateChanged();
     });
 
     /* numOpen and isOpen are both derived from this vector and both notify
@@ -876,10 +874,7 @@ HubController::processRpcPacket(QProcess *process, UUID vUUID, const QJsonObject
 
             proc.state = *state;
 
-            if (proc.vUUID == m_vUUID) {
-                m_vInfo["state"] = VMStateEnum::key(*state);
-                emit selectionChanged();
-            }
+            if (proc.vUUID == m_vUUID) emit stateChanged();
 
             m_sidebarController.refresh(vUUID);
             break;
