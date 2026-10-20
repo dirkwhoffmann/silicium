@@ -249,7 +249,7 @@ Item {
 
             SuText {
 
-                text: track ? track : ""
+                text: track
                 font.pixelSize: Style.small
                 Layout.preferredWidth: 20
                 horizontalAlignment: Text.AlignHCenter

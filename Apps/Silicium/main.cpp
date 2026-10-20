@@ -23,6 +23,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
+#include <QFileInfo>
 #include <QFileOpenEvent>
 #include <QQuickWindow>
 #include <QIcon>
@@ -39,6 +40,8 @@
  * Anything that lands that early is held here and replayed from flush(), which
  * the engine's objectCreated handler calls. That handler is a queued
  * connection, so it runs after engine.load() has returned and start() with it.
+ *
+ * Machines named on the command line take the same route (see main()).
  */
 class FileOpenFilter : public QObject {
 
@@ -56,6 +59,9 @@ class FileOpenFilter : public QObject {
     QQuickWindow *window = nullptr;
 
   public:
+
+    // Holds a document until the hub is up (see flush)
+    void queue(const QUrl &url) { pending.append(url); }
 
     void flush(QObject *root)
     {
@@ -144,6 +150,22 @@ main(int argc, char *argv[])
 
     // Enable logging support
     startLogger(argc, argv);
+
+    /* Machines named on the command line are opened as soon as the hub is up,
+     * exactly as if Finder had handed them over. The hub then launches SiC64
+     * or SiAmiga, depending on the platform recorded in the SVM.
+     */
+    for (const auto &arg : QCoreApplication::arguments().mid(1)) {
+
+        if (arg.startsWith('-')) continue;
+
+        const QFileInfo info(arg);
+        if (!info.exists()) {
+            qCWarning(siLog) << "Ignoring" << arg << "(no such file)";
+            continue;
+        }
+        fileOpenFilter.queue(QUrl::fromLocalFile(info.absoluteFilePath()));
+    }
 
     // Identify the application
     QCoreApplication::setOrganizationName("dirkwhoffmann");
