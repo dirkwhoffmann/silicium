@@ -26,15 +26,11 @@ class VirtualMachineLibrary : public SiObject {
     // Returns the number of managed virtual machines
     isize numVirtualMachines() const { return (isize)vms.size(); }
 
-    /* Drops every machine, releasing the SVM files they own.
-     *
-     * In-memory only: an SVM is the tree on disk, so letting go of it writes
-     * nothing and deletes nothing. Called on shutdown because HubController is
-     * a deliberately leaked singleton and nothing else ever destroys this.
-     */
-    void clear() { vms.clear(); }
 
-    // Returns a view of raw pointers (updated to extract .second from the map pair)
+    //
+    // Returning a view of raw pointers
+    //
+
     auto getVirtualMachines()
     {
         return vms | std::views::transform([](const auto &pair) { return pair.second.get(); });
@@ -45,7 +41,6 @@ class VirtualMachineLibrary : public SiObject {
         return vms | std::views::transform([](const auto &pair) { return pair.second.get(); });
     }
 
-    // Updated predicates to match map pairs
     auto getVirtualMachines(auto predicate)
     {
         return vms
@@ -83,10 +78,6 @@ class VirtualMachineLibrary : public SiObject {
     SnapshotInfo *lookupSnapshot(utl::UUID uuid);
     SnapshotInfo *lookupSnapshot(const string &uuid);
 
-    utl::UUID lookupVirtualMachineUUID(utl::UUID uuid) const;
-    utl::UUID lookupVirtualMachineUUID(const string &uuid) const;
-    utl::UUID lookupVirtualMachineUUID(const fs::path &path) const;
-
     // Returns the UUIDs all virtual machine with a matching predicate
     vector<utl::UUID> collect(const std::function<bool(const VirtualMachine &)> &predicate) const;
 
@@ -116,6 +107,9 @@ class VirtualMachineLibrary : public SiObject {
     bool removeVirtualMachine(utl::UUID uuid);
     bool removeVirtualMachine(const string &uuid);
     bool removeVirtualMachine(const fs::path &path);
+
+    // Removes all virtual machines
+    void clear() { vms.clear(); }
 
     // Renames a virtual machine
     void rename(utl::UUID uuid, const string &name, bool uniquify = false);

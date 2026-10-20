@@ -28,11 +28,11 @@ class HubController : public Controller {
     // Quick references
     VirtualMachineLibrary &library = Silicium::instance().getLibrary();
 
-    // The running emulator processes and the state each last reported
-    vector<VMProcess> m_processes;
-
     // Resource path to all pre-installed virtual machines
     fs::path m_showcases;
+
+    // The running emulator processes and their reported states
+    vector<VMProcess> m_processes;
 
     // The currently selected virtual machine and snapshot
     UUID m_vUUID;
@@ -46,8 +46,10 @@ class HubController : public Controller {
     QString m_panel = "splash";
     QString m_overlay = "";
 
+
     //
     // Initializing
+    //
 
   public:
 
@@ -71,15 +73,14 @@ class HubController : public Controller {
     // Returns the sidebar controller
     Q_PROPERTY(HubSidebarController *sidebarController READ sidebarController CONSTANT)
 
-    // Returns the current state of a tracked virtual machine (see
-    // m_processes), or VMState::HIBERNATED if it isn't running.
+    // Returns the current state of a tracked virtual machine
     VMState lookupState(UUID uuid) const;
 
   private:
 
     HubSidebarController *sidebarController() { return &m_sidebarController; }
 
-    // Finds the tracked emulator process for a running machine, or nullptr.
+    // Returns the tracked emulator process for a running machine
     const VMProcess *findProcess(UUID uuid) const;
 
 
@@ -117,11 +118,11 @@ class HubController : public Controller {
 
   public:
 
-    // Returns the number of virtual machines, and the number of machines which are open
+    // Returns the number of (open) virtual machines
     Q_PROPERTY(int vCount READ vCount NOTIFY libraryChanged)
     Q_PROPERTY(int numOpen READ numOpen NOTIFY openChanged)
 
-    // Returns the UUID of the current selection (matches m_vUUID or m_sUUID)
+    // Returns the UUID of the current selection (matches either m_vUUID or m_sUUID)
     Q_PROPERTY(QString selected READ selected WRITE setSelected NOTIFY selectionChanged)
 
     // Indicates whether a virtual machine, a snapshot, or any of them is selected
@@ -162,7 +163,6 @@ class HubController : public Controller {
 
     bool vSelected() const { return !m_vUUID.isZero() && m_sUUID.isZero(); }
     bool sSelected() const { return !m_sUUID.isZero(); }
-    // bool selected() const { return vSelected() || sSelected(); }
 
     QVariantMap vInfo() const { return m_vInfo; }
 
@@ -174,6 +174,7 @@ class HubController : public Controller {
 
     // Returns a vector with all open virtual machines
     vector<UUID> openVMs() const;
+
 
     //
     // Managing virtual machines
@@ -227,45 +228,30 @@ class HubController : public Controller {
     // Launches a new virtual machine in a new emulator window
     void launch(UUID vUUID, UUID sUUID);
 
-    /* Creates and wires up a QProcess for a new emulator instance: hooks its
-     * stdout/stderr/started/finished signals and registers it in
-     * m_processes. 'sUUID', if set, is loaded via RPC once the process
-     * has started. The caller still has to start() it.
-     */
+    // Creates and wires up a QProcess for a new emulator instance
     QProcess *createProcess(UUID vUUID, UUID sUUID);
 
-    /* Assembles the emulator command line: the SVM path plus the --exec
-     * commands that bring up its RPC server and start the machine running.
-     * 'sUUID', if set, is loaded via RPC after startup (see createProcess),
-     * so no boot instruction is added here for that case.
-     */
+    // Assembles the emulator command line parameters
     static QStringList buildArguments(const QString &svmPath, const Manifest &manifest, UUID sUUID);
 
     // Processes a JSON-RPC packet received from an emulator process
     void processRpcPacket(QProcess *process, UUID vUUID, const QJsonObject &rpc);
 
-    // Sends a JSON-RPC "prefsChanged" notification for the given settings
-    // group to every running emulator process, prompting each to re-read that
-    // group from the shared settings file.
+    // Sends a "prefsChanged" RPC notification to all running emulator processes
     void broadcastPrefsChange(const QString &group);
 
-    // Sends a fire-and-forget JSON-RPC notification to every running emulator
-    // process. 'params' is omitted from the packet entirely when left null.
+    // Sends a fire-and-forget JSON-RPC notification to all running emulator processes
     void broadcastRpc(const QString &method, const QJsonValue &params = QJsonValue());
 
-    // Sends a fire-and-forget JSON-RPC notification to a single emulator
-    // process (no "id", so its RPC server sends no reply). 'params' is
-    // omitted from the packet entirely when left null.
+    // Sends a fire-and-forget JSON-RPC notification to a single process
     void sendRpc(QProcess *process, const QString &method, const QJsonValue &params = QJsonValue());
 
-    /* Tells the emulator instance running 'vUUID', if any, that we just rewrote
-     * its SVM file. Call after every Hub-side write -- see the definition for
-     * why a silent write is a bug rather than a missed refresh.
-     */
+    // Tells an emulator instance that its SVM file is outdated
     void notifySvmChanged(UUID vUUID);
 
     // Shuts down a launched machine
     void shutdown(UUID uuid);
+
 
     //
     // Persisting data
@@ -276,11 +262,12 @@ class HubController : public Controller {
 
   private:
 
-    // Load or save the virtual machine path list from the QSettings
+    // Loads the virtual machine path list from the QSettings
     QStringList readVmList() const;
 
-    // Load or save the virtual machine path list from the QSettings
+    // Save the virtual machine path list in the QSettings
     void writeVmList();
+
 
     //
     // Signals
@@ -292,7 +279,6 @@ class HubController : public Controller {
     void overlayChanged();
     void selectionChanged();
     void libraryChanged();
-    // void vmSelected();
     void openChanged();
     void ambiguousUUID(const QUrl &url);
     void snapshotSaved(const QString &vUUID, const QString &sUUID);
