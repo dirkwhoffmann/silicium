@@ -18,6 +18,7 @@
 // #include "Socket.h"
 // #include "Thread.h"
 #include "Transport.h"
+#include "utl/wrappers.h"
 // #include <thread>
 
 namespace vc64 {
@@ -27,7 +28,7 @@ namespace vc64 {
  * subclasses) so that common functionality, such as traffic recording, can
  * be implemented in a single place.
  */
-class RemoteServer : public SubComponent, public Inspectable<RemoteServerInfo>, public TransportDelegate {
+class RemoteServer : public SubComponent, public TransportDelegate {
 
     friend class RemoteManager;
 
@@ -61,6 +62,11 @@ class RemoteServer : public SubComponent, public Inspectable<RemoteServerInfo>, 
         Opt::SRV_ENABLE
     };
 
+public:
+
+    // Result of the latest inspection
+    utl::Backed<RemoteServerInfo> info;
+
 protected:
     
     // Current configuration
@@ -73,7 +79,7 @@ protected:
     
 public:
     
-    using SubComponent::SubComponent;
+    RemoteServer(C64& ref, isize id);
 
     RemoteServer& operator= (const RemoteServer& other) {
 
@@ -140,12 +146,12 @@ public:
 
     
     //
-    // Methods from Inspectable
+    // Analyzing
     //
 
 public:
 
-    void cacheInfo(RemoteServerInfo &result) const override;
+    RemoteServerInfo cacheInfo() const;
 
 
     //

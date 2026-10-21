@@ -70,7 +70,9 @@ RemoteManager::RemoteManager(C64& ref) : SubComponent(ref)
         &rpcServer,
         &dapServer,
         &promServer,
-    };    
+    };
+
+    info.bind([this] { return cacheInfo(); } );
 }
 
 void
@@ -107,16 +109,17 @@ RemoteManager::_dump(Category category, std::ostream &os) const
     }
 }
 
-void
-RemoteManager::cacheInfo(RemoteManagerInfo &result) const
+RemoteManagerInfo
+RemoteManager::cacheInfo() const
 {
-    {   SYNCHRONIZED
+    RemoteManagerInfo info;
 
-        info.rshInfo = rshServer.getInfo();
-        info.rpcInfo = rpcServer.getInfo();
-        info.dapInfo = dapServer.getInfo();
-        info.promInfo = promServer.getInfo();
-    }
+    info.rshInfo = rshServer.cacheInfo();
+    info.rpcInfo = rpcServer.cacheInfo();
+    info.dapInfo = dapServer.cacheInfo();
+    info.promInfo = promServer.cacheInfo();
+
+    return info;
 }
 
 isize

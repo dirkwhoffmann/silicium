@@ -18,6 +18,7 @@
 #include "RshServer.h"
 #include "DapServer.h"
 #include "PromServer.h"
+#include "utl/wrappers.h"
 #include <deque>
 #include <mutex>
 
@@ -56,7 +57,7 @@ public:
     void clear();
 };
 
-class RemoteManager final : public SubComponent, public Inspectable<RemoteManagerInfo> {
+class RemoteManager final : public SubComponent {
 
     Descriptions descriptions = {{
 
@@ -79,6 +80,11 @@ public:
 
     // Convenience wrapper
     std::vector <RemoteServer *> servers = { &rshServer, &rpcServer, &dapServer, &promServer };
+
+public:
+
+    // Result of the latest inspection
+    utl::Backed<RemoteManagerInfo> info;
 
     
     //
@@ -127,12 +133,12 @@ public:
 
 
     //
-    // Methods from Inspectable
+    // Analyzing
     //
 
 public:
 
-    void cacheInfo(RemoteManagerInfo &result) const override;
+    RemoteManagerInfo cacheInfo() const;
 
 
     //

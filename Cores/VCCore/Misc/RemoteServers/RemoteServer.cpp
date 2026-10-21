@@ -17,6 +17,11 @@
 
 namespace vc64 {
 
+RemoteServer::RemoteServer(C64& ref, isize id) : SubComponent(ref, id)
+{
+    info.bind([this] { return cacheInfo(); } );
+}
+
 void
 RemoteServer::recordTraffic(TrafficDirection direction, const string &payload)
 {
@@ -152,10 +157,14 @@ RemoteServer::setOption(Opt opt, i64 value)
     }
 }
 
-void
-RemoteServer::cacheInfo(RemoteServerInfo &result) const
+RemoteServerInfo
+RemoteServer::cacheInfo() const
 {
+    RemoteServerInfo info;
+
     info.state = getState();
+
+    return info;
 }
 
 void
