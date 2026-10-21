@@ -95,16 +95,6 @@ RemoteManager::_dump(Category category, std::ostream &os) const
             os << TransportProtocolEnum::key(transport);
             if (transport != TransportProtocol::STDIO) { os << ":" << dec(port); }
             os << " (" << SrvStateEnum::key(server->getState()) << ")" << std::endl;
-
-            /*
-             if (server->isOff()) {
-             os << "Off" << std::endl;
-             } else {
-             os << TransportProtocolEnum::key(transport);
-             if (transport != TransportProtocol::STDIO) { os << ":" << dec(port);
-             os << " (" << SrvStateEnum::key(server->getState()) << ")" << std::endl;
-             }
-             */
         }
     }
 }
@@ -183,13 +173,17 @@ RemoteManager::update()
 void
 RemoteManager::recordTraffic(ServerType server, TrafficDirection direction, const string &payload)
 {
-    // Ignore empty packets (e.g., HTTP responses without content)
+    // Ignore empty packets
     if (payload.empty()) return;
 
     // Store the packet in the traffic log
     auto nr = trafficLog.append(server, direction, payload);
 
-    // Inform the GUI
+    /* Inform the GUI. The packet itself rides along in the message's string
+     * attachment: the GUI has no way back to the traffic log from the message
+     * alone, and app-level RPC notifications (Silicium's "prefsChanged", say)
+     * are handled by reading this payload -- see SiAmController::rpcReceive().
+     */
     auto msg = direction == TrafficDirection::SENT ? Msg::SRV_SEND : Msg::SRV_RECEIVE;
     msgQueue.put(msg, i64(server), i64(nr), payload);
 }

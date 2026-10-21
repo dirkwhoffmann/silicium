@@ -33,7 +33,7 @@ class RemoteServer : public SubComponent, public TransportDelegate {
         .shell          = "server rsh"
     }, {
         .name           = "RpcServer",
-        .description    = "RPC Remote Server",
+        .description    = "JSON RPC Server",
         .shell          = "server rpc"
     }, {
         .name           = "GdbServer",
@@ -66,7 +66,7 @@ public:
     utl::Backed<RemoteServerInfo> info;
 
 protected:
-
+    
     // Current configuration
     ServerConfig config = {};
 

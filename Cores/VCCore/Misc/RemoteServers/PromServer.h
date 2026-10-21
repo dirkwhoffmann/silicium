@@ -21,6 +21,7 @@ class PromServer final : public RemoteServer {
 
     HttpTransport http = HttpTransport(*this);
 
+public:
 
     //
     // Methods

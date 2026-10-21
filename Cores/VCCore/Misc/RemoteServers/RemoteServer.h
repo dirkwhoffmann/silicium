@@ -43,7 +43,7 @@ class RemoteServer : public SubComponent, public TransportDelegate {
         .shell          = "server rpc"
     }, {
         .name           = "DapServer",
-        .description    = "Debug Adaper",
+        .description    = "Debug Adapter",
         .shell          = "server dap"
     }, {
         .name           = "PromServer",

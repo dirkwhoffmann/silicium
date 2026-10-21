@@ -94,6 +94,11 @@ public:
     
     RemoteManager& operator= (const RemoteManager& other) {
 
+        CLONE(rshServer)
+        CLONE(rpcServer)
+        CLONE(dapServer)
+        CLONE(promServer)
+
         return *this;
     }
 

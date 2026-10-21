@@ -25,12 +25,6 @@ RemoteServer::RemoteServer(C64& ref, isize id) : SubComponent(ref, id)
 }
 
 void
-RemoteServer::recordTraffic(TrafficDirection direction, const string &payload)
-{
-    remoteManager.recordTraffic(ServerType(objid), direction, payload);
-}
-
-void
 RemoteServer::_dump(Category category, std::ostream &os) const
 {
     using namespace utl;
@@ -50,13 +44,13 @@ RemoteServer::_dump(Category category, std::ostream &os) const
 void
 RemoteServer::_powerOff()
 {
-    // try { stop(); } catch(...) { }
+    
 }
 
 void
 RemoteServer::_didLoad()
 {
-    // Stop the server (will be restarted by the launch daemon)
+    // Stop the server (will be restarted by the launch daemon in auto-run mode)
     stop();
 }
 
@@ -91,7 +85,7 @@ RemoteServer::checkOption(Opt opt, i64 value)
             if (!isSupported(TransportProtocol(value))) {
 
                 auto name = string(TransportProtocolEnum::key(TransportProtocol(value)));
-                throw CoreError(CoreError::OPT_UNSUPPORTED, "Unsupported protocol: " + name);
+                throw CoreError(CoreError::OPT_UNSUPPORTED, "Unsupported transport: " + name);
             }
             return;
 
@@ -184,6 +178,12 @@ void
 RemoteServer::waitForLaunch()
 {
     transport().wait();
+}
+
+void
+RemoteServer::recordTraffic(TrafficDirection direction, const string &payload)
+{
+    remoteManager.recordTraffic(ServerType(objid), direction, payload);
 }
 
 void
