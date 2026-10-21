@@ -194,7 +194,10 @@ public:
     virtual bool canRun() = 0;
 
     // Launch the remote server
-    virtual void start();
+    void start();
+
+    // Returns the endpoint the transport is started with (HTTP-based servers)
+    virtual string endpoint() const { return ""; }
 
     // Shuts down the remote server
     virtual void stop();

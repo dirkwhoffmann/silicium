@@ -164,7 +164,7 @@ RemoteServer::start()
     if (!(isOff() || isWaiting())) return;
 
     waiting = false;
-    transport().start(config.port);
+    transport().start(config.port, endpoint());
 }
 
 void

@@ -61,7 +61,7 @@ protected:
     //
 
     bool canRun() override { return true; }
-    void start() override { transport().start(config.port, "/rpc"); }
+    string endpoint() const override { return "/rpc"; }
 
     Transport &transport() override;
     const Transport &transport() const override;
