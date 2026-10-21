@@ -500,6 +500,12 @@ C64::set(Opt opt, i64 value, const std::vector<isize> objids)
 {
     if (!isInitialized()) initialize();
 
+    /* Validate first: either all targets accept the value or none of them is
+     * changed. A rejected value is reported by throwing; for a queued command,
+     * the exception is caught in update() and sent to the GUI (Msg::CONFIG_ERROR).
+     */
+    check(opt, value, objids);
+
     value = overrideOption(opt, value);
 
     if (objids.empty()) {
@@ -832,6 +838,11 @@ C64::update(CmdQueue &queue)
 
             logmsg(LOG_WARN, "Command: %s Exception: %s\n", CmdEnum::key(cmd.type), e.what());
             error = std::current_exception();
+
+            // Tell the GUI that a configuration request has failed
+            if (cmd.type == Cmd::CONFIG || cmd.type == Cmd::CONFIG_ALL || cmd.type == Cmd::CONFIG_SCHEME) {
+                msgQueue.put(Msg::CONFIG_ERROR, error);
+            }
         }
 
         // Tell the sender that the command has been carried out
