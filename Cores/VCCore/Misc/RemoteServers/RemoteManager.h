@@ -24,13 +24,7 @@
 
 namespace vc64 {
 
-/* A bounded log keeping the most recently transmitted packets of all remote
- * servers. The log is filled by the transport layers (via
- * RemoteServer::recordTraffic) and read by the GUI (via
- * RemoteManagerAPI::getTraffic). Because packets are recorded on the
- * transports' session threads and read from the GUI thread, all access is
- * mutex-protected.
- */
+// A bounded log keeping the most recently transmitted packets of all servers
 class TrafficLog {
 
     // Maximum number of entries to keep
@@ -81,15 +75,15 @@ public:
     // Convenience wrapper
     std::vector <RemoteServer *> servers = { &rshServer, &rpcServer, &dapServer, &promServer };
 
-    // Frame counter
-    usize frame = 0;
-
-public:
-
     // Result of the latest inspection
     utl::Backed<RemoteManagerInfo> info;
 
-    
+private:
+
+    // Frame counter
+    usize frame = 0;
+
+
     //
     // Initializing
     //

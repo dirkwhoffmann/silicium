@@ -71,12 +71,6 @@ RpcServer::isSupported(TransportProtocol protocol) const
 }
 
 void
-RpcServer::didSwitch(SrvState from, SrvState to)
-{
-    if (from != to) msgQueue.put(Msg::SRV_STATE, (i64)to);
-}
-
-void
 RpcServer::didReceive(const string &payload)
 {
     // Ignore blank packets (e.g., stray newlines on the stdio transport)

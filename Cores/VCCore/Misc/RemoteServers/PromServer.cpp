@@ -55,12 +55,6 @@ PromServer::isSupported(TransportProtocol protocol) const
 }
 
 void
-PromServer::didSwitch(SrvState from, SrvState to)
-{
-    if (from != to) msgQueue.put(Msg::SRV_STATE, (i64)to);
-}
-
-void
 PromServer::didReceive(const httplib::Request &req, httplib::Response &res)
 {
     res.set_content(respond(req), "text/plain");

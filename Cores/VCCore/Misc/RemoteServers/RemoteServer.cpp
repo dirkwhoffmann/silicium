@@ -14,6 +14,8 @@
 #include "RemoteServer.h"
 #include "RemoteManager.h"
 #include "Emulator.h"
+#include "MsgQueue.h"
+#include "RetroShell.h"
 
 namespace vc64 {
 
@@ -182,6 +184,19 @@ void
 RemoteServer::waitForLaunch()
 {
     transport().wait();
+}
+
+void
+RemoteServer::didSwitch(SrvState from, SrvState to)
+{
+    if (from != to) msgQueue.put(Msg::SRV_STATE, (i64)to);
+}
+
+void
+RemoteServer::didTerminate(const string &error)
+{
+    transport().switchState(SrvState::INVALID);
+    retroShell << "Server Error: " << error << '\n';
 }
 
 void

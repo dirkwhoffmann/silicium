@@ -77,7 +77,6 @@ private:
     // Methods from TransportDelegate
     //
 
-    virtual void didSwitch(SrvState from, SrvState to) override;
     virtual void didStart() override { }
     virtual void didStop() override { }
     virtual void didConnect() override { }

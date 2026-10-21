@@ -97,12 +97,6 @@ RshServer::send(const string &payload)
 */
 
 void
-RshServer::didSwitch(SrvState from, SrvState to)
-{
-    if (from != to) msgQueue.put(Msg::SRV_STATE, (i64)to);
-}
-
-void
 RshServer::didConnect()
 {
     // Hand the client a fresh shell

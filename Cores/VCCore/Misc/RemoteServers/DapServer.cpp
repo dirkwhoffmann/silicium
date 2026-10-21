@@ -78,12 +78,6 @@ DapServer::isSupported(TransportProtocol protocol) const
 }
 
 void
-DapServer::didSwitch(SrvState from, SrvState to)
-{
-    if (from != to) msgQueue.put(Msg::SRV_STATE, (i64)to);
-}
-
-void
 DapServer::didReceive(const string &cmd)
 {
     // Try to find the header terminator

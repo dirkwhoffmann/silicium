@@ -74,9 +74,9 @@ protected:
 
 
     //
-    // Methods
+    // Initializing
     //
-    
+
 public:
     
     RemoteServer(C64& ref, isize id);
@@ -84,6 +84,7 @@ public:
     RemoteServer& operator= (const RemoteServer& other) {
 
         CLONE(config)
+
         return *this;
     }
 
@@ -235,6 +236,16 @@ public:
     RemoteServer &operator<<(int payload) { send(payload); return *this; }
     RemoteServer &operator<<(long payload) { send(payload); return *this; }
     RemoteServer &operator<<(std::stringstream &payload) { send(payload); return *this; }
+
+
+    //
+    // Methods from TransportDelegate
+    //
+
+public:
+
+    void didSwitch(SrvState from, SrvState to) override;
+    void didTerminate(const string &error) override;
 };
 
 }
