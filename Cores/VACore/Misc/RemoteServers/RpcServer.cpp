@@ -92,6 +92,9 @@ RpcServer::didReceive(const string &payload)
     // Remove LF and CR (if present)
     auto trimmed = utl::rtrim(payload, "\n\r");
 
+    // Ignore blank packets (e.g., stray newlines on the stdio transport)
+    if (trimmed.find_first_not_of(" \t") == string::npos) return;
+
     if (config.verbose) {
 
         retroShell << "R: " << utl::makePrintable(trimmed) << "\n";
@@ -100,7 +103,8 @@ RpcServer::didReceive(const string &payload)
 
     if (auto response = process(trimmed, false); response) {
 
-        send(*response);
+        // The newline allows clients to process the stream line by line
+        send(*response + "\n");
     }
 }
 
@@ -244,7 +248,7 @@ RpcServer::didExecute(const InputLine& input, std::stringstream &ss)
     // If a promise is attached, fulfill it
     if (input.promise) { input.promise->set_value(response.dump()); }
 
-    send(response.dump());
+    send(response.dump() + "\n");
 }
 
 void
@@ -278,7 +282,7 @@ RpcServer::didExecute(const InputLine& input, std::stringstream &ss, std::except
     // If a promise is attached, fulfill it
     if (input.promise) { input.promise->set_value(response.dump()); }
 
-    send(response.dump());
+    send(response.dump() + "\n");
 }
 
 }

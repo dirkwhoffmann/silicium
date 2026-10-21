@@ -71,12 +71,18 @@ protected:
     bool canRun() override { return true; }
     string endpoint() const override { return "/rpc"; }
 
+public:
+
+    void send(const string &payload) override;
+
+private:
+
 
     //
     // Methods from TransportDelegate
     //
 
-    void didStart() override { }
+    void didStart() override;
     void didStop() override { }
     void didConnect() override { }
     void didDisconnect() override { }

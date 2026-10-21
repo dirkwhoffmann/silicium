@@ -15,6 +15,7 @@
 #include "Emulator.h"
 #include "json.h"
 #include "httplib.h"
+#include "utl/support.h"
 #include <thread>
 
 namespace vc64 {
@@ -24,15 +25,12 @@ using nlohmann::json;
 void
 RpcServer::_initialize()
 {
-    // The RPC server drives its own shell, independent of the GUI's one
     rpcShell.console.delegates.push_back(this);
 }
 
 void
 RpcServer::_dump(Category category, std::ostream &os) const
 {
-    using namespace utl;
-
     RemoteServer::_dump(category, os);
 }
 
@@ -71,17 +69,45 @@ RpcServer::isSupported(TransportProtocol protocol) const
 }
 
 void
+RpcServer::didStart()
+{
+    if (config.verbose) {
+
+        *this << "Remote server is listening at port " << config.port << "\n";
+    }
+}
+
+void
+RpcServer::send(const string &payload)
+{
+    transport().send(payload);
+
+    if (config.verbose) {
+
+        retroShell << "T: " << utl::makePrintable(payload) << "\n";
+        printf("T: %s\n", utl::makePrintable(payload).c_str());
+    }
+}
+
+void
 RpcServer::didReceive(const string &payload)
 {
+    // Remove LF and CR (if present)
+    auto trimmed = utl::rtrim(payload, "\n\r");
+
     // Ignore blank packets (e.g., stray newlines on the stdio transport)
-    if (payload.find_first_not_of(" \t\r\n") == string::npos) return;
+    if (trimmed.find_first_not_of(" \t") == string::npos) return;
 
-    if (auto response = process(payload); response) {
+    if (config.verbose) {
 
-        // Route the response through the active transport. (Sending via
-        // 'tcp' directly would break in stdio mode.) The newline allows
-        // clients to process the stream line by line.
-        *this << *response + "\n";
+        retroShell << "R: " << utl::makePrintable(trimmed) << "\n";
+        printf("R: %s\n", utl::makePrintable(trimmed).c_str());
+    }
+
+    if (auto response = process(trimmed, false); response) {
+
+        // The newline allows clients to process the stream line by line
+        send(*response + "\n");
     }
 }
 
