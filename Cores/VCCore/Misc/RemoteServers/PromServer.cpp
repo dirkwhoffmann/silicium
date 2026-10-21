@@ -27,8 +27,6 @@ PromServer::_initialize()
 void
 PromServer::_dump(Category category, std::ostream &os) const
 {
-    using namespace utl;
-
     RemoteServer::_dump(category, os);
 }
 
@@ -45,7 +43,8 @@ PromServer::transport()
 }
 
 const Transport &
-PromServer::transport() const {
+PromServer::transport() const
+{
     return const_cast<PromServer *>(this)->transport();
 }
 
@@ -69,7 +68,7 @@ PromServer::didReceive(const httplib::Request &req, httplib::Response &res)
     auto translate = [&](const string& metric,
                          const string& help,
                          const string& type,
-                         const string& value,
+                         auto value,
                          const std::map<string, string>& labels = {}) {
 
         if (!help.empty()) {

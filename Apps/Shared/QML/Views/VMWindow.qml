@@ -265,9 +265,9 @@ ApplicationWindow {
 
             showNotification(
                 "Read-only Virtual Machine",
-                "This preconfigured virtual machine is a temporary showcase designed to demonstrate the " +
-                "emulator's capabilities. Any changes you make will be lost when the emulator shuts down.\n" +
-                "To save your progress, you can clone this instance in the Central Hub to convert it into a " +
+                "This preconfigured virtual machine is a showcase that demonstrates the " +
+                "emulator's capabilities. Any changes will be lost when the emulator shuts down.\n" +
+                "You can clone this instance in the Central Hub to convert it into a " +
                 "regular virtual machine.")
         }
     }
