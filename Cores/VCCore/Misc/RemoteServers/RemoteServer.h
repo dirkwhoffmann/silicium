@@ -15,10 +15,10 @@
 #include "RemoteServerTypes.h"
 #include "RemoteManagerTypes.h"
 #include "SubComponent.h"
-#include "Socket.h"
-#include "Thread.h"
+// #include "Socket.h"
+// #include "Thread.h"
 #include "Transport.h"
-#include <thread>
+// #include <thread>
 
 namespace vc64 {
 
@@ -50,15 +50,10 @@ class RemoteServer : public SubComponent, public Inspectable<RemoteServerInfo>, 
         .shell          = "server prom"
     }};
 
-    /* ENABLE comes last on purpose. exportConfig() emits the options in this
-     * order, and a generated config.retrosh is replayed line by line: with
-     * ENABLE first, the server is started on whatever transport and port
-     * happened to be current, and the following lines then have to stop and
-     * restart it (see setOption). Configuring first and switching on last
-     * means the server is only ever started once, already on the settings it
-     * is meant to run with.
-     */
     Options options = {
+
+        // ENABLE comes last so it is executed last when a config script is read,
+        // ensuring the server starts with the correct settings.
 
         Opt::SRV_TRANSPORT,
         Opt::SRV_PORT,

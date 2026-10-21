@@ -51,10 +51,13 @@ class RemoteServer : public SubComponent, public TransportDelegate {
 
     Options options = {
 
-        Opt::SRV_ENABLE,
-        Opt::SRV_PORT,
+        // ENABLE comes last so it is executed last when a config script is read,
+        // ensuring the server starts with the correct settings.
+
         Opt::SRV_TRANSPORT,
-        Opt::SRV_VERBOSE
+        Opt::SRV_PORT,
+        Opt::SRV_VERBOSE,
+        Opt::SRV_ENABLE
     };
 
 public:
