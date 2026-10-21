@@ -63,6 +63,12 @@ PromServer::didSwitch(SrvState from, SrvState to)
 void
 PromServer::didReceive(const httplib::Request &req, httplib::Response &res)
 {
+    res.set_content(respond(req), "text/plain");
+}
+
+string
+PromServer::respond(const httplib::Request& request)
+{
     std::ostringstream output;
 
     auto translate = [&](const string& metric,
@@ -157,7 +163,7 @@ PromServer::didReceive(const httplib::Request &req, httplib::Response &res)
                   {{"component","audio"}});
     }
 
-    res.set_content(output.str(), "text/plain");
+    return output.str();
 }
 
 /*

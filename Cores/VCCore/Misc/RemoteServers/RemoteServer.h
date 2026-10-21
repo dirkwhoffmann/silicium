@@ -182,7 +182,10 @@ public:
 public:
 
     // Launch the remote server
-    virtual void start() { transport().start(config.port); }
+    void start() { transport().start(config.port, endpoint()); }
+
+    // Returns the endpoint the transport is started with (HTTP-based servers)
+    virtual string endpoint() const { return ""; }
 
     // Shuts down the remote server
     virtual void stop() { transport().stop(); }

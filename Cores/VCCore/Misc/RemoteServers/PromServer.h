@@ -52,7 +52,7 @@ protected:
     Transport &transport() override;
     const Transport &transport() const override;
     bool isSupported(TransportProtocol protocol) const override;
-    void start() override { transport().start(config.port, "/metrics"); }
+    string endpoint() const override { return "/metrics"; }
 
     
     //
@@ -65,6 +65,14 @@ protected:
     void didConnect() override { }
     void didDisconnect() override { }
     void didReceive(const httplib::Request &req, httplib::Response &res) override;
+
+
+    //
+    // Handling requests
+    //
+
+    // Generate a response
+    string respond(const httplib::Request& request);
 };
 
 }
