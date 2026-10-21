@@ -126,36 +126,32 @@ RpcServer::process(const string &payload, bool blocking)
 
         json request = json::parse(payload);
 
-        // Check input format
+        // Check the envelope
         if (!request.contains("method")) {
-            throw AppException(RPC::INVALID_REQUEST, "Missing 'method'");
+            throw utl::Error(RPC::INVALID_REQUEST, "Missing 'method'");
         }
         if (!request["method"].is_string()) {
-            throw AppException(RPC::INVALID_PARAMS, "'method' must be a string");
+            throw utl::Error(RPC::INVALID_PARAMS, "'method' must be a string");
         }
-
         if (request["method"] == "retroshell") {
 
             if (!request.contains("params")) {
-                throw AppException(RPC::INVALID_REQUEST, "Missing 'params'");
+                throw utl::Error(RPC::INVALID_REQUEST, "Missing 'params'");
             }
             if (!request["params"].is_string()) {
-                throw AppException(RPC::INVALID_PARAMS, "'params' must be a string");
+                throw utl::Error(RPC::INVALID_PARAMS, "'params' must be a string");
             }
 
+            auto id = request.value("id", 0);
+
             if (blocking) {
-                return execBlocking(request["params"], request.value("id", 0));
+                return execBlocking(request["params"], id);
             } else {
-                return execNonBlocking(request["params"], request.value("id", 0));
+                return execNonBlocking(request["params"], id);
             }
         }
 
-        /* Any other method is not handled by the core. Such packets are
-         * app-level notifications (e.g., Silicium's "prefsChanged"), which
-         * the app processes by observing the traffic log (Msg::SRV_RECEIVE).
-         * The core sends no response for them, matching the JSON-RPC rule
-         * that notifications (requests without an "id") are never answered.
-         */
+        // Any other method is not handled by the core
         return { };
 
     } catch (const json::parse_error &) {
@@ -168,12 +164,12 @@ RpcServer::process(const string &payload, bool blocking)
         };
         return response.dump();
 
-    } catch (const AppException &e) {
+    } catch (const utl::Error &e) {
 
         json response = {
 
             {"jsonrpc", "2.0"},
-            {"error", {{"code", e.data}, {"message", e.what()}}},
+            {"error", {{"code", e.payload}, {"message", e.what()}}},
             {"id", nullptr}
         };
         return response.dump();
@@ -229,7 +225,7 @@ RpcServer::didExecute(const InputLine& input, std::stringstream &ss)
     // If a promise is attached, fulfill it
     if (input.promise) { input.promise->set_value(response.dump()); }
 
-    *this << response.dump() + "\n";
+    send(response.dump() + "\n");
 }
 
 void
@@ -263,7 +259,7 @@ RpcServer::didExecute(const InputLine& input, std::stringstream &ss, std::except
     // If a promise is attached, fulfill it
     if (input.promise) { input.promise->set_value(response.dump()); }
 
-    *this << response.dump() + "\n";
+    send(response.dump() + "\n");
 }
 
 }
