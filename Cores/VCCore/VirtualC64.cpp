@@ -178,21 +178,28 @@ const EmulatorInfo &
 VirtualC64::getInfo() const 
 {
     VC64_PUBLIC
-    return emu->getInfo();
+    return emu->info.current();
 }
 
 const EmulatorInfo &
 VirtualC64::getCachedInfo() const
 {
     VC64_PUBLIC
-    return emu->getCachedInfo();
+    return emu->info.backed();
 }
 
-const EmulatorStats &
-VirtualC64::getStats() const 
+const EmulatorMetrics &
+VirtualC64::getMetrics() const
 {
     VC64_PUBLIC
-    return emu->getStats();
+    return emu->metrics.current();
+}
+
+const EmulatorMetrics &
+VirtualC64::getCachedMetrics() const
+{
+    VC64_PUBLIC
+    return emu->metrics.backed();
 }
 
 bool
@@ -864,19 +871,25 @@ CIAAPI::getConfig() const
 const CIAInfo &
 CIAAPI::getInfo() const
 {
-    return cia->getInfo();
+    return cia->info.current();
 }
 
 const CIAInfo &
 CIAAPI::getCachedInfo() const
 {
-    return cia->getCachedInfo();
+    return cia->info.backed();
 }
 
-const CIAStats &
-CIAAPI::getStats() const
+const CIAMetrics &
+CIAAPI::getMetrics() const
 {
-    return cia->getStats();
+    return cia->metrics.current();
+}
+
+const CIAMetrics &
+CIAAPI::getCachedMetrics() const
+{
+    return cia->metrics.backed();
 }
 
 
@@ -959,10 +972,10 @@ SIDAPI::draw(u32 *buffer, isize width, isize height,
 // Audio port
 //
 
-const AudioPortStats &
+const AudioPortMetrics &
 AudioPortAPI::getStats() const
 {
-    return audioPort->getStats();
+    return audioPort->metrics.current();
 }
 
 isize

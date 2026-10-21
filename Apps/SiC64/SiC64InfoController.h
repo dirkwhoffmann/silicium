@@ -40,9 +40,9 @@ class SiC64InfoController : public Controller {
     // at. Stats live alongside the info they belong with.
     vc64::CPUInfo m_cpuInfo = { };
     vc64::CIAInfo m_ciaInfo[2] = { };
-    vc64::CIAStats m_ciaStats[2] = { };
+    vc64::CIAMetrics m_ciaStats[2] = { };
     vc64::SIDInfo m_sidInfo[4] = { };
-    vc64::AudioPortStats m_audioStats = { };
+    vc64::AudioPortMetrics m_audioStats = { };
     vc64::C64Info m_c64Info = { };
     vc64::VICIIInfo m_vicInfo = { };
     vc64::SpriteInfo m_spriteInfo[8] = { };
@@ -99,9 +99,9 @@ class SiC64InfoController : public Controller {
     // Cached info accessors.
     const vc64::CPUInfo &cpuInfo() const { return m_cpuInfo; }
     const vc64::CIAInfo &ciaInfo(int nr) const { return m_ciaInfo[nr]; }
-    const vc64::CIAStats &ciaStats(int nr) const { return m_ciaStats[nr]; }
+    const vc64::CIAMetrics &ciaStats(int nr) const { return m_ciaStats[nr]; }
     const vc64::SIDInfo &sidInfo(int nr) const { return m_sidInfo[nr]; }
-    const vc64::AudioPortStats &audioStats() const { return m_audioStats; }
+    const vc64::AudioPortMetrics &audioStats() const { return m_audioStats; }
     const vc64::C64Info &c64Info() const { return m_c64Info; }
     const vc64::VICIIInfo &vicInfo() const { return m_vicInfo; }
     const vc64::SpriteInfo &spriteInfo(int nr) const { return m_spriteInfo[nr]; }

@@ -27,9 +27,9 @@ SiC64ActivityController::update(i64 cycle, i64 emuFrame, i64 gpuFrame)
 
     if (counter % 16 == 0) {
 
-        auto &stats      = core.getStats();
-        auto &cia1Stats  = core.cia1.getStats();
-        auto &cia2Stats  = core.cia2.getStats();
+        auto &stats      = core.getMetrics();
+        auto &cia1Stats  = core.cia1.getMetrics();
+        auto &cia2Stats  = core.cia2.getMetrics();
         auto &audioStats = core.audioPort.getStats();
 
         m_cia1      = cia1Stats.idlePercentage;

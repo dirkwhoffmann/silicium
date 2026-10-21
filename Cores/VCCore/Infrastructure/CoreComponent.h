@@ -16,7 +16,6 @@
 #include "EmulatorTypes.h"
 #include "CoreObject.h"
 #include "Configurable.h"
-#include "Inspectable.h"
 #include "utl/wrappers.h"
 #include "Serializable.h"
 #include "utl/abilities/Synchronizable.h"

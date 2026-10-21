@@ -1472,12 +1472,13 @@ C64::processINSEvent()
     if (mask & 1LL << long(Class::C64))             { info.record(); }
     if (mask & 1LL << long(Class::CPU))             { cpu.info.record(); }
     if (mask & 1LL << long(Class::Memory))          { mem.info.record(); }
-    if (mask & 1LL << long(Class::CIA))             { cia1.record(); cia2.record(); }
+    if (mask & 1LL << long(Class::CIA))             { cia1.info.record(); cia1.metrics.record(); cia2.info.record(); cia2.metrics.record(); }
     if (mask & 1LL << long(Class::VICII))           { vic.info.record(); }
     
     if (mask & 1LL << long(Class::SID)) {
         for (isize i = 0; i < 4; i++) sidBridge.sid[i].info.record();
     }
+    if (mask & 1LL << long(Class::AudioPort))       { audioPort.info.record(); audioPort.metrics.record(); }
     if (mask & 1LL << long(Class::Drive))           { drive8.info.record(); drive9.info.record(); }
     if (mask & 1LL << long(Class::Datasette))       { datasette.info.record(); }
     if (mask & 1LL << long(Class::Joystick))        { port1.joystick.info.record(); port2.joystick.info.record(); }

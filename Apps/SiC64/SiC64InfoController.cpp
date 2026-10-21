@@ -73,8 +73,8 @@ SiC64InfoController::grab(Component component)
 
             m_ciaInfo[0] = core.cia1.getInfo();
             m_ciaInfo[1] = core.cia2.getInfo();
-            m_ciaStats[0] = core.cia1.getStats();
-            m_ciaStats[1] = core.cia2.getStats();
+            m_ciaStats[0] = core.cia1.getMetrics();
+            m_ciaStats[1] = core.cia2.getMetrics();
             break;
 
         case SID:
