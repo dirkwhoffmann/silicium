@@ -183,6 +183,9 @@ public:
 
 public:
 
+    // Indicates if the server is ready to launch
+    virtual bool canRun() = 0;
+
     // Launch the remote server
     void start();
 

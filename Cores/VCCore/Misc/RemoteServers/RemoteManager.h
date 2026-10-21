@@ -81,6 +81,9 @@ public:
     // Convenience wrapper
     std::vector <RemoteServer *> servers = { &rshServer, &rpcServer, &dapServer, &promServer };
 
+    // Frame counter
+    usize frame = 0;
+
 public:
 
     // Result of the latest inspection
@@ -152,6 +155,15 @@ public:
     isize numListening() const;
     isize numConnected() const;
     isize numErroneous() const;
+
+
+    //
+    // Running the launch daemon
+    //
+
+public:
+
+    void update();
 
 
     //

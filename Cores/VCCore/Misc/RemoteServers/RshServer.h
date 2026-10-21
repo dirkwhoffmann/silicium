@@ -58,6 +58,7 @@ private:
     Transport &transport() override;
     const Transport &transport() const override;
     bool isSupported(TransportProtocol protocol) const override;
+    bool canRun() override { return true; }
     // SrvState getState() const override;
     // void start() override;
     // void stop() override;

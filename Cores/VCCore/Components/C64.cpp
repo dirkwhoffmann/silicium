@@ -829,6 +829,9 @@ C64::update(CmdQueue &queue)
     if (retroShell.isDirty) { retroShell.isDirty = false; msgQueue.put(Msg::RSH_UPDATE, 0); }
     if (rshShell.isDirty)   { rshShell.isDirty = false;   msgQueue.put(Msg::RSH_UPDATE, 1); }
     if (rpcShell.isDirty)   { rpcShell.isDirty = false;   msgQueue.put(Msg::RSH_UPDATE, 2); }
+
+    // Update subcomponents
+    remoteManager.update();
 }
 
 void

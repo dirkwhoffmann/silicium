@@ -54,7 +54,8 @@ RemoteServer::_powerOff()
 void
 RemoteServer::_didLoad()
 {
-    config.enable ? start() : stop();
+    // Stop the server (will be restarted by the launch daemon)
+    stop();
 }
 
 i64
@@ -106,11 +107,7 @@ RemoteServer::setOption(Opt opt, i64 value)
 
         case Opt::SRV_ENABLE:
 
-            if (config.enable != (bool)value) {
-                
-                config.enable = (bool)value;
-                config.enable ? start() : stop();
-            }
+            config.enable = (bool)value;
             return;
 
         case Opt::SRV_PORT:

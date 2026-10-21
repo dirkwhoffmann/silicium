@@ -70,6 +70,7 @@ private:
     Transport &transport() override;
     const Transport &transport() const override;
     bool isSupported(TransportProtocol protocol) const override;
+    bool canRun() override { return true; }
 
 
     //
