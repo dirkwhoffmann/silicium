@@ -1471,7 +1471,7 @@ C64::processINSEvent()
     // Analyze bit mask
     if (mask & 1LL << long(Class::C64))             { info.record(); }
     if (mask & 1LL << long(Class::CPU))             { cpu.info.record(); }
-    if (mask & 1LL << long(Class::Memory))          { mem.record(); }
+    if (mask & 1LL << long(Class::Memory))          { mem.info.record(); }
     if (mask & 1LL << long(Class::CIA))             { cia1.record(); cia2.record(); }
     if (mask & 1LL << long(Class::VICII))           { vic.record(); }
     

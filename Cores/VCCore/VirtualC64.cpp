@@ -823,13 +823,13 @@ MemoryAPI::getConfig() const
 const MemInfo &
 MemoryAPI::getInfo() const
 {
-    return mem->getInfo();
+    return mem->info.current();
 }
 
 const MemInfo &
 MemoryAPI::getCachedInfo() const
 {
-    return mem->getCachedInfo();
+    return mem->info.backed();
 }
 
 string
