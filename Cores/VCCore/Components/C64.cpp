@@ -1473,7 +1473,7 @@ C64::processINSEvent()
     if (mask & 1LL << long(Class::CPU))             { cpu.info.record(); }
     if (mask & 1LL << long(Class::Memory))          { mem.info.record(); }
     if (mask & 1LL << long(Class::CIA))             { cia1.record(); cia2.record(); }
-    if (mask & 1LL << long(Class::VICII))           { vic.record(); }
+    if (mask & 1LL << long(Class::VICII))           { vic.info.record(); }
     
     if (mask & 1LL << long(Class::SID)) {
         for (isize i = 0; i < 4; i++) sidBridge.sid[i].info.record();

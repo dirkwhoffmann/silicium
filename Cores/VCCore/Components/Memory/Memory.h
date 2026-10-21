@@ -188,7 +188,7 @@ private:
      * API nor snapshotted, so they are kept in a plain member: wrapping them
      * in a Backed would triple their size (value, cache, live) for nothing.
      */
-    MemStats stats = { };
+    MemMetrics metrics = { };
 
 
     //

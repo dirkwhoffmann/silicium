@@ -899,13 +899,13 @@ VICIIAPI::getConfig() const
 const VICIIInfo &
 VICIIAPI::getInfo() const
 {
-    return vicii->getInfo();
+    return vicii->info.current();
 }
 
 const VICIIInfo &
 VICIIAPI::getCachedInfo() const
 {
-    return vicii->getCachedInfo();
+    return vicii->info.backed();
 }
 
 SpriteInfo
