@@ -498,14 +498,14 @@ const C64Info &
 C64API::getInfo() const
 {
     VC64_PUBLIC
-    return c64->getInfo();
+    return c64->info.current();
 }
 
 const C64Info &
 C64API::getCachedInfo() const
 {
     VC64_PUBLIC
-    return c64->getCachedInfo();
+    return c64->info.backed();
 }
 
 void
@@ -740,13 +740,13 @@ C64API::flash(const fs::path &path, isize item)
 const CPUInfo &
 CPUAPI::getInfo() const
 {
-    return cpu->getInfo();
+    return cpu->info.current();
 }
 
 const CPUInfo &
 CPUAPI::getCachedInfo() const
 {
-    return cpu->getCachedInfo();
+    return cpu->info.backed();
 }
 
 isize
@@ -936,7 +936,7 @@ SIDAPI::getInfo(isize nr) const
 {
     assert(nr <= 3);
 
-    return sidBridge->sid[nr].getInfo();
+    return sidBridge->sid[nr].info.current();
 }
 
 SIDInfo
@@ -944,7 +944,7 @@ SIDAPI::getCachedInfo(isize nr) const
 {
     assert(nr <= 3);
 
-    return sidBridge->sid[nr].getCachedInfo();
+    return sidBridge->sid[nr].info.backed();
 }
 
 float
@@ -1242,14 +1242,14 @@ const JoystickInfo &
 JoystickAPI::getInfo() const
 {
     VC64_PUBLIC
-    return joystick->getInfo();
+    return joystick->info.current();
 }
 
 const JoystickInfo &
 JoystickAPI::getCachedInfo() const
 {
     VC64_PUBLIC
-    return joystick->getCachedInfo();
+    return joystick->info.backed();
 }
 
 void
@@ -1275,14 +1275,14 @@ const PaddleInfo &
 PaddleAPI::getInfo() const
 {
     VC64_PUBLIC
-    return paddle->getInfo();
+    return paddle->info.current();
 }
 
 const PaddleInfo &
 PaddleAPI::getCachedInfo() const
 {
     VC64_PUBLIC
-    return paddle->getCachedInfo();
+    return paddle->info.backed();
 }
 
 
@@ -1294,14 +1294,14 @@ const DatasetteInfo &
 DatasetteAPI::getInfo() const
 {
     VC64_PUBLIC
-    return datasette->getInfo();
+    return datasette->info.current();
 }
 
 const DatasetteInfo &
 DatasetteAPI::getCachedInfo() const
 {
     VC64_PUBLIC
-    return datasette->getCachedInfo();
+    return datasette->info.backed();
 }
 
 void
@@ -1455,14 +1455,14 @@ const RetroShellInfo &
 RetroShellAPI::getInfo() const
 {
     VC64_PUBLIC
-    return retroShell->getInfo();
+    return retroShell->info.current();
 }
 
 const RetroShellInfo &
 RetroShellAPI::getCachedInfo() const
 {
     VC64_PUBLIC
-    return retroShell->getCachedInfo();
+    return retroShell->info.backed();
 }
 
 const char *
@@ -1620,13 +1620,13 @@ DriveAPI::getConfig() const
 const DriveInfo &
 DriveAPI::getInfo() const
 {
-    return drive->getInfo();
+    return drive->info.current();
 }
 
 const DriveInfo &
 DriveAPI::getCachedInfo() const
 {
-    return drive->getCachedInfo();
+    return drive->info.backed();
 }
 
 void

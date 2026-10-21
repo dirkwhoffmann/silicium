@@ -100,7 +100,7 @@ CIA::cacheInfo(CIAInfo &result) const
         result.imr = imr;
         result.intLine = INT;
 
-        result.tod = tod.info;
+        result.tod = tod.cacheInfo();
         result.todIntEnable= imr & 0x04;
     }
 }
