@@ -90,12 +90,6 @@ Transport::stop()
 }
 
 void
-Transport::disconnect()
-{
-
-}
-
-void
 Transport::switchState(SrvState newState)
 {
     auto oldState = state;
@@ -123,39 +117,7 @@ Transport::switchState(SrvState newState)
         if (oldState == SrvState::CONNECTED) {
             delegate.didDisconnect();
         }
-
-        // Inform the GUI
-        // msgQueue.put(Msg::SRV_STATE, (i64)newState); MOVE TO DELEGATE
     }
 }
-
-/*
-void
-Transport::send(char payload)
-{
-    send(string(1, payload));
-}
-
-void
-Transport::send(int payload)
-{
-    send(std::to_string(payload));
-}
-
-void
-Transport::send(long payload)
-{
-    send(std::to_string(payload));
-}
-
-void
-Transport::send(std::stringstream &payload)
-{
-    string line;
-    while(std::getline(payload, line)) {
-        send(line + "\n");
-    }
-}
-*/
 
 }
