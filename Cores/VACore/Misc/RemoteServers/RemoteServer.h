@@ -90,22 +90,23 @@ public:
     //
     // Methods from CoreObject
     //
-
+    
 protected:
 
     void _dump(Category category, std::ostream &os) const override;
-
-public:
-
-    const Descriptions &getDescriptions() const override { return descriptions; }
 
 
     //
     // Methods from CoreComponent
     //
 
-protected:
+private:
 
+    void _halt() override { try { stop(); } catch(...) { } };
+    const Descriptions &getDescriptions() const override { return descriptions; }
+
+protected:
+    
     void _powerOff() override;
 
     template <class T>
@@ -126,7 +127,7 @@ protected:
     virtual void operator << (SerResetter &worker) override { serialize(worker); }
     virtual void operator << (SerReader &worker) override { serialize(worker); }
     virtual void operator << (SerWriter &worker) override { serialize(worker); }
-
+    
     void _didLoad() override;
 
 
@@ -142,7 +143,7 @@ public:
     void checkOption(Opt opt, i64 value) override;
     void setOption(Opt option, i64 value) override;
 
-
+    
     //
     // Analyzing
     //
@@ -165,10 +166,7 @@ private:
 public:
 
     virtual bool isSupported(TransportProtocol protocol) const = 0;
-
-    // Returns the state of the transport
     SrvState getState() const { return transport().getState(); }
-
     bool isOff() const { return getState() == SrvState::OFF; }
     bool isWaiting() const { return getState() == SrvState::WAITING; }
     bool isStarting() const { return getState() == SrvState::STARTING; }
@@ -179,7 +177,7 @@ public:
 
 
     //
-    // Starting and stopping the server
+    // Running the server
     //
 
 public:
@@ -199,7 +197,7 @@ public:
     // Disconnects the client (if any)
     virtual void disconnect() { transport().disconnect(); }
 
-    // Switches into the WAITING state (called by the RemoteManager's launch daemon)
+    // Switches into the WAITING state
     void waitForLaunch();
 
 
