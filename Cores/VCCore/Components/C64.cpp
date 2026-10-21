@@ -1506,7 +1506,7 @@ C64::loadWorkspace(const fs::path &path)
         ss << "\n";
         ss << "try workspace activate";
 
-    } catch (AppError &exc) {
+    } catch (std::exception &exc) {
 
         printf("Error: %s\n", exc.what());
         throw;
@@ -2325,7 +2325,7 @@ C64::flash(const FileSystem &fs, isize nr)
     auto dir = fs.readDir();
     
     // Only proceed if the requested file exists
-    if (isize(dir.size()) < nr) throw AppError(Fault::FS_HAS_NO_FILES);
+    if (isize(dir.size()) < nr) throw retro::vault::FSError(retro::vault::FSError::FS_NOT_FOUND, "Directory is empty.");
     
     // Get the requested item
     Buffer<u8> buf; fs.extractData(dir[nr], buf);

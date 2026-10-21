@@ -107,21 +107,6 @@ VMWindow {
     }
 
     //
-    // Pause overlay
-    //
-
-    PauseOverlay {
-
-        id: pauseOverlay
-
-        anchors.top: overlayArea.top
-        anchors.right: overlayArea.right
-        anchors.topMargin: Style.largeSpacing
-        anchors.rightMargin: Style.largeSpacing
-        controller: root.c64
-    }
-
-    //
     // Drop area
     //
 

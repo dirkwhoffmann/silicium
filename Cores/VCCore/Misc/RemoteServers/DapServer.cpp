@@ -114,7 +114,7 @@ DapServer::didReceive(const string &cmd)
 
         adapter->process(jsonStr);
 
-    } catch (AppError &err) {
+    } catch (std::exception &err) {
 
         auto msg = "DAP server error: " + string(err.what());
         logmsg(LOG_SRV, "%s\n", msg.c_str());
