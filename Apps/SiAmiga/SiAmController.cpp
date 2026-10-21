@@ -1270,6 +1270,15 @@ SiAmController::process(const Message &msg, const string &attachment, std::excep
             m_infoIsDirty = true;
             break;
 
+        case Msg::CONFIG_ERROR:
+
+            // The panels show what the core holds, so re-read it to drop the
+            // rejected value, and tell the user why it was not applied
+            m_configIsDirty = true;
+            showError(tr("Failed to change the configuration."),
+                      (attachment.empty() ? QString() : QString::fromStdString(attachment) + ": ") + errorText(exception));
+            break;
+
         case Msg::POWER:
 
             msg.value ? didPowerOn() : didPowerOff();

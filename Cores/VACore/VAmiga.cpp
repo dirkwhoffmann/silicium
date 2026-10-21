@@ -2410,6 +2410,20 @@ VAmiga::set(Opt opt, i64 value)
 }
 
 void
+VAmiga::check(Opt opt, i64 value)
+{
+    VAMIGA_PUBLIC
+    emu->check(opt, value);
+}
+
+void
+VAmiga::check(Opt opt, i64 value, long id)
+{
+    VAMIGA_PUBLIC
+    emu->check(opt, value, { id });
+}
+
+void
 VAmiga::set(Opt opt, i64 value, long id)
 {
     VAMIGA_PUBLIC

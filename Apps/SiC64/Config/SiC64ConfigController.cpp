@@ -289,13 +289,24 @@ SiC64ConfigController::get(vc64::Opt opt, long id) const
 void
 SiC64ConfigController::set(vc64::Opt opt, i64 newValue)
 {
-    try { C64Controller::core().set(opt, newValue); } catch (...) { }
+    /* A control that follows the machine also writes back what it was just
+     * told, e.g. a combo box whose index is bound to the option. Such a write
+     * changes nothing, but a locked option (e.g. the Chip Ram of a running
+     * machine) would be refused and reported as an error. Skip it.
+     */
+    try {
+        if (C64Controller::core().get(opt) == newValue) return;
+        C64Controller::core().set(opt, newValue);
+    } catch (...) { }
 }
 
 void
 SiC64ConfigController::set(vc64::Opt opt, i64 newValue, long id)
 {
-    try { C64Controller::core().set(opt, newValue, id); } catch (...) { }
+    try {
+        if (C64Controller::core().get(opt, id) == newValue) return;
+        C64Controller::core().set(opt, newValue, id);
+    } catch (...) { }
 }
 
 void
@@ -318,13 +329,13 @@ SiC64ConfigController::restoreDefaults(Opt opt, std::vector<isize> objids)
     // the remaining items from being restored.
     if (objids.empty()) {
 
-        try { core.set(opt, defaults.get(opt)); } catch (...) { }
+        try { core.check(opt, defaults.get(opt)); core.set(opt, defaults.get(opt)); } catch (...) { }
 
     } else {
 
         for (auto id : objids) {
 
-            try { core.set(opt, defaults.get(opt, id), id); } catch (...) { }
+            try { core.check(opt, defaults.get(opt, id), id); core.set(opt, defaults.get(opt, id), id); } catch (...) { }
         }
     }
 }

@@ -452,6 +452,20 @@ VirtualC64::set(Opt opt, i64 value)
 }
 
 void
+VirtualC64::check(Opt opt, i64 value)
+{
+    VC64_PUBLIC
+    emu->check(opt, value);
+}
+
+void
+VirtualC64::check(Opt opt, i64 value, long id)
+{
+    VC64_PUBLIC
+    emu->check(opt, value, { id });
+}
+
+void
 VirtualC64::set(Opt opt, i64 value, long id)
 {
     VC64_PUBLIC

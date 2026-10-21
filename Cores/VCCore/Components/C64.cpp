@@ -841,7 +841,13 @@ C64::update(CmdQueue &queue)
 
             // Tell the GUI that a configuration request has failed
             if (cmd.type == Cmd::CONFIG || cmd.type == Cmd::CONFIG_ALL || cmd.type == Cmd::CONFIG_SCHEME) {
-                msgQueue.put(Msg::CONFIG_ERROR, error);
+                bool scheme = cmd.type == Cmd::CONFIG_SCHEME;
+                string detail = scheme ? string("configuration scheme") :
+                    string(OptEnum::key(cmd.config.option)) + " = " + std::to_string(cmd.config.value) +
+                    (cmd.type == Cmd::CONFIG ? " (component " + std::to_string(cmd.config.id) + ")" : "");
+
+                msgQueue.put(Message { .type = Msg::CONFIG_ERROR,
+                                       .value = scheme ? 0 : i64(cmd.config.option) }, detail, error);
             }
         }
 
