@@ -832,6 +832,7 @@ HubController::buildArguments(const QString &svmPath, const Manifest &manifest, 
     argv << QProcess::splitCommand(emulatorParameters(manifest.platform));
 
     argv << "--exec" << "server rpc set TRANSPORT STDIO";
+    argv << "--exec" << "server rpc set VERBOSE true";
     argv << "--exec" << "server rpc set ENABLE true";
 
     // Instruct the emulator to run the startup script or power up -- unless a
