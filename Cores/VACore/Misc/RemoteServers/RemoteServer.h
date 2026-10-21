@@ -67,14 +67,6 @@ protected:
     // Current configuration
     ServerConfig config = {};
 
-    /* Indicates that this server is enabled but waiting for its launch
-     * condition (canRun()) to become true. Unlike the transport's own state
-     * machine (owned by Transport, see transport().getState()), this flag is
-     * tracked here because it describes a precondition on *starting* the
-     * transport at all, not a state the transport itself passes through.
-     */
-    bool waiting = false;
-
 
     //
     // Initializing
@@ -171,9 +163,8 @@ public:
 
     virtual bool isSupported(TransportProtocol protocol) const = 0;
 
-    // Returns the combined state (WAITING is layered above the transport's
-    // own state -- see 'waiting')
-    virtual SrvState getState() const { return waiting ? SrvState::WAITING : transport().getState(); }
+    // Returns the state of the transport
+    SrvState getState() const { return transport().getState(); }
 
     bool isOff() const { return getState() == SrvState::OFF; }
     bool isWaiting() const { return getState() == SrvState::WAITING; }

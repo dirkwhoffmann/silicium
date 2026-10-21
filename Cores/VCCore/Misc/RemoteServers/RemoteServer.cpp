@@ -161,9 +161,6 @@ RemoteServer::cacheInfo(RemoteServerInfo &result) const
 void
 RemoteServer::start()
 {
-    if (!(isOff() || isWaiting())) return;
-
-    waiting = false;
     transport().start(config.port, endpoint());
 }
 
@@ -172,14 +169,13 @@ RemoteServer::stop()
 {
     if (isOff() || isStopping()) return;
 
-    waiting = false;
     transport().stop();
 }
 
 void
 RemoteServer::waitForLaunch()
 {
-    if (isOff()) waiting = true;
+    transport().wait();
 }
 
 void

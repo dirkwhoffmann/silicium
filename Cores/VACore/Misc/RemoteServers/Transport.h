@@ -64,6 +64,7 @@ public:
 
     SrvState getState() const { return state; }
     bool isOff() const { return state == SrvState::OFF; }
+    bool isWaiting() const { return state == SrvState::WAITING; }
     bool isStarting() const { return state == SrvState::STARTING; }
     bool isListening() const { return state == SrvState::LISTENING; }
     bool isConnected() const { return state == SrvState::CONNECTED; }
@@ -80,6 +81,9 @@ public:
     //
 
 public:
+
+    // Arms the server: it is enabled, but waits for its launch condition
+    void wait();
 
     // Launch the remote server
     virtual void start(u16 port, const string &endpoint = "");
