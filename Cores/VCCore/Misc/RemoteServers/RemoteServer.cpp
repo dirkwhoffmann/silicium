@@ -159,6 +159,30 @@ RemoteServer::cacheInfo(RemoteServerInfo &result) const
 }
 
 void
+RemoteServer::start()
+{
+    if (!(isOff() || isWaiting())) return;
+
+    waiting = false;
+    transport().start(config.port, endpoint());
+}
+
+void
+RemoteServer::stop()
+{
+    if (isOff() || isStopping()) return;
+
+    waiting = false;
+    transport().stop();
+}
+
+void
+RemoteServer::waitForLaunch()
+{
+    if (isOff()) waiting = true;
+}
+
+void
 RemoteServer::send(char payload)
 {
     send(string(1, payload));

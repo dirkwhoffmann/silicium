@@ -215,6 +215,7 @@ SiC64InfoController::serverStateName(int state) const
 {
     switch (SrvState(state)) {
 
+        case SrvState::WAITING:   return "Waiting";
         case SrvState::STARTING:  return "Starting";
         case SrvState::LISTENING: return "Listening";
         case SrvState::CONNECTED: return "Connected";
