@@ -89,10 +89,12 @@ ApplicationWindow {
     function adjustWindowSize() {
 
         if (!canvasRef || !controllerRef || !controllerRef.renderer) return
-        if (visibility !== Window.Windowed) return
+        if (visibility !== Window.Windowed && visibility !== Window.Hidden) return
 
-        const lines = 4 * controllerRef.renderer.visibleLines()
+        // Use 4 physical pixels per line on a hires display, 2 on a regular one
         const pixelRatio = screen ? screen.devicePixelRatio : 1
+        const pixelsPerLine = pixelRatio > 1 ? 4 : 2
+        const lines = pixelsPerLine * controllerRef.renderer.visibleLines()
 
         const canvasHeight = lines / pixelRatio
         const canvasWidth = canvasHeight * canvasRef.aspectRatio
@@ -256,10 +258,16 @@ ApplicationWindow {
     // Lifetime
     //
 
-    // A read-only machine is a temporary showcase: say so, once, when the
-    // window is up. (The machine is set by the concrete window, whose bindings
-    // are in place by now.)
+    /* The window is created hidden and shown once it has the right size, so
+     * the canvas has the proper aspect ratio from the first frame on. A
+     * read-only machine is a temporary showcase: say so, once, when the
+     * window is up. (The machine is set by the concrete window, whose bindings
+     * are in place by now.)
+     */
     Component.onCompleted: {
+
+        adjustWindowSize()
+        visible = true
 
         if (controllerRef && controllerRef.readOnly) {
 

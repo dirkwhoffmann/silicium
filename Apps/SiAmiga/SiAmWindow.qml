@@ -23,7 +23,6 @@ VMWindow {
     property real aspectRatio: 4.0 / 3.0
     property alias actions: siActions
 
-    visible: true
     width: 800
     height: 600
     minimumWidth: 400
