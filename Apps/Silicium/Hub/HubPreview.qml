@@ -76,7 +76,7 @@ Pane {
     Action {
         id: snapshotAction
         text: "Restore Snapshot"
-        onTriggered: HubController.open(vUUID)
+        onTriggered: HubController.open(vUUID, sUUID)
         icon.name: HubController.isOpen ? "refresh" : "play_circle"
     }
 
