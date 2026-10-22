@@ -110,6 +110,29 @@ ApplicationWindow {
         height = Math.min(Math.round(canvasHeight + extraHeight), maxHeight)
     }
 
+    // Set once the window has been sized for the first time (see below)
+    property bool sizing: false
+    property bool sized: false
+
+    Connections {
+
+        target: root
+        enabled: !root.sized
+
+        function onAfterSynchronizing() {
+
+            if (root.sizing) return
+            root.sizing = true
+
+            // Not inside the signal, as the render loop is waiting for us
+            Qt.callLater(function () {
+                root.adjustWindowSize()
+                root.opacity = 1
+                root.sized = true
+            })
+        }
+    }
+
     //
     // Hints
     //
@@ -258,15 +281,20 @@ ApplicationWindow {
     // Lifetime
     //
 
-    /* The window is created hidden and shown once it has the right size, so
-     * the canvas has the proper aspect ratio from the first frame on. A
-     * read-only machine is a temporary showcase: say so, once, when the
+    /* The window is created hidden. To get the proper aspect ratio from the
+     * first visible frame on, it is shown with zero opacity and sized as soon
+     * as the scene graph has synchronized for the first time. Only then has
+     * the chrome (title bar, toolbar, status bar) its final height, which the
+     * size computation needs.
+     *
+     * A read-only machine is a temporary showcase: say so, once, when the
      * window is up. (The machine is set by the concrete window, whose bindings
      * are in place by now.)
      */
     Component.onCompleted: {
 
-        adjustWindowSize()
+        // Show the window invisibly, size it once the chrome is laid out
+        opacity = 0
         visible = true
 
         if (controllerRef && controllerRef.readOnly) {

@@ -856,7 +856,15 @@ SiAmController::rpcReceive(const string &payload)
     } else if (method == "raise") {
         if (m_window) { m_window->raise(); m_window->requestActivate(); }
     } else if (method == "loadSnapshot") {
-        loadSnapshot(utl::UUID::fromString(rpc["params"].toString().toStdString()));
+        try {
+
+            loadSnapshot(utl::UUID::fromString(rpc["params"].toString().toStdString()));
+
+        } catch (const std::exception &e) {
+
+            // A malformed UUID in a packet must not take the app down
+            qCWarning(siLog).noquote() << "Invalid loadSnapshot request:" << e.what();
+        }
     } else if (method == "svmChanged") {
         try {
             svm->readManifest();
