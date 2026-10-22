@@ -74,5 +74,12 @@ SuUserDialog {
     // Nothing to save is not a save: say what the button will do
     okLabel: snapshotBox.checked || workspaceBox.checked ? qsTr("Save") : qsTr("Quit")
 
+    // Return confirms, no matter which control has the focus
+    Shortcut {
+        sequences: ["Return", "Enter"]
+        enabled: root.opened
+        onActivated: root.accept()
+    }
+
     onAccepted: root.confirmed(snapshotBox.checked, workspaceBox.checked)
 }

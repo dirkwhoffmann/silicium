@@ -11,38 +11,12 @@ Dialog {
     property string okLabel: "OK"
     property string cancelLabel: "Cancel"
 
-    /* Apply carries no accept role, so a dialog offering it stays open when
-     * it is pressed. That is what a dialog which turns into a progress
-     * display needs (see SiAmDropOverlay).
-     */
-    property string applyLabel: "Apply"
     property bool sound: false
 
     property alias buttons: buttonBox.standardButtons
     default property alias paneContent: container.data
 
     property var acceptedCallback: null
-
-    /* Runs work in the background. The controller's run() takes a C++ lambda,
-     * so it is the C++ side that calls it, e.g.
-     *
-     *     auto *c = dialog->property("controller").value<SuDialogController *>();
-     *     c->run([] { ... });
-     *
-     * While a job is running, the buttons are disabled and the dialog cannot
-     * be dismissed.
-     */
-    readonly property SuDialogController controller: SuDialogController { }
-    readonly property bool busy: controller.busy
-
-    signal taskFinished()
-    signal taskFailed(string message)
-
-    Connections {
-        target: root.controller
-        function onFinished() { root.taskFinished() }
-        function onFailed(message) { root.taskFailed(message) }
-    }
 
     onAccepted: {
         if (acceptedCallback) acceptedCallback()
@@ -60,20 +34,6 @@ Dialog {
         if (btn) btn.text = root.cancelLabel
     }
 
-    onApplyLabelChanged: {
-
-        var btn = buttonBox.standardButton(Dialog.Apply)
-        if (btn) btn.text = root.applyLabel
-    }
-
-    // Enables or disables one of the standard buttons, e.g. to stop a job
-    // being started twice while the first is still running.
-    function setButtonEnabled(which, value) {
-
-        var btn = buttonBox.standardButton(which)
-        if (btn) btn.enabled = value
-    }
-
     // Positioning & Sizing
     x: (parent.width - width) / 2
     y: (parent.height - height) / 2
@@ -88,7 +48,7 @@ Dialog {
 
     padding: Style.largeSpacing
     modal: true
-    closePolicy: busy ? Popup.NoAutoClose : Popup.CloseOnEscape
+    closePolicy: Popup.CloseOnEscape
     header: Item { visible: false }
 
     //
@@ -99,7 +59,6 @@ Dialog {
 
         id: buttonBox
         alignment: Qt.AlignRight
-        enabled: !root.busy
         spacing: Style.mediumSpacing
         background: Rectangle { color: "transparent" }
         topPadding: 0

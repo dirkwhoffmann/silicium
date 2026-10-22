@@ -62,8 +62,6 @@ qt_add_qml_module(Sulfur
         src/Palette.cpp
         src/Shortcuts.h
         src/Shortcuts.cpp
-        src/SuDialogController.h
-        src/SuDialogController.cpp
         src/SulfurSettings.h
         src/SulfurSettings.cpp)
 
@@ -71,7 +69,6 @@ target_include_directories(Sulfur PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 target_link_libraries(Sulfur PUBLIC
         Qt6::Core
-        Qt6::Concurrent
         Qt6::Gui
         Qt6::Quick
         Qt6::QuickControls2
