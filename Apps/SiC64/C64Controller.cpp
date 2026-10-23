@@ -1361,7 +1361,7 @@ C64Controller::process(const Message &msg, const string &attachment, std::except
             break;
         }
 
-        case Msg::DMA_DEBUG: {
+        case Msg::XRAY: {
 
             break;
         }

@@ -681,7 +681,7 @@ Agnus::executeUntil(Cycle cycle) {
                 remoteManager.serServer.serviceSerEvent();
             }
             if (isDue<SLOT_BTR>(cycle)) {
-                xray.beamtraps.serviceEvent();
+                debugger.beamtraps.serviceEvent();
             }
             if (isDue<SLOT_ALA>(cycle)) {
                 amiga.serviceAlarmEvent();
@@ -870,7 +870,8 @@ Agnus::eolHandler()
 {
     assert(pos.h == PAL::HPOS_CNT || pos.h == NTSC::HPOS_CNT);
 
-    // Pass control to the DMA debugger
+    // Pass control to the debuggers
+    debugger.eolHandler();
     xray.eolHandler();
 
     // Move to the next line
@@ -935,6 +936,8 @@ Agnus::eofHandler()
     controlPort2.joystick.eofHandler();
     mem.eofHandler();
     logicAnalyzer.eofHandler();
+
+    debugger.eofHandler();
 
     // Update statistics
     updateStats();

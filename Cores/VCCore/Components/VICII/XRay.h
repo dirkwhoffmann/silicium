@@ -26,7 +26,7 @@ class XRay final : public SubComponent {
 
         .name           = "XRay",
         .description    = "Bus Monitor",
-        .shell          = "dmadebugger"
+        .shell          = "xray"
     }};
 
     Options options = {
@@ -135,8 +135,8 @@ public:
     //
 
     // Sets a debug color in ABGR format
-    void setDmaDebugColor(MemAccess type, GpuColor<TexelFormat::ABGR> color);
-    void setDmaDebugColor(MemAccess type, RgbColor color);
+    void setXRayColor(MemAccess type, GpuColor<TexelFormat::ABGR> color);
+    void setXRayColor(MemAccess type, RgbColor color);
 
     // Derives all color shades in the host's current HOST_TEX_FORMAT
     void updateDebugColors();

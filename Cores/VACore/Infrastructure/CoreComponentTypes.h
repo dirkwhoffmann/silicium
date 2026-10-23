@@ -23,6 +23,7 @@ enum class Class : long
     
     // Internal components
     Agnus,
+    AgnusDebugger,
     Amiga,
     AudioFilter,
     Blitter,

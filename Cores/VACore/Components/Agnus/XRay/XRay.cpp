@@ -23,36 +23,9 @@ XRay::XRay(Amiga &ref) : SubComponent(ref)
 void
 XRay::_dump(Category category, std::ostream &os) const
 {
-    auto print = [&]() {
-
-        using namespace utl;
-
-        for (int i = 0; i < beamtraps.elements(); i++) {
-
-            auto bp = *beamtraps.guardNr(i);
-            auto v = std::to_string(HI_WORD(bp.addr));
-            auto h = std::to_string(LO_WORD(bp.addr));
-            os << tab("Beamtrap " + std::to_string(i));
-            os << "(" + v + "," + h + ")";
-
-            if (!bp.enabled) os << " (Disabled)";
-            else if (bp.ignore) os << " (Disabled for " << dec(bp.ignore) << " hits)";
-            os << std::endl;
-        }
-    };
-
     if (category == Category::Config) {
         
         dumpConfig(os);
-    }
-
-    if (category == Category::Beamtraps) {
-
-        if (beamtraps.elements()) {
-            print();
-        } else {
-            os << "No beamtraps set" << std::endl;
-        }
     }
 }
 
@@ -159,7 +132,7 @@ XRay::setOption(Opt option, i64 value)
             // mode has painted its own pixels.
             pixelEngine.clearAll();
 
-            msgQueue.put(Msg::DMA_DEBUG, value);
+            msgQueue.put(Msg::XRAY, value);
             return;
 
         case Opt::XRAY_OVERLAY:
@@ -377,9 +350,6 @@ XRay::setColor(BusOwner owner, u32 rgba)
 void
 XRay::eolHandler()
 {
-    // Check if execution should be interrupted
-    if (eolTrap) { eolTrap = false; amiga.setFlag(RL::EOL_REACHED); }
-    
     if (config.mode == XRayMode::XRAY_DMA) {
         
         // Copy Agnus arrays before they get deleted
@@ -507,13 +477,6 @@ XRay::vSyncHandler()
             dma[col] = Texture::black;
         }
     }
-}
-
-void
-XRay::eofHandler()
-{
-    // Check if execution should be interrupted
-    if (eofTrap) { eofTrap = false; amiga.setFlag(RL::EOF_REACHED); }
 }
 
 }

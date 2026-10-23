@@ -12,7 +12,6 @@
 #include "XRayTypes.h"
 #include "FrameBufferTypes.h"
 #include "SubComponent.h"
-#include "Beamtraps.h"
 #include "utl/gfx/Colors.h"
 #include "Constants.h"
 #include "utl/wrappers.h"
@@ -26,7 +25,7 @@ class XRay final : public SubComponent {
         .type           = Class::XRay,
         .name           = "XRay",
         .description    = "DMA Debugger",
-        .shell          = "dmadebugger"
+        .shell          = "xray"
     }};
     
     Options options = {
@@ -80,15 +79,7 @@ private:
     // HSYNC handler information (recorded in the EOL handler)
     isize pixel0 = 0;
     
-public:
-    
-    // Beamtraps
-    Beamtraps beamtraps = Beamtraps(agnus);
-    
-    bool eolTrap = false;
-    bool eofTrap = false;
-    
-    
+
     //
     // Initializing
     //
@@ -175,9 +166,6 @@ public:
     
     // Cleans by Agnus at the end of each frame
     void vSyncHandler();
-    
-    // Called at the end of each frame
-    void eofHandler();
 
     /* Recomputes the xray texture for XRayMode::XRAY_CROSSHAIRS. The texture
      * is filled with black and a crosshair is drawn, centered at the beam

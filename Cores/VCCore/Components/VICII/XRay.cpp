@@ -22,13 +22,13 @@ XRay::XRay(C64 &ref) : SubComponent(ref)
 }
 
 void
-XRay::setDmaDebugColor(MemAccess type, GpuColor<TexelFormat::ABGR> color)
+XRay::setXRayColor(MemAccess type, GpuColor<TexelFormat::ABGR> color)
 {
-    setDmaDebugColor(type, RgbColor(color));
+    setXRayColor(type, RgbColor(color));
 }
 
 void
-XRay::setDmaDebugColor(MemAccess type, RgbColor color)
+XRay::setXRayColor(MemAccess type, RgbColor color)
 {
     assert(MemAccessEnum::isValid(type));
 
@@ -49,7 +49,7 @@ void
 XRay::updateDebugColors()
 {
     for (long channel = 0; channel < 6; channel++) {
-        setDmaDebugColor(MemAccess(channel), RgbColor(GpuColor<TexelFormat::ABGR>(config.dmaColor[channel])));
+        setXRayColor(MemAccess(channel), RgbColor(GpuColor<TexelFormat::ABGR>(config.dmaColor[channel])));
     }
 }
 

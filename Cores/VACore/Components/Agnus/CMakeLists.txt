@@ -8,6 +8,8 @@ AgnusRegs.cpp
 AgnusDma.cpp
 AgnusEvents.cpp
 Beam.cpp
+Beamtraps.cpp
+AgnusDebugger.cpp
 
 )
 

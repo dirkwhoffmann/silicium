@@ -588,72 +588,72 @@ class SiC64ConfigController : public Controller {
   public:
 
     Q_PROPERTY(int XRAY_MODE READ xrayMode WRITE setXrayMode NOTIFY configChanged)
-    Q_PROPERTY(bool XRAY_OVERLAY READ dmaDebugOverlay WRITE setDmaDebugOverlay NOTIFY configChanged)
-    Q_PROPERTY(int XRAY_OVERLAY_STYLE READ dmaDebugMode WRITE setDmaDebugMode NOTIFY configChanged)
-    Q_PROPERTY(int XRAY_OVERLAY_OPACITY READ dmaDebugOpacity WRITE setDmaDebugOpacity NOTIFY configChanged)
+    Q_PROPERTY(bool XRAY_OVERLAY READ xRayOverlay WRITE setXRayOverlay NOTIFY configChanged)
+    Q_PROPERTY(int XRAY_OVERLAY_STYLE READ xRayOverlayStyle WRITE setXRayOverlayStyle NOTIFY configChanged)
+    Q_PROPERTY(int XRAY_OVERLAY_OPACITY READ xRayOpacity WRITE setXRayOpacity NOTIFY configChanged)
     Q_PROPERTY(int XRAY_COMPOSITOR READ xrayCompositor WRITE setXrayCompositor NOTIFY configChanged)
-    Q_PROPERTY(bool XRAY_DMA_CHANNEL0 READ dmaDebugChannel0 WRITE setDmaDebugChannel0 NOTIFY configChanged)
-    Q_PROPERTY(bool XRAY_DMA_CHANNEL1 READ dmaDebugChannel1 WRITE setDmaDebugChannel1 NOTIFY configChanged)
-    Q_PROPERTY(bool XRAY_DMA_CHANNEL2 READ dmaDebugChannel2 WRITE setDmaDebugChannel2 NOTIFY configChanged)
-    Q_PROPERTY(bool XRAY_DMA_CHANNEL3 READ dmaDebugChannel3 WRITE setDmaDebugChannel3 NOTIFY configChanged)
-    Q_PROPERTY(bool XRAY_DMA_CHANNEL4 READ dmaDebugChannel4 WRITE setDmaDebugChannel4 NOTIFY configChanged)
-    Q_PROPERTY(bool XRAY_DMA_CHANNEL5 READ dmaDebugChannel5 WRITE setDmaDebugChannel5 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_COLOR0 READ dmaDebugColor0 WRITE setDmaDebugColor0 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_COLOR1 READ dmaDebugColor1 WRITE setDmaDebugColor1 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_COLOR2 READ dmaDebugColor2 WRITE setDmaDebugColor2 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_COLOR3 READ dmaDebugColor3 WRITE setDmaDebugColor3 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_COLOR4 READ dmaDebugColor4 WRITE setDmaDebugColor4 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_COLOR5 READ dmaDebugColor5 WRITE setDmaDebugColor5 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_COLOR6 READ dmaDebugColor6 WRITE setDmaDebugColor6 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_COLOR7 READ dmaDebugColor7 WRITE setDmaDebugColor7 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_COLOR8 READ dmaDebugColor8 WRITE setDmaDebugColor8 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_COLOR9 READ dmaDebugColor9 WRITE setDmaDebugColor9 NOTIFY configChanged)
-    Q_PROPERTY(QColor XRAY_COLOR10 READ dmaDebugColor10 WRITE setDmaDebugColor10 NOTIFY configChanged)
+    Q_PROPERTY(bool XRAY_DMA_CHANNEL0 READ xRayChannel0 WRITE setXRayChannel0 NOTIFY configChanged)
+    Q_PROPERTY(bool XRAY_DMA_CHANNEL1 READ xRayChannel1 WRITE setXRayChannel1 NOTIFY configChanged)
+    Q_PROPERTY(bool XRAY_DMA_CHANNEL2 READ xRayChannel2 WRITE setXRayChannel2 NOTIFY configChanged)
+    Q_PROPERTY(bool XRAY_DMA_CHANNEL3 READ xRayChannel3 WRITE setXRayChannel3 NOTIFY configChanged)
+    Q_PROPERTY(bool XRAY_DMA_CHANNEL4 READ xRayChannel4 WRITE setXRayChannel4 NOTIFY configChanged)
+    Q_PROPERTY(bool XRAY_DMA_CHANNEL5 READ xRayChannel5 WRITE setXRayChannel5 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR0 READ xRayColor0 WRITE setXRayColor0 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR1 READ xRayColor1 WRITE setXRayColor1 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR2 READ xRayColor2 WRITE setXRayColor2 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR3 READ xRayColor3 WRITE setXRayColor3 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR4 READ xRayColor4 WRITE setXRayColor4 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR5 READ xRayColor5 WRITE setXRayColor5 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR6 READ xRayColor6 WRITE setXRayColor6 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR7 READ xRayColor7 WRITE setXRayColor7 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR8 READ xRayColor8 WRITE setXRayColor8 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR9 READ xRayColor9 WRITE setXRayColor9 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR10 READ xRayColor10 WRITE setXRayColor10 NOTIFY configChanged)
 
     int xrayMode() const { return (int)get(vc64::Opt::XRAY_MODE); }
     void setXrayMode(int value) { set(vc64::Opt::XRAY_MODE, (i64)value); }
-    bool dmaDebugOverlay() const { return (bool)get(vc64::Opt::XRAY_OVERLAY); }
-    void setDmaDebugOverlay(bool value) { set(vc64::Opt::XRAY_OVERLAY, (i64)value); }
-    int dmaDebugMode() const { return (int)get(vc64::Opt::XRAY_OVERLAY_STYLE); }
-    void setDmaDebugMode(int value) { set(vc64::Opt::XRAY_OVERLAY_STYLE, (i64)value); }
-    int dmaDebugOpacity() const { return (int)get(vc64::Opt::XRAY_OVERLAY_OPACITY); }
-    void setDmaDebugOpacity(int value) { set(vc64::Opt::XRAY_OVERLAY_OPACITY, (i64)value); }
+    bool xRayOverlay() const { return (bool)get(vc64::Opt::XRAY_OVERLAY); }
+    void setXRayOverlay(bool value) { set(vc64::Opt::XRAY_OVERLAY, (i64)value); }
+    int xRayOverlayStyle() const { return (int)get(vc64::Opt::XRAY_OVERLAY_STYLE); }
+    void setXRayOverlayStyle(int value) { set(vc64::Opt::XRAY_OVERLAY_STYLE, (i64)value); }
+    int xRayOpacity() const { return (int)get(vc64::Opt::XRAY_OVERLAY_OPACITY); }
+    void setXRayOpacity(int value) { set(vc64::Opt::XRAY_OVERLAY_OPACITY, (i64)value); }
     int xrayCompositor() const { return (int)get(vc64::Opt::XRAY_COMPOSITOR); }
     void setXrayCompositor(int value) { set(vc64::Opt::XRAY_COMPOSITOR, (i64)value); }
-    bool dmaDebugChannel0() const { return (bool)get(vc64::Opt::XRAY_DMA_CHANNEL0); }
-    void setDmaDebugChannel0(bool value) { set(vc64::Opt::XRAY_DMA_CHANNEL0, (i64)value); }
-    bool dmaDebugChannel1() const { return (bool)get(vc64::Opt::XRAY_DMA_CHANNEL1); }
-    void setDmaDebugChannel1(bool value) { set(vc64::Opt::XRAY_DMA_CHANNEL1, (i64)value); }
-    bool dmaDebugChannel2() const { return (bool)get(vc64::Opt::XRAY_DMA_CHANNEL2); }
-    void setDmaDebugChannel2(bool value) { set(vc64::Opt::XRAY_DMA_CHANNEL2, (i64)value); }
-    bool dmaDebugChannel3() const { return (bool)get(vc64::Opt::XRAY_DMA_CHANNEL3); }
-    void setDmaDebugChannel3(bool value) { set(vc64::Opt::XRAY_DMA_CHANNEL3, (i64)value); }
-    bool dmaDebugChannel4() const { return (bool)get(vc64::Opt::XRAY_DMA_CHANNEL4); }
-    void setDmaDebugChannel4(bool value) { set(vc64::Opt::XRAY_DMA_CHANNEL4, (i64)value); }
-    bool dmaDebugChannel5() const { return (bool)get(vc64::Opt::XRAY_DMA_CHANNEL5); }
-    void setDmaDebugChannel5(bool value) { set(vc64::Opt::XRAY_DMA_CHANNEL5, (i64)value); }
-    QColor dmaDebugColor0() const { return dmaColor(vc64::Opt::XRAY_COLOR0); }
-    void setDmaDebugColor0(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR0, c); }
-    QColor dmaDebugColor1() const { return dmaColor(vc64::Opt::XRAY_COLOR1); }
-    void setDmaDebugColor1(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR1, c); }
-    QColor dmaDebugColor2() const { return dmaColor(vc64::Opt::XRAY_COLOR2); }
-    void setDmaDebugColor2(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR2, c); }
-    QColor dmaDebugColor3() const { return dmaColor(vc64::Opt::XRAY_COLOR3); }
-    void setDmaDebugColor3(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR3, c); }
-    QColor dmaDebugColor4() const { return dmaColor(vc64::Opt::XRAY_COLOR4); }
-    void setDmaDebugColor4(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR4, c); }
-    QColor dmaDebugColor5() const { return dmaColor(vc64::Opt::XRAY_COLOR5); }
-    void setDmaDebugColor5(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR5, c); }
-    QColor dmaDebugColor6() const { return dmaColor(vc64::Opt::XRAY_COLOR6); }
-    void setDmaDebugColor6(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR6, c); }
-    QColor dmaDebugColor7() const { return dmaColor(vc64::Opt::XRAY_COLOR7); }
-    void setDmaDebugColor7(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR7, c); }
-    QColor dmaDebugColor8() const { return dmaColor(vc64::Opt::XRAY_COLOR8); }
-    void setDmaDebugColor8(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR8, c); }
-    QColor dmaDebugColor9() const { return dmaColor(vc64::Opt::XRAY_COLOR9); }
-    void setDmaDebugColor9(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR9, c); }
-    QColor dmaDebugColor10() const { return dmaColor(vc64::Opt::XRAY_COLOR10); }
-    void setDmaDebugColor10(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR10, c); }
+    bool xRayChannel0() const { return (bool)get(vc64::Opt::XRAY_DMA_CHANNEL0); }
+    void setXRayChannel0(bool value) { set(vc64::Opt::XRAY_DMA_CHANNEL0, (i64)value); }
+    bool xRayChannel1() const { return (bool)get(vc64::Opt::XRAY_DMA_CHANNEL1); }
+    void setXRayChannel1(bool value) { set(vc64::Opt::XRAY_DMA_CHANNEL1, (i64)value); }
+    bool xRayChannel2() const { return (bool)get(vc64::Opt::XRAY_DMA_CHANNEL2); }
+    void setXRayChannel2(bool value) { set(vc64::Opt::XRAY_DMA_CHANNEL2, (i64)value); }
+    bool xRayChannel3() const { return (bool)get(vc64::Opt::XRAY_DMA_CHANNEL3); }
+    void setXRayChannel3(bool value) { set(vc64::Opt::XRAY_DMA_CHANNEL3, (i64)value); }
+    bool xRayChannel4() const { return (bool)get(vc64::Opt::XRAY_DMA_CHANNEL4); }
+    void setXRayChannel4(bool value) { set(vc64::Opt::XRAY_DMA_CHANNEL4, (i64)value); }
+    bool xRayChannel5() const { return (bool)get(vc64::Opt::XRAY_DMA_CHANNEL5); }
+    void setXRayChannel5(bool value) { set(vc64::Opt::XRAY_DMA_CHANNEL5, (i64)value); }
+    QColor xRayColor0() const { return dmaColor(vc64::Opt::XRAY_COLOR0); }
+    void setXRayColor0(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR0, c); }
+    QColor xRayColor1() const { return dmaColor(vc64::Opt::XRAY_COLOR1); }
+    void setXRayColor1(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR1, c); }
+    QColor xRayColor2() const { return dmaColor(vc64::Opt::XRAY_COLOR2); }
+    void setXRayColor2(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR2, c); }
+    QColor xRayColor3() const { return dmaColor(vc64::Opt::XRAY_COLOR3); }
+    void setXRayColor3(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR3, c); }
+    QColor xRayColor4() const { return dmaColor(vc64::Opt::XRAY_COLOR4); }
+    void setXRayColor4(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR4, c); }
+    QColor xRayColor5() const { return dmaColor(vc64::Opt::XRAY_COLOR5); }
+    void setXRayColor5(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR5, c); }
+    QColor xRayColor6() const { return dmaColor(vc64::Opt::XRAY_COLOR6); }
+    void setXRayColor6(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR6, c); }
+    QColor xRayColor7() const { return dmaColor(vc64::Opt::XRAY_COLOR7); }
+    void setXRayColor7(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR7, c); }
+    QColor xRayColor8() const { return dmaColor(vc64::Opt::XRAY_COLOR8); }
+    void setXRayColor8(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR8, c); }
+    QColor xRayColor9() const { return dmaColor(vc64::Opt::XRAY_COLOR9); }
+    void setXRayColor9(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR9, c); }
+    QColor xRayColor10() const { return dmaColor(vc64::Opt::XRAY_COLOR10); }
+    void setXRayColor10(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR10, c); }
 
     //
     // Helpers

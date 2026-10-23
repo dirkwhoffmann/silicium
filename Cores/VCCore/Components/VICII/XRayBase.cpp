@@ -136,7 +136,7 @@ XRay::setOption(Opt opt, i64 value)
         case Opt::XRAY_OVERLAY:
             
             config.dmaOverlay = value;
-            msgQueue.put(Msg::DMA_DEBUG, value);
+            msgQueue.put(Msg::XRAY, value);
             return;
             
         case Opt::XRAY_OVERLAY_STYLE: 
@@ -154,12 +154,12 @@ XRay::setOption(Opt opt, i64 value)
         case Opt::XRAY_DMA_CHANNEL4:    config.dmaChannel[4] = value; return;
         case Opt::XRAY_DMA_CHANNEL5:    config.dmaChannel[5] = value; return;
 
-        case Opt::XRAY_COLOR0:      setDmaDebugColor(MemAccess::R, GpuColor<TexelFormat::ABGR>((u32)value)); return;
-        case Opt::XRAY_COLOR1:      setDmaDebugColor(MemAccess::I, GpuColor<TexelFormat::ABGR>((u32)value)); return;
-        case Opt::XRAY_COLOR2:      setDmaDebugColor(MemAccess::C, GpuColor<TexelFormat::ABGR>((u32)value)); return;
-        case Opt::XRAY_COLOR3:      setDmaDebugColor(MemAccess::G, GpuColor<TexelFormat::ABGR>((u32)value)); return;
-        case Opt::XRAY_COLOR4:      setDmaDebugColor(MemAccess::P, GpuColor<TexelFormat::ABGR>((u32)value)); return;
-        case Opt::XRAY_COLOR5:      setDmaDebugColor(MemAccess::S, GpuColor<TexelFormat::ABGR>((u32)value)); return;
+        case Opt::XRAY_COLOR0:      setXRayColor(MemAccess::R, GpuColor<TexelFormat::ABGR>((u32)value)); return;
+        case Opt::XRAY_COLOR1:      setXRayColor(MemAccess::I, GpuColor<TexelFormat::ABGR>((u32)value)); return;
+        case Opt::XRAY_COLOR2:      setXRayColor(MemAccess::C, GpuColor<TexelFormat::ABGR>((u32)value)); return;
+        case Opt::XRAY_COLOR3:      setXRayColor(MemAccess::G, GpuColor<TexelFormat::ABGR>((u32)value)); return;
+        case Opt::XRAY_COLOR4:      setXRayColor(MemAccess::P, GpuColor<TexelFormat::ABGR>((u32)value)); return;
+        case Opt::XRAY_COLOR5:      setXRayColor(MemAccess::S, GpuColor<TexelFormat::ABGR>((u32)value)); return;
 
         // Layer colors only: they have no DMA channel, hence no shade table
         case Opt::XRAY_COLOR6:

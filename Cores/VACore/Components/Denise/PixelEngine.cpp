@@ -504,12 +504,6 @@ PixelEngine::vsyncHandler()
 }
 
 void
-PixelEngine::eofHandler()
-{
-    xray.eofHandler();
-}
-
-void
 PixelEngine::replayColRegChanges()
 {
     // Apply all color register changes that happened in this line

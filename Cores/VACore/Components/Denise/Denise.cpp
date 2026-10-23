@@ -1714,7 +1714,6 @@ Denise::eofHandler()
     // In this area, the border mask has to be rebuild in each line.
     if (isOCS()) markBorderBufferAsDirty(10);
 
-    pixelEngine.eofHandler();
     debugger.eofHandler();
 }
 

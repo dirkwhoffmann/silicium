@@ -12,6 +12,7 @@
 #include "AgnusTypes.h"
 #include "SubComponent.h"
 #include "Beam.h"
+#include "AgnusDebugger.h"
 #include "Blitter.h"
 #include "ChangeRecorder.h"
 #include "Copper.h"
@@ -73,6 +74,7 @@ public:
     Copper copper = Copper(amiga);
     Blitter blitter = Blitter(amiga);
     XRay xray = XRay(amiga);
+    AgnusDebugger debugger = AgnusDebugger(amiga);
 
 
     //
