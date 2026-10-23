@@ -251,7 +251,7 @@ SiAmConfigController::set(vamiga::Opt opt, i64 newValue)
      */
     try {
         if (SiAmController::core().get(opt) == newValue) return;
-        SiAmController::core().set(opt, newValue);
+        SiAmController::core().setAsync(opt, newValue);
     } catch (...) { }
 }
 
@@ -260,7 +260,7 @@ SiAmConfigController::set(vamiga::Opt opt, i64 newValue, long id)
 {
     try {
         if (SiAmController::core().get(opt, id) == newValue) return;
-        SiAmController::core().set(opt, newValue, id);
+        SiAmController::core().setAsync(opt, newValue, id);
     } catch (...) { }
 }
 
@@ -283,13 +283,13 @@ SiAmConfigController::restoreDefaults(Opt opt, std::vector<isize> objids)
     // refusal must not stop the remaining items from being restored.
     if (objids.empty()) {
 
-        try { core.check(opt, defaults.get(opt)); core.set(opt, defaults.get(opt)); } catch (...) { }
+        try { core.check(opt, defaults.get(opt)); core.setAsync(opt, defaults.get(opt)); } catch (...) { }
 
     } else {
 
         for (auto id : objids) {
 
-            try { core.check(opt, defaults.get(opt, id), id); core.set(opt, defaults.get(opt, id), id); } catch (...) { }
+            try { core.check(opt, defaults.get(opt, id), id); core.setAsync(opt, defaults.get(opt, id), id); } catch (...) { }
         }
     }
 }

@@ -50,7 +50,7 @@ SiC64Renderer::start()
     controller->getConfigController()->setHostTexFormat((int)vc64::TexFormat::ARGB);
 
     // The GPU blends the xray texture into the picture (see merge.frag)
-    controller->core().set(vc64::Opt::XRAY_COMPOSITOR, (i64)vc64::XRayCompositor::GPU);
+    controller->core().setAsync(vc64::Opt::XRAY_COMPOSITOR, (i64)vc64::XRayCompositor::GPU);
 
     // Only proceed if no connection exists yet
     if (m_frameConnection) return;
@@ -212,8 +212,8 @@ SiC64Renderer::geometryChange(const QRectF &newGeometry, const QRectF &oldGeomet
         auto width  = qRound(newGeometry.width() * dpr);
         auto height = qRound(newGeometry.height() * dpr);
 
-        controller->core().set(vc64::Opt::HOST_FRAMEBUF_WIDTH, width);
-        controller->core().set(vc64::Opt::HOST_FRAMEBUF_HEIGHT, height);
+        controller->core().setAsync(vc64::Opt::HOST_FRAMEBUF_WIDTH, width);
+        controller->core().setAsync(vc64::Opt::HOST_FRAMEBUF_HEIGHT, height);
     }
 }
 

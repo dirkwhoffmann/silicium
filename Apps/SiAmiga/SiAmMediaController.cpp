@@ -168,7 +168,7 @@ SiAmMediaController::setHdSnapshot(int nr, bool value)
 {
     try {
 
-        SiAmController::core().set(Opt::HDR_SNAPSHOT, value, nr);
+        SiAmController::core().setAsync(Opt::HDR_SNAPSHOT, value, nr);
 
     } catch (const std::exception &e) {
 
@@ -187,7 +187,7 @@ SiAmMediaController::setHdWriteThrough(int nr, bool value)
 {
     try {
 
-        SiAmController::core().set(Opt::HDR_WRITE_THROUGH,
+        SiAmController::core().setAsync(Opt::HDR_WRITE_THROUGH,
                                    (i64)(value ? WriteThroughMode::ON_IDLE : WriteThroughMode::NEVER), nr);
 
     } catch (const std::exception &e) {

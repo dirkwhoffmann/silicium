@@ -468,7 +468,7 @@ void
 SiAmController::linkAudioSink(QAudioSink *sink, QAudioFormat &format)
 {
     auto sampleRate = format.sampleRate();
-    core().set(Opt::HOST_SAMPLE_RATE, sampleRate);
+    core().setAsync(Opt::HOST_SAMPLE_RATE, sampleRate);
 
     sink->start([](QSpan<float> buffer) {
 
@@ -671,7 +671,7 @@ SiAmController::hdDidArrive(int nr)
      * cycle: the machine has to go round again to notice a drive that was not
      * there when it booted, but it does not have to be switched off for that.
      */
-    if (!core().get(Opt::HDC_CONNECT, nr)) core().set(Opt::HDC_CONNECT, true, nr);
+    if (!core().get(Opt::HDC_CONNECT, nr)) core().setAsync(Opt::HDC_CONNECT, true, nr);
     core().hardReset();
 
     /* Write the machine out, so config.retrosh carries the attach line and the

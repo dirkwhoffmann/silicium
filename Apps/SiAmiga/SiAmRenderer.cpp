@@ -49,7 +49,7 @@ SiAmRenderer::start()
 
     // Get the refresh rate and pass it to the core
     if (auto screen = window() ? window()->screen() : nullptr) {
-        controller->core().set(vamiga::Opt::HOST_REFRESH_RATE, (i64)screen->refreshRate());
+        controller->core().setAsync(vamiga::Opt::HOST_REFRESH_RATE, (i64)screen->refreshRate());
     }
 
     // Set the texture format
@@ -329,8 +329,8 @@ SiAmRenderer::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometr
         auto pxWidth  = qRound(newGeometry.width() * dpr);
         auto pxHeight = qRound(newGeometry.height() * dpr);
 
-        controller->core().set(vamiga::Opt::HOST_FRAMEBUF_WIDTH, pxWidth);
-        controller->core().set(vamiga::Opt::HOST_FRAMEBUF_HEIGHT, pxHeight);
+        controller->core().setAsync(vamiga::Opt::HOST_FRAMEBUF_WIDTH, pxWidth);
+        controller->core().setAsync(vamiga::Opt::HOST_FRAMEBUF_HEIGHT, pxHeight);
     }
 }
 

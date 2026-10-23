@@ -82,8 +82,8 @@ SiAmLogicAnalyzerController::selectPreset(int channel, int index)
 
     try {
 
-        core.set(probeOpt, (i64)preset.probe);
-        if (preset.hasAddr) core.set(addrOpt, (i64)preset.addr);
+        core.setAsync(probeOpt, (i64)preset.probe);
+        if (preset.hasAddr) core.setAsync(addrOpt, (i64)preset.addr);
 
     } catch (...) { }
 }
@@ -161,8 +161,8 @@ SiAmLogicAnalyzerController::selectAddress(int channel, const QString &hex)
 
     try {
 
-        core.set(probeOpt, (i64)Probe::MEMORY);
-        core.set(addrOpt, (i64)addr);
+        core.setAsync(probeOpt, (i64)Probe::MEMORY);
+        core.setAsync(addrOpt, (i64)addr);
 
     } catch (...) { return false; }
 

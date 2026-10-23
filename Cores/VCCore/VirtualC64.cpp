@@ -436,7 +436,7 @@ VirtualC64::get(Opt option, long id) const
 }
 
 void
-VirtualC64::set(ConfigScheme model)
+VirtualC64::setAsync(ConfigScheme model)
 {
     VC64_PUBLIC_SUSPEND
     put(Cmd::CONFIG_SCHEME, (i64)model);
@@ -444,7 +444,7 @@ VirtualC64::set(ConfigScheme model)
 }
 
 void
-VirtualC64::set(Opt opt, i64 value)
+VirtualC64::setAsync(Opt opt, i64 value)
 {
     VC64_PUBLIC
     put(Cmd::CONFIG_ALL, ConfigCmd { .option = opt, .value = value });
@@ -452,7 +452,7 @@ VirtualC64::set(Opt opt, i64 value)
 }
 
 void
-VirtualC64::setAwait(ConfigScheme model)
+VirtualC64::set(ConfigScheme model)
 {
     VC64_PUBLIC
     emu->sendAndWait(Command(Cmd::CONFIG_SCHEME, (i64)model));
@@ -460,7 +460,7 @@ VirtualC64::setAwait(ConfigScheme model)
 }
 
 void
-VirtualC64::setAwait(Opt opt, i64 value)
+VirtualC64::set(Opt opt, i64 value)
 {
     VC64_PUBLIC
     emu->sendAndWait(Command(Cmd::CONFIG_ALL, ConfigCmd { .option = opt, .value = value }));
@@ -468,7 +468,7 @@ VirtualC64::setAwait(Opt opt, i64 value)
 }
 
 void
-VirtualC64::setAwait(Opt opt, i64 value, long id)
+VirtualC64::set(Opt opt, i64 value, long id)
 {
     VC64_PUBLIC
     emu->sendAndWait(Command(Cmd::CONFIG, ConfigCmd { .option = opt, .value = value, .id = id }));
@@ -490,7 +490,7 @@ VirtualC64::check(Opt opt, i64 value, long id)
 }
 
 void
-VirtualC64::set(Opt opt, i64 value, long id)
+VirtualC64::setAsync(Opt opt, i64 value, long id)
 {
     VC64_PUBLIC
     put(Cmd::CONFIG, ConfigCmd { .option = opt, .value = value, .id = id });
