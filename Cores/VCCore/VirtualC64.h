@@ -1701,9 +1701,12 @@ struct VirtualC64 : public API {
      *  Because the command queue is processed in order, all requests issued
      *  earlier have been carried out when the call returns.
      *
+     *  If the emulator thread has not been launched yet, the request is carried
+     *  out immediately in the calling thread.
+     *
      *  @throw CoreError (#Fault::NOT_LAUNCHED) if the emulator thread cannot
-     *  carry out the request, because it is not launched, halted, or suspended.
-     *  The same applies if the function is called from the emulator thread.
+     *  carry out the request, because it is halted or suspended. The same
+     *  applies if the function is called from the emulator thread.
      */
     void setAwait(ConfigScheme model);
     void setAwait(Opt opt, i64 value);

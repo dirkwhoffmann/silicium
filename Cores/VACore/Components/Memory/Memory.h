@@ -211,11 +211,7 @@ public:
     u32 extMask = 0;
     u32 chipMask = 0;
 
-    /* Traits of the installed Roms. Computing them requires a checksum of the
-     * whole Rom, so the result is cached. Whenever the content of rom, wom, or
-     * ext changes, the corresponding value needs to be invalidated (always
-     * *after* the modification).
-     */
+    // Traits of the installed Roms
     utl::Backed<RomTraits> romTraits;
     utl::Backed<RomTraits> womTraits;
     utl::Backed<RomTraits> extTraits;
