@@ -842,6 +842,17 @@ SiAmController::shrinkSnapshotStorage(int count)
 }
 
 void
+SiAmController::reportConfigError(const vamiga::ConfigMsg &cfg, std::exception_ptr exception)
+{
+    const QString detail = cfg.option < 0 ?
+        tr("configuration scheme") :
+        QString::fromUtf8(vamiga::OptEnum::key(vamiga::Opt(cfg.option))) + " = " + QString::number(cfg.value) +
+        (cfg.id >= 0 ? " (" + tr("component") + " " + QString::number(cfg.id) + ")" : QString());
+
+    showError(tr("Failed to change the configuration."), detail + ": " + errorText(exception));
+}
+
+void
 SiAmController::rpcReceive(const string &payload)
 {
     if (payload.empty()) return;
@@ -1276,15 +1287,12 @@ SiAmController::process(const Message &msg, const string &attachment, std::excep
 
             m_configIsDirty = true;
             m_infoIsDirty = true;
-            break;
 
-        case Msg::CONFIG_ERROR:
-
-            // The panels show what the core holds, so re-read it to drop the
-            // rejected value, and tell the user why it was not applied
-            m_configIsDirty = true;
-            showError(tr("Failed to change the configuration."),
-                      (attachment.empty() ? QString() : QString::fromStdString(attachment) + ": ") + errorText(exception));
+            // The panels show what the core holds, so the refresh also drops a
+            // rejected value. Tell the user why it was not applied.
+            if (exception) {
+                reportConfigError(msg.config, exception);
+            }
             break;
 
         case Msg::POWER:

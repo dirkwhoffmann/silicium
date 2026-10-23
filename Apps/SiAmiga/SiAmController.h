@@ -490,6 +490,9 @@ private:
 
     // Processes incoming RPC messages
     void rpcReceive(const string &payload);
+
+    // Tells the user that a configuration request has failed
+    void reportConfigError(const vamiga::ConfigMsg &cfg, std::exception_ptr exception);
     void rpcSend(const string &payload);
 
     // Loads a specific snapshot from this VM's own SVM
