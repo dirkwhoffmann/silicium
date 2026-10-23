@@ -1286,8 +1286,8 @@ Amiga::computeFrame()
             // Did we reach a beam trap?
             if (flags & RL::BEAMTRAP_REACHED) {
 
-                auto v = agnus.dmaDebugger.beamtraps.hitV;
-                auto h = agnus.dmaDebugger.beamtraps.hitH;
+                auto v = agnus.xray.beamtraps.hitV;
+                auto h = agnus.xray.beamtraps.hitH;
                 msgQueue.put(Msg::BEAMTRAP_REACHED, BeamMsg { v, h },
                              std::format("Beam trap reached at ({},{})", v, h));
                 action = pause;

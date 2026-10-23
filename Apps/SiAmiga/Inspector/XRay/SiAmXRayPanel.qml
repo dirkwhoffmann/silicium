@@ -33,7 +33,7 @@ SiAmInspectorWindow {
     readonly property int tab: 21
     readonly property int tabtab: 42
 
-    // Mirrors vamiga::XRayMode (see DmaDebuggerTypes.h)
+    // Mirrors vamiga::XRayMode (see XRayTypes.h)
     readonly property int xrayNone: 0
     readonly property int xrayDma: 1
     readonly property int xrayLayers: 2

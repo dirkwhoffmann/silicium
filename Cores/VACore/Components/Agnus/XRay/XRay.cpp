@@ -8,20 +8,20 @@
 // -----------------------------------------------------------------------------
 
 #include "vaconfig.h"
-#include "DmaDebugger.h"
+#include "XRay.h"
 #include "Amiga.h"
 #include "Emulator.h"
 #include "utl/io.h"
 
 namespace vamiga {
 
-DmaDebugger::DmaDebugger(Amiga &ref) : SubComponent(ref)
+XRay::XRay(Amiga &ref) : SubComponent(ref)
 {
     info.bind([this] { return cacheInfo(); } );
 }
 
 void
-DmaDebugger::_dump(Category category, std::ostream &os) const
+XRay::_dump(Category category, std::ostream &os) const
 {
     auto print = [&]() {
 
@@ -57,7 +57,7 @@ DmaDebugger::_dump(Category category, std::ostream &os) const
 }
 
 i64
-DmaDebugger::getOption(Opt option) const
+XRay::getOption(Opt option) const
 {
     switch (option) {
             
@@ -93,7 +93,7 @@ DmaDebugger::getOption(Opt option) const
 }
 
 void
-DmaDebugger::checkOption(Opt opt, i64 value)
+XRay::checkOption(Opt opt, i64 value)
 {
     switch (opt) {
 
@@ -146,7 +146,7 @@ DmaDebugger::checkOption(Opt opt, i64 value)
 }
 
 void
-DmaDebugger::setOption(Opt option, i64 value)
+XRay::setOption(Opt option, i64 value)
 {
     switch (option) {
 
@@ -324,10 +324,10 @@ DmaDebugger::setOption(Opt option, i64 value)
     }
 }
 
-DmaDebuggerInfo
-DmaDebugger::cacheInfo() const
+XRayInfo
+XRay::cacheInfo() const
 {
-    DmaDebuggerInfo info;
+    XRayInfo info;
 
     info.visualizeCopper = config.visualize[isize(DmaChannel::COPPER)];
     info.visualizeBlitter = config.visualize[isize(DmaChannel::BLITTER)];
@@ -351,7 +351,7 @@ DmaDebugger::cacheInfo() const
 }
 
 void
-DmaDebugger::getColor(DmaChannel channel, double *rgb) const
+XRay::getColor(DmaChannel channel, double *rgb) const
 {
     DmaChannelEnum::validate(channel);
 
@@ -362,7 +362,7 @@ DmaDebugger::getColor(DmaChannel channel, double *rgb) const
 }
 
 void
-DmaDebugger::setColor(BusOwner owner, u32 rgba)
+XRay::setColor(BusOwner owner, u32 rgba)
 {
     BusOwnerEnum::key(owner);
 
@@ -375,7 +375,7 @@ DmaDebugger::setColor(BusOwner owner, u32 rgba)
 }
 
 void
-DmaDebugger::eolHandler()
+XRay::eolHandler()
 {
     // Check if execution should be interrupted
     if (eolTrap) { eolTrap = false; amiga.setFlag(RL::EOL_REACHED); }
@@ -393,7 +393,7 @@ DmaDebugger::eolHandler()
 }
 
 void
-DmaDebugger::hsyncHandler(isize vpos)
+XRay::hsyncHandler(isize vpos)
 {
     assert(agnus.pos.h == 0x12);
 
@@ -411,7 +411,7 @@ DmaDebugger::hsyncHandler(isize vpos)
 }
 
 void
-DmaDebugger::computeOverlay(Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val)
+XRay::computeOverlay(Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val)
 {
     switch (static_cast<TexelFormat>(host.getConfig().texFormat)) {
 
@@ -425,7 +425,7 @@ DmaDebugger::computeOverlay(Texel *dmaPtr, isize first, isize last, BusOwner *ow
 
 template <TexelFormat F>
 void
-DmaDebugger::computeOverlay(Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val)
+XRay::computeOverlay(Texel *dmaPtr, isize first, isize last, BusOwner *own, u16 *val)
 {
     for (isize i = first; i <= last; i++, dmaPtr += 4) {
 
@@ -453,7 +453,7 @@ DmaDebugger::computeOverlay(Texel *dmaPtr, isize first, isize last, BusOwner *ow
 }
 
 void
-DmaDebugger::_pause()
+XRay::_pause()
 {
     if (config.mode != XRayMode::XRAY_CROSSHAIRS) return;
 
@@ -464,7 +464,7 @@ DmaDebugger::_pause()
 }
 
 void
-DmaDebugger::computeCrosshairs(Texel *xray)
+XRay::computeCrosshairs(Texel *xray)
 {
     const auto &info = isPaused() ? agnus.info.current() : agnus.info.backed();
 
@@ -482,7 +482,7 @@ DmaDebugger::computeCrosshairs(Texel *xray)
 }
 
 void
-DmaDebugger::vSyncHandler()
+XRay::vSyncHandler()
 {
     // In crosshairs mode, start the new frame with a fresh texture
     if (config.mode == XRayMode::XRAY_CROSSHAIRS) {
@@ -510,7 +510,7 @@ DmaDebugger::vSyncHandler()
 }
 
 void
-DmaDebugger::eofHandler()
+XRay::eofHandler()
 {
     // Check if execution should be interrupted
     if (eofTrap) { eofTrap = false; amiga.setFlag(RL::EOF_REACHED); }

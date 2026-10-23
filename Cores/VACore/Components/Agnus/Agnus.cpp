@@ -20,7 +20,7 @@ Agnus::Agnus(Amiga& ref) : SubComponent(ref)
         &sequencer,
         &copper,
         &blitter,
-        &dmaDebugger
+        &xray
     };
 
     info.bind([this] { return cacheInfo(); } );
@@ -36,7 +36,7 @@ Agnus::operator= (const Agnus& other) {
     CLONE(sequencer)
     CLONE(copper)
     CLONE(blitter)
-    CLONE(dmaDebugger)
+    CLONE(xray)
     
     CLONE_ARRAY(trigger)
     CLONE_ARRAY(id)
@@ -681,7 +681,7 @@ Agnus::executeUntil(Cycle cycle) {
                 remoteManager.serServer.serviceSerEvent();
             }
             if (isDue<SLOT_BTR>(cycle)) {
-                dmaDebugger.beamtraps.serviceEvent();
+                xray.beamtraps.serviceEvent();
             }
             if (isDue<SLOT_ALA>(cycle)) {
                 amiga.serviceAlarmEvent();
@@ -871,7 +871,7 @@ Agnus::eolHandler()
     assert(pos.h == PAL::HPOS_CNT || pos.h == NTSC::HPOS_CNT);
 
     // Pass control to the DMA debugger
-    dmaDebugger.eolHandler();
+    xray.eolHandler();
 
     // Move to the next line
     pos.eol();
@@ -948,7 +948,7 @@ Agnus::hsyncHandler()
     // Draw the previous line
     isize vpos = agnus.pos.vPrev();
     denise.hsyncHandler(vpos);
-    dmaDebugger.hsyncHandler(vpos);
+    xray.hsyncHandler(vpos);
 
     // Encode a LORES marker in the first HBLANK pixel
     REPLACE_BIT(*pixelEngine.workingPtr(vpos), 28, res != Resolution::LORES);

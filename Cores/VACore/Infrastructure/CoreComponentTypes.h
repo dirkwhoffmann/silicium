@@ -34,7 +34,7 @@ enum class Class : long
     Denise,
     DeniseDebugger,
     DiskController,
-    DmaDebugger,
+    XRay,
     HdController,
     Host,
     LogicAnalyzer,

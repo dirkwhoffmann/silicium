@@ -20,29 +20,26 @@ void main()
     vec3 color = texture(picture, vTexCoord).rgb;
 
     /* Blend the xray texture into the picture. Same arithmetic as
-     * DmaDebugger::computeOverlay() in the core, which does this on the CPU
-     * for hosts that cannot: a black xray pixel means that there is no effect
-     * at this place.
+     * XRay::computeOverlay() in the core, which does this on the CPU
+     * for hosts that cannot: a non-black xray pixel is an effect pixel that
+     * is mixed with the picture, a black one dims it.
      */
     if (ubuf.xrayOverlay > 0.5) {
 
+        float opacity = ubuf.xrayWeight;
+        float fg = ubuf.xrayStyle < 0.5 ? 1.0 - opacity       // Foreground layer
+                 : ubuf.xrayStyle < 1.5 ? 0.0                 // Background layer
+                 :                        1.0 - opacity;      // Mixed layers
+        float bg = ubuf.xrayStyle < 0.5 ? 0.0
+                 : ubuf.xrayStyle < 1.5 ? 1.0 - opacity
+                 :                        opacity;
+
         vec3 dma = texture(xray, vTexCoord).rgb;
-        bool effect = dma != vec3(0.0);
 
-        if (ubuf.xrayStyle < 0.5) {
-
-            // Foreground layer
-            if (effect) color = mix(color, dma, ubuf.xrayWeight);
-
-        } else if (ubuf.xrayStyle < 1.5) {
-
-            // Background layer
-            color = effect ? dma : color * (1.0 - ubuf.xrayWeight);
-
-        } else {
-
-            // Mixed layers
-            color = mix(dma, color, ubuf.xrayWeight);
+        if (dma != vec3(0.0)) {
+            color = fg != 0.0 ? mix(dma, color, fg) : dma;
+        } else if (bg != 0.0) {
+            color *= 1.0 - bg;
         }
     }
 

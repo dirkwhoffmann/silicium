@@ -11,24 +11,24 @@
 // -----------------------------------------------------------------------------
 
 #include "vcconfig.h"
-#include "DmaDebugger.h"
+#include "XRay.h"
 #include "Emulator.h"
 
 namespace vc64 {
 
-DmaDebugger::DmaDebugger(C64 &ref) : SubComponent(ref)
+XRay::XRay(C64 &ref) : SubComponent(ref)
 {
 
 }
 
 void
-DmaDebugger::setDmaDebugColor(MemAccess type, GpuColor<TexelFormat::ABGR> color)
+XRay::setDmaDebugColor(MemAccess type, GpuColor<TexelFormat::ABGR> color)
 {
     setDmaDebugColor(type, RgbColor(color));
 }
 
 void
-DmaDebugger::setDmaDebugColor(MemAccess type, RgbColor color)
+XRay::setDmaDebugColor(MemAccess type, RgbColor color)
 {
     assert(MemAccessEnum::isValid(type));
 
@@ -46,7 +46,7 @@ DmaDebugger::setDmaDebugColor(MemAccess type, RgbColor color)
 }
 
 void
-DmaDebugger::updateDebugColors()
+XRay::updateDebugColors()
 {
     for (long channel = 0; channel < 6; channel++) {
         setDmaDebugColor(MemAccess(channel), RgbColor(GpuColor<TexelFormat::ABGR>(config.dmaColor[channel])));
@@ -55,7 +55,7 @@ DmaDebugger::updateDebugColors()
 
 template <TexelFormat F>
 void
-DmaDebugger::updateDebugColor(long channel, const RgbColor &color)
+XRay::updateDebugColor(long channel, const RgbColor &color)
 {
     GpuColor<F> gpuColor(color);
 
@@ -66,13 +66,13 @@ DmaDebugger::updateDebugColor(long channel, const RgbColor &color)
 }
 
 void
-DmaDebugger::visualizeDma(isize offset, u8 data, MemAccess type)
+XRay::visualizeDma(isize offset, u8 data, MemAccess type)
 {
     visualizeDma((u32 *)vic.xrayTexturePtr + offset, data, type);
 }
 
 void
-DmaDebugger::visualizeDma(u32 *p, u8 data, MemAccess type)
+XRay::visualizeDma(u32 *p, u8 data, MemAccess type)
 {
     auto channel = (long)type;
     
@@ -86,13 +86,13 @@ DmaDebugger::visualizeDma(u32 *p, u8 data, MemAccess type)
 }
 
 void
-DmaDebugger::computeOverlay(u32 *emuTexture, u32 *xrayTexture)
+XRay::computeOverlay(u32 *emuTexture, u32 *xrayTexture)
 {
     // The host merges the textures itself (e.g., in a shader)
     if (config.compositor != XRayCompositor::CPU) return;
 
     // Dispatched once per call (not per pixel) -- see the class comment in
-    // DmaDebugger.h. Each branch below calls a separate instantiation of
+    // XRay.h. Each branch below calls a separate instantiation of
     // the templated overload, so the format is a compile-time constant for
     // the whole per-pixel loop inside it.
     switch (static_cast<TexelFormat>(host.getConfig().texFormat)) {
@@ -107,78 +107,66 @@ DmaDebugger::computeOverlay(u32 *emuTexture, u32 *xrayTexture)
 
 template <TexelFormat F>
 void
-DmaDebugger::computeOverlay(u32 *emuTexture, u32 *xrayTexture)
+XRay::computeOverlay(u32 *emuTexture, u32 *xrayTexture)
 {
-    double weight = config.dmaOpacity / 255.0;
+    if (!config.dmaOverlay) return;
 
-    if (config.dmaOverlay) {
+    /* A non-black X-ray pixel is an effect pixel that is mixed with the
+     * picture. A black one dims the picture. The weights depend on the
+     * display mode. They are the same in all cores, and they are the ones
+     * used by the host if it merges the textures on the GPU (see the overlay
+     * function in the merge shaders).
+     */
+    double opacity = double(config.dmaOpacity) / 255.0;
+    double bgWeight = 0;
+    double fgWeight = 0;
 
-        switch (config.dmaDisplayMode) {
+    switch (config.dmaDisplayMode) {
 
-            case DmaDisplayMode::FG_LAYER:
+        case DmaDisplayMode::FG_LAYER:
 
-                for (isize y = 0; y < Texture::height; y++) {
+            bgWeight = 0.0;
+            fgWeight = 1.0 - opacity;
+            break;
 
-                    u32 *emu = emuTexture + (y * Texture::width);
-                    u32 *dma = xrayTexture + (y * Texture::width);
+        case DmaDisplayMode::BG_LAYER:
 
-                    for (isize x = 0; x < Texture::width; x++) {
+            bgWeight = 1.0 - opacity;
+            fgWeight = 0.0;
+            break;
 
-                        if ((dma[x] & 0xFFFFFF) == 0) continue;
+        case DmaDisplayMode::ODD_EVEN_LAYERS:
 
-                        GpuColor<F> emuColor(emu[x]);
-                        GpuColor<F> dmaColor(dma[x]);
-                        GpuColor<F> mixColor = emuColor.mix(dmaColor, weight);
-                        emu[x] = mixColor.rawValue;
-                    }
-                }
-                break;
+            bgWeight = opacity;
+            fgWeight = 1.0 - opacity;
+            break;
 
-            case DmaDisplayMode::BG_LAYER:
+        default:
+            fatalError;
+    }
 
-                for (isize y = 0; y < Texture::height; y++) {
+    for (isize i = 0; i < Texture::width * Texture::height; i++) {
 
-                    u32 *emu = emuTexture + (y * Texture::width);
-                    u32 *dma = xrayTexture + (y * Texture::width);
+        if ((xrayTexture[i] & 0xFFFFFF) != 0) {
 
-                    for (isize x = 0; x < Texture::width; x++) {
+            if (fgWeight != 0.0) {
+                GpuColor<F> xrayColor(xrayTexture[i]);
+                GpuColor<F> emuColor(emuTexture[i]);
+                emuTexture[i] = xrayColor.mix(emuColor, fgWeight).rawValue;
+            } else {
+                emuTexture[i] = xrayTexture[i];
+            }
 
-                        if ((dma[x] & 0xFFFFFF) != 0) {
-                            emu[x] = dma[x];
-                        } else {
-                            GpuColor<F> emuColor(emu[x]);
-                            GpuColor<F> mixColor = emuColor.shade(weight);
-                            emu[x] = mixColor.rawValue;
-                        }
-                    }
-                }
-                break;
+        } else if (bgWeight != 0.0) {
 
-            case DmaDisplayMode::ODD_EVEN_LAYERS:
-
-                for (isize y = 0; y < Texture::height; y++) {
-
-                    u32 *emu = emuTexture + (y * Texture::width);
-                    u32 *dma = xrayTexture + (y * Texture::width);
-
-                    for (isize x = 0; x < Texture::width; x++) {
-
-                        GpuColor<F> emuColor(emu[x]);
-                        GpuColor<F> dmaColor(dma[x]);
-                        GpuColor<F> mixColor = dmaColor.mix(emuColor, weight);
-                        emu[x] = mixColor.rawValue;
-                    }
-                }
-                break;
-
-            default:
-                fatalError;
+            GpuColor<F> emuColor(emuTexture[i]);
+            emuTexture[i] = emuColor.shade(bgWeight).rawValue;
         }
     }
 }
 
 void
-DmaDebugger::cutLayers()
+XRay::cutLayers()
 {
     // Cutting is a feature of the layer scan
     if (config.mode != XRayMode::XRAY_LAYERS) return;
@@ -196,7 +184,7 @@ DmaDebugger::cutLayers()
 
 template <TexelFormat F>
 void
-DmaDebugger::cutLayers()
+XRay::cutLayers()
 {
     /* Paints a checkerboard into the X-ray texture for each pixel that
      * belongs to a cut layer, and black (no effect) for all others. The

@@ -126,7 +126,7 @@ SiC64Renderer::tick()
     controller->getSIDController()->tick();
 
     /* Find out whether the xray texture is blended into the picture by the
-     * GPU. The weights are those of DmaDebugger::computeOverlay() in the core,
+     * GPU. The weights are those of XRay::computeOverlay() in the core,
      * which does the same if the compositor is the CPU.
      */
     bool blend = false;

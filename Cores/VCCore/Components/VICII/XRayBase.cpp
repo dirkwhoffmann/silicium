@@ -11,14 +11,14 @@
 // -----------------------------------------------------------------------------
 
 #include "vcconfig.h"
-#include "DmaDebugger.h"
+#include "XRay.h"
 #include "VICII.h"
 #include "MsgQueue.h"
 
 namespace vc64 {
 
 void
-DmaDebugger::_dump(Category category, std::ostream &os) const
+XRay::_dump(Category category, std::ostream &os) const
 {
     using namespace utl;
 
@@ -29,7 +29,7 @@ DmaDebugger::_dump(Category category, std::ostream &os) const
 }
 
 i64
-DmaDebugger::getOption(Opt option) const
+XRay::getOption(Opt option) const
 {
     switch (option) {
 
@@ -65,7 +65,7 @@ DmaDebugger::getOption(Opt option) const
 }
 
 void
-DmaDebugger::checkOption(Opt opt, i64 value)
+XRay::checkOption(Opt opt, i64 value)
 {
     switch (opt) {
 
@@ -120,7 +120,7 @@ DmaDebugger::checkOption(Opt opt, i64 value)
 }
 
 void
-DmaDebugger::setOption(Opt opt, i64 value)
+XRay::setOption(Opt opt, i64 value)
 {
     checkOption(opt, value);
 

@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "DmaDebuggerTypes.h"
+#include "XRayTypes.h"
 #include "FrameBufferTypes.h"
 #include "SubComponent.h"
 #include "Beamtraps.h"
@@ -19,12 +19,12 @@
 
 namespace vamiga {
 
-class DmaDebugger final : public SubComponent {
+class XRay final : public SubComponent {
     
     Descriptions descriptions = {{
         
-        .type           = Class::DmaDebugger,
-        .name           = "DmaDebugger",
+        .type           = Class::XRay,
+        .name           = "XRay",
         .description    = "DMA Debugger",
         .shell          = "dmadebugger"
     }};
@@ -57,12 +57,12 @@ class DmaDebugger final : public SubComponent {
     };
     
     // Current configuration
-    DmaDebuggerConfig config = {};
+    XRayConfig config = {};
 
 public:
 
     // Result of the latest inspection
-    utl::Backed<DmaDebuggerInfo> info;
+    utl::Backed<XRayInfo> info;
 
 private:
 
@@ -95,9 +95,9 @@ public:
     
 public:
     
-    DmaDebugger(Amiga &ref);
+    XRay(Amiga &ref);
     
-    DmaDebugger& operator= (const DmaDebugger& other) {
+    XRay& operator= (const XRay& other) {
         
         CLONE_ARRAY(visualize)
         CLONE_ARRAY(busData)
@@ -140,7 +140,7 @@ private:
     
 public:
     
-    DmaDebuggerInfo cacheInfo() const;
+    XRayInfo cacheInfo() const;
 
     
     //
@@ -149,7 +149,7 @@ public:
     
 public:
     
-    const DmaDebuggerConfig &getConfig() const { return config; }
+    const XRayConfig &getConfig() const { return config; }
     const Options &getOptions() const override { return options; }
     i64 getOption(Opt option) const override;
     void checkOption(Opt opt, i64 value) override;

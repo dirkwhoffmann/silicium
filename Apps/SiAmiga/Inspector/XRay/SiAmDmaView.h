@@ -16,7 +16,7 @@
 //
 // Live preview of the DMA debugger's raw visualization, shown in the Layers
 // inspector (SiAmXRayPanel.qml). Grabs VideoPortAPI::getXrayTexture() --
-// PixelEngine's xrayTexture ring buffer, painted by DmaDebugger::
+// PixelEngine's xrayTexture ring buffer, painted by XRay::
 // computeOverlay() independently of the real picture -- so it shows DMA
 // usage whenever XRAY_MODE is XRAY_DMA, whether or not XRAY_OVERLAY is
 // also blending it into the display. Mirrors SiC64DmaView, which does the

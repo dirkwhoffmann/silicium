@@ -31,7 +31,7 @@ SiC64InspectorWindow {
     readonly property int tab: 21
     readonly property int tabtab: 42
 
-    // Mirrors vc64::XRayMode (see DmaDebuggerTypes.h)
+    // Mirrors vc64::XRayMode (see XRayTypes.h)
     readonly property int xrayNone: 0
     readonly property int xrayDma: 1
     readonly property int xrayLayers: 2
@@ -76,7 +76,7 @@ SiC64InspectorWindow {
     }
 
     // A single bit of Opt.VICII_CUT_LAYERS, paired with the XRAY_COLORn slot
-    // it shares with XRayMode::XRAY_DMA (see DmaDebugger::cutLayers for the
+    // it shares with XRayMode::XRAY_DMA (see XRay::cutLayers for the
     // bit layout: sprites 0-7 in bits 0x01-0x80, background graphics in 0x200,
     // foreground graphics in 0x400, border in 0x800).
     component LayerRow: ChannelRow {
