@@ -52,9 +52,6 @@ SuMenuBar {
                 action: window.actions.openMemoryInspector
             }
             SuMenuItem {
-                action: window.actions.openBusInspector
-            }
-            SuMenuItem {
                 action: window.actions.openCIAInspector
             }
             SuMenuItem {
@@ -65,6 +62,13 @@ SuMenuBar {
             }
             SuMenuItem {
                 action: window.actions.openEventsInspector
+            }
+
+            SuMenuSeparator {
+            }
+
+            SuMenuItem {
+                action: window.actions.openXRayScanner
             }
         }
 

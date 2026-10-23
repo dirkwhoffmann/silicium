@@ -72,9 +72,6 @@ Item {
                     action: root.window.actions.openMemoryInspector
                 }
                 SuMenuItem {
-                    action: root.window.actions.openBusInspector
-                }
-                SuMenuItem {
                     action: root.window.actions.openCIAInspector
                 }
                 SuMenuItem {
@@ -85,6 +82,12 @@ Item {
                 }
                 SuMenuItem {
                     action: root.window.actions.openEventsInspector
+                }
+                SuMenuSeparator {
+
+                }
+                SuMenuItem {
+                    action: root.window.actions.openXRayScanner
                 }
             }
         }

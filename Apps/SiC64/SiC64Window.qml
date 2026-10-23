@@ -148,7 +148,7 @@ VMWindow {
         keyboardWindowRef: keyboardWindow
         eventsInspectorRef: eventsInspectorWindow
         ciaInspectorRef: ciaInspectorWindow
-        busInspectorRef: busInspectorWindow
+        xrayScannerRef: xrayScannerWindow
         cpuInspectorRef: cpuInspectorWindow
         memoryInspectorRef: memoryInspectorWindow
         vicInspectorRef: vicInspectorWindow
@@ -297,9 +297,9 @@ VMWindow {
         actions: root.actions
     }
 
-    SiC64BusPanel {
+    SiC64XRayPanel {
 
-        id: busInspectorWindow
+        id: xrayScannerWindow
         actions: root.actions
     }
 

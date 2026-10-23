@@ -16,9 +16,7 @@
 // VICII inspector controller -- port of the old Swift-based emulator's VICII
 // inspector (Inspector.swift's VICII tab / VICPanel.swift). Exposes the
 // video chip's counters, display/memory state, interrupt and lightpen
-// registers, the currently selected sprite's attributes, and the "cutter"
-// layer stencils (which write through to the VICII_CUT_LAYERS / _OPACITY
-// options).
+// registers and the currently selected sprite's attributes.
 //
 // Numeric fields honour the shared format setting (C64Controller::format).
 // The shared active flag, tick throttle and beam-position readout come from
@@ -133,24 +131,8 @@ class SiC64VICController : public SiC64InspectorController {
     Q_PROPERTY(QColor sprExtra1 READ sprExtra1 NOTIFY vicChanged)
     Q_PROPERTY(QColor sprExtra2 READ sprExtra2 NOTIFY vicChanged)
 
-    // Cutter (layer stencils). Cutting is the X-ray layer mode: enabling it
-    // switches XRAY_MODE to XRAY_LAYERS (with the overlay on), and the layer
-    // switches write through to the VICII_CUT_LAYERS bitmask. The opacity is
-    // the one of the X-ray overlay.
-    Q_PROPERTY(bool cutEnable READ cutEnable WRITE setCutEnable NOTIFY cutChanged)
-    Q_PROPERTY(bool cutBorder READ cutBorder WRITE setCutBorder NOTIFY cutChanged)
-    Q_PROPERTY(bool cutForeground READ cutForeground WRITE setCutForeground NOTIFY cutChanged)
-    Q_PROPERTY(bool cutBackground READ cutBackground WRITE setCutBackground NOTIFY cutChanged)
-    Q_PROPERTY(bool cutSprites READ cutSprites WRITE setCutSprites NOTIFY cutChanged)
-    Q_PROPERTY(int cutOpacity READ cutOpacity WRITE setCutOpacity NOTIFY cutChanged)
-    // Bit i of cutSpriteMask corresponds to sprite i (0..7).
-    Q_PROPERTY(int cutSpriteMask READ cutSpriteMask NOTIFY cutChanged)
-
     int selectedSprite() const { return m_selectedSprite; }
     void setSelectedSprite(int value);
-
-    // Per-sprite cutter toggle (sprite 0..7), driven from the panel.
-    Q_INVOKABLE void toggleCutSprite(int sprite);
 
   protected:
 
@@ -215,31 +197,7 @@ class SiC64VICController : public SiC64InspectorController {
     QColor sprExtra1() const { return m_sprExtra1; }
     QColor sprExtra2() const { return m_sprExtra2; }
 
-    // Cutter layer bitmask helpers (see VICPanel.swift's masks)
-    static constexpr int MaskBorder     = 0x0800;
-    static constexpr int MaskForeground = 0x0400;
-    static constexpr int MaskBackground = 0x0200;
-    static constexpr int MaskSprites    = 0x0100;
-
-    int cutLayers() const;
-    void setLayer(int mask, bool on);
-
-    bool cutEnable() const;
-    void setCutEnable(bool v);
-    bool cutBorder() const { return cutLayers() & MaskBorder; }
-    void setCutBorder(bool v) { setLayer(MaskBorder, v); }
-    bool cutForeground() const { return cutLayers() & MaskForeground; }
-    void setCutForeground(bool v) { setLayer(MaskForeground, v); }
-    bool cutBackground() const { return cutLayers() & MaskBackground; }
-    void setCutBackground(bool v) { setLayer(MaskBackground, v); }
-    bool cutSprites() const { return cutLayers() & MaskSprites; }
-    void setCutSprites(bool v) { setLayer(MaskSprites, v); }
-    int cutSpriteMask() const { return cutLayers() & 0xFF; }
-    int cutOpacity() const;
-    void setCutOpacity(int value);
-
   signals:
 
     void vicChanged();
-    void cutChanged();
 };

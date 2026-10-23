@@ -7,9 +7,9 @@
 // See https://www.gnu.org for license information
 // -----------------------------------------------------------------------------
 
-#include "SiC64BusController.h"
+#include "SiC64XRayController.h"
 
-SiC64BusController::SiC64BusController(C64Controller *parent)
+SiC64XRayController::SiC64XRayController(C64Controller *parent)
     : SiC64InspectorController(parent)
 {
 

@@ -26,7 +26,7 @@ Item {
     required property var keyboardWindowRef
     required property var eventsInspectorRef
     required property var ciaInspectorRef
-    required property var busInspectorRef
+    required property var xrayScannerRef
     required property var cpuInspectorRef
     required property var memoryInspectorRef
     required property var vicInspectorRef
@@ -55,7 +55,7 @@ Item {
     property alias quit: quitAction
     property alias openEventsInspector: openEventsInspectorAction
     property alias openCIAInspector: openCIAInspectorAction
-    property alias openBusInspector: openBusInspectorAction
+    property alias openXRayScanner: openXRayScannerAction
     property alias openCPUInspector: openCPUInspectorAction
     property alias openMemoryInspector: openMemoryInspectorAction
     property alias openVICInspector: openVICInspectorAction
@@ -151,13 +151,14 @@ Item {
 
     Action {
 
-        id: openBusInspectorAction
-        text: qsTr("Bus...")
+        id: openXRayScannerAction
+        text: qsTr("XRay...")
+        icon.name: "stack"
         onTriggered: {
 
-            busInspectorRef.show()
-            busInspectorRef.raise()
-            busInspectorRef.requestActivate()
+            xrayScannerRef.show()
+            xrayScannerRef.raise()
+            xrayScannerRef.requestActivate()
         }
     }
 

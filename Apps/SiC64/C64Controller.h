@@ -21,7 +21,7 @@
 #include "Keyboard/SiC64KeyboardController.h"
 #include "Inspector/Events/SiC64EventController.h"
 #include "Inspector/CIA/SiC64CIAController.h"
-#include "Inspector/Bus/SiC64BusController.h"
+#include "Inspector/XRay/SiC64XRayController.h"
 #include "Inspector/CPU/SiC64CPUController.h"
 #include "Inspector/Memory/SiC64MemoryController.h"
 #include "Inspector/VIC/SiC64VICController.h"
@@ -56,7 +56,7 @@ class C64Controller : public Controller {
 
     // Subcontrollers
     unique_ptr<SiC64ActivityController> m_activityController;
-    unique_ptr<SiC64BusController> m_busController;
+    unique_ptr<SiC64XRayController> m_xrayController;
     unique_ptr<SiC64CIAController> m_ciaController;
     unique_ptr<SiC64CPUController> m_cpuController;
     unique_ptr<SiC64MemoryController> m_memoryController;
@@ -242,7 +242,7 @@ public:
     Q_INVOKABLE void openKeyboard() {}
 
     Q_PROPERTY(SiC64ActivityController *activityController READ getActivityController CONSTANT)
-    Q_PROPERTY(SiC64BusController *busController READ getBusController CONSTANT)
+    Q_PROPERTY(SiC64XRayController *xrayController READ getXrayController CONSTANT)
     Q_PROPERTY(SiC64CIAController *ciaController READ getCIAController CONSTANT)
     Q_PROPERTY(SiC64CPUController *cpuController READ getCPUController CONSTANT)
     Q_PROPERTY(SiC64MemoryController *memoryController READ getMemoryController CONSTANT)
@@ -256,7 +256,7 @@ public:
     Q_PROPERTY(C64MediaController *media READ media CONSTANT)
 
     SiC64ActivityController *getActivityController() const { return m_activityController.get(); }
-    SiC64BusController *getBusController() const { return m_busController.get(); }
+    SiC64XRayController *getXrayController() const { return m_xrayController.get(); }
     SiC64CIAController *getCIAController() const { return m_ciaController.get(); }
     SiC64CPUController *getCPUController() const { return m_cpuController.get(); }
     SiC64MemoryController *getMemoryController() const { return m_memoryController.get(); }

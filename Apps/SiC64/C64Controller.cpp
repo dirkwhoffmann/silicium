@@ -72,7 +72,7 @@ C64Controller::C64Controller()
     m_keyboardController  = make_unique<SiC64KeyboardController>(this);
     m_eventController     = make_unique<SiC64EventController>(this);
     m_ciaController       = make_unique<SiC64CIAController>(this);
-    m_busController       = make_unique<SiC64BusController>(this);
+    m_xrayController      = make_unique<SiC64XRayController>(this);
     m_cpuController       = make_unique<SiC64CPUController>(this);
     m_memoryController    = make_unique<SiC64MemoryController>(this);
     m_vicController       = make_unique<SiC64VICController>(this);

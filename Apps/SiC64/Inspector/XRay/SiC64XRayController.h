@@ -12,7 +12,7 @@
 #include "Inspector/SiC64InspectorController.h"
 
 //
-// Bus inspector controller -- supplies SiC64BusPanel's inspector-window
+// X-Ray inspector controller -- supplies SiC64XRayPanel's inspector-window
 // chrome (currentController for the toolbar, the shared active flag, tick
 // throttle and beam-position readout from SiC64InspectorController). It owns
 // no properties of its own: the DMA debugger's settings are DMA_DEBUG_*
@@ -23,11 +23,11 @@
 
 class C64Controller;
 
-class SiC64BusController : public SiC64InspectorController {
+class SiC64XRayController : public SiC64InspectorController {
 
     Q_OBJECT
 
   public:
 
-    explicit SiC64BusController(C64Controller *parent = nullptr);
+    explicit SiC64XRayController(C64Controller *parent = nullptr);
 };

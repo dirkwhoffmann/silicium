@@ -119,7 +119,7 @@ SiC64Renderer::tick()
     controller->getActivityController()->update(cpuInfo.cycle, c64Info.frame, frame);
     controller->getEventController()->tick();
     controller->getCIAController()->tick();
-    controller->getBusController()->tick();
+    controller->getXrayController()->tick();
     controller->getCPUController()->tick();
     controller->getMemoryController()->tick();
     controller->getVICController()->tick();

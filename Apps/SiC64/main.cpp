@@ -17,7 +17,7 @@
 #include "SiC64ConfigController.h"
 #include "SiC64InfoController.h"
 #include "Inspector/SiC64InspectorController.h"
-#include "Inspector/Bus/SiC64DmaView.h"
+#include "Inspector/XRay/SiC64DmaView.h"
 #include "Inspector/Memory/SiC64Heatmap.h"
 #include "Inspector/SID/SiC64Waveform.h"
 #include "SiC64ActivityController.h"

@@ -458,12 +458,14 @@ SiC64ConfigController::restoreVideoDefaults()
 QColor
 SiC64ConfigController::dmaColor(Opt opt) const
 {
+    // The core keeps XRAY_COLORx as a GpuColor<TexelFormat::ABGR>, i.e., with
+    // red in the lowest byte
     u32 v = (u32)get(opt);
-    return QColor((v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF);
+    return QColor(v & 0xFF, (v >> 8) & 0xFF, (v >> 16) & 0xFF);
 }
 
 void
 SiC64ConfigController::setDmaColor(Opt opt, const QColor &c)
 {
-    set(opt, (i64(c.red()) << 16) | (i64(c.green()) << 8) | i64(c.blue()));
+    set(opt, (i64(0xFF) << 24) | (i64(c.blue()) << 16) | (i64(c.green()) << 8) | i64(c.red()));
 }

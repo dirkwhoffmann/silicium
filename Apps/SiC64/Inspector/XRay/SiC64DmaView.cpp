@@ -37,7 +37,7 @@ SiC64DmaView::connectToWindow(QQuickWindow *win)
 {
     // Grab a fresh DMA texture and repaint once per rendered frame, exactly
     // like SiC64Renderer. Because a hidden window emits no frames, this loop
-    // is naturally idle while the Bus inspector is closed.
+    // is naturally idle while the X-Ray inspector is closed.
     m_frameConnection = connect(win, &QQuickWindow::frameSwapped, this, [this]() {
         grab();
         update();

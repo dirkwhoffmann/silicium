@@ -1,0 +1,409 @@
+// -----------------------------------------------------------------------------
+// This file is part of Silicium UI
+//
+// Copyright (C) Dirk W. Hoffmann. www.dirkwhoffmann.de
+// Licensed under the GNU General Public License v3
+//
+// See https://www.gnu.org for license information
+// -----------------------------------------------------------------------------
+
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import Silicium.Components
+import Silicium.Controllers
+import Sulfur
+
+// The X-Ray inspector: the controls of the X-Ray debugger paired with a live
+// preview. The debugger always paints its raw visualization into its own
+// texture (VICII::xrayTexture, mirrored here by SiC64DmaView) whenever
+// XRAY_MODE is not XRAY_NONE, and only additionally blends it into the real
+// picture when XRAY_OVERLAY is also on -- so the preview works independently
+// of whether the live display is affected.
+SiC64InspectorWindow {
+
+    id: root
+
+    titleText: qsTr("X-Ray Inspector")
+    currentController: controller.xrayController
+
+    readonly property var cc: controller.configController
+    readonly property int tab: 21
+    readonly property int tabtab: 42
+
+    // Mirrors vc64::XRayMode (see DmaDebuggerTypes.h)
+    readonly property int xrayNone: 0
+    readonly property int xrayDma: 1
+    readonly property int xrayLayers: 2
+
+    // The channel rows only exist in the DMA and layer scans
+    readonly property bool hasChannels: cc.XRAY_MODE === xrayDma || cc.XRAY_MODE === xrayLayers
+
+    // Mirrors vc64::XRayCompositor
+    readonly property int xrayCompositorCpu: 0
+    readonly property int xrayCompositorGpu: 1
+
+    component ChannelRow: RowLayout {
+
+        id: chRow
+
+        required property string label
+        property bool on: false
+        property color swatch: "black"
+
+        signal toggled(bool value)
+        signal colorPicked(color value)
+
+        Layout.fillWidth: true
+        spacing: Style.mediumSpacing
+
+        SuLabeledCheckBox {
+
+            Layout.fillWidth: true
+            // indent: tab
+            checked: chRow.on
+            onClicked: chRow.toggled(checked)
+            r: chRow.label
+        }
+
+        HSpacer { }
+
+        SuColorWell {
+
+            value: chRow.swatch
+            onPicked: (value) => chRow.colorPicked(value)
+        }
+    }
+
+    // A single bit of Opt.VICII_CUT_LAYERS, paired with the XRAY_COLORn slot
+    // it shares with XRayMode::XRAY_DMA (see DmaDebugger::cutLayers for the
+    // bit layout: sprites 0-7 in bits 0x01-0x80, background graphics in 0x200,
+    // foreground graphics in 0x400, border in 0x800).
+    component LayerRow: ChannelRow {
+
+        required property int bit
+
+        on: (cc.VICII_CUT_LAYERS & bit) !== 0
+        onToggled: (value) => cc.VICII_CUT_LAYERS = value ?
+                       (cc.VICII_CUT_LAYERS | bit) :
+                       (cc.VICII_CUT_LAYERS & ~bit)
+    }
+
+    RowLayout {
+
+        anchors.fill: parent
+        anchors.margins: Style.mediumSpacing
+        spacing: Style.mediumSpacing
+
+        //
+        // X-Ray
+        //
+
+        ColumnLayout {
+
+            // A ColumnLayout whose only children are SiBoxes has no
+            // implicit width of its own, and Qt Quick Layouts defaults
+            // Layout.fillWidth to true for exactly that case -- so without
+            // fillWidth:false pinning it down, this column doesn't stay at
+            // its preferredWidth, it grabs a share of the RowLayout's
+            // left-over space instead, growing well past 280px and
+            // squeezing the Preview box (see SiC64CPUPanel.qml's Registers/
+            // Flags column for the same fix, found the same way).
+            Layout.preferredWidth: 280
+            Layout.fillWidth: false
+            Layout.fillHeight: true
+            spacing: Style.mediumSpacing
+
+            SiBox {
+
+                title: qsTr("X-Ray Control")
+                Layout.fillWidth: true
+                spacing: Style.tinySpacing
+
+                SuLabeledComboBox {
+
+                    Layout.fillWidth: true
+                    model: [qsTr("Off"), qsTr("DMA scan"), qsTr("Layer scan")]
+                    currentIndex: cc.XRAY_MODE
+                    onCurrentIndexChanged: cc.XRAY_MODE = currentIndex
+                }
+
+                //
+                // Overlay settings
+                //
+
+                VSpacer {
+
+                    visible: cc.XRAY_MODE !== xrayNone
+                    size: Style.smallSpacing
+                }
+
+                SuLabeledCheckBox {
+
+                    visible: cc.XRAY_MODE !== xrayNone
+                    checked: cc.XRAY_OVERLAY
+                    onClicked: cc.XRAY_OVERLAY = checked
+                    r: qsTr("Show as overlay")
+                }
+
+                SuLabeledComboBox {
+
+                    visible: cc.XRAY_MODE !== xrayNone
+                    indent: tab
+                    Layout.fillWidth: true
+                    enabled: cc.XRAY_OVERLAY
+                    model: [qsTr("Foreground layer"), qsTr("Background layer"), qsTr("Mixed layers")]
+                    currentIndex: cc.XRAY_OVERLAY_STYLE
+                    onCurrentIndexChanged: cc.XRAY_OVERLAY_STYLE = currentIndex
+                }
+
+                SuLabeledSlider {
+
+                    visible: cc.XRAY_MODE !== xrayNone
+                    indent: tab
+                    Layout.fillWidth: true
+                    enabled: cc.XRAY_OVERLAY
+                    from: 0
+                    to: 255
+                    value: cc.XRAY_OVERLAY_OPACITY
+                    onMoved: (value) => cc.XRAY_OVERLAY_OPACITY = value
+                }
+
+                SuLabeledCheckBox {
+
+                    visible: cc.XRAY_MODE !== xrayNone
+                    indent: tab
+                    enabled: cc.XRAY_OVERLAY
+                    checked: cc.XRAY_COMPOSITOR === xrayCompositorGpu
+                    onClicked: cc.XRAY_COMPOSITOR = checked ? xrayCompositorGpu : xrayCompositorCpu
+                    r: qsTr("GPU compositing")
+                }
+            }
+
+            VSpacer {
+
+                visible: !hasChannels
+            }
+
+            //
+            // Channels -- the DMA channel rows (DMA Debugger mode) or the
+            // hidden-layer rows (Layers mode), whichever XRAY_MODE selects.
+            // Its own box, below Controls, so a long list of rows scrolls
+            // within its own area instead of stretching (or overflowing)
+            // the whole panel -- same ScrollView-around-a-Layout trick used
+            // by SiC64CIAPanel's main grid.
+            //
+
+            SiBox {
+
+                title: qsTr("Channels")
+                visible: hasChannels
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                ScrollView {
+
+                    id: channelsScroll
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+                    contentWidth: channelsContent.width
+                    contentHeight: channelsContent.height
+
+                    // See SiC64CIAPanel.qml for why both dimensions are
+                    // driven explicitly like this: a Flickable's content
+                    // item only ever sizes to its own implicit size, so
+                    // without this a short list would leave the box's
+                    // bottom half blank instead of the rows simply
+                    // spanning it, and a long one wouldn't scroll at all.
+                    ColumnLayout {
+
+                        id: channelsContent
+
+                        width: Math.max(implicitWidth, channelsScroll.availableWidth)
+                        height: Math.max(implicitHeight, channelsScroll.availableHeight)
+                        spacing: Style.tinySpacing
+
+                        ChannelRow {
+                            visible: cc.XRAY_MODE === xrayDma
+                            label: qsTr("Refresh cycles")
+                            on: cc.XRAY_DMA_CHANNEL0; swatch: cc.XRAY_COLOR0
+                            onToggled: (value) => cc.XRAY_DMA_CHANNEL0 = value
+                            onColorPicked: (value) => cc.XRAY_COLOR0 = value
+                        }
+
+                        ChannelRow {
+                            visible: cc.XRAY_MODE === xrayDma
+                            label: qsTr("Idle reads")
+                            on: cc.XRAY_DMA_CHANNEL1; swatch: cc.XRAY_COLOR1
+                            onToggled: (value) => cc.XRAY_DMA_CHANNEL1 = value
+                            onColorPicked: (value) => cc.XRAY_COLOR1 = value
+                        }
+
+                        ChannelRow {
+                            visible: cc.XRAY_MODE === xrayDma
+                            label: qsTr("Character accesses")
+                            on: cc.XRAY_DMA_CHANNEL2; swatch: cc.XRAY_COLOR2
+                            onToggled: (value) => cc.XRAY_DMA_CHANNEL2 = value
+                            onColorPicked: (value) => cc.XRAY_COLOR2 = value
+                        }
+
+                        ChannelRow {
+                            visible: cc.XRAY_MODE === xrayDma
+                            label: qsTr("Graphics accesses")
+                            on: cc.XRAY_DMA_CHANNEL3; swatch: cc.XRAY_COLOR3
+                            onToggled: (value) => cc.XRAY_DMA_CHANNEL3 = value
+                            onColorPicked: (value) => cc.XRAY_COLOR3 = value
+                        }
+
+                        ChannelRow {
+                            visible: cc.XRAY_MODE === xrayDma
+                            label: qsTr("Sprite-pointer accesses")
+                            on: cc.XRAY_DMA_CHANNEL4; swatch: cc.XRAY_COLOR4
+                            onToggled: (value) => cc.XRAY_DMA_CHANNEL4 = value
+                            onColorPicked: (value) => cc.XRAY_COLOR4 = value
+                        }
+
+                        ChannelRow {
+                            visible: cc.XRAY_MODE === xrayDma
+                            label: qsTr("Sprite-data accesses")
+                            on: cc.XRAY_DMA_CHANNEL5; swatch: cc.XRAY_COLOR5
+                            onToggled: (value) => cc.XRAY_DMA_CHANNEL5 = value
+                            onColorPicked: (value) => cc.XRAY_COLOR5 = value
+                        }
+
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Sprite 0"); bit: 0x01
+                            swatch: cc.XRAY_COLOR0
+                            onColorPicked: (value) => cc.XRAY_COLOR0 = value
+                        }
+
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Sprite 1"); bit: 0x02
+                            swatch: cc.XRAY_COLOR1
+                            onColorPicked: (value) => cc.XRAY_COLOR1 = value
+                        }
+
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Sprite 2"); bit: 0x04
+                            swatch: cc.XRAY_COLOR2
+                            onColorPicked: (value) => cc.XRAY_COLOR2 = value
+                        }
+
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Sprite 3"); bit: 0x08
+                            swatch: cc.XRAY_COLOR3
+                            onColorPicked: (value) => cc.XRAY_COLOR3 = value
+                        }
+
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Sprite 4"); bit: 0x10
+                            swatch: cc.XRAY_COLOR4
+                            onColorPicked: (value) => cc.XRAY_COLOR4 = value
+                        }
+
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Sprite 5"); bit: 0x20
+                            swatch: cc.XRAY_COLOR5
+                            onColorPicked: (value) => cc.XRAY_COLOR5 = value
+                        }
+
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Sprite 6"); bit: 0x40
+                            swatch: cc.XRAY_COLOR6
+                            onColorPicked: (value) => cc.XRAY_COLOR6 = value
+                        }
+
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Sprite 7"); bit: 0x80
+                            swatch: cc.XRAY_COLOR7
+                            onColorPicked: (value) => cc.XRAY_COLOR7 = value
+                        }
+
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Border"); bit: 0x800
+                            swatch: cc.XRAY_COLOR8
+                            onColorPicked: (value) => cc.XRAY_COLOR8 = value
+                        }
+
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Foreground"); bit: 0x400
+                            swatch: cc.XRAY_COLOR9
+                            onColorPicked: (value) => cc.XRAY_COLOR9 = value
+                        }
+
+                        LayerRow {
+                            visible: cc.XRAY_MODE === xrayLayers
+                            label: qsTr("Background"); bit: 0x200
+                            swatch: cc.XRAY_COLOR10
+                            onColorPicked: (value) => cc.XRAY_COLOR10 = value
+                        }
+                    }
+                }
+            }
+        }
+
+        //
+        // Live preview
+        //
+
+        SiBox {
+
+            title: qsTr("Preview")
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            padding: 0
+
+            Rectangle {
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                visible: cc.XRAY_MODE !== xrayNone
+                color: "black"
+                border.width: 1
+                border.color: Palette.surfaceBorder
+                radius: Style.radius
+                clip: true
+
+                SiC64DmaView {
+
+                    // Inset by the corner radius so the texture never
+                    // reaches the rounded corners -- the black rectangle
+                    // shows through there, blending with the view's own
+                    // black background.
+                    anchors.fill: parent
+                    anchors.margins: Style.radius
+                }
+            }
+
+            // Placeholder shown while X-Ray is off
+            Item {
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                visible: cc.XRAY_MODE === xrayNone
+
+                SuSymbol {
+
+                    anchors.centerIn: parent
+                    phosphor: "eye"
+                    // Scales with the cell -- size the glyph in pixels directly.
+                    width: Math.min(parent.width, parent.height) * 0.75
+                    height: width
+                    color: Palette.disabled
+                }
+            }
+        }
+    }
+}

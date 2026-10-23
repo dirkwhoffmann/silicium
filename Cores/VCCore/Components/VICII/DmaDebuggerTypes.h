@@ -146,7 +146,7 @@ typedef struct
     u8 dmaOpacity;
     
     // Layers cut out in XRayMode::XRAY_LAYERS
-    // Bits 0 - 7: sprites, 8: sprites at all, 9: background, 10: foreground, 11: border
+    // Bits 0 - 7: sprites, 9: background, 10: foreground, 11: border
     u16 cutLayers;
 }
 DmaDebuggerConfig;

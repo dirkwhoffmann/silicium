@@ -129,10 +129,6 @@ SiC64VICController::refreshData()
     m_sprExtra2 = color(spr.extraColor2);
 
     emit vicChanged();
-
-    // The cutter fields are read live from the config options, but a refresh
-    // is a good moment to let any external change propagate.
-    emit cutChanged();
 }
 
 void
@@ -144,70 +140,5 @@ SiC64VICController::setSelectedSprite(int value)
 
         m_selectedSprite = value;
         refresh();
-    }
-}
-
-int
-SiC64VICController::cutLayers() const
-{
-    return parent->getConfigController()->vicCutLayers();
-}
-
-void
-SiC64VICController::setLayer(int mask, bool on)
-{
-    int layers = cutLayers();
-    int updated = on ? (layers | mask) : (layers & ~mask);
-
-    if (updated != layers) {
-
-        parent->getConfigController()->setVicCutLayers(updated);
-        emit cutChanged();
-    }
-}
-
-void
-SiC64VICController::toggleCutSprite(int sprite)
-{
-    if (sprite < 0 || sprite > 7) return;
-    setLayer(1 << sprite, !(cutLayers() & (1 << sprite)));
-}
-
-bool
-SiC64VICController::cutEnable() const
-{
-    return parent->getConfigController()->xrayMode() == (int)vc64::XRayMode::XRAY_LAYERS;
-}
-
-void
-SiC64VICController::setCutEnable(bool value)
-{
-    auto *config = parent->getConfigController();
-
-    if (value) {
-
-        config->setXrayMode((int)vc64::XRayMode::XRAY_LAYERS);
-        config->setDmaDebugOverlay(true);
-
-    } else if (cutEnable()) {
-
-        config->setXrayMode((int)vc64::XRayMode::XRAY_NONE);
-    }
-    emit cutChanged();
-}
-
-int
-SiC64VICController::cutOpacity() const
-{
-    return parent->getConfigController()->dmaDebugOpacity();
-}
-
-void
-SiC64VICController::setCutOpacity(int value)
-{
-    if (value != cutOpacity()) {
-
-        parent->getConfigController()->setDmaDebugOpacity(value);
-        emit cutChanged();
     }
 }

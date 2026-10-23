@@ -238,7 +238,7 @@ DmaDebugger::cutLayers()
 
             case DEPTH_SPRITE_BG & 0xE0:
             case DEPTH_SPRITE_FG & 0xE0:
-                if ((config.cutLayers & 0x100) && GET_BIT(config.cutLayers, zBuffer[i] & 0xF)) {
+                if (GET_BIT(config.cutLayers, zBuffer[i] & 0xF)) {
                     slot = zBuffer[i] & 0xF;
                 }
                 break;

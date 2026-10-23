@@ -15,12 +15,12 @@
 
 //
 // Port of the old Swift-based emulator's DmaView (DmaView.swift): the live
-// preview of the VICII DMA debugger's texture shown in the Bus inspector.
+// preview of the VICII DMA debugger's texture shown in the X-Ray inspector.
 //
 // A self-contained QQuickItem that mirrors SiC64Renderer's texture plumbing
 // but for the DMA texture (VideoPort::getXrayTexture). It self-drives off its
 // window's frameSwapped signal while visible -- so it only renders while the
-// Bus inspector window is actually on screen -- and needs no controller
+// X-Ray inspector window is actually on screen -- and needs no controller
 // wiring beyond the static core() accessor.
 //
 
@@ -47,7 +47,7 @@ class SiC64DmaView : public QQuickItem {
 
     // Connects/disconnects the frameSwapped grab loop as the item enters or
     // leaves a window, so the view is live exactly while it's in a scene (and
-    // naturally idle while the Bus inspector window is hidden, since a hidden
+    // naturally idle while the X-Ray inspector window is hidden, since a hidden
     // window emits no frames).
     void itemChange(ItemChange change, const ItemChangeData &value) override;
 

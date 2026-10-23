@@ -19,8 +19,8 @@ target_sources(SiC64 PRIVATE
         Inspector/Events/SiC64EventController.cpp
         Inspector/Events/SiC64EventTableModel.cpp
         Inspector/CIA/SiC64CIAController.cpp
-        Inspector/Bus/SiC64BusController.cpp
-        Inspector/Bus/SiC64DmaView.cpp
+        Inspector/XRay/SiC64XRayController.cpp
+        Inspector/XRay/SiC64DmaView.cpp
         Inspector/CPU/SiC64CPUController.cpp
         Inspector/CPU/SiC64InstructionModel.cpp
         Inspector/CPU/SiC64TraceModel.cpp
