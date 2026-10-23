@@ -33,10 +33,17 @@ Item {
 
     width: panel.implicitWidth + 2 * Style.largeSpacing
     height: panel.implicitHeight + 2 * Style.largeSpacing
-    y: shown ? slideTop - 1 : slideTop - height
-    visible: y > slideTop - height
 
-    Behavior on y {
+    /* How far the sheet has slid out (0 = hidden, 1 = shown). Only this is
+     * animated, not y itself: y also follows slideTop, which jumps when the
+     * toolbar is shown or hidden, and a hidden sheet must not slide along.
+     */
+    property real reveal: shown ? 1 : 0
+
+    y: slideTop - height + reveal * (height - 1)
+    visible: reveal > 0
+
+    Behavior on reveal {
 
         NumberAnimation {
 
