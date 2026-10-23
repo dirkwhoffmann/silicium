@@ -133,8 +133,10 @@ class SiC64VICController : public SiC64InspectorController {
     Q_PROPERTY(QColor sprExtra1 READ sprExtra1 NOTIFY vicChanged)
     Q_PROPERTY(QColor sprExtra2 READ sprExtra2 NOTIFY vicChanged)
 
-    // Cutter (layer stencils). These write straight through to the
-    // VICII_CUT_LAYERS bitmask / VICII_CUT_OPACITY options.
+    // Cutter (layer stencils). Cutting is the X-ray layer mode: enabling it
+    // switches XRAY_MODE to XRAY_LAYERS (with the overlay on), and the layer
+    // switches write through to the VICII_CUT_LAYERS bitmask. The opacity is
+    // the one of the X-ray overlay.
     Q_PROPERTY(bool cutEnable READ cutEnable WRITE setCutEnable NOTIFY cutChanged)
     Q_PROPERTY(bool cutBorder READ cutBorder WRITE setCutBorder NOTIFY cutChanged)
     Q_PROPERTY(bool cutForeground READ cutForeground WRITE setCutForeground NOTIFY cutChanged)
@@ -214,7 +216,6 @@ class SiC64VICController : public SiC64InspectorController {
     QColor sprExtra2() const { return m_sprExtra2; }
 
     // Cutter layer bitmask helpers (see VICPanel.swift's masks)
-    static constexpr int MaskEnable     = 0x1000;
     static constexpr int MaskBorder     = 0x0800;
     static constexpr int MaskForeground = 0x0400;
     static constexpr int MaskBackground = 0x0200;
@@ -223,8 +224,8 @@ class SiC64VICController : public SiC64InspectorController {
     int cutLayers() const;
     void setLayer(int mask, bool on);
 
-    bool cutEnable() const { return cutLayers() & MaskEnable; }
-    void setCutEnable(bool v) { setLayer(MaskEnable, v); }
+    bool cutEnable() const;
+    void setCutEnable(bool v);
     bool cutBorder() const { return cutLayers() & MaskBorder; }
     void setCutBorder(bool v) { setLayer(MaskBorder, v); }
     bool cutForeground() const { return cutLayers() & MaskForeground; }

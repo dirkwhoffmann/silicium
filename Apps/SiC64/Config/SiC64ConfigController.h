@@ -256,7 +256,6 @@ class SiC64ConfigController : public Controller {
     Q_PROPERTY(int VICII_GRAY_DOT_BUG READ vicGrayDotBug WRITE setVicGrayDotBug NOTIFY configChanged)
     Q_PROPERTY(bool VICII_HIDE_SPRITES READ vicHideSprites WRITE setVicHideSprites NOTIFY configChanged)
     Q_PROPERTY(int VICII_CUT_LAYERS READ vicCutLayers WRITE setVicCutLayers NOTIFY configChanged)
-    Q_PROPERTY(int VICII_CUT_OPACITY READ vicCutOpacity WRITE setVicCutOpacity NOTIFY configChanged)
     Q_PROPERTY(int CIA_REVISION READ ciaRevision WRITE setCiaRevision NOTIFY configChanged)
     Q_PROPERTY(bool CIA_TIMER_B_BUG READ ciaTimerBBug WRITE setCiaTimerBBug NOTIFY configChanged)
     Q_PROPERTY(int SID_REV READ sidRevision WRITE setSidRevision NOTIFY configChanged)
@@ -288,8 +287,6 @@ class SiC64ConfigController : public Controller {
     void setVicHideSprites(bool value) { set(vc64::Opt::VICII_HIDE_SPRITES, (i64)value); }
     int vicCutLayers() const { return (int)get(vc64::Opt::VICII_CUT_LAYERS); }
     void setVicCutLayers(int value) { set(vc64::Opt::VICII_CUT_LAYERS, (i64)value); }
-    int vicCutOpacity() const { return (int)get(vc64::Opt::VICII_CUT_OPACITY); }
-    void setVicCutOpacity(int value) { set(vc64::Opt::VICII_CUT_OPACITY, (i64)value); }
     int ciaRevision() const { return (int)get(vc64::Opt::CIA_REVISION); }
     void setCiaRevision(int value) { set(vc64::Opt::CIA_REVISION, (i64)value); }
     bool ciaTimerBBug() const { return (bool)get(vc64::Opt::CIA_TIMER_B_BUG); }
@@ -607,6 +604,11 @@ class SiC64ConfigController : public Controller {
     Q_PROPERTY(QColor XRAY_COLOR3 READ dmaDebugColor3 WRITE setDmaDebugColor3 NOTIFY configChanged)
     Q_PROPERTY(QColor XRAY_COLOR4 READ dmaDebugColor4 WRITE setDmaDebugColor4 NOTIFY configChanged)
     Q_PROPERTY(QColor XRAY_COLOR5 READ dmaDebugColor5 WRITE setDmaDebugColor5 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR6 READ dmaDebugColor6 WRITE setDmaDebugColor6 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR7 READ dmaDebugColor7 WRITE setDmaDebugColor7 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR8 READ dmaDebugColor8 WRITE setDmaDebugColor8 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR9 READ dmaDebugColor9 WRITE setDmaDebugColor9 NOTIFY configChanged)
+    Q_PROPERTY(QColor XRAY_COLOR10 READ dmaDebugColor10 WRITE setDmaDebugColor10 NOTIFY configChanged)
 
     int xrayMode() const { return (int)get(vc64::Opt::XRAY_MODE); }
     void setXrayMode(int value) { set(vc64::Opt::XRAY_MODE, (i64)value); }
@@ -642,6 +644,16 @@ class SiC64ConfigController : public Controller {
     void setDmaDebugColor4(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR4, c); }
     QColor dmaDebugColor5() const { return dmaColor(vc64::Opt::XRAY_COLOR5); }
     void setDmaDebugColor5(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR5, c); }
+    QColor dmaDebugColor6() const { return dmaColor(vc64::Opt::XRAY_COLOR6); }
+    void setDmaDebugColor6(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR6, c); }
+    QColor dmaDebugColor7() const { return dmaColor(vc64::Opt::XRAY_COLOR7); }
+    void setDmaDebugColor7(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR7, c); }
+    QColor dmaDebugColor8() const { return dmaColor(vc64::Opt::XRAY_COLOR8); }
+    void setDmaDebugColor8(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR8, c); }
+    QColor dmaDebugColor9() const { return dmaColor(vc64::Opt::XRAY_COLOR9); }
+    void setDmaDebugColor9(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR9, c); }
+    QColor dmaDebugColor10() const { return dmaColor(vc64::Opt::XRAY_COLOR10); }
+    void setDmaDebugColor10(const QColor &c) { setDmaColor(vc64::Opt::XRAY_COLOR10, c); }
 
     //
     // Helpers

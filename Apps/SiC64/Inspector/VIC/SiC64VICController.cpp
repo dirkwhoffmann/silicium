@@ -173,10 +173,33 @@ SiC64VICController::toggleCutSprite(int sprite)
     setLayer(1 << sprite, !(cutLayers() & (1 << sprite)));
 }
 
+bool
+SiC64VICController::cutEnable() const
+{
+    return parent->getConfigController()->xrayMode() == (int)vc64::XRayMode::XRAY_LAYERS;
+}
+
+void
+SiC64VICController::setCutEnable(bool value)
+{
+    auto *config = parent->getConfigController();
+
+    if (value) {
+
+        config->setXrayMode((int)vc64::XRayMode::XRAY_LAYERS);
+        config->setDmaDebugOverlay(true);
+
+    } else if (cutEnable()) {
+
+        config->setXrayMode((int)vc64::XRayMode::XRAY_NONE);
+    }
+    emit cutChanged();
+}
+
 int
 SiC64VICController::cutOpacity() const
 {
-    return parent->getConfigController()->vicCutOpacity();
+    return parent->getConfigController()->dmaDebugOpacity();
 }
 
 void
@@ -184,7 +207,7 @@ SiC64VICController::setCutOpacity(int value)
 {
     if (value != cutOpacity()) {
 
-        parent->getConfigController()->setVicCutOpacity(value);
+        parent->getConfigController()->setDmaDebugOpacity(value);
         emit cutChanged();
     }
 }

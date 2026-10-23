@@ -133,7 +133,7 @@ SiC64Renderer::tick()
     try {
 
         blend = core.get(vc64::Opt::XRAY_OVERLAY)
-            && core.get(vc64::Opt::XRAY_MODE) == (i64)vc64::XRayMode::XRAY_DMA
+            && core.get(vc64::Opt::XRAY_MODE) != (i64)vc64::XRayMode::XRAY_NONE
             && core.get(vc64::Opt::XRAY_COMPOSITOR) == (i64)vc64::XRayCompositor::GPU;
 
         xrayStyle = float(core.get(vc64::Opt::XRAY_OVERLAY_STYLE));
