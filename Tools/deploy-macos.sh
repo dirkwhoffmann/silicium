@@ -59,7 +59,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 BUILD_DIR="$ROOT_DIR/build"
 OUT_DIR="$BUILD_DIR/dist"
-APPS=(silicium SiC64 SiAmiga)
+APPS=(Silicium SiC64 SiAmiga)
 
 DO_BUILD=0
 DO_SMOKE_TEST=1
@@ -626,7 +626,7 @@ if [ "$DO_NOTARIZE" -eq 1 ]; then
 cat <<EOF
 
     Copy ALL bundles to the target machine -- the Hub launches SiC64 and
-    SiAmiga as separate processes, so silicium.app alone cannot start a
+    SiAmiga as separate processes, so Silicium.app alone cannot start a
     machine.
 
     Signed with "$IDENTITY", notarized and stapled. They open by
@@ -635,19 +635,19 @@ cat <<EOF
 
     To confirm on the target machine before handing it out:
 
-        spctl -a -t exec -vv /path/to/silicium.app
+        spctl -a -t exec -vv /path/to/Silicium.app
 EOF
 else
 cat <<EOF
 
     Copy ALL bundles to the target machine -- the Hub launches SiC64 and
-    SiAmiga as separate processes, so silicium.app alone cannot start a
+    SiAmiga as separate processes, so Silicium.app alone cannot start a
     machine.
 
     They are ad-hoc signed, not notarized. On the target machine, clear the
     quarantine flag once after copying:
 
-        xattr -dr com.apple.quarantine /path/to/silicium.app
+        xattr -dr com.apple.quarantine /path/to/Silicium.app
         xattr -dr com.apple.quarantine /path/to/SiC64.app
         xattr -dr com.apple.quarantine /path/to/SiAmiga.app
 

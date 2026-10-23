@@ -181,6 +181,11 @@ set_target_properties(silicium PROPERTIES
         MACOSX_BUNDLE_BUNDLE_VERSION "${SI_BUILD_VERSION}"
         MACOSX_BUNDLE_COPYRIGHT "${SI_COPYRIGHT}")
 
+# The bundle is called Silicium.app (the target keeps its lower-case name)
+if(APPLE)
+    set_target_properties(silicium PROPERTIES OUTPUT_NAME "Silicium")
+endif()
+
 si_app_icon(silicium SiIcon)
 
 # The binary dir carries the generated version.h, which config.h includes.
