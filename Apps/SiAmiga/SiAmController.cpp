@@ -414,7 +414,7 @@ SiAmController::windowDidOpen()
     for (const auto &command : execCommands) {
 
         qCDebug(siLog).noquote() << "Executing command: '" << command << "'";
-        core().retroShell.execScript(command);
+        core().retroShell.execScriptAsync(command);
     }
 
     startRenderer();
