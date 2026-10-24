@@ -1452,6 +1452,7 @@ SiAmController::process(const Message &msg, const string &attachment, std::excep
         case Msg::RSH_UPDATE:
         case Msg::RSH_SWITCH:
         case Msg::RSH_WAIT:
+        case Msg::RSH_DONE:
         case Msg::RSH_ERROR:
 
             m_retroShellIsDirty = true;

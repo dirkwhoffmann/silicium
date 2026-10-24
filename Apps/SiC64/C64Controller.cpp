@@ -1263,6 +1263,7 @@ C64Controller::process(const Message &msg, const string &attachment, std::except
         case Msg::RSH_SWITCH:
         case Msg::RSH_DEBUGGER:
         case Msg::RSH_WAIT:
+        case Msg::RSH_DONE:
         case Msg::RSH_ERROR: {
 
             m_retroShellIsDirty = true;
