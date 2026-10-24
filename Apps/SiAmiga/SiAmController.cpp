@@ -1002,27 +1002,47 @@ SiAmController::softReset()
 }
 
 void
+SiAmController::step(const std::function<void()> &action)
+{
+    try {
+
+        action();
+
+    } catch (const vamiga::CoreError &e) {
+
+        // Stepping while the emulator is running is a harmless misclick
+        if (e.payload != vamiga::CoreError::RUNNING) {
+            showError(tr("The emulator refuses to step."), e.what());
+        }
+
+    } catch (const std::exception &e) {
+
+        showError(tr("The emulator refuses to step."), e.what());
+    }
+}
+
+void
 SiAmController::stepOver()
 {
-    core().stepOver();
+    step([] { core().stepOver(); });
 }
 
 void
 SiAmController::stepInto()
 {
-    core().stepInto();
+    step([] { core().stepInto(); });
 }
 
 void
 SiAmController::finishLine()
 {
-    core().finishLine();
+    step([] { core().finishLine(); });
 }
 
 void
 SiAmController::finishFrame()
 {
-    core().finishFrame();
+    step([] { core().finishFrame(); });
 }
 
 void

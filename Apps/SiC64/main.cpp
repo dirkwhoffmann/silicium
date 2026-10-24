@@ -104,11 +104,12 @@ main(int argc, char *argv[])
      * them lands in process(), which marshals onto a Qt event loop that no
      * longer exists.
      *
-     * Order matters: detach first, then halt. halt() only queues a command
-     * for the emulator thread, which answers it by posting Msg::SHUTDOWN --
-     * so halting first would emit exactly the message this is meant to
-     * avoid. Detaching is synchronised against delivery inside MsgQueue, so
-     * it is safe to do while that thread is running.
+     * Order matters: detach first, then halt. halt() sends a command to the
+     * emulator thread and waits until the thread has terminated. The thread
+     * answers the command by posting Msg::SHUTDOWN -- so halting first would
+     * emit exactly the message this is meant to avoid. Detaching is
+     * synchronised against delivery inside MsgQueue, so it is safe to do
+     * while that thread is running.
      *
      * Without this the app segfaults on quit whenever nothing else halted
      * the core first, which is the case when it opens the About dialog

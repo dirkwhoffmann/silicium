@@ -695,33 +695,53 @@ C64Controller::brk()
 }
 
 void
+C64Controller::step(const std::function<void()> &action)
+{
+    try {
+
+        action();
+
+    } catch (const vc64::CoreError &e) {
+
+        // Stepping while the emulator is running is a harmless misclick
+        if (e.payload != vc64::CoreError::RUNNING) {
+            showError(tr("The emulator refuses to step."), e.what());
+        }
+
+    } catch (const std::exception &e) {
+
+        showError(tr("The emulator refuses to step."), e.what());
+    }
+}
+
+void
 C64Controller::stepOver()
 {
-    core().stepOver();
+    step([] { core().stepOver(); });
 }
 
 void
 C64Controller::stepInto()
 {
-    core().stepInto();
+    step([] { core().stepInto(); });
 }
 
 void
 C64Controller::stepCycle()
 {
-    core().stepCycle();
+    step([] { core().stepCycle(); });
 }
 
 void
 C64Controller::finishLine()
 {
-    core().finishLine();
+    step([] { core().finishLine(); });
 }
 
 void
 C64Controller::finishFrame()
 {
-    core().finishFrame();
+    step([] { core().finishFrame(); });
 }
 
 void
