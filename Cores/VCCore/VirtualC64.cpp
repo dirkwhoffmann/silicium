@@ -498,6 +498,15 @@ VirtualC64::setAsync(Opt opt, i64 value, long id)
 }
 
 void
+VirtualC64::sync()
+{
+    VC64_PUBLIC
+
+    // A command that does nothing: once it has been carried out, so has everything before it
+    emu->sendAndWait(Command(Cmd::NONE));
+}
+
+void
 VirtualC64::exportConfig(const fs::path &path) const
 {
     VC64_PUBLIC_SUSPEND

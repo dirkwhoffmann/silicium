@@ -142,8 +142,7 @@ SiAmController::initialize()
     }
 
     // Registering the listener and starting the emulator thread happen
-    // together on this core's API (unlike VirtualC64, which splits them into
-    // launch() and a separate setListener()).
+    // together.
     core().launch(this, ::process);
 
     /* Ask the emulator thread to snapshot every component as it runs.

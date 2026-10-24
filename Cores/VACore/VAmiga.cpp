@@ -2460,17 +2460,8 @@ VAmiga::sync()
 {
     VAMIGA_PUBLIC
 
-    /* A suspended thread is parked and a halted one is gone, so neither is
-     * going to empty the queue. Waiting on them is a caller's mistake rather
-     * than something to sit through, hence the assertion; in a release build
-     * it returns instead of hanging.
-     */
-    assert(!emu->isSuspended());
-    if (!emu->isLaunched() || emu->isHalted() || emu->isSuspended()) return;
-
-    // The thread sleeps between frames, so nudge it rather than wait for it
-    emu->wakeUp();
-    emu->cmdQueue.wait();
+    // A command that does nothing: once it has been carried out, so has everything before it
+    emu->sendAndWait(Command(Cmd::NONE));
 }
 
 void

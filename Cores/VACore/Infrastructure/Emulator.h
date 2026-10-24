@@ -194,9 +194,9 @@ public:
 
     /* Sends a command and returns a future that becomes ready once the
      * emulator thread has carried it out. A command that fails makes get()
-     * throw the exception. Like CmdQueue::wait(), this only works while the
-     * emulator thread is running: a thread that polls nothing never fulfills
-     * the promise, so waiting on the future would block forever.
+     * throw the exception. This only works while the emulator
+     * thread is running: a thread that polls nothing never fulfills the
+     * promise, so waiting on the future would block forever.
      */
     std::future<void> send(const Command &cmd, const string &str = "");
 

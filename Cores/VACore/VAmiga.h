@@ -1775,7 +1775,7 @@ public:
     /// @{
 
     /** @brief  Executes a script.
-     *  The script is executes asynchroneously. However, RetroShell will
+     *  The script is executed asynchronously. However, RetroShell will
      *  send messages back to the GUI thread to inform about the execution
      *  state. After the last script command has been executed,
      *  MSG\_SCRIPT\_DONE is sent. If shell execution has been aborted due
@@ -1965,7 +1965,7 @@ public:
     bool isTracking() const;
     
     /** @brief  Checks if the emulator is runnable.
-     *  The function checks if the necessary ROMs are installed to lauch the
+     *  The function checks if the necessary ROMs are installed to launch the
      *  emulator. On success, the functions returns. Otherwise, an exception
      *  is thrown.
      */
@@ -1978,16 +1978,22 @@ public:
     
     /** @brief  Switches the emulator on
      *
-     *  Powering on the emulator changes the interal state to #STATE\_PAUSED,
+     *  Powering on the emulator changes the internal state to #STATE\_PAUSED,
      *  the same state that is entered when the user hits the pause button.
      *  Calling this function on an already powered-on emulator has no effect.
+     *
+     *  @note The request is queued and carried out asynchronously by the emulator
+     *  thread. Use sync() to wait for it.
      *  */
     void powerOn();
     
     /** @brief  Switches the emulator off
      *
-     *  Powering off the emulator changes the interal state of #STATE\_OFF.
+     *  Powering off the emulator changes the internal state to #STATE\_OFF.
      *  Calling this function on an already powered-off emulator has no effect.
+     *
+     *  @note The request is queued and carried out asynchronously by the emulator
+     *  thread. Use sync() to wait for it.
      */
     void powerOff();
     
@@ -1996,16 +2002,23 @@ public:
      *  Running the emulator changes the internal state to #STATE\_RUNNING,
      *  which is the normal operation state. Frames are computed at normal
      *  pace, if warp mode is switched off, or as fast as possible, if warp
-     *  mode is switched on. If this function is called for a powere-off
+     *  mode is switched on. If this function is called for a powered-off
      *  emulator, an implicit call to powerOn() will be performed.
+     *
+     *  @throw CoreError if the emulator is not ready to run (see isReady()). The
+     *  request itself is queued and carried out asynchronously by the emulator
+     *  thread. Use sync() to wait for it.
      */
     void run();
     
     /** @brief   Pauses emulation
      *
-     * Pausing the emulator changes the interal state from #STATE\_RUNNING
-     * to #STATE\_PAUSED after completing the curent frame. The emulator
-     * enteres a frozes state where no more frames are computed.
+     * Pausing the emulator changes the internal state from #STATE\_RUNNING
+     * to #STATE\_PAUSED after completing the current frame. The emulator
+     * enters a frozen state where no more frames are computed.
+     *
+     *  @note The request is queued and carried out asynchronously by the emulator
+     *  thread. Use sync() to wait for it.
      */
     void pause();
     
@@ -2013,12 +2026,18 @@ public:
      *
      *  A hard reset affects all components. The effect is similar to
      *  switching power off and on.
+     *
+     *  @note The request is queued and carried out asynchronously by the emulator
+     *  thread. Use sync() to wait for it.
      */
     void hardReset();
     
     /** @brief   Performs a soft reset
      *
      *  A soft reset is similar to executing the CPU's reset instruction.
+     *
+     *  @note The request is queued and carried out asynchronously by the emulator
+     *  thread. Use sync() to wait for it.
      */
     void softReset();
     
@@ -2027,22 +2046,34 @@ public:
      *  Halting the emulator changes the internal state to #STATE\_HALTED.
      *  This state is part of the shutdown procedure and never entered during
      *  normal operation.
+     *
+     *  @note The function blocks until the emulator thread has terminated.
      */
     void halt();
     
     /** @brief  Enables warp mode.
+     *
+     *  @note The request is queued and carried out asynchronously by the emulator
+     *  thread. Use sync() to wait for it.
      */
     void warpOn(isize source = 0);
     
     /** @brief  Disables warp mode.
+     *
+     *  @note The request is queued and carried out asynchronously by the emulator
+     *  thread. Use sync() to wait for it.
      */
     void warpOff(isize source = 0);
     
     /** @brief  Enables track mode.
+     *
+     *  @note The change is made synchronously (the emulator is suspended meanwhile).
      */
     void trackOn(isize source = 0);
     
     /** @brief  Disables track mode.
+     *
+     *  @note The change is made synchronously (the emulator is suspended meanwhile).
      */
     void trackOff(isize source = 0);
     
@@ -2057,6 +2088,9 @@ public:
      *  a single instruction. Otherwise, calling this function
      *  has no effect. The CPU debugger utilizes this function to implement single
      *  stepping.
+     *
+     *  @note The run state is changed right away in the calling thread, not
+     *  through the command queue.
      */
     void stepInto();
     
@@ -2076,20 +2110,29 @@ public:
      *  returns, the emulator will remain in running state. Calling this
      *  function will then be equivalent to a calling run(), with the exception
      *  of a small runtime overhead since the emulator will check after the
-     *  each instruction if the program counter has reached it's target
+     *  each instruction if the program counter has reached its target
      *  location.
+     *
+     *  @note The run state is changed right away in the calling thread, not
+     *  through the command queue.
      */
     void stepOver();
     
-    /** @brief  Fnishes the current rasterline
+    /** @brief  Finishes the current rasterline
      *
-     *  Calling this functions runs the CPU until the end of the current rasterline.
+     *  Calling this function runs the CPU until the end of the current rasterline.
+     *
+     *  @note The run state is changed right away in the calling thread, not
+     *  through the command queue.
      */
     void finishLine();
     
-    /** @brief  Fnishes the current frame
+    /** @brief  Finishes the current frame
      *
-     *  Calling this functions runs the CPU until the end of the current frame.
+     *  Calling this function runs the CPU until the end of the current frame.
+     *
+     *  @note The run state is changed right away in the calling thread, not
+     *  through the command queue.
      */
     void finishFrame();
     
@@ -2126,6 +2169,11 @@ public:
      *  callback you can utilize the pointer to invoke a message processing
      *  function on that object.
      *  @param  func        The callback function.
+     *
+     *  @note All functions of this API must be called from a user thread, i.e.,
+     *  from any thread except the emulator thread. In particular, the callback
+     *  registered here is invoked on the emulator thread and must not call into
+     *  the API. Forward the message to a user thread instead.
      */
     void launch(const void *listener = nullptr, Callback *func = nullptr);
 
@@ -2213,9 +2261,10 @@ public:
      *  These functions hand the request to the emulator thread and return at
      *  once. They are the asynchronous counterparts of set(). Use them if
      *  waiting is impossible or undesirable, e.g., when many options are
-     *  changed in a row (follow up with sync() if needed), when the call
-     *  happens inside a message callback (which runs on the emulator thread),
-     *  or when the emulator thread is suspended.
+     *  changed in a row (follow up with sync() if needed), before the emulator
+     *  thread has been launched (the request is carried out at launch), or
+     *  while the emulator thread is suspended (it is carried out when the thread
+     *  resumes).
      *
      *  The value is validated when the emulator thread carries out the
      *  command. A rejected value is reported by Msg::CONFIG, which then carries the exception.
@@ -2317,8 +2366,10 @@ public:
      *  the configuration, can still see the old state. Calling this
      *  afterwards closes that gap.
      *
-     *  It must not be called while the emulator is suspended or halted:
-     *  neither polls the command queue, so the wait would never end.
+     *  @throw CoreError (#Fault::NOT_LAUNCHED) if the emulator thread cannot
+     *  carry out commands, because it has not been launched yet, is halted or
+     *  suspended. The same applies if the function is called from the emulator
+     *  thread.
      */
     void sync();
     
