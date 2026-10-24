@@ -109,7 +109,7 @@ C64MediaController::exportDisk(int drive, const QUrl &url)
         if (drive == 8) core.drive8.save(path);
         if (drive == 9) core.drive9.save(path);
 
-        core.put(Cmd::DSK_UNMODIFIED, slot);
+        core.putAsync(Cmd::DSK_UNMODIFIED, slot);
 
     } catch (const std::exception &e) {
 
@@ -129,7 +129,7 @@ C64MediaController::exportDiskFolder(int drive, const QUrl &url)
         if (drive == 8) core.drive8.saveFiles(path);
         if (drive == 9) core.drive9.saveFiles(path);
 
-        core.put(Cmd::DSK_UNMODIFIED, slot);
+        core.putAsync(Cmd::DSK_UNMODIFIED, slot);
 
     } catch (const std::exception &e) {
 
@@ -157,7 +157,7 @@ void
 C64MediaController::toggleWriteProtection(int drive)
 {
     int slot = drive == 8 ? 0 : 1;
-    C64Controller::core().put(Cmd::DSK_TOGGLE_WP, slot);
+    C64Controller::core().putAsync(Cmd::DSK_TOGGLE_WP, slot);
 }
 
 void
@@ -169,7 +169,7 @@ C64MediaController::toggleUnsavedState(int drive)
     // state.
     int slot = drive == 8 ? 0 : 1;
     bool modified = drive == 8 ? drive8Modified() : drive9Modified();
-    C64Controller::core().put(modified ? Cmd::DSK_UNMODIFIED : Cmd::DSK_MODIFIED, slot);
+    C64Controller::core().putAsync(modified ? Cmd::DSK_UNMODIFIED : Cmd::DSK_MODIFIED, slot);
 }
 
 void
@@ -251,13 +251,13 @@ C64MediaController::exportTape(const QUrl &url)
 void
 C64MediaController::rewindTape()
 {
-    C64Controller::core().put(Cmd::DATASETTE_REWIND);
+    C64Controller::core().putAsync(Cmd::DATASETTE_REWIND);
 }
 
 void
 C64MediaController::playOrStopTape()
 {
-    C64Controller::core().put(C64Controller::core().datasette.getInfo().playKey ? Cmd::DATASETTE_STOP : Cmd::DATASETTE_PLAY);
+    C64Controller::core().putAsync(C64Controller::core().datasette.getInfo().playKey ? Cmd::DATASETTE_STOP : Cmd::DATASETTE_PLAY);
 }
 
 bool C64MediaController::tapeInserted() const { return C64Controller::core().datasette.getInfo().hasTape; }
@@ -349,10 +349,10 @@ C64MediaController::exportCartridge(const QUrl &url)
 void
 C64MediaController::pressCartridgeButton(int nr)
 {
-    C64Controller::core().put(Cmd::CRT_BUTTON_PRESS, nr);
+    C64Controller::core().putAsync(Cmd::CRT_BUTTON_PRESS, nr);
 
     QTimer::singleShot(500, this, [nr]() {
-        C64Controller::core().put(Cmd::CRT_BUTTON_RELEASE, nr);
+        C64Controller::core().putAsync(Cmd::CRT_BUTTON_RELEASE, nr);
     });
 }
 
@@ -361,9 +361,9 @@ C64MediaController::setCartridgeSwitch(int pos)
 {
     auto &core = C64Controller::core();
 
-    if (pos < 0) core.put(Cmd::CRT_SWITCH_LEFT);
-    else if (pos > 0) core.put(Cmd::CRT_SWITCH_RIGHT);
-    else core.put(Cmd::CRT_SWITCH_NEUTRAL);
+    if (pos < 0) core.putAsync(Cmd::CRT_SWITCH_LEFT);
+    else if (pos > 0) core.putAsync(Cmd::CRT_SWITCH_RIGHT);
+    else core.putAsync(Cmd::CRT_SWITCH_NEUTRAL);
 
     // No message is emitted for switch changes (unlike CRT_ATTACHED), so
     // the menu's checkmark needs an explicit nudge to refresh.

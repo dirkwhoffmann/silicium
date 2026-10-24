@@ -181,9 +181,9 @@ SiC64CPUController::cycleBreakpoint(int addr)
     auto &core = C64Controller::core();
 
     if (auto *guard = core.cpu.breakpointAt(u16(addr))) {
-        core.put(guard->enabled ? Cmd::BP_DISABLE_AT : Cmd::BP_ENABLE_AT, addr);
+        core.putAsync(guard->enabled ? Cmd::BP_DISABLE_AT : Cmd::BP_ENABLE_AT, addr);
     } else {
-        core.put(Cmd::BP_SET_AT, addr);
+        core.putAsync(Cmd::BP_SET_AT, addr);
     }
     refresh();
 }
@@ -193,14 +193,14 @@ SiC64CPUController::toggleBreakpoint(int addr)
 {
     auto &core = C64Controller::core();
 
-    core.put(core.cpu.breakpointAt(u16(addr)) ? Cmd::BP_REMOVE_AT : Cmd::BP_SET_AT, addr);
+    core.putAsync(core.cpu.breakpointAt(u16(addr)) ? Cmd::BP_REMOVE_AT : Cmd::BP_SET_AT, addr);
     refresh();
 }
 
 void
 SiC64CPUController::addBreakpoint(int addr)
 {
-    C64Controller::core().put(Cmd::BP_SET_AT, addr);
+    C64Controller::core().putAsync(Cmd::BP_SET_AT, addr);
     refresh();
 }
 
@@ -210,7 +210,7 @@ SiC64CPUController::toggleBreakpointNr(int nr)
     auto &core = C64Controller::core();
 
     if (auto *guard = core.cpu.breakpointNr(nr)) {
-        core.put(guard->enabled ? Cmd::BP_DISABLE_NR : Cmd::BP_ENABLE_NR, nr);
+        core.putAsync(guard->enabled ? Cmd::BP_DISABLE_NR : Cmd::BP_ENABLE_NR, nr);
         refresh();
     }
 }
@@ -218,21 +218,21 @@ SiC64CPUController::toggleBreakpointNr(int nr)
 void
 SiC64CPUController::removeBreakpointNr(int nr)
 {
-    C64Controller::core().put(Cmd::BP_REMOVE_NR, nr);
+    C64Controller::core().putAsync(Cmd::BP_REMOVE_NR, nr);
     refresh();
 }
 
 void
 SiC64CPUController::moveBreakpointNr(int nr, int addr)
 {
-    C64Controller::core().put(Cmd::BP_MOVE_TO, nr, addr);
+    C64Controller::core().putAsync(Cmd::BP_MOVE_TO, nr, addr);
     refresh();
 }
 
 void
 SiC64CPUController::addWatchpoint(int addr)
 {
-    C64Controller::core().put(Cmd::WP_SET_AT, addr);
+    C64Controller::core().putAsync(Cmd::WP_SET_AT, addr);
     refresh();
 }
 
@@ -242,7 +242,7 @@ SiC64CPUController::toggleWatchpointNr(int nr)
     auto &core = C64Controller::core();
 
     if (auto *guard = core.cpu.watchpointNr(nr)) {
-        core.put(guard->enabled ? Cmd::WP_DISABLE_NR : Cmd::WP_ENABLE_NR, nr);
+        core.putAsync(guard->enabled ? Cmd::WP_DISABLE_NR : Cmd::WP_ENABLE_NR, nr);
         refresh();
     }
 }
@@ -250,14 +250,14 @@ SiC64CPUController::toggleWatchpointNr(int nr)
 void
 SiC64CPUController::removeWatchpointNr(int nr)
 {
-    C64Controller::core().put(Cmd::WP_REMOVE_NR, nr);
+    C64Controller::core().putAsync(Cmd::WP_REMOVE_NR, nr);
     refresh();
 }
 
 void
 SiC64CPUController::moveWatchpointNr(int nr, int addr)
 {
-    C64Controller::core().put(Cmd::WP_MOVE_TO, nr, addr);
+    C64Controller::core().putAsync(Cmd::WP_MOVE_TO, nr, addr);
     refresh();
 }
 

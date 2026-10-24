@@ -1189,7 +1189,7 @@ SiAmController::warpToCenter()
 void
 SiAmController::resetKeyboardMatrix()
 {
-    core().put(Cmd::KEY_RELEASE_ALL);
+    core().putAsync(Cmd::KEY_RELEASE_ALL);
 }
 
 void

@@ -691,7 +691,7 @@ C64Controller::softReset()
 void
 C64Controller::brk()
 {
-    core().put(Cmd::CPU_BRK);
+    core().putAsync(Cmd::CPU_BRK);
 }
 
 void

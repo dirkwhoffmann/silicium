@@ -1669,18 +1669,17 @@ struct VirtualC64 : public API {
      *  requests issued earlier (e.g., via setAsync()) have been carried out as
      *  well. A rejected value throws the corresponding exception.
      *
-     *  If the emulator thread has not been launched yet, the change is made
-     *  immediately in the calling thread.
-     *
      *  @param opt      The option to set
      *  @param value    The option's value
      *
      *  @note If this function is called for an options that applies to multiple
      *  components, all components are configured with the specified value.
      *  @throw CoreError (#Fault::NOT_LAUNCHED) if the emulator thread cannot
-     *  carry out the request, because it is halted or suspended. The same
-     *  applies if the function is called from the emulator thread. Use
-     *  setAsync() in these situations.
+     *  carry out the request, because it has not been launched yet, is halted or
+     *  suspended. The same applies if the function is called from the emulator
+     *  thread. Use setAsync() in these situations (it can also be called before
+     *  the emulator thread is launched, in which case the request is carried out
+     *  at launch).
      */
     void set(Opt opt, i64 value);
 
@@ -1758,7 +1757,23 @@ struct VirtualC64 : public API {
     /// @name Using the command queue
     /// @{
 
-    /** @brief  Feeds a command into the command queue.
+    /** @brief  Feeds a command into the command queue and waits for the result.
+     *
+     *  The function returns when the emulator thread has carried out the
+     *  command. A command that fails throws the corresponding exception.
+     *
+     *  Because the queue is processed in order, all commands issued earlier
+     *  (e.g., via putAsync()) have been carried out when the call returns.
+     *  Commands that carry a pointer to an object of the caller can rely on
+     *  that object being alive for the whole duration of the command.
+     *
+     *  @throw CoreError (#Fault::NOT_LAUNCHED) if the emulator thread cannot
+     *  carry out the command, because it has not been launched yet, is halted or
+     *  suspended. The same applies if the function is called from the emulator
+     *  thread. Use putAsync() in these situations (it can also be called before
+     *  the emulator thread is launched, in which case the command is carried out
+     *  at launch), and for events that occur at a high rate (e.g., key presses
+     *  or mouse movements).
      */
     void put(const Command &cmd, const std::string &str = "");
     void put(Cmd type, const std::string &str) { put(Command(type), str); }
@@ -1769,6 +1784,22 @@ struct VirtualC64 : public API {
     void put(Cmd type, GamePadCmd payload) { put(Command(type, payload)); }
     void put(Cmd type, TapeCmd payload) { put(Command(type, payload)); }
     void put(Cmd type, AlarmCmd payload) { put(Command(type, payload)); }
+
+    /** @brief  Feeds a command into the command queue without waiting for the result.
+     *
+     *  This is the asynchronous counterpart of put(). The command is carried out
+     *  by the emulator thread at some later time. The caller must keep objects
+     *  referenced by the command alive until it has been carried out.
+     */
+    void putAsync(const Command &cmd, const std::string &str = "");
+    void putAsync(Cmd type, const std::string &str) { putAsync(Command(type), str); }
+    void putAsync(Cmd type, i64 payload = 0, i64 payload2 = 0) { putAsync(Command(type, payload, payload2)); }
+    void putAsync(Cmd type, ConfigCmd payload) { putAsync(Command(type, payload)); }
+    void putAsync(Cmd type, KeyCmd payload) { putAsync(Command(type, payload)); }
+    void putAsync(Cmd type, CoordCmd payload) { putAsync(Command(type, payload)); }
+    void putAsync(Cmd type, GamePadCmd payload) { putAsync(Command(type, payload)); }
+    void putAsync(Cmd type, TapeCmd payload) { putAsync(Command(type, payload)); }
+    void putAsync(Cmd type, AlarmCmd payload) { putAsync(Command(type, payload)); }
     /// @}
 };
 

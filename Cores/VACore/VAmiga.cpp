@@ -2397,7 +2397,7 @@ void
 VAmiga::setAsync(ConfigScheme model)
 {
     VAMIGA_PUBLIC_SUSPEND
-    put(Cmd::CONFIG_SCHEME, (i64)model);
+    putAsync(Cmd::CONFIG_SCHEME, (i64)model);
     emu->markAsDirty();
 }
 
@@ -2405,7 +2405,7 @@ void
 VAmiga::setAsync(Opt opt, i64 value)
 {
     VAMIGA_PUBLIC
-    put(Cmd::CONFIG_ALL, ConfigCmd { .option = opt, .value = value });
+    putAsync(Cmd::CONFIG_ALL, ConfigCmd { .option = opt, .value = value });
     emu->markAsDirty();
 }
 
@@ -2451,7 +2451,7 @@ void
 VAmiga::setAsync(Opt opt, i64 value, long id)
 {
     VAMIGA_PUBLIC
-    put(Cmd::CONFIG, ConfigCmd { .option = opt, .value = value, .id = id });
+    putAsync(Cmd::CONFIG, ConfigCmd { .option = opt, .value = value, .id = id });
     emu->markAsDirty();
 }
 
@@ -2489,6 +2489,13 @@ VAmiga::exportConfig(std::ostream &stream, bool diff) const
 
 void
 VAmiga::put(const Command &cmd, const std::string &str)
+{
+    VAMIGA_PUBLIC
+    emu->sendAndWait(cmd, str);
+}
+
+void
+VAmiga::putAsync(const Command &cmd, const std::string &str)
 {
     VAMIGA_PUBLIC
     emu->put(cmd, str);
