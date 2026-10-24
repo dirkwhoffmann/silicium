@@ -129,7 +129,8 @@ C64Controller::core()
 void
 C64Controller::initialize()
 {
-    core().launch();
+    // Registering the listener and starting the emulator thread happen together
+    core().launch(this, ::process);
 
     // Point RomManager at the Rom library and scan it once. Nothing but this
     // class and SiC64ConfigController::copyToLibrary() ever write here, so
@@ -471,7 +472,6 @@ void
 C64Controller::windowDidOpen()
 {
     // Power on the emulator
-    core().setListener(this, ::process);
     core().c64.installOpenRoms();
 
     // A corrupted SVM can throw here. This runs inside a Qt signal handler
