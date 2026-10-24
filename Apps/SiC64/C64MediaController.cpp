@@ -297,7 +297,7 @@ void
 C64MediaController::detachCartridge()
 {
     C64Controller::core().expansionPort.detachCartridge();
-    C64Controller::core().hardReset();
+    C64Controller::core().hardResetAsync();
 }
 
 void

@@ -25,8 +25,8 @@ SiAmCopperController::SiAmCopperController(SiAmController *parent)
     // to this panel's own active flag instead of a single shared window,
     // same as SiAmCPUController's own Trace-log tracking.
     connect(this, &SiAmInspectorController::activeChanged, this, [this]() {
-        if (isActive()) SiAmController::core().trackOn(SiAmInspectorController::trackSource);
-        else SiAmController::core().trackOff(SiAmInspectorController::trackSource);
+        if (isActive()) SiAmController::core().trackOnAsync(SiAmInspectorController::trackSource);
+        else SiAmController::core().trackOffAsync(SiAmInspectorController::trackSource);
     });
 }
 

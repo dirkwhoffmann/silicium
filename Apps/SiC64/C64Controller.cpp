@@ -486,7 +486,7 @@ C64Controller::windowDidOpen()
         showError("Failed to load workspace.", e.what());
     }
 
-    core().powerOn();
+    core().powerOnAsync();
 
     for (const auto &command : execCommands) {
 
@@ -637,7 +637,7 @@ void
 C64Controller::run()
 {
     try {
-        core().run();
+        core().runAsync();
     } catch (const std::exception &e) {
         showError("The emulator refuses to run.", e.what());
     }
@@ -646,21 +646,21 @@ C64Controller::run()
 void
 C64Controller::pause()
 {
-    core().pause();
+    core().pauseAsync();
 }
 
 void
 C64Controller::reset()
 {
-    core().hardReset();
-    core().run();
+    core().hardResetAsync();
+    core().runAsync();
 }
 
 void
 C64Controller::powerOn()
 {
     try {
-        core().run();
+        core().runAsync();
     } catch (const std::exception &e) {
         showError("The emulator refuses to power on.", e.what());
     }
@@ -669,23 +669,23 @@ C64Controller::powerOn()
 void
 C64Controller::powerOff()
 {
-    core().powerOff();
+    core().powerOffAsync();
 }
 
 void
 C64Controller::stopAndGo()
 {
     if (core().isRunning()) {
-        core().pause();
+        core().pauseAsync();
     } else {
-        core().run();
+        core().runAsync();
     }
 }
 
 void
 C64Controller::softReset()
 {
-    core().softReset();
+    core().softResetAsync();
 }
 
 void
@@ -1113,7 +1113,7 @@ C64Controller::didPowerOn()
     // Release brakes
     try {
 
-        core().run();
+        core().runAsync();
 
     } catch (const std::exception &e) {
 

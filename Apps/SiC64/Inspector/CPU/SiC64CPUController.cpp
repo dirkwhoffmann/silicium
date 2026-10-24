@@ -21,8 +21,8 @@ SiC64CPUController::SiC64CPUController(C64Controller *parent)
     // enables it while the CPU inspector is open and disables it on close --
     // here keyed to this panel's active flag.
     connect(this, &SiC64InspectorController::activeChanged, this, [this]() {
-        if (isActive()) C64Controller::core().trackOn(SiC64InspectorController::trackSource);
-        else C64Controller::core().trackOff(SiC64InspectorController::trackSource);
+        if (isActive()) C64Controller::core().trackOnAsync(SiC64InspectorController::trackSource);
+        else C64Controller::core().trackOffAsync(SiC64InspectorController::trackSource);
     });
 }
 

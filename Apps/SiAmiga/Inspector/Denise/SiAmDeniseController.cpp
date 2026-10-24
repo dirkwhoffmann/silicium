@@ -25,8 +25,8 @@ SiAmDeniseController::SiAmDeniseController(SiAmController *parent)
     // rather than the Swift reference's single shared Inspector window,
     // which calls emu.trackOn() once for any panel via dialogWillShow().
     connect(this, &SiAmInspectorController::activeChanged, this, [this]() {
-        if (isActive()) SiAmController::core().trackOn(SiAmInspectorController::trackSource);
-        else SiAmController::core().trackOff(SiAmInspectorController::trackSource);
+        if (isActive()) SiAmController::core().trackOnAsync(SiAmInspectorController::trackSource);
+        else SiAmController::core().trackOffAsync(SiAmInspectorController::trackSource);
     });
 }
 

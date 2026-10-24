@@ -409,7 +409,7 @@ SiAmController::windowDidOpen()
         showError("Failed to load workspace.", e.what());
     }
 
-    core().powerOn();
+    core().powerOnAsync();
 
     for (const auto &command : execCommands) {
 
@@ -671,7 +671,7 @@ SiAmController::hdDidArrive(int nr)
      * there when it booted, but it does not have to be switched off for that.
      */
     if (!core().get(Opt::HDC_CONNECT, nr)) core().setAsync(Opt::HDC_CONNECT, true, nr);
-    core().hardReset();
+    core().hardResetAsync();
 
     /* Write the machine out, so config.retrosh carries the attach line and the
      * drive is still there the next time the SVM is opened. These are all
@@ -960,7 +960,7 @@ void
 SiAmController::run()
 {
     try {
-        core().run();
+        core().runAsync();
     } catch (const std::exception &e) {
         showError("The emulator refuses to run.", e.what());
     }
@@ -969,21 +969,21 @@ SiAmController::run()
 void
 SiAmController::pause()
 {
-    core().pause();
+    core().pauseAsync();
 }
 
 void
 SiAmController::reset()
 {
-    core().hardReset();
-    core().run();
+    core().hardResetAsync();
+    core().runAsync();
 }
 
 void
 SiAmController::powerOn()
 {
     try {
-        core().run();
+        core().runAsync();
     } catch (const std::exception &e) {
         showError("The emulator refuses to power on.", e.what());
     }
@@ -992,13 +992,13 @@ SiAmController::powerOn()
 void
 SiAmController::powerOff()
 {
-    core().powerOff();
+    core().powerOffAsync();
 }
 
 void
 SiAmController::softReset()
 {
-    core().softReset();
+    core().softResetAsync();
 }
 
 void
@@ -1221,7 +1221,7 @@ SiAmController::didPowerOn()
         qCWarning(siLog).noquote() << "Power-on bookkeeping failed:" << e.what();
     }
     try {
-        core().run();
+        core().runAsync();
     } catch (const std::exception &e) {
         qCCritical(siLog).noquote() << "Failed to power on the virtual machine:" << e.what();
         emit showFatalError("Failed to power on the virtual machine.", e.what());
