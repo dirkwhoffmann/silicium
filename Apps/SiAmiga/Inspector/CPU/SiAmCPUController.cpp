@@ -21,8 +21,8 @@ SiAmCPUController::SiAmCPUController(SiAmController *parent)
     // while the CPU inspector is open and disables it on close -- here keyed
     // to this panel's active flag.
     connect(this, &SiAmInspectorController::activeChanged, this, [this]() {
-        if (isActive()) SiAmController::core().trackOn();
-        else SiAmController::core().trackOff();
+        if (isActive()) SiAmController::core().trackOn(SiAmInspectorController::trackSource);
+        else SiAmController::core().trackOff(SiAmInspectorController::trackSource);
     });
 }
 

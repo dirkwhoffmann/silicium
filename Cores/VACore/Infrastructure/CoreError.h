@@ -20,11 +20,11 @@ struct CoreError : public Error {
 
     // Execution state
     static constexpr long LAUNCH_FAILED     = 100; ///< Launching the emulator thread failed
-    static constexpr long NOT_LAUNCHED      = 104; ///< The emulator thread is not running
-    static constexpr long ALREADY_LAUNCHED  = 105; ///< The emulator thread has been launched already
-    static constexpr long POWERED_OFF       = 101; ///< The emulator is powered off
-    static constexpr long POWERED_ON        = 102; ///< The emulator is powered on
-    static constexpr long RUNNING           = 103; ///< The emulator is running
+    static constexpr long NOT_LAUNCHED      = 101; ///< The emulator thread is not running
+    static constexpr long ALREADY_LAUNCHED  = 102; ///< The emulator thread has been launched already
+    static constexpr long POWERED_OFF       = 103; ///< The emulator is powered off
+    static constexpr long POWERED_ON        = 104; ///< The emulator is powered on
+    static constexpr long RUNNING           = 105; ///< The emulator is running
 
     // Configuration
     static constexpr long OPT_UNSUPPORTED   = 200; ///< Unsupported configuration option

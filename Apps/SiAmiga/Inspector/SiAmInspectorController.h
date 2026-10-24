@@ -36,6 +36,13 @@ class SiAmInspectorController : public Controller {
 
     Q_OBJECT
 
+  public:
+
+    /* The source all inspector panels use to request track mode from the
+     * core. Sources 0 to 6 are available to the clients of the API.
+     */
+    static constexpr long trackSource = 0;
+
   protected:
 
     class SiAmController *parent = nullptr;
