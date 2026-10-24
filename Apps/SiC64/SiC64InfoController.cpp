@@ -84,7 +84,7 @@ SiC64InfoController::grab(Component component)
 
         case AUDIO:
 
-            m_audioStats = core.audioPort.getStats();
+            m_audioStats = core.audioPort.getMetrics();
             break;
 
         case C64:

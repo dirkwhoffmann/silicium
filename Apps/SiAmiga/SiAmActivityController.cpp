@@ -30,7 +30,7 @@ SiAmActivityController::update(i64 cycle, i64 emuFrame, i64 gpuFrame)
         auto metrics     = core.getMetrics();
         auto ciaAMetrics = core.ciaA.getMetrics();
         auto ciaBMetrics = core.ciaB.getMetrics();
-        auto &audioStats = core.audioPort.getStats();
+        auto &audioStats = core.audioPort.getMetrics();
 
         m_ciaA      = ciaAMetrics.idlePercentage;
         m_ciaB      = ciaBMetrics.idlePercentage;
