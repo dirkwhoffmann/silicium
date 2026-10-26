@@ -17,6 +17,7 @@
 #include "CoreError.h"
 #include "Snapshot.h"
 #include <array>
+#include <functional>
 #include "FileSystems/CBM/FSTypes.h"
 
 using retro::vault::cbm::FSFormat;
@@ -102,10 +103,12 @@ public:
      *  as often as suspend(). Use it to read or modify the state of a
      *  component that is not protected by the API itself.
      *
-     *  Do not call it from the emulator thread. While the thread is
-     *  suspended, the blocking API functions (those that wait for the
-     *  emulator thread) refuse to work, and halt() cannot finish. Queued
-     *  requests wait in the queue until the thread continues.
+     *  Only one thread can hold a suspension at a time. Another thread that
+     *  calls suspend(), or a blocking API function that waits for the
+     *  emulator thread, waits until the holder has resumed the emulator.
+     *  The holder itself must not call such a function, because it would wait
+     *  for itself: they throw a CoreError, and so does halt(). Do not call
+     *  suspend() from the emulator thread.
      */
     void suspend() const;
 
@@ -1793,6 +1796,12 @@ public:
      *  @throw Error if the file cannot be read or does not contain valid data.
      */
     void loadSnapshot(const std::filesystem::path &path);
+    /** @brief  Asynchronous version of loadSnapshot(): queues the request and returns at once.
+     *
+     *  Success and failure are both reported by the usual message
+     *  (SNAPSHOT_RESTORED). If the request failed, the message carries the exception.
+     */
+    void loadSnapshotAsync(const std::filesystem::path &path);
 
     /** @brief  Saves a snapshot to disk
      *
@@ -1873,6 +1882,13 @@ public:
      */
     void loadRom(const std::filesystem::path &path);
     void loadRom(const std::filesystem::path &path, RomType rom);
+    /** @brief  Asynchronous version of loadRom(): queues the request and returns at once.
+     *
+     *  Success and failure are both reported by a ROM_LOADED message. If the
+     *  request failed, the message carries the exception.
+     */
+    void loadRomAsync(const std::filesystem::path &path);
+    void loadRomAsync(const std::filesystem::path &path, RomType rom);
 
     /** @brief  Removes an installed ROM
      *          The ROM contents is overwritten with zeroes.
@@ -1983,6 +1999,11 @@ public:
     //
 
     VirtualC64();
+    /** @brief  Halts the emulator thread and destroys the emulator
+     *
+     *  A suspension that the calling thread still holds is released first,
+     *  because a suspended emulator thread cannot be halted.
+     */
     ~VirtualC64();
 
 
@@ -2222,8 +2243,8 @@ public:
      *  @note The function blocks until the emulator thread has terminated. It
      *  does nothing if there is no running emulator thread (e.g., if the
      *  thread has already been halted), so it is safe to call it more than
-     *  once. It must not be called while the emulator thread is suspended,
-     *  because a suspended thread cannot terminate.
+     *  once. It throws a CoreError if the calling thread has suspended the
+     *  emulator thread, because a suspended thread cannot terminate.
      */
     void halt();
 
@@ -2643,17 +2664,57 @@ public:
 
 
     /// @}
-    /// @name Using the command queue (advanced)
+    /// @name Danger zone
     /// @{
 
-    /* ADVANCED INTERFACE
+    /* DANGER ZONE
      *
-     * The functions below feed raw commands into the command queue. Almost all
-     * functionality is available through dedicated functions of this API, which
-     * should be preferred. The set of commands, their payload layout and their
-     * lifetime requirements (some commands carry pointers to objects owned by
-     * the caller) are internal to the emulator and may change between versions.
+     * The functions below bypass the dedicated functions of this API. Almost
+     * all functionality is available through the dedicated functions, which
+     * should be preferred.
+     *
+     *   put(), putAsync() : Feed raw commands into the command queue. The set
+     *                       of commands, their payload layout and their
+     *                       lifetime requirements (some commands carry
+     *                       pointers to objects owned by the caller) are
+     *                       internal to the emulator and may change between
+     *                       versions.
+     *   call(), callAsync() : Run an arbitrary function on the emulator
+     *                       thread. The function can reach all internals of
+     *                       the emulator and is responsible for keeping them
+     *                       consistent. What it touches is not covered by any
+     *                       compatibility promise.
      */
+
+    /** @brief  Runs a function on the emulator thread and waits until it is done.
+     *
+     *  @warning This is an advanced interface, see above.
+     *
+     *  The function is carried out in the order of the commands that have been
+     *  queued before, and never while a frame is computed or while another
+     *  thread has suspended the emulator. An exception thrown by the function
+     *  is passed on to the caller.
+     *
+     *  @throw CoreError (#CoreError::NOT_LAUNCHED) if the emulator thread cannot
+     *  carry out the request (see put()).
+     */
+    void call(const std::function<void()> &fn);
+
+    /** @brief  Queues a function for the emulator thread without waiting for it.
+     *
+     *  @warning This is an advanced interface, see above.
+     *
+     *  This is the asynchronous counterpart of call(). The function is carried
+     *  out by the emulator thread at some later time, so everything it refers
+     *  to must stay valid until then. A failure of the function cannot be
+     *  passed on to the caller. If 'done' is given, it is called on the
+     *  emulator thread when the function has been carried out, with the
+     *  exception it threw (or null). It is also called, on the calling thread,
+     *  if the command queue is full and the request is dropped. Nothing is
+     *  carried out as long as the emulator thread has not been launched.
+     */
+    void callAsync(std::function<void()> fn,
+                   std::function<void(std::exception_ptr)> done = nullptr);
 
     /** @brief  Feeds a command into the command queue and waits for the result.
      *

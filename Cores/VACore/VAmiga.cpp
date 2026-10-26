@@ -746,6 +746,20 @@ MemoryAPI::getExtTraits() const
 }
 
 void
+MemoryAPI::loadRomAsync(const fs::path &path)
+{
+    VAMIGA_PUBLIC
+    emu->callAsync([this, path]{ mem->loadRom(path); });
+}
+
+void
+MemoryAPI::loadExtAsync(const fs::path &path)
+{
+    VAMIGA_PUBLIC
+    emu->callAsync([this, path]{ mem->loadExt(path); });
+}
+
+void
 MemoryAPI::loadRom(const fs::path &path)
 {
     VAMIGA_PUBLIC
@@ -1366,6 +1380,14 @@ FloppyDriveAPI::insertBlankDisk(amiga::FSFormat fstype, amiga::BootBlockId bb,
     emu->call([&]{
         drive->insertNew(fstype, bb, name, path);
     });
+}
+
+void
+FloppyDriveAPI::insertBlankDiskAsync(amiga::FSFormat fstype, amiga::BootBlockId bb,
+                                     string name, const std::filesystem::path &path)
+{
+    VAMIGA_PUBLIC
+    emu->callAsync([this, fstype, bb, name, path]{ drive->insertNew(fstype, bb, name, path); });
 }
 
 void
@@ -2290,6 +2312,10 @@ VAmiga::VAmiga() {
 VAmiga::~VAmiga()
 {
     VAMIGA_PUBLIC
+
+    // A suspended emulator thread cannot be halted, so give up forgotten suspensions
+    while (emu->isSuspendedByCurrentThread()) emu->resume();
+
     halt();
     delete emu;
 }
@@ -2504,7 +2530,7 @@ VAmiga::halt()
     if (!emu->isLaunched()) return;
 
     // A suspended thread cannot process the halt command, so waiting for it would never end
-    if (emu->isSuspended()) throw CoreError(CoreError::NOT_LAUNCHED, "The emulator thread is suspended.");
+    if (emu->isSuspendedByCurrentThread()) throw CoreError(CoreError::NOT_LAUNCHED, "The emulator thread is suspended by the calling thread.");
 
     // Signal the emulator to halt
     emu->put(Cmd::HALT);
@@ -2731,6 +2757,20 @@ VAmiga::exportConfig(std::ostream &stream, bool diff) const
 }
 
 void
+VAmiga::call(const std::function<void()> &fn)
+{
+    VAMIGA_PUBLIC
+    emu->call(fn);
+}
+
+void
+VAmiga::callAsync(std::function<void()> fn, std::function<void(std::exception_ptr)> done)
+{
+    VAMIGA_PUBLIC
+    emu->callAsync(std::move(fn), std::move(done));
+}
+
+void
 VAmiga::put(const Command &cmd, const std::string &str)
 {
     VAMIGA_PUBLIC
@@ -2809,24 +2849,14 @@ void
 AmigaAPI::loadSnapshot(const Snapshot &snapshot)
 {
     VAMIGA_PUBLIC
-    emu->call([&]{
-        try {
+    emu->call([&]{ amiga->loadSnapshot(snapshot); });
+}
 
-            // Restore the saved state
-            amiga->loadSnapshot(snapshot);
-
-        } catch(Error &) {
-
-            /* If we reach this point, the emulator has been put into an
-             * inconsistent state due to corrupted snapshot data. We cannot
-             * continue emulation, because it would likely crash the
-             * application. Because we cannot revert to the old state either,
-             * we perform a hard reset to eliminate the inconsistency.
-             */
-            emu->put(Cmd::HARD_RESET);
-            throw;
-        }
-    });
+void
+AmigaAPI::loadSnapshotAsync(const fs::path &path)
+{
+    VAMIGA_PUBLIC
+    emu->callAsync([this, path]{ amiga->loadSnapshot(path); });
 }
 
 void
