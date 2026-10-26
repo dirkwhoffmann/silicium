@@ -1291,6 +1291,11 @@ SiAmController::process(const Message &msg, const string &attachment, std::excep
             hibernateDidFinish(exception);
             break;
 
+        case Msg::QUEUE_FULL:
+
+            qCWarning(siLog) << "The command queue is full. Commands are dropped.";
+            break;
+
         case Msg::CONFIG:
 
             m_configIsDirty = true;
