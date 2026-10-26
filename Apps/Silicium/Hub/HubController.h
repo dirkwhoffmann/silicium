@@ -29,10 +29,10 @@ class HubController : public Controller {
     VirtualMachineLibrary &library = Silicium::instance().getLibrary();
 
     // Resource path to all pre-installed virtual machines
-    fs::path m_showcases;
+    std::filesystem::path m_showcases;
 
     // The running emulator processes and their reported states
-    vector<VMProcess> m_processes;
+    std::vector<VMProcess> m_processes;
 
     // The currently selected virtual machine and snapshot
     UUID m_vUUID;
@@ -178,7 +178,7 @@ class HubController : public Controller {
     bool isOpen() const { return isOpen(m_vUUID); }
 
     // Returns a vector with all open virtual machines
-    vector<UUID> openVMs() const;
+    std::vector<UUID> openVMs() const;
 
 
     //

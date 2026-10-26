@@ -66,20 +66,20 @@ class VirtualMachineLibrary : public SiObject {
 
     // Looks up a virtual machine with a given UUID
     VirtualMachine *lookupVirtualMachine(utl::UUID uuid);
-    VirtualMachine *lookupVirtualMachine(const string &uuid);
+    VirtualMachine *lookupVirtualMachine(const std::string &uuid);
     const VirtualMachine *lookupVirtualMachine(utl::UUID uuid) const;
-    const VirtualMachine *lookupVirtualMachine(const string &uuid) const;
+    const VirtualMachine *lookupVirtualMachine(const std::string &uuid) const;
 
     // Looks up a virtual machine with a given SVM path
-    VirtualMachine *lookupVirtualMachine(const fs::path &path);
-    const VirtualMachine *lookupVirtualMachine(const fs::path &path) const;
+    VirtualMachine *lookupVirtualMachine(const std::filesystem::path &path);
+    const VirtualMachine *lookupVirtualMachine(const std::filesystem::path &path) const;
 
     // Looks up a snapshot with the given UUID
     SnapshotInfo *lookupSnapshot(utl::UUID uuid);
-    SnapshotInfo *lookupSnapshot(const string &uuid);
+    SnapshotInfo *lookupSnapshot(const std::string &uuid);
 
     // Returns the UUIDs all virtual machine with a matching predicate
-    vector<utl::UUID> collect(const std::function<bool(const VirtualMachine &)> &predicate) const;
+    std::vector<utl::UUID> collect(const std::function<bool(const VirtualMachine &)> &predicate) const;
 
 
     //
@@ -92,7 +92,7 @@ class VirtualMachineLibrary : public SiObject {
      * - Throws an exception if a machine with the same UUID exists.
      * - Returns a pointer to the added machine.
      */
-    VirtualMachine *addVirtualMachine(const fs::path &path);
+    VirtualMachine *addVirtualMachine(const std::filesystem::path &path);
 
     /* Clones an existing virtual machine.
      *
@@ -100,18 +100,18 @@ class VirtualMachineLibrary : public SiObject {
      *   machine. After that, the machine is added to the library.
      * - Returns a pointer to the cloned machine.
      */
-    VirtualMachine *cloneVirtualMachine(utl::UUID uuid, const fs::path &clonePath);
-    VirtualMachine *cloneVirtualMachine(const fs::path &path, const fs::path &clonePath);
+    VirtualMachine *cloneVirtualMachine(utl::UUID uuid, const std::filesystem::path &clonePath);
+    VirtualMachine *cloneVirtualMachine(const std::filesystem::path &path, const std::filesystem::path &clonePath);
 
     // Removes a virtual machine from the database
     bool removeVirtualMachine(utl::UUID uuid);
-    bool removeVirtualMachine(const string &uuid);
-    bool removeVirtualMachine(const fs::path &path);
+    bool removeVirtualMachine(const std::string &uuid);
+    bool removeVirtualMachine(const std::filesystem::path &path);
 
     // Removes all virtual machines
     void clear() { vms.clear(); }
 
     // Renames a virtual machine
-    void rename(utl::UUID uuid, const string &name, bool uniquify = false);
-    void rename(VirtualMachine &vm, const string &name, bool uniquify = false);
+    void rename(utl::UUID uuid, const std::string &name, bool uniquify = false);
+    void rename(VirtualMachine &vm, const std::string &name, bool uniquify = false);
 };

@@ -156,7 +156,7 @@ class SiAmConfigController : public Controller {
      * already sitting in the library under that name (e.g. reinstalling one
      * via installKickRom()/installExtRom(), which load straight from there).
      */
-    void copyToLibrary(const fs::path &path) const;
+    void copyToLibrary(const utl::fs::path &path) const;
 
 
     //

@@ -199,7 +199,7 @@ class SiC64ConfigController : public Controller {
      * already sitting in the library under that name (e.g. reinstalling one
      * via installRom() above, which loads straight from there).
      */
-    void copyToLibrary(const fs::path &path) const;
+    void copyToLibrary(const utl::fs::path &path) const;
 
     void deleteRom(vc64::RomType type);
 

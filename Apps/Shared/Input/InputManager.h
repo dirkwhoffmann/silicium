@@ -132,9 +132,9 @@ class InputManager : public QObject, SiObject, SDLManagerDelegate {
 
     // Current keyboard state
     KeyModifier m_mods {};
-    optional<uint> m_qKey {};
-    optional<uint> m_pKey {};
-    optional<QString> m_sKey {};
+    std::optional<uint> m_qKey {};
+    std::optional<uint> m_pKey {};
+    std::optional<QString> m_sKey {};
 
     // Remembered portions of the latest key event
     QEvent::Type m_latestType {};
@@ -331,7 +331,7 @@ private:
     bool keyUpEventFilter(QObject *obj, QKeyEvent *event);
     bool emulationKeyFilter(int port, QKeyEvent *event, bool down);
 
-    optional<KeyCombo> keyCombo(QKeyEvent *event) const;
+    std::optional<KeyCombo> keyCombo(QKeyEvent *event) const;
     bool isRepeat(QKeyEvent *event) const;
     void rememberEvent(QKeyEvent *event);
 

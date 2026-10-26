@@ -42,7 +42,7 @@ class AppController : public Controller {
 
   public:
 
-    static string version();
+    static std::string version();
 
     // Subcomponents
     Q_PROPERTY(InputManager* inputManager READ getInputManager CONSTANT)

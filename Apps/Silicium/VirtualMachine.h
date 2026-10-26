@@ -19,7 +19,7 @@ using retro::vault::SnapshotInfo;
 class VirtualMachine : public SiObject {
 
     // The associated SVM file
-    unique_ptr<SVMFile> svm;
+    std::unique_ptr<SVMFile> svm;
 
 
     //
@@ -28,10 +28,10 @@ class VirtualMachine : public SiObject {
 
   public:
 
-    explicit VirtualMachine(unique_ptr<SVMFile> svmFile) : svm(std::move(svmFile)) { }
+    explicit VirtualMachine(std::unique_ptr<SVMFile> svmFile) : svm(std::move(svmFile)) { }
 
     // Virtual machine factory
-    static unique_ptr<VirtualMachine> make(const fs::path &path);
+    static std::unique_ptr<VirtualMachine> make(const std::filesystem::path &path);
 
 
     //
@@ -49,15 +49,15 @@ class VirtualMachine : public SiObject {
     // implementation.
     void reload();
 
-    const fs::path &getSourcePath() const { return svm->getSourcePath(); }
-    const fs::path &root() const { return svm->root(); }
+    const std::filesystem::path &getSourcePath() const { return svm->getSourcePath(); }
+    const std::filesystem::path &root() const { return svm->root(); }
 
     bool isPreinstalled() const { return getManifest().isPreinstalled(); }
     bool isReadOnly() const { return svm->isReadOnly(); }
     bool isOutdated() const { return svm->isOutdated(); }
 
     void persist() const;
-    void rename(const string &name);
+    void rename(const std::string &name);
 
     //
     // Managing snapshots
@@ -68,7 +68,7 @@ class VirtualMachine : public SiObject {
     SnapshotInfo *lookupLatestSnapshot();
 
     // Changes the logical name of a snapshots
-    void renameSnapshot(utl::UUID uuid, const string &name);
+    void renameSnapshot(utl::UUID uuid, const std::string &name);
 
     // Deletes a snapshot
     bool deleteSnapshot(utl::UUID uuid);

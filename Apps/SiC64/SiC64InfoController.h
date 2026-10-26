@@ -233,13 +233,13 @@ class SiC64InfoController : public Controller {
 
     // Interrupt lines, decoded from the IRQ / NMI source masks.
     bool irq() const { return m_cpuInfo.irq != 0; }
-    bool irqCIA() const { return m_cpuInfo.irq & INTSRC_CIA; }
-    bool irqVIC() const { return m_cpuInfo.irq & INTSRC_VIC; }
-    bool irqEXP() const { return m_cpuInfo.irq & INTSRC_EXP; }
+    bool irqCIA() const { return m_cpuInfo.irq & vc64::INTSRC_CIA; }
+    bool irqVIC() const { return m_cpuInfo.irq & vc64::INTSRC_VIC; }
+    bool irqEXP() const { return m_cpuInfo.irq & vc64::INTSRC_EXP; }
     bool nmi() const { return m_cpuInfo.nmi != 0; }
-    bool nmiCIA() const { return m_cpuInfo.nmi & INTSRC_CIA; }
-    bool nmiKBD() const { return m_cpuInfo.nmi & INTSRC_KBD; }
-    bool nmiEXP() const { return m_cpuInfo.nmi & INTSRC_EXP; }
+    bool nmiCIA() const { return m_cpuInfo.nmi & vc64::INTSRC_CIA; }
+    bool nmiKBD() const { return m_cpuInfo.nmi & vc64::INTSRC_KBD; }
+    bool nmiEXP() const { return m_cpuInfo.nmi & vc64::INTSRC_EXP; }
     bool rdy() const { return m_cpuInfo.rdy; }
     bool jammed() const { return m_cpuInfo.jammed; }
 

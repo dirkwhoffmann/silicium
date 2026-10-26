@@ -181,7 +181,7 @@ public:
      * Returns the number of files copied. Throws utl::IOError if a file cannot
      * be created, so a half-extracted tree is never silently handed back.
      */
-    static utl::isize extract(const QString &root, const fs::path &destination);
+    static utl::isize extract(const QString &root, const utl::fs::path &destination);
 
 private:
 

@@ -216,7 +216,7 @@ SiC64ConfigController::getRomVendor(const RomTraits &traits) const
 std::vector<RomTraits>
 SiC64ConfigController::availableRoms(RomType type) const
 {
-    auto &romManager = RomManager::shared();
+    auto &romManager = retro::vault::RomManager::shared();
 
     // Restrict to entries the folder scan actually found a file for -- the
     // database also knows about Roms the user doesn't have
@@ -251,7 +251,7 @@ SiC64ConfigController::installRom(RomType type, int index)
     auto roms = availableRoms(type);
     if (index < 0 || index >= (int)roms.size()) return;
 
-    auto path = RomManager::shared().getRom(roms[(size_t)index]);
+    auto path = retro::vault::RomManager::shared().getRom(roms[(size_t)index]);
     if (!path) return;
 
     loadRom(QUrl::fromLocalFile(QString::fromStdString(path->string())), type);
@@ -260,7 +260,7 @@ SiC64ConfigController::installRom(RomType type, int index)
 void
 SiC64ConfigController::copyToLibrary(const fs::path &path) const
 {
-    auto traits = RomManager::shared().resolve(path);
+    auto traits = retro::vault::RomManager::shared().resolve(path);
     if (!traits) return;
 
     auto checksum = traits->crc ? QString::number(traits->crc, 16) : QString::number(traits->fnv, 16);

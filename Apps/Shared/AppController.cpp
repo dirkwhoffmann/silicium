@@ -16,10 +16,10 @@
 #include <QDir>
 #include <QStandardPaths>
 
-string
+std::string
 AppController::version()
 {
-    string result;
+    std::string result;
 
     result = std::to_string(VER_MAJOR) + "." + std::to_string(VER_MINOR);
     if constexpr (VER_SUBMINOR > 0) result += "." + std::to_string(VER_SUBMINOR);
@@ -91,7 +91,7 @@ AppController::locateExecutable(const QString &name)
 QString
 AppController::locateExecutable(Platform platform)
 {
-    string name;
+    std::string name;
 
     switch (platform) {
 

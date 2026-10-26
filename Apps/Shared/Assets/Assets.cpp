@@ -139,11 +139,11 @@ Assets::getMarkdown(const QString &name)
 }
 
 utl::isize
-Assets::extract(const QString &root, const fs::path &destination)
+Assets::extract(const QString &root, const utl::fs::path &destination)
 {
     utl::isize count = 0;
 
-    fs::create_directories(destination);
+    utl::fs::create_directories(destination);
 
     QDirIterator it(root, QDirIterator::Subdirectories);
 
@@ -155,11 +155,11 @@ Assets::extract(const QString &root, const fs::path &destination)
 
         if (QFileInfo(resource).isDir()) {
 
-            fs::create_directories(target);
+            utl::fs::create_directories(target);
             continue;
         }
 
-        fs::create_directories(target.parent_path());
+        utl::fs::create_directories(target.parent_path());
 
         /* QFile::copy refuses to overwrite, so clear the way first. This is
          * what makes a second call a no-op rather than a failure.

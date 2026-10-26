@@ -722,8 +722,8 @@ InputManager::keyDownEventFilter(QObject *obj, QKeyEvent *event)
             return true;
         }
 
-        optional<uint> newQKey = event->key();
-        optional<uint> newPKey = physicalKeyCode(event);
+        std::optional<uint> newQKey = event->key();
+        std::optional<uint> newPKey = physicalKeyCode(event);
         auto newMods = m_mods;
 
         newMods.leftShift |= leftShift(event);
@@ -811,8 +811,8 @@ InputManager::keyUpEventFilter(QObject *obj, QKeyEvent *event)
             return true;
         }
 
-        optional<uint> newQKey = { };
-        optional<uint> newPKey = { };
+        std::optional<uint> newQKey = { };
+        std::optional<uint> newPKey = { };
         auto newMods = m_mods;
 
         if ((event->modifiers() & Qt::ShiftModifier) == 0)
@@ -915,7 +915,7 @@ InputManager::emulationKeyFilter(int port, QKeyEvent *event, bool down)
     return false;
 }
 
-optional<KeyCombo>
+std::optional<KeyCombo>
 InputManager::keyCombo(QKeyEvent *event) const
 {
     if (event->modifiers() & Qt::ControlModifier) {

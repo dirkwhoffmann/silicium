@@ -105,18 +105,18 @@ HubController::~HubController()
 void
 HubController::setupShowcases()
 {
-    m_showcases = fs::temp_directory_path() / "Showcases";
+    m_showcases = std::filesystem::temp_directory_path() / "Showcases";
 
     /* Start from scratch. Assets::extract() overwrites but never deletes, so
      * wiping first is what keeps a showcase removed from the resources from
      * lingering in temp across runs.
      */
-    fs::remove_all(m_showcases);
+    std::filesystem::remove_all(m_showcases);
 
     Assets::extract(":/Showcases", m_showcases);
 
     // Register all showcases
-    for (const auto &entry : fs::directory_iterator(m_showcases)) {
+    for (const auto &entry : std::filesystem::directory_iterator(m_showcases)) {
 
         if (entry.is_directory() && entry.path().extension() == SVMFile::suffix) {
 
@@ -150,7 +150,7 @@ HubController::setupUserVMs()
 
         try {
 
-            auto path = fs::path(url.toLocalFile().toStdString());
+            auto path = std::filesystem::path(url.toLocalFile().toStdString());
             library.addVirtualMachine(path);
 
         } catch (std::exception &e) {
@@ -351,7 +351,7 @@ HubController::select(UUID uuid)
 
         if (m.meta) {
 
-            auto publish = [&](const char *key, const string &value) {
+            auto publish = [&](const char *key, const std::string &value) {
 
                 if (value.empty()) return;
 
@@ -368,7 +368,7 @@ HubController::select(UUID uuid)
         m_vInfo["meta"] = metaList;
 
         if (const auto screenshot = vm->root() / SVMFile::workspaceDir / m.screenshot;
-            !m.screenshot.empty() && fs::exists(screenshot)) {
+            !m.screenshot.empty() && std::filesystem::exists(screenshot)) {
 
             m_vInfo["screenshot"] = QString::fromStdString(m.screenshot.string());
             m_vInfo["screenshotUrl"] = toUrl(screenshot);
@@ -398,7 +398,7 @@ HubController::select(UUID uuid)
             m_sInfo["modified"]      = QDateTime::fromSecsSinceEpoch(snap->modified).toString(dateString);
 
             if (const auto screenshot = vm->root() / SVMFile::snapshotDir / snap->screenshot;
-                !snap->screenshot.empty() && fs::exists(screenshot)) {
+                !snap->screenshot.empty() && std::filesystem::exists(screenshot)) {
 
                 m_sInfo["screenshot"]    = QString::fromStdString(snap->screenshot.string());
                 m_sInfo["screenshotUrl"] = toUrl(screenshot);
@@ -432,7 +432,7 @@ HubController::sCount() const
     return 0;
 }
 
-vector<UUID>
+std::vector<UUID>
 HubController::openVMs() const
 {
     std::vector<UUID> result;
@@ -449,7 +449,7 @@ HubController::addVM(const QUrl &url)
 {
     try {
 
-        auto path = fs::path(url.toLocalFile().toStdString());
+        auto path = std::filesystem::path(url.toLocalFile().toStdString());
 
         if (auto *vm = library.addVirtualMachine(path)) {
 
@@ -475,7 +475,7 @@ HubController::openVM(const QUrl &url)
 {
     LogTask task("Opening a virtual machine by location...");
 
-    const auto path = fs::path(url.toLocalFile().toStdString());
+    const auto path = std::filesystem::path(url.toLocalFile().toStdString());
 
     /* A machine handed to us from outside -- by Finder, say -- may or may not
      * be one the library already holds, and addVM() refuses a path it knows
@@ -505,7 +505,7 @@ HubController::cloneVM(const QString &quuid, const QUrl &cloneUrl)
 {
     try {
 
-        auto clonePath = fs::path(cloneUrl.toLocalFile().toStdString());
+        auto clonePath = std::filesystem::path(cloneUrl.toLocalFile().toStdString());
         auto uuid = UUID::fromString(quuid.toStdString());
 
         if (auto *vm = library.cloneVirtualMachine(uuid, clonePath)) {

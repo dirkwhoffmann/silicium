@@ -20,11 +20,11 @@
 #include <functional>
 #include "FileSystems/CBM/FSTypes.h"
 
-using retro::vault::cbm::FSFormat;
-
 namespace retro::vault { class SVMFile; }
 
 namespace vc64 {
+
+using retro::vault::cbm::FSFormat;
 
 using peddle::Guard;
 using peddle::DasmStyle;

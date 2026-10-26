@@ -23,10 +23,9 @@
 #include <sstream>
 #include <fstream>
 
-using retro::vault::cbm::PETName;
-
 namespace vc64 {
 
+using retro::vault::cbm::PETName;
 using utl::Buffer;
 
 /* All media files are organized in the class hierarchy displayed below. AnyFile

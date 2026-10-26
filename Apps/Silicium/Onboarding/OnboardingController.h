@@ -62,7 +62,7 @@ public:
     // Creates a new virtual machine
     Q_INVOKABLE QUrl create(const QString &path);
     Q_INVOKABLE QUrl create(const QUrl &path);
-    QUrl create(const fs::path &path);
+    QUrl create(const utl::fs::path &path);
 
   private:
 
@@ -70,14 +70,14 @@ public:
     void createAmigaWorkspace(SVMFile &svm);
 
     // Creates the workspace folder of a freshly made SVM and returns its path
-    static fs::path prepareWorkspaceFolder(SVMFile &svm);
+    static utl::fs::path prepareWorkspaceFolder(SVMFile &svm);
 
     /* Writes the bundled Rom with this checksum to 'dest'. Throws if no
      * embedded Rom carries it.
      */
-    static void installBundledRom(u32 crc, const fs::path &dest);
-    void createC64ConfigScript(SVMFile &svm, const fs::path &scriptFile);
-    void createAmigaConfigScript(SVMFile &svm, const fs::path &scriptFile);
+    static void installBundledRom(u32 crc, const utl::fs::path &dest);
+    void createC64ConfigScript(SVMFile &svm, const utl::fs::path &scriptFile);
+    void createAmigaConfigScript(SVMFile &svm, const utl::fs::path &scriptFile);
 
   public:
 

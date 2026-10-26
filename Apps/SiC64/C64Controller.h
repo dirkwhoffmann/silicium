@@ -36,10 +36,10 @@ class C64Controller : public Controller {
     Q_OBJECT
 
     // Command line arguments
-    vector<string> execCommands;
+    std::vector<std::string> execCommands;
 
     // Associated SVM file
-    unique_ptr<SVMFile> svm;
+    std::unique_ptr<SVMFile> svm;
 
     // Describes why the SVM file could not be opened, set by parseArguments()
     QString errorMessage;
@@ -55,18 +55,18 @@ class C64Controller : public Controller {
     AudioController m_audio;
 
     // Subcontrollers
-    unique_ptr<SiC64ActivityController> m_activityController;
-    unique_ptr<SiC64XRayController> m_xrayController;
-    unique_ptr<SiC64CIAController> m_ciaController;
-    unique_ptr<SiC64CPUController> m_cpuController;
-    unique_ptr<SiC64MemoryController> m_memoryController;
-    unique_ptr<SiC64VICController> m_vicController;
-    unique_ptr<SiC64SIDController> m_sidController;
-    unique_ptr<SiC64ConfigController> m_configController;
-    unique_ptr<SiC64EventController> m_eventController;
-    unique_ptr<SiC64InfoController> m_infoController;
-    unique_ptr<SiC64KeyboardController> m_keyboardController;
-    unique_ptr<C64MediaController> m_mediaController;
+    std::unique_ptr<SiC64ActivityController> m_activityController;
+    std::unique_ptr<SiC64XRayController> m_xrayController;
+    std::unique_ptr<SiC64CIAController> m_ciaController;
+    std::unique_ptr<SiC64CPUController> m_cpuController;
+    std::unique_ptr<SiC64MemoryController> m_memoryController;
+    std::unique_ptr<SiC64VICController> m_vicController;
+    std::unique_ptr<SiC64SIDController> m_sidController;
+    std::unique_ptr<SiC64ConfigController> m_configController;
+    std::unique_ptr<SiC64EventController> m_eventController;
+    std::unique_ptr<SiC64InfoController> m_infoController;
+    std::unique_ptr<SiC64KeyboardController> m_keyboardController;
+    std::unique_ptr<C64MediaController> m_mediaController;
 
 
     //
@@ -395,7 +395,7 @@ public:
 
     // Receives messages from the emulator thread (see windowDidOpen()) and
     // marshals them onto the GUI thread.
-    void process(const vc64::Message &msg, const string &attachment = "", std::exception_ptr exception = nullptr);
+    void process(const vc64::Message &msg, const std::string &attachment = "", std::exception_ptr exception = nullptr);
 
     // Called when the emulator thread reports the result of a save
     void workspaceDidSave(std::exception_ptr exception);
@@ -420,14 +420,14 @@ public:
 private:
 
     // Processes incoming RPC messages
-    void rpcReceive(const string &payload);
+    void rpcReceive(const std::string &payload);
 
     // Carries out a single-stepping request and reports a failure to the user
     void step(const std::function<void()> &action);
 
     // Tells the user that a configuration request has failed
     void reportConfigError(const vc64::ConfigMsg &cfg, std::exception_ptr exception);
-    void rpcSend(const string &payload);
+    void rpcSend(const std::string &payload);
 
     // Loads a specific snapshot from this VM's own SVM
     void loadSnapshot(const utl::UUID &uuid);

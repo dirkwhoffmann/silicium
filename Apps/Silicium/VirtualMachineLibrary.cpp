@@ -62,19 +62,19 @@ VirtualMachineLibrary::lookupVirtualMachine(utl::UUID uuid)
 }
 
 VirtualMachine *
-VirtualMachineLibrary::lookupVirtualMachine(const string &uuid)
+VirtualMachineLibrary::lookupVirtualMachine(const std::string &uuid)
 {
     return lookupVirtualMachine(utl::UUID::fromString(uuid));
 }
 
 VirtualMachine*
-VirtualMachineLibrary::lookupVirtualMachine(const fs::path &path)
+VirtualMachineLibrary::lookupVirtualMachine(const std::filesystem::path &path)
 {
     std::error_code ec;
 
     // for (auto &vm : vms) {
     for (const auto &vm : std::views::values(vms)) {
-        if (fs::equivalent(vm->getSourcePath(), path, ec)) return vm.get();
+        if (std::filesystem::equivalent(vm->getSourcePath(), path, ec)) return vm.get();
     }
     return nullptr;
 }
@@ -86,13 +86,13 @@ VirtualMachineLibrary::lookupVirtualMachine(utl::UUID uuid) const
 }
 
 const VirtualMachine *
-VirtualMachineLibrary::lookupVirtualMachine(const string &uuid) const
+VirtualMachineLibrary::lookupVirtualMachine(const std::string &uuid) const
 {
     return const_cast<VirtualMachineLibrary *>(this)->lookupVirtualMachine(uuid);
 }
 
 const VirtualMachine *
-VirtualMachineLibrary::lookupVirtualMachine(const fs::path &path) const
+VirtualMachineLibrary::lookupVirtualMachine(const std::filesystem::path &path) const
 {
     return const_cast<VirtualMachineLibrary *>(this)->lookupVirtualMachine(path);
 }
@@ -111,15 +111,15 @@ VirtualMachineLibrary::lookupSnapshot(utl::UUID uuid)
 }
 
 SnapshotInfo *
-VirtualMachineLibrary::lookupSnapshot(const string &uuid)
+VirtualMachineLibrary::lookupSnapshot(const std::string &uuid)
 {
     return lookupSnapshot(utl::UUID::fromString(uuid));
 }
 
-vector<utl::UUID>
+std::vector<utl::UUID>
 VirtualMachineLibrary::collect(const std::function<bool(const VirtualMachine &)> &predicate) const
 {
-    vector<utl::UUID> result;
+    std::vector<utl::UUID> result;
 
     // for (const auto &vm : vms) {
     for (const auto &vm : std::views::values(vms)) {
@@ -130,7 +130,7 @@ VirtualMachineLibrary::collect(const std::function<bool(const VirtualMachine &)>
 }
 
 VirtualMachine *
-VirtualMachineLibrary::addVirtualMachine(const fs::path &path)
+VirtualMachineLibrary::addVirtualMachine(const std::filesystem::path &path)
 {
     // Check if a virtual with the same source path already exists
     if (lookupVirtualMachine(path))
@@ -159,7 +159,7 @@ VirtualMachineLibrary::addVirtualMachine(const fs::path &path)
 }
 
 VirtualMachine *
-VirtualMachineLibrary::cloneVirtualMachine(const fs::path &path, const fs::path &clonePath)
+VirtualMachineLibrary::cloneVirtualMachine(const std::filesystem::path &path, const std::filesystem::path &clonePath)
 {
     // Create a clone on disk
     SVMFile svm(SVMFile::Clone, path, clonePath);
@@ -172,7 +172,7 @@ VirtualMachineLibrary::cloneVirtualMachine(const fs::path &path, const fs::path 
 }
 
 VirtualMachine *
-VirtualMachineLibrary::cloneVirtualMachine(utl::UUID uuid, const fs::path &clonePath)
+VirtualMachineLibrary::cloneVirtualMachine(utl::UUID uuid, const std::filesystem::path &clonePath)
 {
     if (auto *vm = lookupVirtualMachine(uuid))
         return cloneVirtualMachine(vm->getSourcePath(), clonePath);
@@ -200,13 +200,13 @@ VirtualMachineLibrary::removeVirtualMachine(const std::string &uuid)
 }
 
 bool
-VirtualMachineLibrary::removeVirtualMachine(const fs::path &path)
+VirtualMachineLibrary::removeVirtualMachine(const std::filesystem::path &path)
 {
     std::error_code ec;
 
     for (auto it = vms.begin(); it != vms.end(); ++it) {
 
-        if (fs::equivalent(it->second->getSourcePath(), path, ec)) {
+        if (std::filesystem::equivalent(it->second->getSourcePath(), path, ec)) {
             vms.erase(it);
             return true;
         }
@@ -216,7 +216,7 @@ VirtualMachineLibrary::removeVirtualMachine(const fs::path &path)
 }
 
 void
-VirtualMachineLibrary::rename(utl::UUID uuid, const string &name, bool uniquify)
+VirtualMachineLibrary::rename(utl::UUID uuid, const std::string &name, bool uniquify)
 {
     auto [vm, snap] = resolve(uuid);
 
@@ -228,7 +228,7 @@ VirtualMachineLibrary::rename(utl::UUID uuid, const string &name, bool uniquify)
 }
 
 void
-VirtualMachineLibrary::rename(VirtualMachine &vm, const string &name, bool uniquify)
+VirtualMachineLibrary::rename(VirtualMachine &vm, const std::string &name, bool uniquify)
 {
     auto nameExists = [this](const std::string& s) {
         return std::any_of(vms.begin(), vms.end(), [&s](const auto& pair) {

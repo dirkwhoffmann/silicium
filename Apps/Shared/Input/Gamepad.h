@@ -69,7 +69,7 @@ struct Gamepad {
     //
 
     bool hasEmulationKeys() const;
-    optional<int> isEmulationKey(int key, int vkey) const;
+    std::optional<int> isEmulationKey(int key, int vkey) const;
 };
 
 Q_DECLARE_METATYPE(Gamepad)

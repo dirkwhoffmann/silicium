@@ -11,10 +11,10 @@
 #include "Logger.h"
 #include <stdio.h>
 
-unique_ptr<VirtualMachine>
-VirtualMachine::make(const fs::path &path)
+std::unique_ptr<VirtualMachine>
+VirtualMachine::make(const std::filesystem::path &path)
 {
-    return make_unique<VirtualMachine>(make_unique<SVMFile>(path));
+    return std::make_unique<VirtualMachine>(std::make_unique<SVMFile>(path));
 }
 
 void
@@ -66,7 +66,7 @@ VirtualMachine::persist() const
 }
 
 void
-VirtualMachine::rename(const string &name)
+VirtualMachine::rename(const std::string &name)
 {
     LogTask task("Renaming virtual machine...");
 
@@ -80,7 +80,7 @@ VirtualMachine::rename(const string &name)
 }
 
 void
-VirtualMachine::renameSnapshot(utl::UUID uuid, const string &name)
+VirtualMachine::renameSnapshot(utl::UUID uuid, const std::string &name)
 {
     LogTask task("Renaming snapshot...");
 
@@ -126,8 +126,8 @@ VirtualMachine::deleteSnapshot(const SnapshotInfo *info)
 
             // Remove snapshot files
             std::error_code ec;
-            fs::remove(binary, ec);
-            fs::remove(screenshot, ec);
+            std::filesystem::remove(binary, ec);
+            std::filesystem::remove(screenshot, ec);
 
             // Update the SVM
             persist();

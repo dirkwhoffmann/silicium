@@ -166,16 +166,16 @@ private:
 
 public:
 
-    optional<int> find(UUID uuid, int startIndex = 0, int delta = 1) const;
-    optional<int> find(ItemType type, int startIndex = 0, int delta = 1) const;
+    std::optional<int> find(UUID uuid, int startIndex = 0, int delta = 1) const;
+    std::optional<int> find(ItemType type, int startIndex = 0, int delta = 1) const;
 
-    optional<UUID> nextVMIndex(int index) const;
-    optional<UUID> prevVMIndex(int index) const;
-    optional<UUID> nextSnapIndex(int index) const;
-    optional<UUID> prevSnapIndex(int index) const;
+    std::optional<UUID> nextVMIndex(int index) const;
+    std::optional<UUID> prevVMIndex(int index) const;
+    std::optional<UUID> nextSnapIndex(int index) const;
+    std::optional<UUID> prevSnapIndex(int index) const;
 
-    optional<UUID> nextVM(UUID uuid) const; // DEPRECATED
-    optional<UUID> prevVM(UUID uuid) const; // DEPRECATED
-    optional<UUID> nextSnap(UUID uuid) const; // DEPRECATED
-    optional<UUID> prevSnap(UUID uuid) const; // DEPRECATED
+    std::optional<UUID> nextVM(UUID uuid) const; // DEPRECATED
+    std::optional<UUID> prevVM(UUID uuid) const; // DEPRECATED
+    std::optional<UUID> nextSnap(UUID uuid) const; // DEPRECATED
+    std::optional<UUID> prevSnap(UUID uuid) const; // DEPRECATED
 };

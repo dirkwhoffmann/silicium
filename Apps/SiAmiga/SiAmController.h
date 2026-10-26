@@ -42,10 +42,10 @@ class SiAmController : public Controller {
     Q_OBJECT
 
     // Command line arguments
-    vector<string> execCommands;
+    std::vector<std::string> execCommands;
 
     // Associated SVM file
-    unique_ptr<SVMFile> svm;
+    std::unique_ptr<SVMFile> svm;
 
     // Describes why the SVM file could not be opened, set by parseArguments()
     QString errorMessage;
@@ -61,24 +61,24 @@ class SiAmController : public Controller {
     AudioController m_audio;
 
     // Subcontrollers
-    unique_ptr<SiAmActivityController> m_activityController;
-    unique_ptr<SiAmConfigController> m_configController;
-    unique_ptr<SiAmKeyboardController> m_keyboardController;
-    unique_ptr<SiAmInspectorController> m_inspectorController;
-    unique_ptr<SiAmInfoController> m_infoController;
-    unique_ptr<SiAmCIAController> m_ciaController;
-    unique_ptr<SiAmEventController> m_eventController;
-    unique_ptr<SiAmMemoryController> m_memoryController;
-    unique_ptr<SiAmCopperController> m_copperController;
-    unique_ptr<SiAmBlitterController> m_blitterController;
-    unique_ptr<SiAmAgnusController> m_agnusController;
-    unique_ptr<SiAmPaulaController> m_paulaController;
-    unique_ptr<SiAmLogicAnalyzerController> m_logicAnalyzerController;
-    unique_ptr<SiAmXRayController> m_xrayController;
-    unique_ptr<SiAmCPUController> m_cpuController;
-    unique_ptr<SiAmDeniseController> m_deniseController;
-    unique_ptr<SiAmPortController> m_portController;
-    unique_ptr<SiAmMediaController> m_mediaController;
+    std::unique_ptr<SiAmActivityController> m_activityController;
+    std::unique_ptr<SiAmConfigController> m_configController;
+    std::unique_ptr<SiAmKeyboardController> m_keyboardController;
+    std::unique_ptr<SiAmInspectorController> m_inspectorController;
+    std::unique_ptr<SiAmInfoController> m_infoController;
+    std::unique_ptr<SiAmCIAController> m_ciaController;
+    std::unique_ptr<SiAmEventController> m_eventController;
+    std::unique_ptr<SiAmMemoryController> m_memoryController;
+    std::unique_ptr<SiAmCopperController> m_copperController;
+    std::unique_ptr<SiAmBlitterController> m_blitterController;
+    std::unique_ptr<SiAmAgnusController> m_agnusController;
+    std::unique_ptr<SiAmPaulaController> m_paulaController;
+    std::unique_ptr<SiAmLogicAnalyzerController> m_logicAnalyzerController;
+    std::unique_ptr<SiAmXRayController> m_xrayController;
+    std::unique_ptr<SiAmCPUController> m_cpuController;
+    std::unique_ptr<SiAmDeniseController> m_deniseController;
+    std::unique_ptr<SiAmPortController> m_portController;
+    std::unique_ptr<SiAmMediaController> m_mediaController;
 
 
     //
@@ -146,7 +146,7 @@ public:
      * machine owns lives here (see Amiga::saveWorkspace), so a file copied in
      * travels with the SVM.
      */
-    fs::path workspaceFolder() const;
+    std::filesystem::path workspaceFolder() const;
 
     // The SVM file this machine belongs to
     SVMFile &svmFile() { return *svm; }
@@ -302,7 +302,7 @@ public:
      * hdAttachDidFinish), and the machine is then set up to see the drive.
      * Returns false if nothing was started.
      */
-    bool attachHdAsync(int nr, const fs::path &path);
+    bool attachHdAsync(int nr, const std::filesystem::path &path);
 
     /* The same for a new drive, which the core creates in the workspace. The
      * creation is quick and happens right away. Files are imported by the
@@ -310,7 +310,7 @@ public:
      * hdImportDidFinish). Returns false if nothing was started.
      */
     bool createHd(int nr, int megabytes, int fsFormat, const std::string &name,
-                  const fs::path &importPath = {});
+                  const std::filesystem::path &importPath = {});
 
     // A job is running, or the emulator thread is saving
     bool busy() const override { return m_savingWorkspace || m_savingSnapshot || m_hibernating || m_attachingHd >= 0 || m_importingHd >= 0; }
@@ -456,7 +456,7 @@ public:
 
     // Receives messages from the emulator thread (see initialize()) and
     // marshals them onto the GUI thread.
-    void process(const vamiga::Message &msg, const string &attachment = "", std::exception_ptr exception = nullptr);
+    void process(const vamiga::Message &msg, const std::string &attachment = "", std::exception_ptr exception = nullptr);
 
     // Called when the emulator thread reports the result of a save
     void workspaceDidSave(std::exception_ptr exception);
@@ -489,14 +489,14 @@ public:
 private:
 
     // Processes incoming RPC messages
-    void rpcReceive(const string &payload);
+    void rpcReceive(const std::string &payload);
 
     // Carries out a single-stepping request and reports a failure to the user
     void step(const std::function<void()> &action);
 
     // Tells the user that a configuration request has failed
     void reportConfigError(const vamiga::ConfigMsg &cfg, std::exception_ptr exception);
-    void rpcSend(const string &payload);
+    void rpcSend(const std::string &payload);
 
     // Loads a specific snapshot from this VM's own SVM
     void loadSnapshot(const utl::UUID &uuid);

@@ -226,7 +226,7 @@ HubSidebarModel::reveal(UUID uuid)
     }
 }
 
-optional<int>
+std::optional<int>
 HubSidebarModel::find(UUID uuid, int startIndex, int delta) const
 {
     for (int i = startIndex; i >= 0 && i < items.size(); i += delta) {
@@ -235,7 +235,7 @@ HubSidebarModel::find(UUID uuid, int startIndex, int delta) const
     return {};
 }
 
-optional<int>
+std::optional<int>
 HubSidebarModel::find(ItemType type, int startIndex, int delta) const
 {
     for (int i = startIndex; i >= 0 && i < items.size(); i += delta) {
@@ -244,7 +244,7 @@ HubSidebarModel::find(ItemType type, int startIndex, int delta) const
     return {};
 }
 
-optional<UUID>
+std::optional<UUID>
 HubSidebarModel::nextVMIndex(int index) const
 {
     for (int i = index + 1; i >= 0 && i < items.size(); ++i) {
@@ -253,7 +253,7 @@ HubSidebarModel::nextVMIndex(int index) const
     return {};
 }
 
-optional<UUID>
+std::optional<UUID>
 HubSidebarModel::prevVMIndex(int index) const
 {
     for (int i = index - 1; i >= 0 && i < items.size(); --i) {
@@ -262,7 +262,7 @@ HubSidebarModel::prevVMIndex(int index) const
     return {};
 }
 
-optional<UUID>
+std::optional<UUID>
 HubSidebarModel::nextSnapIndex(int index) const
 {
     for (int i = index + 1; i >= 0 && i < items.size(); ++i) {
@@ -271,7 +271,7 @@ HubSidebarModel::nextSnapIndex(int index) const
     return {};
 }
 
-optional<UUID>
+std::optional<UUID>
 HubSidebarModel::prevSnapIndex(int index) const
 {
     for (int i = index - 1; i >= 0 && i < items.size(); --i) {

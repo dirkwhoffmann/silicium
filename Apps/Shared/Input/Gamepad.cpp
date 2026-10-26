@@ -57,7 +57,7 @@ Gamepad::hasEmulationKeys() const
     return false;
 }
 
-optional<int>
+std::optional<int>
 Gamepad::isEmulationKey(int qKey, int pKey) const
 {
     for (int i = 0; i < int(keys.size()); ++i) {
