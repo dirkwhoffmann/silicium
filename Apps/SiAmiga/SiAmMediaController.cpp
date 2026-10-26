@@ -98,8 +98,8 @@ SiAmMediaController::newDisk(int nr, int fsFormat, int bootBlock, const QString 
 {
     try {
 
-        auto fs = amiga::FSFormat(fsFormat);
-        auto bb = amiga::BootBlockId(bootBlock);
+        auto fs = retro::vault::amiga::FSFormat(fsFormat);
+        auto bb = retro::vault::amiga::BootBlockId(bootBlock);
 
         SiAmController::core().df[nr]->insertBlankDisk(fs, bb, name.toStdString());
 
@@ -369,10 +369,10 @@ SiAmMediaController::installAros(quint32 crc32)
 
         switch (crc32) {
 
-            case CRC32_AROS_54705:    rom = "aros-svn54705-rom";  ext = "aros-svn54705-ext";  break; // UAE, May 2017
-            case CRC32_AROS_55696:    rom = "aros-svn55696-rom";  ext = "aros-svn55696-ext";  break; // SAE, Feb 2019
-            case CRC32_AROS_20250219: rom = "aros-20250219-rom";  ext = "aros-20250219-ext";  break; // Feb 2025
-            case CRC32_AROS_20260820: rom = "aros-20260820-rom";  ext = "aros-20260820-ext";  break; // newest
+            case retro::vault::CRC32_AROS_54705:    rom = "aros-svn54705-rom";  ext = "aros-svn54705-ext";  break; // UAE, May 2017
+            case retro::vault::CRC32_AROS_55696:    rom = "aros-svn55696-rom";  ext = "aros-svn55696-ext";  break; // SAE, Feb 2019
+            case retro::vault::CRC32_AROS_20250219: rom = "aros-20250219-rom";  ext = "aros-20250219-ext";  break; // Feb 2025
+            case retro::vault::CRC32_AROS_20260820: rom = "aros-20260820-rom";  ext = "aros-20260820-ext";  break; // newest
 
             default:
                 throw std::runtime_error("No bundled AROS Rom matches this version.");
@@ -412,8 +412,8 @@ SiAmMediaController::installDiagRom(quint32 crc32)
 
         switch (crc32) {
 
-            case CRC32_DIAG121: rom = "diagrom-121"; break; // v1.2.1, Jul 2020
-            case CRC32_DIAG13:  rom = "diagrom-13";  break; // v1.3, Apr 2023 (newest)
+            case retro::vault::CRC32_DIAG121: rom = "diagrom-121"; break; // v1.2.1, Jul 2020
+            case retro::vault::CRC32_DIAG13:  rom = "diagrom-13";  break; // v1.3, Apr 2023 (newest)
 
             default:
                 throw std::runtime_error("No bundled DiagROM matches this version.");

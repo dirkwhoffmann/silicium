@@ -54,8 +54,8 @@ class SiAmConfigController : public Controller {
     SiAmController *parent = nullptr;
 
     // Cached ROM properties
-    vamiga::RomTraits kickRom {};
-    vamiga::RomTraits extRom {};
+    retro::vault::RomTraits kickRom {};
+    retro::vault::RomTraits extRom {};
 
   public:
 
@@ -121,23 +121,23 @@ class SiAmConfigController : public Controller {
     QUrl getKickRomIcon() const { return getRomIcon(kickRom); }
     QString getKickRomTitle() const { return QString::fromUtf8(kickRom.title); }
     QString getKickRomRevision() const { return QString::fromUtf8(kickRom.revision); }
-    QString getKickRomReleased() const { return QString::fromStdString(vamiga::RomDateToString(kickRom.released)); }
-    QString getKickRomModel() const { return (kickRom.flags & vamiga::RomFlags::Patched) ? QStringLiteral("Patched") : QString(); }
+    QString getKickRomReleased() const { return QString::fromStdString(retro::vault::RomDateToString(kickRom.released)); }
+    QString getKickRomModel() const { return (kickRom.flags & retro::vault::RomFlags::Patched) ? QStringLiteral("Patched") : QString(); }
     QString getKickRomVendor() const { return getRomVendor(kickRom); }
-    bool hasPatchedKickRom() const { return (kickRom.flags & vamiga::RomFlags::Patched) != 0; }
+    bool hasPatchedKickRom() const { return (kickRom.flags & retro::vault::RomFlags::Patched) != 0; }
 
     bool hasExtRom() const { return extRom.crc != 0; }
     u32 getExtRomCrc() const { return extRom.crc; }
     QUrl getExtRomIcon() const { return getRomIcon(extRom); }
     QString getExtRomTitle() const { return QString::fromUtf8(extRom.title); }
     QString getExtRomRevision() const { return QString::fromUtf8(extRom.revision); }
-    QString getExtRomReleased() const { return QString::fromStdString(vamiga::RomDateToString(extRom.released)); }
-    QString getExtRomModel() const { return (extRom.flags & vamiga::RomFlags::Patched) ? QStringLiteral("Patched") : QString(); }
+    QString getExtRomReleased() const { return QString::fromStdString(retro::vault::RomDateToString(extRom.released)); }
+    QString getExtRomModel() const { return (extRom.flags & retro::vault::RomFlags::Patched) ? QStringLiteral("Patched") : QString(); }
     QString getExtRomVendor() const { return getRomVendor(extRom); }
-    bool hasPatchedExtRom() const { return (extRom.flags & vamiga::RomFlags::Patched) != 0; }
+    bool hasPatchedExtRom() const { return (extRom.flags & retro::vault::RomFlags::Patched) != 0; }
 
-    QUrl getRomIcon(const vamiga::RomTraits &traits) const;
-    QString getRomVendor(const vamiga::RomTraits &traits) const;
+    QUrl getRomIcon(const retro::vault::RomTraits &traits) const;
+    QString getRomVendor(const retro::vault::RomTraits &traits) const;
 
     QStringList getAvailableKickRoms() const { return availableRomNames(false); }
     QStringList getAvailableExtRoms() const { return availableRomNames(true); }
@@ -146,7 +146,7 @@ class SiAmConfigController : public Controller {
     // except AMIGA_EXTROM when 'extOnly' is false, only AMIGA_EXTROM ones
     // when it's true -- in the same order availableRomNames()/installXRom()
     // index into.
-    std::vector<vamiga::RomTraits> availableRoms(bool extOnly) const;
+    std::vector<retro::vault::RomTraits> availableRoms(bool extOnly) const;
     QStringList availableRomNames(bool extOnly) const;
 
     /* If 'path' matches a known Rom in the database (by content, not by

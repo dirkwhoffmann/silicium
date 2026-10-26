@@ -9,6 +9,8 @@
 
 #include "SiC64EventController.h"
 #include "C64Controller.h"
+// Internal core headers rely on the name lookup that vcconfig.h provides
+#include "vcconfig.h"
 #include "C64.h"
 
 using namespace vc64;

@@ -96,8 +96,8 @@ public:
     //
 
     // One-click installers for the bundled Rom images
-    Q_INVOKABLE void installAros(quint32 crc32 = vamiga::CRC32_AROS_20260820);
-    Q_INVOKABLE void installDiagRom(quint32 crc32 = vamiga::CRC32_DIAG13);
+    Q_INVOKABLE void installAros(quint32 crc32 = retro::vault::CRC32_AROS_20260820);
+    Q_INVOKABLE void installDiagRom(quint32 crc32 = retro::vault::CRC32_DIAG13);
     Q_INVOKABLE void installEmuTOS();
 
 private:

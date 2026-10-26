@@ -608,14 +608,14 @@ SiAmController::createHd(int nr, int megabytes, int fsFormat, const std::string 
 {
     if (busy()) return false;
 
-    auto fsType = amiga::FSFormat(fsFormat);
+    auto fsType = retro::vault::amiga::FSFormat(fsFormat);
 
     try {
 
         // Quick, even for a large drive
         core().hd[nr]->create(*svm, megabytes, fsType, name);
 
-        if (fsType == amiga::FSFormat::NODOS || importPath.empty()) {
+        if (fsType == retro::vault::amiga::FSFormat::NODOS || importPath.empty()) {
 
             hdDidArrive(nr);
             return true;
