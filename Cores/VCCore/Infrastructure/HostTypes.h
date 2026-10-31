@@ -25,6 +25,7 @@ namespace vc64 {
  * static_cast moves a value from this Reflectable-paired, UI/option-facing
  * enum to the one GpuColor<F> is templated on, and back.
  */
+/// Byte layout of a 32-bit host pixel
 enum class TexFormat : long
 {
     ABGR,                       ///< AABBGGRR
@@ -64,19 +65,20 @@ struct TexFormatEnum : utl::Reflectable<TexFormatEnum, TexFormat> {
 // Structures
 //
 
+/// Properties of the host machine
 typedef struct
 {
-    // Refresh rate of the host display
+    /// Refresh rate of the host display
     isize refreshRate;
 
-    // Audio sample rate of the host computer
+    /// Audio sample rate of the host computer
     isize sampleRate;
 
-    // Texture format
+    /// Texture format
     TexFormat texFormat;
 
     // Framebuffer dimensions
-    isize frameBufferWidth;
+    isize frameBufferWidth;              ///< Width of the host frame buffer (in pixels)
     isize frameBufferHeight;                ///< Height of the host frame buffer (in pixels)
 }
 HostConfig;

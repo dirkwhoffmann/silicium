@@ -58,10 +58,11 @@ struct ServerTypeEnum : utl::Reflectable<ServerTypeEnum, ServerType>
 };
 
 
+/// Direction of a packet in the traffic log
 enum class TrafficDirection : long
 {
-    RECEIVED,       // The packet was received from a client
-    SENT            // The packet was sent to a client
+    RECEIVED,                            ///< The packet was received from a client
+    SENT                                 ///< The packet was sent to a client
 };
 
 struct TrafficDirectionEnum : utl::Reflectable<TrafficDirectionEnum, TrafficDirection>
@@ -94,6 +95,7 @@ struct TrafficDirectionEnum : utl::Reflectable<TrafficDirectionEnum, TrafficDire
 // Structures
 //
 
+/// State of the remote servers
 typedef struct
 {
     RemoteServerInfo rshInfo;               ///< State of the RetroShell server
@@ -108,21 +110,22 @@ RemoteManagerInfo;
  * assigned a monotonically increasing sequence number which is passed to the
  * GUI in the Msg::SRV_RECEIVE and Msg::SRV_SEND notification messages.
  */
+/// An entry of the traffic log
 typedef struct
 {
-    // Sequence number (unique, monotonically increasing)
+    /// Sequence number (unique, monotonically increasing)
     isize nr;
 
-    // The server that received or sent the packet
+    /// The server that received or sent the packet
     ServerType server;
 
-    // Tells whether the packet was received or sent
+    /// Tells whether the packet was received or sent
     TrafficDirection direction;
 
-    // Host time stamp (milliseconds since epoch)
+    /// Host time stamp (milliseconds since epoch)
     i64 time;
 
-    // Packet contents
+    /// Packet contents
     string payload;
 }
 TrafficEntry;

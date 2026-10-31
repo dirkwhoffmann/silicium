@@ -56,12 +56,14 @@ struct UserPortDeviceEnum : utl::Reflectable<UserPortDeviceEnum, UserPortDevice>
 // Structures
 //
 
+/// Configuration of the user port
 typedef struct
 {
     UserPortDevice device;                  ///< User port device
 }
 UserPortConfig;
 
+/// State of the user port (currently carries no data)
 typedef struct
 {
 
