@@ -220,12 +220,11 @@ public:
 
     // Disassembles an item from the log buffer
     isize disassRecorded(char *dst, const char *fmt, isize addr) const;
+    isize disassRecorded(char *dst, const char *fmt, isize addr, const DasmStyle &style) const;
 
     // DEPRECATED
     isize disassembleRecordedInstr(isize i, char *str) const;
     isize disassembleRecordedBytes(isize i, char *str) const;
-    void disassembleRecordedFlags(isize i, char *str) const;
-    void disassembleRecordedPC(isize i, char *str) const;
 
     // Clears the log buffer
     void clearLog() { logCnt = 0; }

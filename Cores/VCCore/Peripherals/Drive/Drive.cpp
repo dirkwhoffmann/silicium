@@ -178,6 +178,20 @@ Drive::executeUF4()
 }
 
 void
+Drive::fitBlankHalftrack()
+{
+    if (!hasDisk() || !disk->halftrackIsEmpty(halftrack)) return;
+
+    // An unformatted halftrack has no length of its own. When we start writing
+    // to it, the number of bits that fit on the track is determined by the
+    // current bit rate (one revolution takes 200000 cycles).
+    isize bits = (isize)(500000000 / delayBetweenTwoCarryPulses[zone]) & ~7;
+
+    disk->length.halftrack[halftrack] = (u16)bits;
+    if (offset >= bits) offset %= bits;
+}
+
+void
 Drive::updateByteReady()
 {
     //
@@ -269,16 +283,16 @@ Drive::setRotating(bool b)
 }
 
 void
-Drive::wakeUp(isize awakeness)
+Drive::wakeUp()
 {
     if (isIdle()) {
         
-        logmsg(LOG_DRV, "Exiting power-safe mode\n");
+        logmsg(LOG_DRV, "Exiting power-save mode\n");
         msgQueue.put(Msg::DRIVE_POWER_SAVE, DriveMsg { .nr = i16(objid), .value = 0 } );
         needsEmulation = true;
     }
 
-    watchdog = awakeness;
+    idleCounter = 0;
 }
 
 void
@@ -537,12 +551,17 @@ Drive::vsyncHandler()
 {
     // Only proceed if the drive is connected and switched on
     if (!config.connected || !config.switchedOn) return;
-
-    // Check if we should enter power-safe mode
-    if (!spinning && config.powerSave) {
-
-        if (--watchdog == 0) {
-
+    
+    if (spinning) {
+        
+        // A spinning drive is never idle
+        wakeUp();
+        
+    } else if (config.powerSave) {
+        
+        // Check if we should enter power-save mode
+        if (!isIdle() && ++idleCounter == powerSafeThreshold) {
+            
             logmsg(LOG_DRV, "Entering power-save mode\n");
             needsEmulation = false;
             msgQueue.put(Msg::DRIVE_POWER_SAVE, DriveMsg { .nr = i16(objid), .value = 1 } );
@@ -567,8 +586,8 @@ Drive::processCommand(const Command &cmd)
 void
 Drive::scheduleFirstDiskChangeEvent(EventID id)
 {
-    // Exit power-safe mode and make sure the drive stays awake for a while
-    wakeUp(200); // 200 frames
+    // Exit power-save mode
+    wakeUp();
 
     // Schedule the first event
     if (isDrive8()) c64.scheduleImm<SLOT_DC8>(id);

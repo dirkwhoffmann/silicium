@@ -9,19 +9,12 @@
 
 #include "SiC64MemoryController.h"
 #include "C64Controller.h"
-#include "SiC64ConfigController.h"
 
 using namespace vc64;
 
 SiC64MemoryController::SiC64MemoryController(C64Controller *parent)
     : SiC64InspectorController(parent), m_rowModel(this)
 {
-    // The heatmap sub-view is only populated while the MEM_HEATMAP config
-    // option is on. Mirror the old Swift-based emulator, which enabled it
-    // while the Memory inspector was open.
-    connect(this, &SiC64InspectorController::activeChanged, this, [this]() {
-        this->parent->getConfigController()->setMemHeatmap(isActive());
-    });
 }
 
 QString

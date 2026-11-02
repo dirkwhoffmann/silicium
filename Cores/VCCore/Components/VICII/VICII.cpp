@@ -705,11 +705,18 @@ VICII::endFrame()
     bool debug = xray.config.mode == XRayMode::XRAY_DMA;
     bool merge = xray.config.mode != XRayMode::XRAY_NONE;
 
+    // Record memory accesses while the heat map is shown
+    xray.updateAccessRecorder();
+
     // Update the VICII revision if requested
     updateRevision();
 
     // Only proceed if the current frame hasn't been executed in headless mode
     if (c64.getHeadless()) return;
+
+    // Draw the spectrum analyzer or the heatmap into the X-ray texture if enabled
+    if (xray.config.mode == XRayMode::XRAY_SPECTRUM) xray.drawSpectrum();
+    if (xray.config.mode == XRayMode::XRAY_HEATMAP) xray.drawHeatmap();
 
     // Merge the X-ray texture into the picture if enabled
     if (merge) xray.computeOverlay(emuTexture, xrayTexture);
@@ -727,6 +734,9 @@ VICII::endFrame()
 
     if (debug) resetEmuTexture(activeBuffer);
     if (merge) resetXrayTexture(activeBuffer);
+
+    // Start the new frame with a fresh crosshair
+    if (xray.config.mode == XRayMode::XRAY_CROSSHAIRS) xray.computeCrosshairs(xrayTexture);
 
     emulator.unlockTexture();
 }

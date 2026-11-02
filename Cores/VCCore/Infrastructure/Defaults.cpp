@@ -127,7 +127,6 @@ Defaults::Defaults()
     setFallback(Opt::SID_POWER_SAVE,            false,                  {0, 1, 2, 3});
 
     setFallback(Opt::MEM_INIT_PATTERN,          (i64)RamPattern::VICE);
-    setFallback(Opt::MEM_HEATMAP,               false);
     setFallback(Opt::MEM_SAVE_ROMS,             true);
 
     setFallback(Opt::DRV_AUTO_CONFIG,           true,               {DRIVE8, DRIVE9});
@@ -187,6 +186,11 @@ Defaults::Defaults()
     setFallback(Opt::SRV_PORT,                  8084,                   { (i64)ServerType::PROM });
     setFallback(Opt::SRV_TRANSPORT,             (i64)TransportProtocol::HTTP, { (i64)ServerType::PROM });
     setFallback(Opt::SRV_VERBOSE,               false,                  { (i64)ServerType::PROM });
+
+    setFallback(Opt::SRV_ENABLE,                false,                  { (i64)ServerType::MCP });
+    setFallback(Opt::SRV_PORT,                  8085,                   { (i64)ServerType::MCP });
+    setFallback(Opt::SRV_TRANSPORT,             (i64)TransportProtocol::HTTP, { (i64)ServerType::MCP });
+    setFallback(Opt::SRV_VERBOSE,               false,                  { (i64)ServerType::MCP });
 
     setFallback(Opt::DBG_DEBUGCART,             0);
     setFallback(Opt::DBG_WATCHDOG,              0);

@@ -47,9 +47,6 @@ SiC64InspectorWindow {
     readonly property real globalRow: mem.displayedBank * 256 + dumpList.contentY / dumpList.rowH
     onGlobalRowChanged: navSlider.value = globalRow
 
-    // 0 = Data view, 1 = Heatmap
-    property int view: 0
-
     component HeaderLabel: SuLabel {
 
         topPadding: 2
@@ -261,37 +258,19 @@ SiC64InspectorWindow {
         }
 
         //
-        // View selector
-        //
-
-        RowLayout {
-
-            Layout.fillWidth: true
-
-            Item { Layout.fillWidth: true }
-
-            SuSegmentedControl {
-
-                model: [qsTr("Data View"), qsTr("Heatmap")]
-                currentIndex: root.view
-                onActivated: (index) => root.view = index
-            }
-
-            Item { Layout.fillWidth: true }
-        }
-
-        //
         // Content
         //
 
-        StackLayout {
+        ColumnLayout {
 
             Layout.fillWidth: true
             Layout.fillHeight: true
-            currentIndex: root.view
+            spacing: 0
 
             RowLayout {
 
+                Layout.fillWidth: true
+                Layout.fillHeight: true
                 spacing: Style.mediumSpacing
 
                 //
@@ -476,28 +455,6 @@ SiC64InspectorWindow {
                             }
                         }
                     }
-                }
-            }
-
-            //
-            // Heatmap view
-            //
-
-            Rectangle {
-
-                color: "transparent"
-                border.color: Palette.surfaceBorder
-                border.width: 0
-                radius: Style.radius
-                clip: true
-
-                SiC64Heatmap {
-
-                    anchors.fill: parent
-                    anchors.topMargin: 2
-                    anchors.leftMargin: 2
-                    anchors.rightMargin: 0
-                    anchors.bottomMargin: 0
                 }
             }
         }

@@ -269,13 +269,10 @@ class SiC64ConfigController : public Controller {
     Q_PROPERTY(int GLUE_LOGIC READ glueLogic WRITE setGlueLogic NOTIFY configChanged)
     Q_PROPERTY(int POWER_GRID READ powerGrid WRITE setPowerGrid NOTIFY configChanged)
     Q_PROPERTY(int MEM_INIT_PATTERN READ ramPattern WRITE setRamPattern NOTIFY configChanged)
-    // Enables the memory-access heatmap texture, populated only while the
-    // Memory inspector is open (see SiC64MemoryController).
-    Q_PROPERTY(bool MEM_HEATMAP READ memHeatmap WRITE setMemHeatmap NOTIFY configChanged)
 
     // Restores the factory settings for every option the Hardware panel
     // exposes (SiC64HardwareConfig.qml) -- note that's a subset of the
-    // hardware options above, e.g. the VICII cutout and heatmap debug options
+    // hardware options above, e.g. the VICII cutout debug options
     // aren't on that panel and are left untouched.
     Q_INVOKABLE void restoreHardwareDefaults();
 
@@ -313,8 +310,6 @@ class SiC64ConfigController : public Controller {
     void setPowerGrid(int value) { set(vc64::Opt::POWER_GRID, (i64)value); }
     int ramPattern() const { return (int)get(vc64::Opt::MEM_INIT_PATTERN); }
     void setRamPattern(int value) { set(vc64::Opt::MEM_INIT_PATTERN, (i64)value); }
-    bool memHeatmap() const { return (bool)get(vc64::Opt::MEM_HEATMAP); }
-    void setMemHeatmap(bool value) { set(vc64::Opt::MEM_HEATMAP, (i64)value); }
 
     //
     // Peripherals

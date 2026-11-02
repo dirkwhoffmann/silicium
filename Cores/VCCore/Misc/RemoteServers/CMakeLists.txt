@@ -7,6 +7,7 @@ RemoteServer.cpp
 RshServer.cpp
 DapServer.cpp
 DapAdapter.cpp
+McpServer.cpp
 RpcServer.cpp
 PromServer.cpp
 Socket.cpp

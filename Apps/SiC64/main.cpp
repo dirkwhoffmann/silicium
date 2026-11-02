@@ -18,7 +18,6 @@
 #include "SiC64InfoController.h"
 #include "Inspector/SiC64InspectorController.h"
 #include "Inspector/XRay/SiC64DmaView.h"
-#include "Inspector/Memory/SiC64Heatmap.h"
 #include "Inspector/SID/SiC64Waveform.h"
 #include "SiC64ActivityController.h"
 #include "Keyboard/SiC64KeyboardController.h"
@@ -72,7 +71,6 @@ main(int argc, char *argv[])
     qmlRegisterType<SiC64KeyboardController>("Silicium.Controllers", 1, 0, "SiC64KeyboardController");
     qmlRegisterType<SiC64Renderer>("Silicium.Components", 1, 0, "SiC64Renderer");
     qmlRegisterType<SiC64DmaView>("Silicium.Components", 1, 0, "SiC64DmaView");
-    qmlRegisterType<SiC64Heatmap>("Silicium.Components", 1, 0, "SiC64Heatmap");
     qmlRegisterType<SiC64Waveform>("Silicium.Components", 1, 0, "SiC64Waveform");
 
     // Tell the UI toolkit what the user has set up

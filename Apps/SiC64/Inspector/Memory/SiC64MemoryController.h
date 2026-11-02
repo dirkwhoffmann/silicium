@@ -27,9 +27,6 @@
 //   - the processor-port mode flags (EXROM/GAME/CHAREN/HIRAM/LORAM).
 //
 // Numeric output honours the shared format setting (C64Controller::format).
-// The heatmap sub-view (SiC64Heatmap) needs the core's MEM_HEATMAP option,
-// which is switched on only while this panel is active.
-//
 // The shared active flag, tick throttle and beam-position readout come from
 // SiC64InspectorController.
 //

@@ -123,7 +123,8 @@ SiC64InspectorWindow {
                 SuLabeledComboBox {
 
                     Layout.fillWidth: true
-                    model: [qsTr("Off"), qsTr("DMA scan"), qsTr("Layer scan")]
+                    model: [qsTr("Off"), qsTr("DMA scan"), qsTr("Layer scan"),
+                             qsTr("Spectrum"), qsTr("Heatmap"), qsTr("Crosshairs")]
                     currentIndex: cc.XRAY_MODE
                     onCurrentIndexChanged: cc.XRAY_MODE = currentIndex
                 }

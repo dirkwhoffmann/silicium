@@ -201,23 +201,6 @@ public:
     const MemInfo &getCachedInfo() const;
 
 
-    /** @brief  Draws a heatmap of the recent memory accesses.
-     *
-     *  The 64 KB address space is shown as a grid of 256 x 256 cells. Neighboring
-     *  addresses are mapped to neighboring cells by interleaving the address
-     *  bits, so that address ranges form compact blocks. A cell lights up when
-     *  its address is accessed and fades out over time. The map is updated at
-     *  the end of each frame, and only while the option Opt::MEM_HEATMAP is
-     *  enabled.
-     *
-     *  @param  buffer  Texture buffer for 256 x 256 pixels (RGBA)
-     *  @param  width   Width of the texture, must be 256
-     *  @param  height  Height of the texture, must be 256
-     *
-     *  @throw  CoreError (CoreError::OPT_INV_ARG) if the size is not 256 x 256.
-     */
-    void drawHeatmap(u32 *buffer, isize width, isize height) const;
-
 };
 
 
@@ -408,6 +391,14 @@ public:
      */
     string disassemble(u16 addr, const string &fmt, isize *len = nullptr) const;
 
+    /** Disassembles an instruction using a specific output style.
+     *  The style determines how numbers are formatted and where operands
+     *  start. All other parameters are as in disassemble() above, which
+     *  uses the default style (see setNumberFormat()).
+     *  @param  style   The output style (see DasmStyle::hex() for a ready-made one)
+     */
+    string disassemble(u16 addr, const string &fmt, const DasmStyle &style, isize *len = nullptr) const;
+
     /** Disassembles an instruction from the record buffer.
      *  @param  nr      Index of the instruction in the record buffer
      *  @param  fmt     String defining the output format (see disassemble())
@@ -415,6 +406,9 @@ public:
      *  @return The disassembled text.
      */
     string disassembleRecorded(isize nr, const string &fmt, isize *len = nullptr) const;
+
+    /// Disassembles an instruction from the record buffer using a specific output style.
+    string disassembleRecorded(isize nr, const string &fmt, const DasmStyle &style, isize *len = nullptr) const;
 };
 
 /** CPU API
@@ -782,6 +776,24 @@ public:
     /// Saves a cutout of the most recent stable X-Ray texture as a PNG file.
     void saveXrayTexture(const std::filesystem::path &path,
                          isize x1, isize x2, isize y1, isize y2) const;
+
+    /** @brief  Returns the most recent stable texture as PNG data
+     *
+     * The cutout is given in texels of the texture. The upper bounds x2 and
+     * y2 are exclusive. Without a cutout, the entire texture is encoded.
+     * The data can be written to a file as is or passed on to other
+     * components (e.g., a network server).
+     *
+     *  @throw Error if the cutout is empty or exceeds the texture.
+     */
+    std::vector<u8> encodeTexture() const;
+    /// Returns a cutout of the most recent stable texture as PNG data (see above).
+    std::vector<u8> encodeTexture(isize x1, isize x2, isize y1, isize y2) const;
+
+    /// Returns the most recent stable X-Ray texture as PNG data.
+    std::vector<u8> encodeXrayTexture() const;
+    /// Returns a cutout of the most recent stable X-Ray texture as PNG data.
+    std::vector<u8> encodeXrayTexture(isize x1, isize x2, isize y1, isize y2) const;
 
     /** @brief  Determines the area of the texture that contains picture data.
      *

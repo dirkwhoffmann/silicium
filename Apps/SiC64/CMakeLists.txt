@@ -26,7 +26,6 @@ target_sources(SiC64 PRIVATE
         Inspector/CPU/SiC64TraceModel.cpp
         Inspector/Memory/SiC64MemoryController.cpp
         Inspector/Memory/SiC64MemDumpModel.cpp
-        Inspector/Memory/SiC64Heatmap.cpp
         Inspector/VIC/SiC64VICController.cpp
         Inspector/SID/SiC64SIDController.cpp
         Inspector/SID/SiC64Waveform.cpp)

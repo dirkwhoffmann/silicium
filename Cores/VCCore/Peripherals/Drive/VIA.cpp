@@ -29,7 +29,7 @@ void VIA6522::_didReset(bool hard)
     t1 = 0x01AA;
     t2 = 0x01AA;
     t1_latch_hi = 0x01;
-    t1_latch_lo = 0x05; // Makes "drive/defaults.prg" happy
+    t1_latch_lo = 0xFF;
     t2_latch_lo = 0xAA;
     feed = (VIACountA0 | VIACountB0);
 }
@@ -738,6 +738,7 @@ VIA6522::pokePCR(u8 value)
     }
     
     // Check CB2 control bits
+    bool oldCB2 = cb2;
     switch(cb2Control()) {
         case 0:
         case 1:
@@ -754,6 +755,9 @@ VIA6522::pokePCR(u8 value)
             cb2 = true;
             break;
     }
+
+    // On VIA2, CB2 is the r/w mode pin. Switching to write mode starts a write.
+    if (isVia2() && oldCB2 && !cb2) drive.fitBlankHalftrack();
 }
 
 u8

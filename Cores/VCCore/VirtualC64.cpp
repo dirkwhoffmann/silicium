@@ -1033,6 +1033,32 @@ CPUDebuggerAPI::disassemble(u16 addr, const string &fmt, isize *len) const
 }
 
 string
+CPUDebuggerAPI::disassemble(u16 addr, const string &fmt, const DasmStyle &style, isize *len) const
+{
+    VC64_PUBLIC
+    checkDisassemblyFormat(fmt);
+
+    std::vector<char> buffer(32 * fmt.size() + 64);
+    auto result = cpu->disassembler.disass(buffer.data(), fmt.c_str(), addr, style);
+    if (len) *len = result;
+
+    return string(buffer.data());
+}
+
+string
+CPUDebuggerAPI::disassembleRecorded(isize nr, const string &fmt, const DasmStyle &style, isize *len) const
+{
+    VC64_PUBLIC
+    checkDisassemblyFormat(fmt);
+
+    std::vector<char> buffer(32 * fmt.size() + 64);
+    auto result = cpu->debugger.disassRecorded(buffer.data(), fmt.c_str(), nr, style);
+    if (len) *len = result;
+
+    return string(buffer.data());
+}
+
+string
 CPUDebuggerAPI::disassembleRecorded(isize nr, const string &fmt, isize *len) const
 {
     VC64_PUBLIC
@@ -1306,14 +1332,6 @@ MemoryDebuggerAPI::memDump(MemType src, u16 addr, isize bytes, isize sz) const
 {
     VC64_PUBLIC
     return mem->debugger.memDump(src, addr, bytes, sz);
-}
-
-void
-MemoryAPI::drawHeatmap(u32 *buffer, isize width, isize height) const
-{
-    VC64_PUBLIC
-    if (width != 256 || height != 256) throw CoreError(CoreError::OPT_INV_ARG, "256 x 256");
-    mem->heatmap.draw(buffer, width, height);
 }
 
 
@@ -1631,6 +1649,42 @@ VideoPortAPI::saveXrayTexture(const fs::path &path, isize x1, isize x2, isize y1
     try { videoPort->saveXrayTexture(path, x1, x2, y1, y2); }
     catch (...) { emu->unlockTexture(); throw; }
     emu->unlockTexture();
+}
+
+std::vector<u8>
+VideoPortAPI::encodeTexture() const
+{
+    VC64_PUBLIC
+    emu->lockTexture();
+    try { auto png = videoPort->encodeTexture(); emu->unlockTexture(); return png; }
+    catch (...) { emu->unlockTexture(); throw; }
+}
+
+std::vector<u8>
+VideoPortAPI::encodeTexture(isize x1, isize x2, isize y1, isize y2) const
+{
+    VC64_PUBLIC
+    emu->lockTexture();
+    try { auto png = videoPort->encodeTexture(x1, x2, y1, y2); emu->unlockTexture(); return png; }
+    catch (...) { emu->unlockTexture(); throw; }
+}
+
+std::vector<u8>
+VideoPortAPI::encodeXrayTexture() const
+{
+    VC64_PUBLIC
+    emu->lockTexture();
+    try { auto png = videoPort->encodeXrayTexture(); emu->unlockTexture(); return png; }
+    catch (...) { emu->unlockTexture(); throw; }
+}
+
+std::vector<u8>
+VideoPortAPI::encodeXrayTexture(isize x1, isize x2, isize y1, isize y2) const
+{
+    VC64_PUBLIC
+    emu->lockTexture();
+    try { auto png = videoPort->encodeXrayTexture(x1, x2, y1, y2); emu->unlockTexture(); return png; }
+    catch (...) { emu->unlockTexture(); throw; }
 }
 
 void

@@ -15,6 +15,7 @@
 #include "XRayTypes.h"
 #include "SubComponent.h"
 #include "utl/gfx/Colors.h"
+#include "Heatmap.h"
 
 namespace vc64 {
 
@@ -115,6 +116,7 @@ public:
 private:
 
     void _dump(Category category, std::ostream &os) const override;
+    void _pause() override;
 
 
     //
@@ -160,6 +162,60 @@ public:
     void computeOverlay(u32 *emuTexture, u32 *xrayTexture);
 
     template <TexelFormat F> void computeOverlay(u32 *emuTexture, u32 *xrayTexture);
+
+
+    //
+    // Drawing the spectrum analyzer
+    //
+
+public:
+
+    static constexpr isize spectrumBars = 64;
+
+private:
+
+    // Access counters (summed up per bar) at the time of the last sample
+    u64 lastTotals[2][spectrumBars] = { };
+
+    // Bar heights and peak markers (0 ... 1) [read, write]
+    float bars[2][spectrumBars] = { };
+    float peaks[2][spectrumBars] = { };
+
+public:
+
+    // Starts a new measurement
+    void resetAccessMonitor();
+
+    // Updates the access recorder after the X-Ray mode has changed
+    void updateAccessRecorder();
+
+    // Draws the spectrum analyzer into the X-Ray texture
+    void drawSpectrum();
+    void drawHeatmap();
+
+    template <TexelFormat F> void drawSpectrum();
+    template <TexelFormat F> void drawHeatmap();
+
+private:
+
+    // Recent activity of the address space
+    Heatmap heatmap;
+
+
+    //
+    // Drawing the crosshairs
+    //
+
+public:
+
+    /* Recomputes the X-Ray texture for XRayMode::XRAY_CROSSHAIRS. The texture
+     * is filled with black and a crosshair is drawn, centered at the beam
+     * position (the cycle that is executed next). 'xray' points to the first
+     * texel of the texture.
+     */
+    void computeCrosshairs(u32 *xray);
+
+    template <TexelFormat F> void computeCrosshairs(u32 *xray);
 
 
     //

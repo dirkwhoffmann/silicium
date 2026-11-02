@@ -17,7 +17,7 @@
 // Port of the old Swift-based emulator's WaveformView (WaveformView.swift):
 // the live audio waveform shown in the SID inspector.
 //
-// A self-contained QQuickItem in the same mold as SiC64DmaView / SiC64Heatmap,
+// A self-contained QQuickItem in the same mold as SiC64DmaView,
 // except the image is produced by SID::draw() -- which also returns an
 // auto-scaling amplitude that is fed back on the next frame -- and the buffer
 // is sized to the item rather than fixed. It self-drives off its window's
