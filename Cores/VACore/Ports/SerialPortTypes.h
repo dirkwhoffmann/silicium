@@ -6,6 +6,7 @@
 //
 // See https://mozilla.org/MPL/2.0 for license information
 // -----------------------------------------------------------------------------
+/// @file
 
 #pragma once
 
@@ -17,6 +18,7 @@ namespace vamiga {
 // Enumerations
 //
 
+/// Type of a device connected to the serial port.
 enum class SerialPortDevice
 {
     NONE,
@@ -65,13 +67,16 @@ struct SerialPortDeviceEnum : utl::Reflectable<SerialPortDeviceEnum, SerialPortD
 // Structures
 //
 
+/// Configuration options of the serial port.
 typedef struct
 {
     SerialPortDevice device;                ///< Serial device type
     bool verbose;                           ///< Verbose mode
+    bool handshake;                     ///< Enables the handshake lines
 }
 SerialPortConfig;
 
+/// State of the serial port.
 typedef struct
 {
     u32 port;                               ///< State of the port pins

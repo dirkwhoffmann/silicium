@@ -6,6 +6,7 @@
 //
 // See https://mozilla.org/MPL/2.0 for license information
 // -----------------------------------------------------------------------------
+/// @file
 
 #pragma once
 
@@ -18,22 +19,24 @@ namespace vamiga {
 // Structures
 //
 
+/// Configuration options of a remote server.
 typedef struct
 {
-    // Enable status
+    /// Enable status
     bool enable;
 
-    // The transport protocol of this server
+    /// The transport protocol of this server
     TransportProtocol transport;
 
-    // The socket port of this server
+    /// The socket port of this server
     u16 port;
 
-    // If true, transmitted packets are shown in RetroShell
+    /// If true, transmitted packets are shown in RetroShell
     bool verbose;
 }
 ServerConfig;
 
+/// State of a remote server.
 typedef struct
 {
     SrvState state;                         ///< State of the server

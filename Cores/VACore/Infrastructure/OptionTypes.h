@@ -6,6 +6,7 @@
 //
 // See https://mozilla.org/MPL/2.0 for license information
 // -----------------------------------------------------------------------------
+/// @file
 
 #pragma once
 
@@ -17,6 +18,7 @@ namespace vamiga {
 // Enumerations
 //
 
+/// Configuration option.
 enum class Opt : long
 {
     // Host
@@ -128,6 +130,7 @@ enum class Opt : long
     CPU_DASM_NUMBERS,       ///< Disassembler number format
     CPU_OVERCLOCKING,       ///< Overclocking factor
     CPU_RESET_VAL,          ///< Register reset value
+    CPU_START_DELAY,        ///< Delay before the CPU starts
     
     // Real-time clock
     RTC_MODEL,              ///< Chip revision
@@ -177,6 +180,7 @@ enum class Opt : long
     // Ports
     SER_DEVICE,             ///< Serial device type
     SER_VERBOSE,            ///< Verbose
+    SER_HANDSHAKE,
     
     // MIDI
     MIDI_DEVICE_OUT,        ///< MIDI output device
@@ -339,6 +343,7 @@ struct OptEnum : utl::Reflectable<OptEnum, Opt>
             case Opt::CPU_DASM_NUMBERS:          return "CPU.DASM_NUMBERS";
             case Opt::CPU_OVERCLOCKING:          return "CPU.OVERCLOCKING";
             case Opt::CPU_RESET_VAL:             return "CPU.RESET_VAL";
+            case Opt::CPU_START_DELAY:           return "CPU.START_DELAY";
                 
             case Opt::RTC_MODEL:                 return "RTC.MODEL";
                 
@@ -381,6 +386,7 @@ struct OptEnum : utl::Reflectable<OptEnum, Opt>
                 
             case Opt::SER_DEVICE:                return "SER.DEVICE";
             case Opt::SER_VERBOSE:               return "SER.VERBOSE";
+            case Opt::SER_HANDSHAKE:             return "SER.HANDSHAKE";
             
             case Opt::MIDI_DEVICE_OUT:           return "MIDI_DEVICE_OUT";
             case Opt::MIDI_DEVICE_IN:            return "MIDI_DEVICE_IN";
@@ -531,6 +537,7 @@ struct OptEnum : utl::Reflectable<OptEnum, Opt>
             case Opt::CPU_DASM_NUMBERS:          return "Disassembler number format";
             case Opt::CPU_OVERCLOCKING:          return "Overclocking factor";
             case Opt::CPU_RESET_VAL:             return "Register reset value";
+            case Opt::CPU_START_DELAY:           return "Delay before the CPU starts";
                 
             case Opt::RTC_MODEL:                 return "Chip revision";
                 
@@ -573,6 +580,7 @@ struct OptEnum : utl::Reflectable<OptEnum, Opt>
                 
             case Opt::SER_DEVICE:                return "Serial device type";
             case Opt::SER_VERBOSE:               return "Verbose";
+            case Opt::SER_HANDSHAKE:             return "RTS/CTS handshake on the null modem cable";
             
             case Opt::MIDI_DEVICE_OUT:           return "MIDI output device";
             case Opt::MIDI_DEVICE_IN:            return "MIDI input device";

@@ -6,6 +6,7 @@
 //
 // See https://mozilla.org/MPL/2.0 for license information
 // -----------------------------------------------------------------------------
+/// @file
 
 #pragma once
 
@@ -17,6 +18,7 @@ namespace vamiga {
 // Enumerations
 //
 
+/// X-Ray visualization mode.
 enum class XRayMode
 {
     XRAY_NONE,
@@ -54,6 +56,7 @@ struct XRayModeEnum : utl::Reflectable<XRayModeEnum, XRayMode>
     }
 };
 
+/// Where X-Ray images are composited.
 enum class XRayCompositor
 {
     CPU,    // The emulator merges the xray texture into the picture
@@ -85,6 +88,7 @@ struct XRayCompositorEnum : utl::Reflectable<XRayCompositorEnum, XRayCompositor>
     }
 };
 
+/// How DMA activity is displayed by X-Ray.
 enum class DmaDisplayMode
 {
     FG_LAYER,
@@ -119,6 +123,7 @@ struct DmaDisplayModeEnum : utl::Reflectable<DmaDisplayModeEnum, DmaDisplayMode>
     }
 };
 
+/// DMA channels visualized by X-Ray.
 enum class DmaChannel
 {
     COPPER,
@@ -171,7 +176,7 @@ struct DmaChannelEnum : utl::Reflectable<DmaChannelEnum, DmaChannel>
     }
 };
 
-/* Number of persisted Opt::XRAY_COLORn slots. XRayMode::XRAY_DMA uses the
+/** Number of persisted Opt::XRAY_COLORn slots. XRayMode::XRAY_DMA uses the
  * first isize(DmaChannel::COUNT) of these, indexed by DmaChannel.
  * XRayMode::XRAY_LAYERS (see PixelEngine::hide) uses all of them, indexed
  * by sprite number 0-7, then playfield 1 and playfield 2 -- both modes
@@ -184,33 +189,35 @@ constexpr isize XRAY_COLOR_COUNT = 10;
 // Structures
 //
 
+/// Configuration options of the X-Ray visualizer.
 typedef struct
 {
-    // X-Ray mode (off, DMA debugger, layer inspector)
+    /// X-Ray mode (off, DMA debugger, layer inspector)
     XRayMode mode;
 
-    // If true, the visualization is blended into the displayed picture. If
-    // false, it is only computed into the dedicated DMA debug texture (see
-    // PixelEngine::xrayTexture), leaving the real picture untouched.
+    /// If true, the visualization is blended into the displayed picture. If
+    /// false, it is only computed into the dedicated DMA debug texture (see
+    /// PixelEngine::xrayTexture), leaving the real picture untouched.
     bool overlay;
 
-    // Individual enable switch for each DMA channel
+    /// Individual enable switch for each DMA channel
     bool visualize[isize(DmaChannel::COUNT)];
     
-    // Color palette
+    /// Color palette
     u32 debugColor[XRAY_COLOR_COUNT];
     
-    // Who merges the xray texture into the picture (if overlay is enabled)
+    /// Who merges the xray texture into the picture (if overlay is enabled)
     XRayCompositor compositor;
 
-    // Display mode
+    /// Display mode
     DmaDisplayMode displayMode;
     
-    // Opacity
+    /// Opacity
     isize opacity;
 }
 XRayConfig;
 
+/// State of the X-Ray visualizer.
 typedef struct
 {
     bool visualizeCopper;                   ///< Show Copper DMA

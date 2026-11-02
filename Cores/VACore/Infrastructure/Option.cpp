@@ -123,6 +123,7 @@ OptionParser::create(Opt opt, i64 arg)
         case Opt::CPU_DASM_NUMBERS:          return enumParser.template operator()<DasmNumbersEnum,DasmNumbers>();
         case Opt::CPU_OVERCLOCKING:          return numParser("x");
         case Opt::CPU_RESET_VAL:             return numParser();
+        case Opt::CPU_START_DELAY:           return numParser();
 
         case Opt::RTC_MODEL:                 return enumParser.template operator()<RTCRevisionEnum,RTCRevision>();
 
@@ -165,6 +166,7 @@ OptionParser::create(Opt opt, i64 arg)
 
         case Opt::SER_DEVICE:                return enumParser.template operator()<SerialPortDeviceEnum,SerialPortDevice>();
         case Opt::SER_VERBOSE:               return boolParser();
+        case Opt::SER_HANDSHAKE:             return boolParser();
 
         case Opt::BLITTER_ACCURACY:          return numParser();
 

@@ -6,6 +6,7 @@
 //
 // See https://mozilla.org/MPL/2.0 for license information
 // -----------------------------------------------------------------------------
+/// @file
 
 #pragma once
 
@@ -17,6 +18,7 @@ namespace vamiga {
 // Enumerations
 //
 
+/// Type of an audio filter.
 enum class FilterType : long
 {
     NONE,
@@ -68,9 +70,10 @@ struct FilterTypeEnum : utl::Reflectable<FilterTypeEnum, FilterType>
 // Structures
 //
 
+/// Configuration options of the audio filters.
 typedef struct
 {
-    // The selected audio filter type
+    /// The selected audio filter type
     FilterType filterType;
 }
 AudioFilterConfig;

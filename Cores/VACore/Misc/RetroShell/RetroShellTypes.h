@@ -6,6 +6,7 @@
 //
 // See https://mozilla.org/MPL/2.0 for license information
 // -----------------------------------------------------------------------------
+/// @file
 
 #pragma once
 
@@ -20,6 +21,7 @@ namespace vamiga {
 // Enumerations
 //
 
+/// Command set of a RetroShell console.
 enum class CommandSet
 {
     Commander,      // Commands for controlling the emulator
@@ -50,6 +52,7 @@ struct CommandSetEnum : utl::Reflectable<CommandSetEnum, CommandSet>
     }
 };
 
+/// Special key of a RetroShell console.
 enum class RSKey
 {
     UP,
@@ -104,8 +107,10 @@ struct RSKeyEnum : utl::Reflectable<RSKeyEnum, RSKey>
 // Structures
 //
 
+/// A line of input for a RetroShell console, together with its source.
 struct InputLine {
 
+    /// Origin of a RetroShell input line.
     enum class Source {
 
         USER,       // User-typed command
@@ -114,16 +119,16 @@ struct InputLine {
         RSH         // RemoteShell request
     };
 
-    // Line number, RPC identifier, etc.
+    /// Line number, RPC identifier, etc.
     isize id;
 
-    // Indicates where the command comes from
+    /// Indicates where the command comes from
     Source type;
 
-    // The command to execute
+    /// The command to execute
     string input;
 
-    /* Completion handler (may be empty).
+    /** Completion handler (may be empty).
      *
      * Called on the emulator thread once the command has been executed, with
      * the console output and a null exception pointer on success, or with the
@@ -133,26 +138,36 @@ struct InputLine {
      * locked, so it must be short and must not block.
      */
     using Completion = std::function<void(const string &output, std::exception_ptr error)>;
+    /// Completion handler of the command
     Completion completion;
 
+    /// Returns true if the line was typed in by the user.
     bool isUserCommand() const { return type == Source::USER; }
+    /// Returns true if the line comes from a script.
     bool isScriptCommand() const { return type == Source::SCRIPT; }
+    /// Returns true if the line is a JSON RPC request.
     bool isRpcCommand() const { return type == Source::RPC; }
+    /// Returns true if the line is a RemoteShell request.
     bool isRshCommand() const { return type == Source::RSH; }
+    /// Returns true if the line is a comment.
     bool isComment() const { return input.size() != 0 && input[0] == '#'; }
 };
 
+/// State of RetroShell.
 typedef struct
 {
-    // Active console
+    /// Active console
     isize console;
     
-    // Relative position of the cursor
+    /// Relative position of the cursor
     isize cursorRel;
 }
 RetroShellInfo;
 
 // Used in operator overloads
-struct vspace { isize lines = 0; };
+/// Vertical space (a number of blank lines) in RetroShell output.
+struct vspace {
+    isize lines = 0;  ///< Number of blank lines
+};
 
 }

@@ -6,6 +6,7 @@
 //
 // See https://mozilla.org/MPL/2.0 for license information
 // -----------------------------------------------------------------------------
+/// @file
 
 #pragma once
 
@@ -18,37 +19,40 @@ namespace vamiga {
 // Structures
 //
 
+/// State of the audio port.
 typedef struct
 {
-    // Indicates whether the final volume is zero
+    /// Indicates whether the final volume is zero
     bool isMuted;
 }
 AudioPortInfo;
 
+/// Configuration options of the audio port.
 typedef struct
 {
-    // Master volume (left and right channel)
+    /// Master volume (left and right channel)
     i64 volL;
     i64 volR;                               ///< Master volume (right)
 
-    // Channel volumes and pan factors
+    /// Channel volumes and pan factors
     i64 vol[4];
     i64 pan[4];                             ///< Pan of each audio channel
 
-    // Sample buffer capacity
+    /// Sample buffer capacity
     isize bufferSize;
 
-    // Selects how the audio buffer is resampled to match the target frequency
+    /// Selects how the audio buffer is resampled to match the target frequency
     SamplingMethod samplingMethod;
 
-    // Adaptive Sample Rate enable switch
+    /// Adaptive Sample Rate enable switch
     bool asr;
 
-    // Performance booster
+    /// Performance booster
     bool idleFastPath;
 }
 AudioPortConfig;
 
+/// Statistics collected by the audio port.
 typedef struct
 {
     isize bufferUnderflows;                 ///< Number of buffer underflows

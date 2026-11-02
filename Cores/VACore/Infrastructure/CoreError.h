@@ -6,6 +6,7 @@
 //
 // See https://mozilla.org/MPL/2.0 for license information
 // -----------------------------------------------------------------------------
+/// @file
 
 #pragma once
 
@@ -13,6 +14,7 @@
 
 namespace vamiga {
 
+/// Error thrown if a request does not match the state of the emulator.
 struct CoreError : public utl::Error {
 
     static constexpr long OK                =   0; ///< No error
@@ -124,10 +126,15 @@ struct CoreError : public utl::Error {
         return "???";
     }
 
+    /// Creates an error with an error code and a descriptive string
     explicit CoreError(long fault, const string &s);
+    /// Creates an error with an error code and a descriptive string
     explicit CoreError(long fault, const char *s) : CoreError(fault, string(s)) { };
+    /// Creates an error with an error code and a file path
     explicit CoreError(long fault, const fs::path &p) : CoreError(fault, p.string()) { };
+    /// Creates an error with an error code and a number
     explicit CoreError(long fault, std::integral auto v) : CoreError(fault, std::to_string(v)) { };
+    /// Creates an error with an error code
     explicit CoreError(long fault) : CoreError(fault, "") { }
 };
 

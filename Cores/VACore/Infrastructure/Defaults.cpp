@@ -129,6 +129,7 @@ Defaults::fallbacks()
     registerDefault(Opt::CPU_DASM_NUMBERS,          (i64)DasmNumbers::HEX);
     registerDefault(Opt::CPU_OVERCLOCKING,          0);
     registerDefault(Opt::CPU_RESET_VAL,             0);
+    registerDefault(Opt::CPU_START_DELAY,           30);
 
     registerDefault(Opt::RTC_MODEL,                 (i64)RTCRevision::OKI);
 
@@ -173,6 +174,7 @@ Defaults::fallbacks()
 
     registerDefault(Opt::SER_DEVICE,                 (i64)SerialPortDevice::NONE);
     registerDefault(Opt::SER_VERBOSE,                0);
+    registerDefault(Opt::SER_HANDSHAKE,              0);
 
     registerDefault(Opt::DENISE_HIDDEN_BITPLANES,    0);
     registerDefault(Opt::DENISE_HIDDEN_SPRITES,      0);

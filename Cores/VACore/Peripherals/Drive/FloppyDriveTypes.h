@@ -6,6 +6,7 @@
 //
 // See https://mozilla.org/MPL/2.0 for license information
 // -----------------------------------------------------------------------------
+/// @file
 
 #pragma once
 
@@ -19,6 +20,7 @@ namespace vamiga {
 // Enumerations
 //
 
+/// Type of a floppy drive.
 enum class FloppyDriveType : long
 {
     DD_35,
@@ -47,6 +49,7 @@ struct FloppyDriveTypeEnum : utl::Reflectable<FloppyDriveTypeEnum, FloppyDriveTy
     }
 };
 
+/// Mechanical model of a floppy drive.
 enum class DriveMechanics
 {
     NONE,
@@ -83,28 +86,29 @@ struct DriveMechanicsEnum : utl::Reflectable<DriveMechanicsEnum, DriveMechanics>
 // Structures
 //
 
+/// Configuration options of a floppy drive.
 typedef struct
 {
-    // Connection status
+    /// Connection status
     bool connected;
     
-    // Drive model
+    /// Drive model
     FloppyDriveType type;
     
-    // Drive mechanics
+    /// Drive mechanics
     DriveMechanics mechanics;
     
-    /* Revolutions per minute. A standard Amiga drive rotates with 300 rpm.
+    /** Revolutions per minute. A standard Amiga drive rotates with 300 rpm.
      * Rotation speed can be measured with AmigaTestKit which analyzes the
      * delay between consecutive index pulses. 300 rpm corresponds to an index
      * pulse delay of 200 ms.
      */
     isize rpm;
     
-    // Delay between ejecting an old disk and inserting a new one
+    /// Delay between ejecting an old disk and inserting a new one
     Cycle diskSwapDelay;
     
-    // Noise settings
+    /// Noise settings
     i16 pan;
     u8 stepVolume;                          ///< Head step volume
     u8 pollVolume;                          ///< Disk polling step volume
@@ -113,6 +117,7 @@ typedef struct
 }
 FloppyDriveConfig;
 
+/// State of a floppy drive.
 typedef struct
 {
     isize nr;                               ///< Number of the drive

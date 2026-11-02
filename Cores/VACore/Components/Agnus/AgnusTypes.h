@@ -6,6 +6,7 @@
 //
 // See https://mozilla.org/MPL/2.0 for license information
 // -----------------------------------------------------------------------------
+/// @file
 
 #pragma once
 
@@ -23,10 +24,10 @@ namespace vamiga {
 // Constants
 //
 
-// Time stamp used for messages that never trigger
+/// Time stamp used for messages that never trigger
 static constexpr i64 NEVER = INT64_MAX;
 
-// Inspection interval in seconds (interval between INS_xxx events)
+/// Inspection interval in seconds (interval between INS_xxx events)
 static constexpr double inspectionInterval = 0.1;
 
 
@@ -34,6 +35,7 @@ static constexpr double inspectionInterval = 0.1;
 // Enumerations
 //
 
+/// Agnus chip revision.
 enum class AgnusRevision : long
 {
     OCS_OLD,          // MOS 8367                (A1000, A2000A)
@@ -75,6 +77,7 @@ struct AgnusRevisionEnum : utl::Reflectable<AgnusRevisionEnum, AgnusRevision>
     }
 };
 
+/// Slot of the event scheduler.
 enum EventSlot : long
 {
     // Primary slots
@@ -126,8 +129,11 @@ enum EventSlot : long
     SLOT_COUNT
 };
 
+/// Returns true if the slot is a primary event slot.
 constexpr bool isPrimarySlot(long s) { return s <= SLOT_SEC; }
+/// Returns true if the slot is a secondary event slot.
 constexpr bool isSecondarySlot(long s) { return s > SLOT_SEC && s <= SLOT_TER; }
+/// Returns true if the slot is a tertiary event slot.
 constexpr bool isTertiarySlot(long s) { return s > SLOT_TER; }
 
 struct EventSlotEnum : utl::Reflectable<EventSlotEnum, EventSlot>
@@ -239,6 +245,7 @@ struct EventSlotEnum : utl::Reflectable<EventSlotEnum, EventSlot>
     }
 };
 
+/// Identifies an event of the event scheduler.
 enum EventID : u8
 {
     EVENT_NONE          = 0,
@@ -491,6 +498,7 @@ enum EventID : u8
     INS_EVENT_COUNT
 };
 
+/// Returns true if the event is a bitplane event of the given bitplane.
 static inline bool isBplxEvent(EventID id, int x)
 {
     switch(id & ~0b11) {
@@ -512,6 +520,7 @@ static inline bool isBplxEvent(EventID id, int x)
 // Structures
 //
 
+/// Static properties of an Agnus revision.
 typedef struct
 {
     bool isOCS;                             ///< The chip is an OCS Agnus
@@ -527,6 +536,7 @@ typedef struct
 }
 AgnusTraits;
 
+/// Configuration options of Agnus.
 typedef struct
 {
     AgnusRevision revision;                 ///< Chip revision
@@ -534,25 +544,27 @@ typedef struct
 }
 AgnusConfig;
 
+/// State of an event slot.
 typedef struct
 {
     EventSlot slot;                         ///< The event slot
     EventID eventId;                        ///< Identifier of the scheduled event (0 if the slot is empty)
     const char *eventName;                  ///< Name of the scheduled event
     
-    // Trigger cycle of the event
+    /// Trigger cycle of the event
     Cycle trigger;
     Cycle triggerRel;                       ///< Time until the event triggers (in master cycles)
     
-    // Trigger frame relative to the current frame
+    /// Trigger frame relative to the current frame
     isize frameRel;
     
-    // The trigger cycle translated to a beam position.
+    /// The trigger cycle translated to a beam position.
     isize vpos;
     isize hpos;                             ///< Horizontal position at which the event triggers
 }
 EventSlotInfo;
 
+/// Clocks of the machine and the current beam position.
 typedef struct
 {
     Cycle cpuClock;                         ///< CPU clock (in master cycles)
@@ -566,6 +578,7 @@ typedef struct
 }
 EventInfo;
 
+/// State of Agnus (beam position, DMA, registers).
 typedef struct
 {
     isize vpos;                             ///< Vertical beam position
@@ -604,6 +617,7 @@ typedef struct
 }
 AgnusInfo;
 
+/// Statistics collected by Agnus (DMA usage).
 typedef struct
 {
     isize usage[BUS_COUNT];                 ///< Number of DMA slots used by each bus owner
@@ -628,13 +642,13 @@ AgnusMetrics;
  * serviceRegEvent()
  */
 
-typedef u32 EventFlags;
+typedef u32 EventFlags;                 ///< Bit mask of EVFL flags
 
 namespace EVFL
 {
-constexpr u32 EOL                = (1 << 0);
-constexpr u32 HSYNC              = (1 << 1);
-constexpr u32 PROBE              = (1 << 2);
+constexpr u32 EOL                = (1 << 0);  ///< Event flag: End of line
+constexpr u32 HSYNC              = (1 << 1);  ///< Event flag: Horizontal sync
+constexpr u32 PROBE              = (1 << 2);  ///< Event flag: Probe the logic analyzer
 };
 
 }

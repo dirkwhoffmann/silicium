@@ -6,6 +6,7 @@
 //
 // See https://mozilla.org/MPL/2.0 for license information
 // -----------------------------------------------------------------------------
+/// @file
 
 #pragma once
 
@@ -17,45 +18,46 @@ namespace vamiga {
 // Constants
 //
 
-// Constants from exec/errors.h
+/// Constants from exec/errors.h
 constexpr i8    IOERR_OPENFAIL      = -1;
-constexpr i8    IOERR_ABORTED       = -2;
-constexpr i8    IOERR_NOCMD         = -3;
-constexpr i8    IOERR_BADLENGTH     = -4;
-constexpr i8    IOERR_BADADDRESS    = -5;
-constexpr i8    IOERR_UNITBUSY      = -6;
-constexpr i8    IOERR_SELFTEST      = -7;
-constexpr i8    TDERR_WRITEPROT     = 28;   // The disk is write protected (trackdisk.device)
-constexpr i8    TDERR_DISKCHANGED   = 29;   // No disk in the drive (trackdisk.device)
+constexpr i8    IOERR_ABORTED       = -2;  ///< IO error: The request was aborted
+constexpr i8    IOERR_NOCMD         = -3;  ///< IO error: Unknown command
+constexpr i8    IOERR_BADLENGTH     = -4;  ///< IO error: Invalid length
+constexpr i8    IOERR_BADADDRESS    = -5;  ///< IO error: Invalid address
+constexpr i8    IOERR_UNITBUSY      = -6;  ///< IO error: The unit is busy
+constexpr i8    IOERR_SELFTEST      = -7;  ///< IO error: The self test failed
+constexpr i8    TDERR_WRITEPROT     = 28;   ///< The disk is write protected (trackdisk.device)
+constexpr i8    TDERR_DISKCHANGED   = 29;   ///< No disk in the drive (trackdisk.device)
 
-// Answer to TD_GETDRIVETYPE from a device that understands the NSD commands
+/// Answer to TD_GETDRIVETYPE from a device that understands the NSD commands
 constexpr u32   DRIVE_NEWSTYLE      = 0x4E535459;   // 'NSTY'
 
-// Device type reported by NSCMD_DEVICEQUERY
+/// Device type reported by NSCMD_DEVICEQUERY
 constexpr u16   NSDEVTYPE_TRACKDISK = 5;
 
-// Size of the NSDeviceQueryResult structure this device fills in
+/// Size of the NSDeviceQueryResult structure this device fills in
 constexpr u32   NSD_QUERY_SIZE      = 16;
 
-// Size of the DriveGeometry structure this device fills in
+/// Size of the DriveGeometry structure this device fills in
 constexpr u32   DG_SIZE             = 32;
 
-// Device type reported by TD_GETGEOMETRY
+/// Device type reported by TD_GETGEOMETRY
 constexpr u8    DG_DIRECT_ACCESS    = 0;
 
-// Offsets into the IOStdReq struct
+/// Offsets into the IOStdReq struct
 constexpr u32   IO_COMMAND          = 0x1C;
-constexpr u32   IO_ERROR            = 0x1F;
-constexpr u32   IO_ACTUAL           = 0x20;
-constexpr u32   IO_LENGTH           = 0x24;
-constexpr u32   IO_DATA             = 0x28;
-constexpr u32   IO_OFFSET           = 0x2C;
+constexpr u32   IO_ERROR            = 0x1F;  ///< Offset of the IORequest error field
+constexpr u32   IO_ACTUAL           = 0x20;  ///< Offset of the IORequest actual field
+constexpr u32   IO_LENGTH           = 0x24;  ///< Offset of the IORequest length field
+constexpr u32   IO_DATA             = 0x28;  ///< Offset of the IORequest data pointer
+constexpr u32   IO_OFFSET           = 0x2C;  ///< Offset of the IORequest offset field
 
 
 //
 // Enumerations
 //
 
+/// Command of the hard drive controller.
 enum class IoCommand
 {
     // Standard commands
@@ -168,6 +170,7 @@ struct IoCommandEnum : utl::Reflectable<IoCommandEnum, IoCommand>
     }
 };
 
+/// State of a hard drive controller.
 enum class HdcState
 {
     UNDETECTED,     // The controller waits to be detected by the OS
@@ -201,11 +204,12 @@ struct HdcStateEnum : utl::Reflectable<HdcStateEnum, HdcState>
 // Structures
 //
 
+/// Configuration options of a hard drive controller.
 typedef struct
 {
     bool connected;                         ///< The controller is connected
 
-    /* Largest drive this controller accepts, in MB (1...16384)
+    /** Largest drive this controller accepts, in MB (1...16384)
      *
      * Controllers of the era could only address so much, and an image beyond
      * their reach would not have worked on the hardware being emulated. 504
@@ -216,6 +220,7 @@ typedef struct
 }
 HdcConfig;
 
+/// State of a hard drive controller.
 typedef struct
 {
     isize nr;                               ///< Number of the controller
@@ -224,9 +229,10 @@ typedef struct
 }
 HdcInfo;
 
+/// Counters of the commands executed by a hard drive controller.
 typedef struct
 {
-    // Tracks the number of executed commands
+    /// Tracks the number of executed commands
     isize cmdCount[29];
 }
 HdcMetrics;
