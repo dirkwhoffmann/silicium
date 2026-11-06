@@ -145,6 +145,10 @@ Agnus::operator << (SerResetter &worker)
     scheduleFirstBplEvent();
     scheduleFirstDasEvent();
     if (insEvent) { data[SLOT_INS] = insMask; scheduleRel <SLOT_INS> (0, insEvent); }
+
+    // The beamtraps are set by the debugger, too, so their event has to
+    // outlive a reset the same way (it is lost with the event slots above)
+    debugger.beamtraps.scheduleNextEvent();
 }
 
 i64
